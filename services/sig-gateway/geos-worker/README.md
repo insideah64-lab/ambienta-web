@@ -27,6 +27,8 @@ Para coordenadas negativas **usá `--bbox=...` con el signo igual**, de modo que
 - Si dos polígonos solo tocan la BBOX en un punto o segmento de área nula, esa intersección no genera un polígono.
 - El archivo original se abre en **solo lectura**; su SHA-256 se registra en el manifiesto. La exportación contiene solo etiquetas depuradas y el índice de origen; **no reproduce todos los atributos** del archivo original.
 - El resultado se escribe de forma atómica en un archivo nuevo, separado del original y del informe.
+- **No sobrescribe archivos existentes**: usá una ruta nueva para la salida y el informe de cada ejecución; las auditorías previas se preservan.
+- Los anillos que cruzan el antimeridiano se bloquean porque necesitan tratamiento geodésico específico.
 - Los grados geográficos no representan metros cuadrados. No calcula superficies certificables, no acredita área de influencia y no asigna perímetro oficial a Diablillos.
 - La licencia del conjunto de datos debe verificarse con la institución emisora antes de redistribuirlo.
 
