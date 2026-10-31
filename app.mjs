@@ -11,7 +11,7 @@ const heading=document.querySelector('#heading');
 const subtitle=document.querySelector('#subtitle');
 const breadcrumb=document.querySelector('#breadcrumb');
 const mainAction=document.querySelector('#main-action');
-let route='pga',program='all',selectedMeasure='MED-001',searchText='',state;
+let route='resumen',program='all',selectedMeasure='MED-001',searchText='',state;
 try {
   state=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')||createDemoState();
   validateState(state);
