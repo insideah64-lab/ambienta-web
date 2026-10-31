@@ -22,7 +22,7 @@ returns jsonb language plpgsql volatile security invoker
 set search_path = ''
 as $$
 declare
- v_now bigint := pg_catalog.floor(pg_catalog.extract(epoch from pg_catalog.clock_timestamp()))::bigint;
+ v_now bigint := pg_catalog.floor(pg_catalog.date_part('epoch', pg_catalog.clock_timestamp()))::bigint;
  v_seconds integer;
  v_scope text;
  v_limit integer;
@@ -51,8 +51,8 @@ begin
    select b.used into v_used
      from ambienta_sig.request_budget as b
      where b.period_seconds=v_seconds and b.bucket=v_bucket and b.scope=v_scope;
-   if pg_catalog.coalesce(v_used,0)>=v_limit then
-      v_retry := pg_catalog.greatest(1,v_seconds - (v_now % v_seconds))::integer;
+   if coalesce(v_used,0)>=v_limit then
+      v_retry := greatest(1,v_seconds - (v_now % v_seconds))::integer;
       return pg_catalog.jsonb_build_object('allowed',false,
          'reason','GLOBAL_BUDGET_EXHAUSTED','retryAfterSeconds',v_retry,
          'periodSeconds',v_seconds,'scope',v_scope);
