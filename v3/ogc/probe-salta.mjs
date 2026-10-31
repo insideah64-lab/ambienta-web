@@ -22,17 +22,10 @@ for(const endpoint of endpoints){
    raw+=decoder.decode(value,{stream:true});
   }
   // Extract a bounded list of advertised WFS FeatureType identifiers.
-  const normalized=raw.replaceAll('wfs:FeatureType','FeatureType')
-    .replaceAll('wfs:Name','Name').replaceAll('wfs:Title','Title');
-  const entries=normalized.split('<FeatureType>').slice(1).map(group=>{
-   const block=group.split('</FeatureType>')[0];
-   const name=block.includes('<Name>')?block.split('<Name>')[1].split('</Name>')[0]:null;
-   const title=block.includes('<Title>')?block.split('<Title>')[1].split('</Title>')[0]:null;
-   return {name,title};
-  }).filter(x=>x.name);
-  item.featureTypeCount=entries.length;
-  item.allNames=entries.slice(0,65);
-  item.matchingNames=entries.filter(x=>/depart|limite|cuenca|hidro|provincia|riesgo|rio|agua/i.test(x.name+' '+x.title)).slice(0,45);
+  const names=[...raw.matchAll(/Name>([^<]+)</g)].map(m=>m[1]).filter(n=>n.includes(':'));
+  item.featureTypeCount=names.length;
+  item.allNames=names.slice(0,90);
+  item.matchingNames=names.filter(n=>/depart|limite|cuenca|hidro|provincia|riesgo|rio|agua/i.test(n)).slice(0,45);
   if(!r.ok)item.error='HTTP '+r.status+' '+raw.slice(0,140);
   else if(!/<(?:[a-zA-Z0-9]+:)?WFS_Capabilities/.test(raw))item.error='Not WFS XML: '+raw.slice(0,170);
  }catch(e){item.error=String(e.message||e)+' | '+String(e.cause?.message||'');}
