@@ -46,7 +46,7 @@ function validate(v:unknown):SourceRequest{
  return {layer:obj.layer as SourceRequest['layer'],bbox:[...b]};
 }
 async function sha256(bytes:Uint8Array){
- const digest=await crypto.subtle.digest('SHA-256',bytes);
+ const digest=await crypto.subtle.digest('SHA-256',bytes.buffer as ArrayBuffer);
  return Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
 }
 async function fromWfs(request:SourceRequest){
