@@ -114,7 +114,10 @@ export function GeoMap({compact=false,province}:Props){
    // Browser-local only: do not send geometry to Supabase or claim ownership of a real project perimeter.
    localStorage.setItem(WORKING_LAYER_KEY,JSON.stringify(next));
    setLayer(next);
-   if(mapRef.current)mountWorking(mapRef.current,next,true);
+   if(mapRef.current){
+    setTilesLoaded(false);
+    mountWorking(mapRef.current,next,true);
+   }
   }catch(cause){setError(cause instanceof Error?cause.message:'No fue posible validar o guardar el archivo.');}
   finally{setBusy(false);}
  }
@@ -140,6 +143,7 @@ export function GeoMap({compact=false,province}:Props){
     <span>{layer?'Capa importada: NO VERIFICADA, sin asociación oficial al proyecto.':'Vista regional orientativa, NO ubicación ni perímetro del proyecto.'}</span>
    </div>
    {status==='loading'&&<div className="geo-status" role="status">Preparando cartografía…</div>}
+   {!tilesLoaded&&status==='ready'&&<div className="geo-status" role="status">Cargando teselas para esta vista…</div>}
    {status==='unavailable'&&<div className="geo-status geo-error" role="status">Falló la carga de teselas. Verificá la conexión; no se utilizan mapas inventados.</div>}
    <div className="geo-meta">
     <span>{cursor||'Mapa interactivo · acercá, alejá o desplazá'}</span>
