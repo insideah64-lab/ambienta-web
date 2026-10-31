@@ -1,0 +1,62 @@
+name: AMBIENTA V3 — validación de versión pública (sin desplegar)
+on:
+  push:
+    branches: ['feature/ambienta-v3-topologia-publicacion-2026-10-31']
+    paths:
+      - 'v3/**'
+      - 'tests/react-v3/**'
+      - '.github/workflows/v3-preview.yml'
+      - '.github/workflows/pages.yml'
+  pull_request:
+    paths:
+      - 'v3/**'
+      - 'tests/react-v3/**'
+      - '.github/workflows/v3-preview.yml'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  v3-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Build immutable V1 and V2 references
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+          (cd apps/web && npm ci --no-audit --no-fund && npm run build)
+          mkdir -p dist/v2
+          cp -a apps/web/dist/. dist/v2/
+          sha256sum dist/index.html dist/v2/index.html > /tmp/ambienta-v1-v2.sha
+      - name: Stage V3, run geospatial regressions and verify V1/V2 integrity
+        run: |
+          bash v3/scripts/build-v3.sh
+          node --test tests/react-v3/aoi-clip.test.mjs
+          sha256sum -c /tmp/ambienta-v1-v2.sha
+          test -s dist/v3/index.html
+      - name: Install Chromium
+        working-directory: apps/web-v3
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.56.1 --no-fund --no-audit
+          npx playwright install --with-deps chromium
+      - name: Test V3 in a real browser
+        run: |
+          python3 -m http.server 8787 --bind 127.0.0.1 --directory dist >/tmp/ambienta-v3-preview.log 2>&1 &
+          for i in $(seq 1 15); do curl -fsS http://127.0.0.1:8787/v3/index.html >/dev/null && break || sleep 1; done
+          node apps/web-v3/scripts/topology-smoke.mjs
+          sha256sum -c /tmp/ambienta-v1-v2.sha
+      - name: Keep QA build (not a deployment)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-v3-topology-preview
+          path: |
+            dist/v3/
+            dist/v2/index.html
+          retention-days: 14
