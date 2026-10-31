@@ -25,6 +25,7 @@ function headers(origin:string|null){
   'content-security-policy':"default-src 'none'; frame-ancestors 'none'",
   'access-control-allow-methods':'POST, OPTIONS',
   'access-control-allow-headers':'Authorization, apikey, Content-Type, x-client-info',
+  'access-control-expose-headers':'Retry-After',
   ...(origin?{'access-control-allow-origin':origin}:{})};
 }
 function json(status:number,body:unknown,origin:string|null,retryAfterSeconds=0):Response{
