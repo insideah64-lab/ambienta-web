@@ -44,3 +44,10 @@ test('WFS completo mantiene geometría y depura campos no aprobados',()=>{
  assert.deepEqual(result.geojson.features[0].properties,{name:'Municipio QA'});
  assert.equal(JSON.stringify(input),copy);
 });
+
+test('nombre en español se conserva solo como etiqueta depurada',()=>{
+ const input={type:'FeatureCollection',numberOfFeatures:1,
+  features:[{...polygon,properties:{nombre:'CACHI',dni:'no difundir'}}]};
+ const out=validateGeoJson(input);
+ assert.deepEqual(out.geojson.features[0].properties,{name:'CACHI'});
+});
