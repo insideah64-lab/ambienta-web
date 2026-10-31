@@ -24,6 +24,15 @@ jobs:
         run: |
           npm ci --no-fund --no-audit
           npm run build
+          # V2 is an independent static app under /v2/, keeping the stable V1 at /.
+          mkdir -p web/assets
+          cp assets/*.jpg web/assets/
+          cd apps/web
+          npm ci --no-fund --no-audit
+          npm run build
+          cd ../..
+          mkdir -p dist/v2
+          cp -a apps/web/dist/. dist/v2/
           touch dist/.nojekyll
       - name: Comprobar HTML, recursos y UTF-8
         run: |
@@ -39,6 +48,10 @@ jobs:
           assert list((root/"assets").glob("*.js"))
           assert list((root/"assets").glob("*.css"))
           assert (root/".nojekyll").exists()
+          v2=(root/"v2"/"index.html").read_text(encoding="utf-8")
+          assert '<div id="root"></div>' in v2
+          assert list((root/"v2"/"assets").glob("*.js"))
+          assert list((root/"v2"/"assets").glob("*.css"))
           PY
       - name: Sincronizar la rama gh-pages con el sitio compilado
         env:
