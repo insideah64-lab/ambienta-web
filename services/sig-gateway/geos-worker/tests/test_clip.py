@@ -83,7 +83,7 @@ class TestAdvancedGeoClip(unittest.TestCase):
         report = self.root / "report.json"
         start_sha = hashlib.sha256(source.read_bytes()).hexdigest()
         p = subprocess.run([sys.executable, str(ROOT/"clip.py"),
-            "--input",str(source),"--bbox","-1,-1,1,1",
+            "--input",str(source),"--bbox=-1,-1,1,1",
             "--output",str(output),"--report",str(report)],
             capture_output=True,text=True,check=False)
         self.assertEqual(p.returncode,2,p.stderr)
