@@ -1,0 +1,38 @@
+name: AMBIENTA V3 — QA polígonos reales IDESA (sin publicar)
+on:
+  push:
+    branches: ['feature/ambienta-v3-wfs-bbox-2026-10-31']
+    paths:
+      - 'v3/overrides/**'
+      - 'v3/ogc/**'
+      - 'tests/react-v3/**'
+      - '.github/workflows/v3-wfs-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  polygons:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Build isolated V3 only
+        run: bash v3/scripts/build-v3.sh
+      - name: Unit-test geojson completeness, geometry clipping and provider allowlist
+        run: |
+          node --test tests/react-v3/*.test.mjs
+      - name: Install Chromium
+        working-directory: apps/web-v3
+        run: |
+          npm install --no-save --ignore-scripts playwright@1.56.1 --no-fund --no-audit
+          npx playwright install --with-deps chromium
+      - name: 'Browser QA: synthetic topological and real full municipal polygons'
+        run: |
+          python3 -m http.server 8787 --bind 127.0.0.1 --directory dist >/tmp/ambienta-v3-wfs.log 2>&1 &
+          for i in $(seq 1 15); do curl -fsS http://127.0.0.1:8787/v3/index.html >/dev/null && break || sleep 1; done
+          node apps/web-v3/scripts/topology-smoke.mjs
+          node apps/web-v3/scripts/idesa-wfs-real-smoke.mjs

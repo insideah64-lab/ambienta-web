@@ -37,7 +37,7 @@ jobs:
       - name: Stage V3, run geospatial regressions and verify V1/V2 integrity
         run: |
           bash v3/scripts/build-v3.sh
-          node --test tests/react-v3/aoi-clip.test.mjs
+          node --test tests/react-v3/*.test.mjs
           sha256sum -c /tmp/ambienta-v1-v2.sha
           test -s dist/v3/index.html
       - name: Install Chromium
