@@ -3,6 +3,8 @@ import type {Map as MapLibreMap} from 'maplibre-gl';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {IS_DIABLILLOS_CASE} from '../../lib/demo';
+// @ts-ignore: shared official WFS URL allowlist is a pure JS GIS adapter
+import {buildIdesaWfsUrl,IDESA_WFS_CAPABILITIES} from './idesa-wfs.mjs';
 // @ts-ignore: shared Georef public API adapter
 import {queryGeoref,georefUrl} from '../georef/georef-service.mjs';
 // @ts-ignore: legacy pure JS parser intentionally shared with Node's native test runner
@@ -340,6 +342,15 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
       {clipped.selectedCount===0&&clipped.unsupportedCount===0&&<p>La capa importada no tiene geometrías dentro de la ventana.</p>}
       <button type="button" onClick={exportClip} disabled={clipped.unsupportedCount>0||clipped.selectedCount===0}>Descargar recorte GeoJSON</button>
      </div>}
+     <div className="geo-catalogue" data-idesa-wfs="bounded-official-provider">
+      <strong>IDESA Salta · polígonos vectoriales oficiales (WFS)</strong>
+      <p>La ventana se envía al servidor provincial como BBOX EPSG:4326. Su respuesta contiene polígonos completos de las entidades intersectadas; AMBIENTA los recorta después de importar.</p>
+      <a href={buildIdesaWfsUrl(aoiLocal.bbox,'municipios')} target="_blank" rel="noopener noreferrer">Abrir consulta WFS de municipios · GeoJSON</a>
+      <a href={buildIdesaWfsUrl(aoiLocal.bbox,'otbn')} target="_blank" rel="noopener noreferrer">Abrir consulta WFS de OTBN 2009 · GeoJSON</a>
+      <a href={IDESA_WFS_CAPABILITIES} target="_blank" rel="noopener noreferrer">Consultar catálogo WFS de IDESA</a>
+      <small>Guardá el GeoJSON que devuelve el proveedor e importalo abajo. El WFS no habilita lectura CORS desde GitHub Pages. Límite: 20 entidades; si hay más, AMBIENTA rechaza el archivo como parcial. Tampoco acepta archivos superiores a 1 MiB o con más de 12.000 vértices. Sin simplificación silenciosa ni sustitución de fuentes.</small>
+      <small>Fuente: Infraestructura de Datos Espaciales de Salta. La disponibilidad y licencia de cada conjunto deben verificarse en su ficha. La BBOX no es un perímetro de proyecto.</small>
+     </div>
      <button type="button" disabled={busy||!!layer} onClick={loadGeorefCentroids}>Consultar centroides departamentales Georef · Salta</button>
      <small>Consulta provincial acotada: centroides puntuales, no polígonos ni base nacional. Solo se muestra la intersección con tu ventana. La consulta está disponible cuando no hay otra capa local activa; no reemplaza archivos importados automáticamente.</small>
      {!layer&&<span>Importá GeoJSON local o consultá los centroides de Georef para recortarlos automáticamente.</span>}
