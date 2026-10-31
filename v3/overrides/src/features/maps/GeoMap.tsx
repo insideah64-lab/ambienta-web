@@ -388,7 +388,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
        <strong>Recorte automático de polígonos IDESA</strong>
        <button type="button" disabled={busy||!!layer||!SIG_GATEWAY_URL} onClick={()=>loadIdesaPolygons('municipios')}>Consultar y recortar municipios automáticamente</button>
        <button type="button" disabled={busy||!!layer||!SIG_GATEWAY_URL} onClick={()=>loadIdesaPolygons('otbn')}>Consultar y recortar OTBN automáticamente</button>
-       <small>{SIG_GATEWAY_URL?'Gateway SIG: consulta WFS acotada, verificaciones de integridad, original preservado localmente y recorte topológico separado.':'Consulta automática aún no activada en este despliegue; utilizá los enlaces manuales.'}</small>
+       <small>{SIG_GATEWAY_URL?'Gateway SIG: consulta WFS acotada y recorte topológico con trazabilidad. Cupo compartido para proteger IDESA: si se agota, la solicitud se bloquea sin generar datos parciales.':'Consulta automática aún no activada en este despliegue; utilizá los enlaces manuales.'}</small>
       </div>
       <strong>IDESA Salta · polígonos vectoriales oficiales (WFS)</strong>
       <p>La ventana se envía al servidor provincial como BBOX EPSG:4326. Su respuesta contiene polígonos completos de las entidades intersectadas; AMBIENTA los recorta después de importar.</p>
