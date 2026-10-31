@@ -138,3 +138,12 @@ dialog::backdrop{background:#021a1dd9;backdrop-filter:blur(5px)}
 @media(max-width:760px){.app-shell{display:block}.sidebar{height:auto;padding:13px}.main-area{padding:0 14px}.landscape-banner{height:210px}.sidebar .brand-icon{flex:0 0 43px}.sidebar-scenery{display:none}.dash-duo,.dash-fields{grid-template-columns:1fr}.dash-facts{grid-template-columns:repeat(2,1fr)}.overview-kpis{grid-template-columns:repeat(2,1fr)!important}.metric-card{min-height:90px!important;padding:12px!important}.metric-card .metric-symbol{width:38px;flex-basis:38px;height:38px}.metric-card .metric-value{font-size:23px}.topline{height:auto;min-height:58px;gap:8px}.province{display:none}.page-head{margin:26px 0 20px}.demo-warning{font-size:11px}.dash-project .project-heading{align-items:flex-start;flex-direction:column}}
 @media(max-width:420px){.overview-kpis{gap:9px!important}.metric-card{gap:9px!important}.metric-card .metric-label{font-size:9px}.metric-card .metric-desc{font-size:9px}.monitor-bar{grid-template-columns:85px 1fr 19px}}
 @media(prefers-reduced-motion:reduce){.dash-panel,.metric-card{animation:none!important}}
+
+/* Decorative landscapes cropped from the user-approved visual mockup.
+   These are atmosphere only, NEVER site photography or geospatial evidence. */
+.landscape-banner{background-image:linear-gradient(90deg,#061b1ed1,#09282c60 45%,#061e20bc),url('./assets/hero-mountain.jpg');background-size:cover;background-position:center 42%}
+.landscape-banner svg{opacity:.31;mix-blend-mode:multiply}
+.landscape-banner:after{background:linear-gradient(90deg,#071e20c7 0%,#0828274d 43%,#0625242c 78%,#071e20a5 100%),linear-gradient(0deg,#092629 0%,transparent 85%)}
+.sidebar-scenery{background-image:linear-gradient(180deg,#072b2900,#0a3b2d1e 50%,#041b16a8),url('./assets/forest-mountains.jpg');background-size:cover;background-position:center}
+.sidebar-scenery svg{opacity:.24;mix-blend-mode:multiply}
+@media(max-width:760px){.landscape-banner{background-position:center top}}
