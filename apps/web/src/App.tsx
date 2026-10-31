@@ -17,18 +17,19 @@ import { applyAndPersist, type Transaction } from './lib/transactions';
 import { DemoActionDialog, type DemoActionKind } from './features/demo/DemoActionDialog';
 import { CloudWorkspace } from './features/cloud/CloudWorkspace';
 import { ReferenceDashboard } from './features/dashboard/ReferenceDashboard';
+import { GeoMap } from './features/maps/GeoMap';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
 const NAV_PRIMARY: Navigation[] = [
   {path:'/',label:'Resumen',icon:LayoutDashboard,description:'Resumen visual del expediente y sus compromisos.'},
   {path:'/expediente',label:'Expediente',icon:FolderOpen,description:'Alcance, responsables y fases del proyecto.'},
-  {path:'/area',label:'Área de estudio',icon:Globe2,description:'Ubicación conceptual y datos territoriales disponibles.'},
+  {path:'/area',label:'Área de estudio',icon:Globe2,description:'Cartografía regional real; ubicación y polígonos del proyecto pendientes de respaldo.'},
   {path:'/impactos',label:'Impactos',icon:Leaf,description:'Impactos ambientales vinculados al proyecto.'},
   {path:'/pga',label:'Plan de Gestión',icon:Layers3,description:'Programas, medidas, indicadores y trazabilidad ambiental.'},
   {path:'/monitoreo',label:'Monitoreo',icon:Activity,description:'Inspecciones, resultados y seguimiento en campo.'},
   {path:'/auditorias',label:'Auditorías',icon:ShieldCheck,description:'Hallazgos, controles y acciones correctivas.'},
   {path:'/evidencias',label:'Evidencias',icon:FileText,description:'Referencias documentales y revisiones registradas.'},
-  {path:'/mapas',label:'Mapas y SIG',icon:Map,description:'Visualización cartográfica preliminar, sin geometría validada.'},
+  {path:'/mapas',label:'Mapas y SIG',icon:Map,description:'Mapa interactivo OSM regional, sin perímetro de proyecto.'},
   {path:'/reportes',label:'Reportes',icon:FolderOpen,description:'Resumen exportable del expediente de demostración.'}
 ];
 const NAV_TOOLS: Navigation[] = [
@@ -50,15 +51,8 @@ function measureTone(status: string): 'neutral'|'mint'|'amber'|'blue' {
 function Panel({kicker, title, children, action}: {kicker:string;title:string;children:React.ReactNode;action?:React.ReactNode}) {
   return <section className="v2-panel"><header className="v2-panel-title"><div><p className="v2-kicker">{kicker}</p><h2>{title}</h2></div>{action}</header>{children}</section>;
 }
-function MapPreview({ province }: { province:string }) {
-  // A deliberate placeholder. No cartographic layer, polygon, geodata or site-specific coordinates exist.
-  return <div className="v2-map">
-    <div className="v2-map-grid" aria-hidden="true"/>
-    <div className="v2-map-boundary" aria-hidden="true"/>
-    <div className="v2-map-bubble"><MapPin size={16}/>{province} · AR</div>
-    <div className="v2-map-legend"><span className="v2-map-dot"/>Localización conceptual</div>
-    <div className="v2-map-disclaimer">Ilustración conceptual · Sin geometría GIS validada</div>
-  </div>;
+function MapPreview({province}:{province:string}) {
+ return <GeoMap province={province}/>;
 }
 function Info({label,value,icon:Icon}:{label:string;value:string;icon:LucideIcon}) {
   return <div className="v2-info"><Icon size={18}/><div><small>{label}</small><strong>{value}</strong></div></div>;
@@ -80,9 +74,9 @@ function Expediente({data}: {data:DemoState}) {
         <ul>{DIABLILLOS_SOURCES.map((src:{id:string;label:string;url:string})=><li key={src.id}><a href={src.url} target="_blank" rel="noreferrer">{src.id} · {src.label} <ExternalLink size={13}/></a></li>)}</ul>
         <p>Las medidas, inspecciones, revisiones, hallazgos y acciones en este expediente son <b>simulaciones del laboratorio</b>. No se realizaron visitas de campo.</p></div> : <p className="v2-panel-note">Expediente ficticio. La edición completa sigue disponible en la aplicación V1 durante la migración.</p>}
     </Panel>
-    <Panel kicker="GIS — PENDIENTE DE INTEGRACIÓN" title="Ubicación y geometría">
+    <Panel kicker="MAPA BASE REAL · GEOMETRÍA DEL PROYECTO PENDIENTE" title="Ubicación y geometría">
       <MapPreview province={p.province}/>
-      <p className="v2-panel-note">No se asignaron coordenadas ni polígonos. MapLibre se incorporará cuando exista una fuente geoespacial validada.</p>
+      <p className="v2-panel-note">Mapa base OpenStreetMap a nivel regional. El área exacta del proyecto y sus límites no están verificados ni representados.</p>
     </Panel>
   </div>;
 }
@@ -93,7 +87,7 @@ function AreaEstudio({data}:{data:DemoState}) {
     <p className="v2-panel-note">No hay una superficie, coordenadas ni polígono de predio verificados asociados a esta demostración. No deben interpretarse mapas ilustrativos como cartografía técnica.</p>
   </Panel><Panel kicker="VISTA CARTOGRÁFICA" title="Geometría pendiente">
     <MapPreview province={data.project.province}/>
-    <p className="v2-panel-note">Sin geometría GIS validada. El mapa no representa el emplazamiento real.</p>
+    <p className="v2-panel-note">La cartografía base es auténtica y regional; no hay coordenadas ni perímetros verificables asociados al expediente.</p>
   </Panel></div>;
 }
 function Impactos({data}:{data:DemoState}) {

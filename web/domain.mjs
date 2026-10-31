@@ -160,6 +160,14 @@ export function changeMeasureStatus(state,id,status,actor='Técnico de demostrac
       const accepted=s.evidence.some(e=>e.measureId===id && e.status==='validada');
       const inspection=s.inspections.some(i=>i.measureId===id && i.result==='conforme');
       if(!accepted||!inspection)throw new Error('Para verificar la medida se requieren inspección conforme y evidencia validada por un revisor.');
+      // QA Diablillos: never accept a cherry-picked conforming inspection while
+      // another observed result or an open finding for the SAME measure remains.
+      const hasObservation=s.inspections.some(i=>i.measureId===id && i.result==='observada');
+      const hasOpenFinding=s.findings.some(f=>f.status==='abierto' &&
+        s.inspections.some(i=>i.id===f.inspectionId && i.measureId===id));
+      if(hasObservation||hasOpenFinding)throw new Error(
+        'La medida tiene inspecciones observadas o hallazgos abiertos; no puede marcarse verificada.'
+      );
     }
     m.status=status;log(s,'measure.status',actor,id+' → '+status,iso(now));
   });

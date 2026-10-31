@@ -1,13 +1,13 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   AlertTriangle, ArrowDownToLine, ArrowRight, CalendarDays,
   ClipboardCheck, Clock3, Cloud, Droplets, FileText,
-  History, Leaf, Layers3, MapPin, Minus, Plus,
+  History, Leaf, MapPin,
   ShieldCheck, Sprout, Wind, Volume2
 } from 'lucide-react';
 import type { DemoState, Summary } from '../../lib/demo';
 import { statusText, IS_DIABLILLOS_CASE } from '../../lib/demo';
+import {GeoMap} from '../maps/GeoMap';
 
 type Props = {data:DemoState;k:Summary;onExport:()=>void};
 const STATUS_STAGE:Record<string,number>={
@@ -50,41 +50,12 @@ function Hero({data}:{data:DemoState}) {
     </div>
   </section>;
 }
-const MAP_LAYERS=['Cobertura','NDVI','Uso del suelo','Hidrología','Áreas sensibles'] as const;
-type MapLayer=typeof MAP_LAYERS[number];
 function MapPanel({province}:{province:string}) {
-  const [layer,setLayer]=useState<MapLayer>('Cobertura');
-  const [zoom,setZoom]=useState(1);
-  return <section className="ref-panel ref-map-panel">
-    <div className="ref-panel-head"><h2>Mapa del área de estudio</h2>
-      <Link to="/mapas">Ver mapas <ArrowRight size={14}/></Link></div>
-    <div className="ref-map-viewport">
-      <div className="ref-map-tabs" role="tablist" aria-label="Capas del mapa de demostración">
-        {MAP_LAYERS.map(name=><button type="button" role="tab" key={name}
-          aria-selected={layer===name} onClick={()=>setLayer(name)}
-          className={layer===name?'is-active':''}>{name}</button>)}
-      </div>
-      <div className={'ref-map-terrain ref-layer-'+MAP_LAYERS.indexOf(layer)}
-        style={{transform:'scale('+zoom+')'}} aria-hidden="true">
-        <svg viewBox="0 0 600 310" preserveAspectRatio="xMidYMid slice">
-          <path className="ref-map-river" d="M 10 205 C 100 175 120 245 200 205 S 290 105 350 185 S 455 250 600 150"/>
-          <path className="ref-map-river-secondary" d="M 70 0 C 160 110 210 120 270 178 S 340 215 440 310"/>
-          <path className="ref-map-polygon" d="M 171 79 L 233 103 294 76 344 92 378 152 437 185 426 267 354 285 302 260 231 257 186 208 171 79 Z"/>
-          <circle cx="309" cy="190" r="6" fill="#e2fffa" stroke="#0b5942" strokeWidth="4"/>
-        </svg>
-      </div>
-      <div className="ref-map-controls">
-        <button type="button" aria-label="Acercar mapa ilustrativo" disabled={zoom>=1.6}
-          onClick={()=>setZoom(z=>Math.min(1.6,Number((z+.2).toFixed(1))))}><Plus size={18}/></button>
-        <button type="button" aria-label="Alejar mapa ilustrativo" disabled={zoom<=1}
-          onClick={()=>setZoom(z=>Math.max(1,Number((z-.2).toFixed(1))))}><Minus size={18}/></button>
-        <span aria-hidden="true"><Layers3 size={17}/></span>
-      </div>
-      <div className="ref-map-pin"><MapPin size={13}/> {province} · área ilustrativa</div>
-      <div className="ref-map-north">N ↑</div>
-      <div className="ref-map-caption"><strong>{layer} · vista conceptual</strong>
-        <small>Sin geometría GIS validada. Contorno y relieve ilustrativos, no corresponden al predio.</small></div>
-    </div>
+ return <section className="ref-panel ref-map-panel ref-map-live">
+    <div className="ref-panel-head"><h2>Mapa base regional</h2>
+      <Link to="/mapas">Abrir SIG <ArrowRight size={14}/></Link></div>
+    <GeoMap province={province} compact/>
+    <p className="ref-panel-foot">Mapa real de OpenStreetMap. Sin perímetro, puntos de muestreo ni resultados del proyecto.</p>
   </section>;
 }
 function Commitments({data}:{data:DemoState}) {
