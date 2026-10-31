@@ -71,19 +71,71 @@ function renderHeader() {
   mainAction.innerHTML=a?button(a[0],a[1],{cls:'primary-btn'}):'';
 }
 function renderResumen() {
-  const k=summary(state);
-  const rows=state.measures.slice(0,4).map(m=>
-    '<div class="brief-item"><div><b>'+h(m.title)+'</b><br><small>'+h(m.id)+' · '+h(m.owner)+'</small></div>'+statusTag(m.status)+'</div>'
+  const p=state.project,k=summary(state);
+  const phases=['Preparación','Construcción','Operación','Cierre'];
+  const idx=Math.max(0,phases.findIndex(v=>(p.phase||'').toLowerCase().includes(v.toLowerCase())));
+  const verifiedPct=k.measures?Math.round(k.verified*100/k.measures):0;
+  const statusIcon=m=>m.programId==='PG-AGU'?'◈':m.programId==='PG-BIO'?'♣':m.programId==='PG-AIR'?'✧':'✿';
+  const classIcon=m=>m.programId==='PG-AGU'?'water':m.programId==='PG-BIO'?'land':'';
+  const metrics=[
+    {icon:'▱',title:'PROGRAMAS',value:k.programs,desc:'Programas del PGA'},
+    {icon:'❧',title:'MEDIDAS',value:k.measures,desc:k.verified+' verificadas'},
+    {icon:'▤',title:'INSPECCIONES',value:k.inspectionsPending,desc:'Programadas'},
+    {icon:'◇',title:'HALLAZGOS',value:k.findingsOpen,desc:'Abiertos',danger:k.findingsOpen>0}
+  ];
+  const cards='<div class="overview-kpis">'+metrics.map(m=>
+    '<div class="metric-card'+(m.danger?' danger':'')+'"><span class="metric-symbol" aria-hidden="true">'+m.icon+'</span>'+
+    '<div><span class="metric-label">'+h(m.title)+'</span><strong class="metric-value">'+m.value+'</strong><small class="metric-desc">'+h(m.desc)+'</small></div></div>'
+  ).join('')+'</div>';
+  const facts=[['⌖',p.province,'Jurisdicción del ejemplo'],['▧',p.kind,'Tipo de actividad'],['♧',String(state.impacts.length),'Impactos registrados']]
+    .map(([icon,val,desc])=>'<div><b><span aria-hidden="true">'+icon+'</span>'+h(val)+'</b><small>'+h(desc)+'</small></div>').join('');
+  const project='<article class="dash-panel dash-project">'+
+    '<p class="section-cap">EXPEDIENTE AMBIENTAL</p><div class="project-heading"><div><h2>'+h(p.name)+'</h2>'+
+    '<p>Código '+h(p.id)+' · Provincia de '+h(p.province)+'</p></div>'+tag('Borrador sin aprobación')+'</div>'+
+    '<div class="dash-fields">'+[
+      ['▤','Estado','Borrador sin aprobación'],['◇','Fase',p.phase],
+      ['♙','Proponente',p.proponent],['♧','Responsable',p.technicalLead]
+    ].map(([icon,label,value])=>'<div class="dash-field"><span class="icon-bubble" aria-hidden="true">'+icon+'</span><div><label>'+h(label)+'</label><strong>'+h(value)+'</strong></div></div>').join('')+
+    '</div><div class="dash-callout"><span aria-hidden="true">▣</span><span>MITA genera productos satelitales y de calidad de aire por separado. <strong>Aún no están vinculados a este expediente</strong> y esto no representa una evaluación legal.</span></div>'+
+    '<div class="dash-facts">'+facts+'</div></article>';
+  const map='<article class="dash-panel dash-map"><p class="section-cap">LOCALIZACIÓN DEL PROYECTO</p>'+
+    '<div class="map-illustration" role="img" aria-label="Fondo cartográfico conceptual sin coordenadas ni delimitación validada"><div class="map-outline"></div>'+
+    '<div class="map-center">⌖ '+h(p.province)+' · AR</div>'+
+    '<span class="map-note">Mapa ilustrativo · Falta cargar geometría GIS verificada</span></div>'+
+    '<div class="map-footer"><span>Sin polígono del proyecto</span>'+button('Ver expediente ↗','go-expediente',{cls:'dash-text-action'})+'</div></article>';
+  const stages=phases.map((stage,i)=>'<div class="stage'+(i===idx?' current':i<idx?' completed':'')+'"><i aria-hidden="true"></i><span>'+h(stage)+'</span><em>'+
+      (i===idx?'Fase actual':i<idx?'Previa':'Pendiente')+'</em></div>').join('');
+  const progress='<article class="dash-panel dash-progress"><p class="section-cap">CONTROL DE MEDIDAS</p>'+
+    '<div class="progress-donut" style="--percent:'+verifiedPct+'%" aria-label="'+verifiedPct+' por ciento de medidas verificadas"><b>'+verifiedPct+'%</b></div>'+
+    '<p class="progress-caption">'+k.verified+' de '+k.measures+' medidas verificadas</p>'+
+    '<div class="stage-list">'+stages+'</div></article>';
+  const rows=state.measures.slice(0,5).map(m=>
+    '<button type="button" class="measure-row" data-action="go-pga" title="Abrir Plan de Gestión Ambiental"><span class="measure-icon '+classIcon(m)+'" aria-hidden="true">'+statusIcon(m)+'</span>'+
+    '<span class="measure-details"><strong>'+h(m.title)+'</strong><small>'+h(m.id)+' · '+h(m.owner)+'</small></span>'+statusTag(m.status)+' <span aria-hidden="true">›</span></button>'
   ).join('');
-  return layoutKpis()+'<div class="hero-grid">'+
-    panel('<p class="section-cap">EXPEDIENTE AMBIENTAL</p><h2>'+h(state.project.name)+'</h2>'+
-      '<p class="muted">Código '+h(state.project.id)+' · Provincia de '+h(state.project.province)+'</p>'+
-      '<div class="data-grid stats-row">'+fields('Estado','Borrador sin aprobación')+
-      fields('Fase',state.project.phase)+fields('Proponente',state.project.proponent)+
-      fields('Responsable',state.project.technicalLead)+'</div>'+
-      '<div class="callout">MITA genera productos satelitales y de calidad del aire por separado. Esta interfaz todavía no está conectada al backend de MITA, ni representa una evaluación legal.</div>')+
-    panel('<div class="panel-head"><div><p class="section-cap">MEDIDAS ACTIVAS</p><h2>Seguimiento de compromisos</h2></div>'+tag(String(k.measures),'gray')+'</div>'+rows+
-      '<p class="muted small">Se necesita revisión profesional de cada evidencia antes de declarar una medida verificada.</p>')+'</div>';
+  const measures='<article class="dash-panel dash-measures"><div class="panel-head"><div><p class="section-cap">MEDIDAS ACTIVAS</p><h2>Seguimiento de compromisos</h2></div>'+
+    tag(String(k.measures),'gray')+'</div><div class="measures-list">'+rows+'</div>'+
+    '<p class="dash-footnote">Las medidas y evidencias requieren revisión profesional antes de declararse verificadas.</p></article>';
+  const breakdown=[
+    {title:'Programadas',count:countBy(state.inspections,'result','pendiente'),className:''},
+    {title:'Conformes',count:countBy(state.inspections,'result','conforme'),className:'other'},
+    {title:'Observadas',count:countBy(state.inspections,'result','observada'),className:'review'}
+  ];
+  const denom=Math.max(1,...breakdown.map(x=>x.count));
+  const monitor='<article class="dash-panel dash-monitor"><div class="panel-head"><div><p class="section-cap">MONITOREO AMBIENTAL</p>'+
+    '<h2>Estado de las inspecciones</h2><p class="muted small">Conteos reales del expediente de demostración</p></div>'+
+    button('Ver monitoreo ↗','go-monitoreo',{cls:'dash-text-action'})+'</div>'+
+    '<div class="monitor-bars">'+breakdown.map(x=>'<div class="monitor-bar"><span>'+x.title+'</span>'+
+    '<div class="monitor-track"><div class="monitor-fill '+x.className+'" style="width:'+(x.count*100/denom)+'%"></div></div><b>'+x.count+'</b></div>').join('')+
+    '</div><p class="monitor-note">No se muestran mediciones de calidad de aire: no hay una serie validada cargada.</p></article>';
+  const audit=state.audit.slice(-3).reverse();
+  const activities='<article class="dash-panel dash-activities"><div class="panel-head"><div><p class="section-cap">TRAZABILIDAD</p>'+
+    '<h2>Últimas actividades</h2></div>'+button('Historial ↗','go-historial',{cls:'dash-text-action'})+'</div>'+
+    (audit.length?audit.map(e=>'<div class="dash-activity"><span class="activity-icon" aria-hidden="true">▤</span>'+
+     '<div><strong>'+h(e.actor||'Sistema de demostración')+'</strong><small>'+h(e.details||e.event||'Registro local de prueba')+'</small></div></div>').join('')
+     :'<p class="muted small">Todavía no se registraron actividades.</p>')+'</article>';
+  return cards+'<div class="dash-layout"><div class="dash-col-a">'+project+monitor+'</div>'+
+    '<div class="dash-col-b"><div class="dash-duo">'+map+progress+'</div>'+measures+activities+'</div></div>';
 }
 function renderExpediente() {
   const p=state.project;
@@ -321,6 +373,9 @@ function doAction(a,id) {
   if(['new-measure','new-inspection','new-evidence','review-evidence','change-status','new-finding','new-corrective'].includes(a))
     return openDialog(a,id);
   if(a==='go-pga'){route='pga';return render();}
+  if(a==='go-expediente'){route='expediente';return render();}
+  if(a==='go-monitoreo'){route='monitoreo';return render();}
+  if(a==='go-historial'){route='historial';return render();}
   if(a==='reset'){
     if(!window.confirm('¿Restaurar los datos ficticios de ejemplo y perder los cambios locales?'))return;
     state=createDemoState();program='all';selectedMeasure='MED-001';searchText='';

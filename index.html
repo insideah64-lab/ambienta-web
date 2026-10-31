@@ -3,15 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="theme-color" content="#123b30">
+  <meta name="theme-color" content="#081e20">
   <meta name="description" content="Plataforma Ambiental Argentina. Laboratorio funcional PGA, monitoreo y auditorías.">
   <title>Ambienta · Gestión ambiental</title>
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./theme-dark.css">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar" aria-label="Menú principal">
-      <div class="brand"><span class="brand-icon">A</span><div><strong>AMBIENTA</strong><small>PLATAFORMA AMBIENTAL</small></div></div>
+      <div class="brand"><span class="brand-icon">❧</span><div><strong>AMBIENTA</strong><small>PLATAFORMA AMBIENTAL</small></div></div>
       <div class="nav-caption">ESPACIO DE TRABAJO</div>
       <nav id="nav" class="nav-list" aria-label="Secciones del proyecto">
         <button type="button" data-route="resumen"><span>◫</span> Resumen</button>
@@ -22,12 +23,27 @@
         <button type="button" data-route="historial"><span>☷</span> Historial</button>
       </nav>
       <a class="cloud-link-sidebar" href="./cloud.html">☁  Expedientes en la nube</a>
+<div class="sidebar-scenery" aria-hidden="true">
+    <svg viewBox="0 0 250 350" preserveAspectRatio="xMidYMax slice" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="sf" x2="0" y2="1"><stop stop-color="#205149" stop-opacity="0"/><stop offset="1" stop-color="#0a3d30"/></linearGradient></defs><rect width="250" height="350" fill="url(#sf)"/><path d="M0 250 33 211 77 255 116 170 154 220 201 161 250 203V350H0Z" fill="#244f48" opacity=".74"/><path d="m0 310 50-72 52 60 40-69 35 47 38-52 35 33v93H0Z" fill="#1b483c"/><g fill="#0c382d"><path d="m0 350 31-147 32 147z m42 0 35-167 30 167z m70 0 29-143 32 143z m48 0 30-160 37 160z m52 0 30-135 33 135z"/></g></svg>
+    </div>
       <div class="sidebar-bottom">
         <div class="avatar">DE</div>
         <div><strong>Entorno de demostración</strong><span>Salta · Argentina</span></div>
       </div>
     </aside>
     <main class="main-area" id="main">
+      <div class="landscape-banner" aria-hidden="true">
+        <svg viewBox="0 0 1400 230" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs><linearGradient id="ambsky" x2="0" y2="1"><stop stop-color="#22474c"/><stop offset=".72" stop-color="#234944"/><stop offset="1" stop-color="#0b312c"/></linearGradient>
+            <linearGradient id="ambrange" x2="0" y2="1"><stop stop-color="#56726e"/><stop offset="1" stop-color="#0c332f"/></linearGradient>
+          </defs>
+          <rect width="1400" height="230" fill="url(#ambsky)"/>
+          <path d="M0 155 105 116 200 147 330 55 430 135 575 58 685 130 830 23 950 92 1060 44 1200 125 1340 56 1400 100V230H0Z" fill="#607f7b" opacity=".54"/>
+          <path d="M0 180 125 155 260 169 410 95 505 146 685 109 790 137 935 61 1070 144 1240 78 1400 147V230H0Z" fill="url(#ambrange)"/>
+          <path d="M0 188Q220 145 392 181T760 161T1150 173T1400 151V230H0Z" fill="#16463e"/>
+          <path d="M0 201Q180 175 350 197T700 193T990 170T1400 188V230H0Z" fill="#103a32"/>
+          <g fill="#0b302b" opacity=".76"><path d="m760 220 19-85 19 85z m29 0 16-64 17 64z m34 0 19-83 21 83z m98 0 18-73 16 73z m58 0 19-92 21 92z m73 0 16-62 19 62z m83 0 24-95 24 95z m85 0 18-78 20 78z m66 0 18-66 20 66z"/></g>
+        </svg></div>
       <div class="topline"><div class="crumbs">PROYECTOS <span>/</span> <strong>DEMO-001</strong> <span>/</span> <span id="breadcrumb">PGA</span></div><div class="topline-actions"><span class="province">◎ Salta · AR</span><button class="ghost-btn" id="export" type="button">↓ Exportar JSON</button></div></div>
       <header class="page-head"><div><p class="eyebrow">PLATAFORMA AMBIENTAL ARGENTINA</p><h1 id="heading">Plan de Gestión Ambiental</h1><p class="subheading" id="subtitle">Trazabilidad de medidas, indicadores y evidencias.</p></div><div id="main-action"></div></header>
       <div class="demo-warning" role="note"><span class="warn-dot">!</span><div><strong>Ambiente de prueba</strong> · Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental.</div></div>
