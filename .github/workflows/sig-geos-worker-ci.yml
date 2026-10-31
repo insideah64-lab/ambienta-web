@@ -1,7 +1,7 @@
-name: AMBIENTA V3.1 · GEOS offline worker
+name: AMBIENTA V3.2 · GEOS and audited WFS acquisition
 on:
   push:
-    branches: ['feature/ambienta-v31-distributed-quotas-2026-10-31']
+    branches: ['feature/ambienta-v31-distributed-quotas-2026-10-31', 'feature/ambienta-v32-wfs-tiled-geos-2026-10-31']
     paths:
       - 'services/sig-gateway/geos-worker/**'
       - '.github/workflows/sig-geos-worker-ci.yml'
@@ -25,5 +25,5 @@ jobs:
           cache-dependency-path: services/sig-gateway/geos-worker/requirements.txt
       - name: Install exact GEOS-backed Shapely runtime
         run: python -m pip install --disable-pip-version-check -r services/sig-gateway/geos-worker/requirements.txt
-      - name: Test concave, holes, multipart, large polygon, invalid and WFS truncation
+      - name: Test GEOS topology, WFS tiling, deduplication, immutable original responses, adversarial limits
         run: python -m unittest discover -s services/sig-gateway/geos-worker/tests -v
