@@ -147,3 +147,8 @@ dialog::backdrop{background:#021a1dd9;backdrop-filter:blur(5px)}
 .sidebar-scenery{background-image:linear-gradient(180deg,#072b2900,#0a3b2d1e 50%,#041b16a8),url('./assets/forest-mountains.jpg');background-size:cover;background-position:center}
 .sidebar-scenery svg{opacity:.24;mix-blend-mode:multiply}
 @media(max-width:760px){.landscape-banner{background-position:center top}}
+
+/* Visual QA refinement: allow the approved scenic backdrop to be visible. */
+.landscape-banner{background-position:center 38%;filter:saturate(1.12) brightness(1.36)}
+.landscape-banner svg{opacity:.04}
+.landscape-banner:after{background:linear-gradient(90deg,#071e20e8 0%,#081f205e 30%,#08232731 66%,#071e20bb 100%),linear-gradient(0deg,#092629 0%,transparent 82%)}
