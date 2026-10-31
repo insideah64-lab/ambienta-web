@@ -113,5 +113,27 @@ class TestAdvancedGeoClip(unittest.TestCase):
             prepare(path, [-1,-1,1,1])
 
 
+    def test_dateline_crossing_requires_geodetic_review(self):
+        ring = [[179,0],[-179,0],[-179,1],[179,1],[179,0]]
+        path = self.write([self.poly(ring)])
+        with self.assertRaises(GeoReviewError) as ctx:
+            prepare(path, [178,-1,180,2])
+        self.assertIn("antimeridiano", str(ctx.exception.issues))
+
+    def test_cli_does_not_overwrite_existing_derived_files(self):
+        ring = [[-2,-2],[2,-2],[2,2],[-2,2],[-2,-2]]
+        source = self.write([self.poly(ring)])
+        output = self.root / "clip.geojson"
+        report = self.root / "audit.json"
+        output.write_text("KEEP ORIGINAL REPORTS",encoding="utf8")
+        p = subprocess.run([sys.executable,str(ROOT/"clip.py"),
+             "--input",str(source),"--bbox=-1,-1,1,1",
+             "--output",str(output),"--report",str(report)],
+             capture_output=True,text=True,check=False)
+        self.assertNotEqual(p.returncode,0)
+        self.assertEqual(output.read_text(encoding="utf8"),"KEEP ORIGINAL REPORTS")
+        self.assertFalse(report.exists())
+
+
 if __name__ == "__main__":
     unittest.main()
