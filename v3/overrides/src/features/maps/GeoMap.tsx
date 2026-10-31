@@ -244,6 +244,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
  }
   async function loadGeorefCentroids(){
   if(!aoiLocal){setError('Primero activá una ventana de consulta con coordenadas válidas.');return;}
+  if(layer){setError('Ya hay una capa de trabajo. Exportala si es necesario y quitála explícitamente antes de consultar Georef.');return;}
   setBusy(true);setError('');
   try{
    // A limited provincial query: administrative centroids, never polygon boundaries.
@@ -339,8 +340,8 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
       {clipped.selectedCount===0&&clipped.unsupportedCount===0&&<p>La capa importada no tiene geometrías dentro de la ventana.</p>}
       <button type="button" onClick={exportClip} disabled={clipped.unsupportedCount>0||clipped.selectedCount===0}>Descargar recorte GeoJSON</button>
      </div>}
-     <button type="button" disabled={busy} onClick={loadGeorefCentroids}>Consultar centroides departamentales Georef · Salta</button>
-     <small>Consulta provincial acotada: centroides puntuales, no polígonos ni base nacional. Solo se muestra la intersección con tu ventana.</small>
+     <button type="button" disabled={busy||!!layer} onClick={loadGeorefCentroids}>Consultar centroides departamentales Georef · Salta</button>
+     <small>Consulta provincial acotada: centroides puntuales, no polígonos ni base nacional. Solo se muestra la intersección con tu ventana. La consulta está disponible cuando no hay otra capa local activa; no reemplaza archivos importados automáticamente.</small>
      {!layer&&<span>Importá GeoJSON local o consultá los centroides de Georef para recortarlos automáticamente.</span>}
     </div>}
     {!compact&&<div className="geo-import-panel">
