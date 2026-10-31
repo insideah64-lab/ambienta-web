@@ -3,7 +3,7 @@
 
 ## Alcance funcional
 - En **Área de estudio**, ingresar latitud y longitud WGS84 (grados decimales) y una distancia nominal de consulta de 0,1 a 100 km.
-- Sin pulsar un botón de recorte, a los 450 ms de disponer de tres valores válidos se construye una **ventana rectangular** de búsqueda (BBOX EPSG:4326). El cálculo aproxima los grados usando 111,195 km/° y coseno de latitud; **no es un buffer geodésico exacto**, ni delimita la instalación, el área de impacto ni la cuenca.
+- Sin pulsar un botón de recorte, al disponer de tres valores válidos se construye una **ventana rectangular** de búsqueda (BBOX EPSG:4326). El cálculo aproxima los grados usando 111,195 km/° y coseno de latitud; **no es un buffer geodésico exacto**, ni delimita la instalación, el área de impacto ni la cuenca.
 - El rectángulo aparece en el mapa en color verde, y MapLibre enfoca su extensión.
 - Cuando ya existe una capa GeoJSON local importada, AMBIENTA calcula su intersección con la ventana sin modificar ni sobrescribir el archivo original ni su SHA-256.
 - Se recortan puntos, multipuntos, líneas, multilíneas y **polígonos simples convexos sin huecos**. Se omiten y contabilizan los polígonos no convexos o con huecos, porque recortarlos con un algoritmo simple podría producir topologías inválidas. Cuando hay omisiones, la descarga del recorte queda bloqueada.

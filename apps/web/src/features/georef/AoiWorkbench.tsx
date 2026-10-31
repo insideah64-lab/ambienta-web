@@ -27,13 +27,11 @@ export function AoiWorkbench({onChange}:Props){
    if(active){localStorage.removeItem(key);setActive(null);onChange(null);}return;
   }
   setError('');
-  const timer=setTimeout(()=>{
-   const saved:PointAoi={...next,savedAt:new Date().toISOString()};
-   try{localStorage.setItem(key,JSON.stringify(saved));}
-   catch{setError('No se pudo guardar la ventana local.');return;}
-   setActive(saved);onChange(saved);
-  },450);
-  return ()=>clearTimeout(timer);
+  // Apply synchronously after React commits the valid input; never expose a stale BBOX.
+  const saved:PointAoi={...next,savedAt:new Date().toISOString()};
+  try{localStorage.setItem(key,JSON.stringify(saved));}
+  catch{setError('No se pudo guardar la ventana local.');return;}
+  setActive(saved);onChange(saved);
  },[lat,lon,km]);
  function clear(){
   localStorage.removeItem(key);setActive(null);onChange(null);
@@ -48,7 +46,7 @@ export function AoiWorkbench({onChange}:Props){
    <label>Distancia nominal (km)<input aria-label="Distancia de consulta" value={km} onChange={e=>setKm(e.target.value)} inputMode="decimal"/></label>
   </div>
   {error&&<p role="alert" className="v2-aoi-error">{error}</p>}
-  {active&&<div className="v2-aoi-ready" data-aoi-active="true">
+  {active&&Number(lat)===active.center.lat&&Number(lon)===active.center.lon&&Number(km)===active.radiusKm&&<div className="v2-aoi-ready" data-aoi-active="true">
    <strong>Ventana de consulta activa · NO es el perímetro del proyecto</strong>
    <code>BBOX EPSG:4326: {active.bbox.map(x=>x.toFixed(6)).join(', ')}</code>
    <button type="button" onClick={clear}>Quitar ventana</button>
