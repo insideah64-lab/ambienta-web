@@ -42,9 +42,10 @@ jobs:
           test -s dist/v3/index.html
       - name: Install Chromium
         working-directory: apps/web-v3
+        timeout-minutes: 8
         run: |
           npm install --no-save --ignore-scripts playwright@1.56.1 --no-fund --no-audit
-          npx playwright install --with-deps chromium
+          npx playwright install chromium
       - name: Test V3 in a real browser
         run: |
           python3 -m http.server 8787 --bind 127.0.0.1 --directory dist >/tmp/ambienta-v3-preview.log 2>&1 &
