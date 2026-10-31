@@ -52,10 +52,14 @@ jobs:
       - name: Unit HTTP, polygon, source integrity and security tests
         run: npm test
       - name: IDESA WFS live limited BBOX smoke
+        if: github.event_name == 'workflow_dispatch'
         run: node tests/live-idesa.mjs
       - name: Supabase Edge gateway authenticated E2E
+        if: github.event_name == 'workflow_dispatch'
         run: node tests/live-supabase-edge.mjs
       - name: Confirm browser CORS preflight without JWT
+        if: github.event_name == 'workflow_dispatch'
         run: node tests/live-cors.mjs
       - name: Isolated Edge V3.1 and Postgres shared quota integration
+        if: github.event_name == 'workflow_dispatch'
         run: node tests/live-supabase-v31.mjs
