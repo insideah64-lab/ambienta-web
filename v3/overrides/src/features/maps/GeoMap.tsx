@@ -3,6 +3,8 @@ import type {Map as MapLibreMap} from 'maplibre-gl';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import {IS_DIABLILLOS_CASE} from '../../lib/demo';
+// @ts-ignore: shared Georef public API adapter
+import {queryGeoref,georefUrl} from '../georef/georef-service.mjs';
 // @ts-ignore: legacy pure JS parser intentionally shared with Node's native test runner
 import {validateGeoJson} from './geojson-validate.mjs';
 // @ts-ignore: hydrology validation is plain JS and unit-tested in Node
@@ -24,7 +26,8 @@ type WorkingLayer={
  label:string;source:string;fileName:string;sha256:string;savedAt:string;
  featureCount:number;coordinateCount:number;bounds:[number,number,number,number];
  geojson:{type:'FeatureCollection';features:unknown[]};
- metadata?:{category:'hydrology';institution:string;date:string;sourceUrl:string;verification:'source_declared_unverified';description:string};
+ metadata?:{category:'hydrology';institution:string;date:string;sourceUrl:string;verification:'source_declared_unverified';description:string}
+ |{category:'georef-centroids';sourceUrl:string;retrievedAt:string;license:'CC BY 4.0';verification:'api_centroids_not_boundaries'};
 };
 const PUNA_CENTER:[number,number]=[-67.2,-24.7];
 const SALTA_CENTER:[number,number]=[-65.45,-24.82];
@@ -42,7 +45,7 @@ const BASE_STYLE:maplibregl.StyleSpecification={
   {id:'ign-raster-ign-topo',type:'raster',source:'ign-topo',layout:{visibility:'none'}}
  ]
 };
-export const WORKING_LAYER_KEY=IS_DIABLILLOS_CASE?'ambienta-gis-diablillos-working-v1':'ambienta-gis-demo-working-v1';
+export const WORKING_LAYER_KEY=IS_DIABLILLOS_CASE?'ambienta-gis-diablillos-working-v3':'ambienta-gis-demo-working-v3';
 function stored():WorkingLayer|null{
  try{
   const value=localStorage.getItem(WORKING_LAYER_KEY);
@@ -239,9 +242,39 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
     },12000);
   }
  }
-  function exportClip(){
+  async function loadGeorefCentroids(){
+  if(!aoiLocal){setError('Primero activá una ventana de consulta con coordenadas válidas.');return;}
+  setBusy(true);setError('');
+  try{
+   // A limited provincial query: administrative centroids, never polygon boundaries.
+   const sourceUrl=georefUrl('departamentos',{provincia:'66',max:50});
+   const data=await queryGeoref('departamentos',{provincia:'66',max:50});
+   if(!data.items.length)throw Error('La respuesta de Georef no contiene centroides válidos.');
+   const collection={type:'FeatureCollection',features:data.items.map((item:{id:string;name:string;lat:number;lon:number})=>({
+    type:'Feature',properties:{name:item.name},geometry:{type:'Point',coordinates:[item.lon,item.lat]}
+   }))};
+   const parsed=validateGeoJson(collection);
+   // SHA256 of generated GeoJSON, NOT a digest of the remote response.
+   const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(parsed.geojson)));
+   const sha256=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
+   const retrievedAt=new Date().toISOString();
+   const next:WorkingLayer={...parsed,geojson:parsed.geojson as WorkingLayer['geojson'],
+    bounds:parsed.bounds as [number,number,number,number],label:'Centroides Georef · Salta',
+    source:'Georef v2.1: centroides administrativos de departamentos de Salta',
+    fileName:'georef-salta-centroides-normalizados.geojson',sha256,savedAt:retrievedAt,
+    metadata:{category:'georef-centroids',sourceUrl,retrievedAt,license:'CC BY 4.0',
+      verification:'api_centroids_not_boundaries'}
+   };
+   localStorage.setItem(WORKING_LAYER_KEY,JSON.stringify(next));
+   setLayer(next);
+  }catch(cause){setError(cause instanceof Error?cause.message:'No fue posible consultar Georef.');}
+  finally{setBusy(false);}
+ }
+ function exportClip(){
   if(!clipped||!layer||clipped.unsupportedCount||!clipped.selectedCount)return;
-  const manifest={status:'LOCAL_NO_VERIFICADO',inputSha256:layer.sha256,
+  const isApi=layer.metadata?.category==='georef-centroids';
+  const manifest={status:'LOCAL_NO_VERIFICADO',inputSha256:isApi?null:layer.sha256,
+   derivedLayerSha256:isApi?layer.sha256:null,hashScope:isApi?'normalized_georef_geojson':'original_imported_file',
    sourceDeclared:layer.source,sourceFile:layer.fileName,
    bbox:clipped.bbox,method:clipped.method,
    sourceCount:clipped.sourceCount,selectedCount:clipped.selectedCount,
@@ -277,7 +310,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
    </div>}
    <div className="geo-canvas-info">
     <strong>{focus?'Centroide administrativo · Georef':IS_DIABLILLOS_CASE?'Puna de Salta · contexto regional':'Provincia de Salta · contexto regional'}</strong>
-    <span>{layer?'Capa importada: NO VERIFICADA, sin asociación oficial al proyecto.':'Vista regional orientativa, NO ubicación ni perímetro del proyecto.'}</span>
+    <span>{layer?.metadata?.category==='georef-centroids'?'Centroides administrativos de Georef: no son polígonos, límites ni ubicación del proyecto.':layer?'Capa importada: NO VERIFICADA, sin asociación oficial al proyecto.':'Vista regional orientativa, NO ubicación ni perímetro del proyecto.'}</span>
    </div>
    {status==='loading'&&<div className="geo-status" role="status">Preparando cartografía…</div>}
    {!tilesLoaded&&status==='ready'&&<div className="geo-status" role="status">Cargando teselas para esta vista…</div>}
@@ -291,7 +324,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
     {aoiLocal&&<span className="geo-layer-working" data-aoi-map="active">Ventana AOI <small>Consulta local · no perímetro</small></span>}
      {boundaryLocal&&<span className="geo-layer-working" data-map-boundary="unverified">Límite administrativo <small>Local · No verificado</small></span>}
     <span className="geo-layer-active">{basemap==='osm'?'Base OSM':basemap==='ign'?'Argenmap IGN':'IGN topográfico'} <small>{basemap==='osm'?'Activa':ignTiles?'Teselas recibidas':'Solicitando teselas'}</small></span>
-    {layer&&<span className="geo-layer-working">{layer.metadata?.category==='hydrology'?'Capa hídrica local':'GeoJSON local'} <small>No verificado</small></span>}
+    {layer&&<span className="geo-layer-working">{layer.metadata?.category==='hydrology'?'Capa hídrica local':layer.metadata?.category==='georef-centroids'?'Centroides Georef':'GeoJSON local'} <small>{layer.metadata?.category==='georef-centroids'?'Referencia administrativa, no perímetro':'No verificado'}</small></span>}
     <span className="geo-layer-disabled" title="No hay productos ambientales vinculados">NDVI <small>Sin datos</small></span>
     {layer?.metadata?.category==='hydrology'?<span className="geo-layer-working" data-hydro-active="unverified">Hidrología <small>Declarada · no validada</small></span>:<span className="geo-layer-disabled" title="Falta integrar capa hidrográfica oficial">Hidrología <small>Sin datos</small></span>}
    </div>
@@ -306,7 +339,9 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
       {clipped.selectedCount===0&&clipped.unsupportedCount===0&&<p>La capa importada no tiene geometrías dentro de la ventana.</p>}
       <button type="button" onClick={exportClip} disabled={clipped.unsupportedCount>0||clipped.selectedCount===0}>Descargar recorte GeoJSON</button>
      </div>}
-     {!layer&&<span>Importá una capa GeoJSON local para recortarla automáticamente.</span>}
+     <button type="button" disabled={busy} onClick={loadGeorefCentroids}>Consultar centroides departamentales Georef · Salta</button>
+     <small>Consulta provincial acotada: centroides puntuales, no polígonos ni base nacional. Solo se muestra la intersección con tu ventana.</small>
+     {!layer&&<span>Importá GeoJSON local o consultá los centroides de Georef para recortarlos automáticamente.</span>}
     </div>}
     {!compact&&<div className="geo-import-panel">
     <strong>GeoJSON · Capa de trabajo local</strong>
@@ -329,11 +364,12 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
     {busy&&<span role="status">Validando geometría y calculando SHA-256…</span>}
     {error&&<p role="alert" className="geo-import-error">{error}</p>}
     {layer&&<div className="geo-layer-details" data-geojson-loaded="true">
-      {aoiLocal&&<small>La capa depurada permanece sin recortar; la ventana modifica solo la vista y la exportación derivada. El SHA-256 corresponde al archivo importado.</small>}
+      {aoiLocal&&<small>La capa depurada permanece sin recortar; la ventana modifica solo la vista y exportación derivada. La huella SHA-256 identifica el archivo local o el GeoJSON generado, según el origen.</small>}
      <strong>Capa local sin validar: {layer.fileName}</strong>
      <small>{layer.featureCount} entidades · {layer.coordinateCount} vértices · fuente declarada: {layer.source}</small>
      {layer.metadata?.category==='hydrology'&&<div className="geo-hydro-provenance" data-hydro-provenance="unverified"><strong>Hidrología NO VERIFICADA</strong><small>{layer.metadata.institution} · {layer.metadata.date}</small><small>Origen declarado: {layer.metadata.sourceUrl}</small><small>Este material NO acredita una cuenca, un cauce oficial ni la situación ambiental de Diablillos.</small></div>}
-     <code>SHA-256 {layer.sha256}</code>
+     {layer.metadata?.category==='georef-centroids'&&<div className="geo-hydro-provenance" data-georef-centroids="true"><strong>Georef · centroides administrativos, NO límites</strong><small>Consulta API v2.1: {layer.metadata.retrievedAt}</small><small>Origen: {layer.metadata.sourceUrl}</small><small>Georef · CC BY 4.0. Los centroides NO son perímetros ni emplazamientos del proyecto.</small></div>}
+     <code>SHA-256 {layer.metadata?.category==='georef-centroids'?'GeoJSON derivado, no respuesta API: ':'archivo original: '}{layer.sha256}</code>
      <div className="geo-actions">
       <button type="button" onClick={exportLayer}>Exportar GeoJSON depurado</button>
       <button type="button" onClick={removeLayer}>Quitar capa local</button>
