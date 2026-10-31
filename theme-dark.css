@@ -152,3 +152,9 @@ dialog::backdrop{background:#021a1dd9;backdrop-filter:blur(5px)}
 .landscape-banner{background-position:center 38%;filter:saturate(1.12) brightness(1.36)}
 .landscape-banner svg{opacity:.04}
 .landscape-banner:after{background:linear-gradient(90deg,#071e20e8 0%,#081f205e 30%,#08232731 66%,#071e20bb 100%),linear-gradient(0deg,#092629 0%,transparent 82%)}
+
+/* Screenshot review: the approved photographic scenery must sit above the main background, below UI. */
+.landscape-banner{z-index:0}
+.topline,.page-head,.demo-warning,#screen,.footer{position:relative;z-index:1}
+.brand-icon{display:grid;place-items:center}
+.brand-icon svg{display:block;width:25px;height:25px}
