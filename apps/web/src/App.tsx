@@ -82,14 +82,21 @@ function Expediente({data}: {data:DemoState}) {
   </div>;
 }
 function AreaEstudio({data}:{data:DemoState}) {
-  return <div className="v2-detail-grid"><Panel kicker="ÁREA DE ESTUDIO" title="Localización del expediente">
-    <div className="v2-project-fields"><Info icon={MapPin} label="Provincia" value={data.project.province}/>
-      <Info icon={FolderOpen} label="Expediente" value={data.project.id}/></div>
-    <p className="v2-panel-note">No hay una superficie, coordenadas ni polígono de predio verificados asociados a esta demostración. No deben interpretarse mapas ilustrativos como cartografía técnica.</p>
-  </Panel><Panel kicker="VISTA CARTOGRÁFICA" title="Geometría pendiente">
+ return <div className="v2-area-stack">
+   <Panel kicker="ÁREA DE ESTUDIO" title="Ficha territorial y trazabilidad">
+    <div className="v2-area-overview">
+     <div className="v2-project-fields">
+      <Info icon={MapPin} label="Provincia" value={data.project.province}/>
+      <Info icon={FolderOpen} label="Expediente" value={data.project.id}/>
+     </div>
+     <p className="v2-panel-note">La cartografía OSM representa el entorno regional. Sin límites del proyecto, puntos de muestreo ni inventarios hidrográficos oficialmente verificados. Las capas importadas permanecen como material local NO VERIFICADO.</p>
+    </div>
+   </Panel>
+   <Panel kicker="SIG · MAPA INTERACTIVO" title="Cartografía regional, capas y procedencia">
     <MapPreview province={data.project.province}/>
-    <p className="v2-panel-note">La cartografía base es auténtica y regional; no hay coordenadas ni perímetros verificables asociados al expediente.</p>
-  </Panel></div>;
+    <p className="v2-panel-note">No se presenta esta cartografía como evaluación de calidad del agua, georreferenciación de instalaciones ni certificación ambiental.</p>
+   </Panel>
+ </div>;
 }
 function Impactos({data}:{data:DemoState}) {
   return <Panel kicker="MATRIZ DE IMPACTOS" title="Impactos ambientales registrados">

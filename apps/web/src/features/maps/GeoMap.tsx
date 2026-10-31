@@ -72,7 +72,7 @@ export function GeoMap({compact=false,province}:Props){
  const [tilesLoaded,setTilesLoaded]=useState(false);
  const [layer,setLayer]=useState<WorkingLayer|null>(stored);
  const [source,setSource]=useState('');
- const [layerType,setLayerType]=useState<'general'|'hydrology'>('general');
+ const [layerType,setLayerType]=useState<'general'|'hydrology'>(()=>stored()?.metadata?.category==='hydrology'?'hydrology':'general');
  const [institution,setInstitution]=useState('');
  const [sourceDate,setSourceDate]=useState('');
  const [hydroUrl,setHydroUrl]=useState('');

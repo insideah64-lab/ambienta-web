@@ -651,3 +651,19 @@ a{text-decoration:none;color:inherit}
 .geo-hydro-provenance{display:grid;gap:4px;background:#0b3242;padding:10px;border-radius:7px;border:1px solid #3aa6c2;overflow-wrap:anywhere}
 .geo-hydro-provenance strong{color:#95efff;font-size:11px}
 .geo-hydro-provenance small{color:#d1e6e6;font-size:10px}
+
+/* GIS is a work surface, not a 50/50 details card: give the map real room. */
+.v2-area-stack{display:grid;gap:16px;min-width:0}
+.v2-area-stack>.v2-panel{min-width:0}
+.v2-area-stack .v2-area-overview{display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.v2-area-stack .v2-area-overview .v2-project-fields{display:flex;flex-wrap:wrap;gap:10px;flex:1;min-width:250px}
+.v2-area-stack .v2-area-overview .v2-info{min-width:180px;flex:1}
+.v2-area-stack .v2-area-overview .v2-panel-note{flex:2;min-width:260px;max-width:660px;margin:0}
+.v2-area-stack .geo-map{height:clamp(420px,53vh,690px)}
+.v2-area-stack .geo-canvas-info{max-width:min(520px,calc(100% - 95px))}
+.v2-area-stack .geo-import-panel{padding:20px;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 20px}
+.v2-area-stack .geo-import-panel>strong,.v2-area-stack .geo-import-panel>p,
+.v2-area-stack .geo-import-panel>.geo-layer-details,.v2-area-stack .geo-import-panel>.geo-catalogue,
+.v2-area-stack .geo-import-panel>.geo-import-note,.v2-area-stack .geo-import-panel>.geo-hydro-fields,
+.v2-area-stack .geo-import-panel>[role=alert],.v2-area-stack .geo-import-panel>[role=status]{grid-column:1/-1}
+@media(max-width:740px){.v2-area-stack .geo-map{height:330px}.v2-area-stack .geo-import-panel{display:grid;grid-template-columns:minmax(0,1fr);padding:13px}.v2-area-stack .geo-import-panel>*{grid-column:1/-1}.v2-area-stack .v2-area-overview .v2-panel-note{min-width:0}}
