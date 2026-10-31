@@ -13,6 +13,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT))
 import wfs_collect as wf
+from clip import GeoReviewError
 
 
 BBOX=[-66.2,-25.1,-66.0,-24.9]
