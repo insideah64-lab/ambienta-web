@@ -18,6 +18,7 @@ import { DemoActionDialog, type DemoActionKind } from './features/demo/DemoActio
 import { CloudWorkspace } from './features/cloud/CloudWorkspace';
 import { ReferenceDashboard } from './features/dashboard/ReferenceDashboard';
 import { GeoMap } from './features/maps/GeoMap';
+import { EvidenceIntegrityLab } from './features/evidence/EvidenceIntegrityLab';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
 const NAV_PRIMARY: Navigation[] = [
@@ -28,7 +29,7 @@ const NAV_PRIMARY: Navigation[] = [
   {path:'/pga',label:'Plan de Gestión',icon:Layers3,description:'Programas, medidas, indicadores y trazabilidad ambiental.'},
   {path:'/monitoreo',label:'Monitoreo',icon:Activity,description:'Inspecciones, resultados y seguimiento en campo.'},
   {path:'/auditorias',label:'Auditorías',icon:ShieldCheck,description:'Hallazgos, controles y acciones correctivas.'},
-  {path:'/evidencias',label:'Evidencias',icon:FileText,description:'Referencias documentales y revisiones registradas.'},
+  {path:'/evidencias',label:'Evidencias',icon:FileText,description:'Referencias documentales, huellas SHA-256 y revisiones en demostración.'},
   {path:'/mapas',label:'Mapas y SIG',icon:Map,description:'Mapa interactivo OSM regional, sin perímetro de proyecto.'},
   {path:'/reportes',label:'Reportes',icon:FolderOpen,description:'Resumen exportable del expediente de demostración.'}
 ];
@@ -102,7 +103,7 @@ function Impactos({data}:{data:DemoState}) {
     <p className="v2-panel-note">No hay puntuaciones de significancia ambiental calculadas automáticamente.</p>
   </Panel>;
 }
-function Evidencias({data,onAction}:{data:DemoState;onAction:(kind:DemoActionKind)=>void}) {
+function Evidencias({data,onAction,onApply}:{data:DemoState;onAction:(kind:DemoActionKind)=>void;onApply:(operation:Transaction,message:string)=>void}) {
   return <Panel kicker="EVIDENCIAS DEL PGA" title="Registro documental"
     action={<button className="v2-action-button" onClick={()=>onAction('evidence')}>+ Registrar evidencia</button>}>
     <div className="v2-evidence-overview"><strong>{data.evidence.length} referencias de demostración</strong>
@@ -112,6 +113,7 @@ function Evidencias({data,onAction}:{data:DemoState;onAction:(kind:DemoActionKin
       <Badge tone={e.status==='validada'?'blue':e.status==='rechazada'?'amber':'neutral'}>{e.status}</Badge>
     </div>):<p className="v2-empty">Todavía no se registraron evidencias documentales.</p>}
     <p className="v2-panel-note">La demo conserva referencias textuales, no el contenido ni la autenticidad de los archivos. Los documentos privados se gestionan por separado.</p>
+    <EvidenceIntegrityLab data={data} onApply={onApply}/>
   </Panel>;
 }
 function Reportes({data,onExport}:{data:DemoState;onExport:()=>void}) {
@@ -278,7 +280,7 @@ export default function App() {
           <Route path="/" element={<ReferenceDashboard data={data} k={k} onExport={()=>exportDemo(data)}/>}/>
           <Route path="/area" element={<AreaEstudio data={data}/>}/>
           <Route path="/impactos" element={<Impactos data={data}/>}/>
-          <Route path="/evidencias" element={<Evidencias data={data} onAction={openAction}/>}/>
+          <Route path="/evidencias" element={<Evidencias data={data} onAction={openAction} onApply={applyTransaction}/>}/>
           <Route path="/mapas" element={<AreaEstudio data={data}/>}/>
           <Route path="/reportes" element={<Reportes data={data} onExport={()=>exportDemo(data)}/>}/>
           <Route path="/mita" element={<ToolSection kind="mita"/>}/>
