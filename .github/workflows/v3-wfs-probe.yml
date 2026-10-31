@@ -21,3 +21,5 @@ jobs:
           node v3/ogc/probe-salta.mjs
           node --check v3/ogc/probe-salta-feature.mjs
           node v3/ogc/probe-salta-feature.mjs
+          node --check v3/ogc/probe-salta-complete.mjs
+          node v3/ogc/probe-salta-complete.mjs
