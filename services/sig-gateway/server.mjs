@@ -1,0 +1,10 @@
+import {createServer} from 'node:http';
+import {createHandler} from './gateway.mjs';
+const port=Number(process.env.PORT||3000);
+if(!Number.isInteger(port)||port<1||port>65535)throw Error('Invalid PORT');
+const server=createServer(createHandler());
+server.requestTimeout=20_000;
+server.headersTimeout=10_000;
+server.keepAliveTimeout=5_000;
+server.listen(port,'0.0.0.0',()=>console.log('AMBIENTA SIG gateway listening on port '+port));
+process.on('SIGTERM',()=>server.close(()=>process.exit(0)));
