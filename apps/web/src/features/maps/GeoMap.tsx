@@ -1,4 +1,4 @@
-import {useEffect,useRef,useState,type ChangeEvent} from 'react';
+import {useEffect,useMemo,useRef,useState,type ChangeEvent} from 'react';
 import type {Map as MapLibreMap} from 'maplibre-gl';
 import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -9,12 +9,17 @@ import {validateGeoJson} from './geojson-validate.mjs';
 import {validateHydrologyImport} from './hydrology-validation.mjs';
 import {WmsWorkbench} from './WmsWorkbench';
 import type {BoundaryOverlay} from '../georef/GeorefTerritory';
+import type {PointAoi} from '../georef/AoiWorkbench';
+// @ts-ignore: browser/Node pure geometry engine
+import {clipGeoJsonToBbox} from './aoi-clip.mjs';
+// @ts-ignore: browser/Node AOI model
+import {aoiRectangle,aoiKey,readPointAoi} from './aoi-model.mjs';
 // @ts-ignore: validated administrative boundary import shared with Node tests
 import {readAdminBoundary,adminBoundaryKey} from '../georef/admin-boundary.mjs';
 // @ts-ignore: official IGN base source specs shared with native Node tests
 import {IGN_MAPS,buildIgnRasterSource,IGN_DOCS} from './ign-basemap.mjs';
 
-type Props={compact?:boolean;province:string;focus?:{lat:number;lon:number;zoom:number;seq:number}|null;boundary?:BoundaryOverlay|null};
+type Props={compact?:boolean;province:string;focus?:{lat:number;lon:number;zoom:number;seq:number}|null;boundary?:BoundaryOverlay|null;aoi?:PointAoi|null};
 type WorkingLayer={
  label:string;source:string;fileName:string;sha256:string;savedAt:string;
  featureCount:number;coordinateCount:number;bounds:[number,number,number,number];
@@ -55,7 +60,7 @@ function clearWorking(map:MapLibreMap){
  if(map.getSource('qa-geojson'))map.removeSource('qa-geojson');
 }
 function mountWorking(map:MapLibreMap,layer:WorkingLayer|null,fit:boolean){
- if(!map.isStyleLoaded())return;
+ if(!map.getLayer('osm-base-raster'))return;
  clearWorking(map);
  if(!layer)return;
  map.addSource('qa-geojson',{type:'geojson',data:layer.geojson as never});
@@ -79,7 +84,7 @@ function mountWorking(map:MapLibreMap,layer:WorkingLayer|null,fit:boolean){
  }
 }
 function drawAdministrativeBoundary(map:MapLibreMap,boundary:BoundaryOverlay|null){
- if(!map.isStyleLoaded())return;
+ if(!map.getLayer('osm-base-raster'))return;
  for(const id of ['admin-border-fill','admin-border-line'])if(map.getLayer(id))map.removeLayer(id);
  if(map.getSource('admin-border-src'))map.removeSource('admin-border-src');
  if(!boundary)return;
@@ -89,7 +94,18 @@ function drawAdministrativeBoundary(map:MapLibreMap,boundary:BoundaryOverlay|nul
  map.addLayer({id:'admin-border-line',type:'line',source:'admin-border-src',
   paint:{'line-color':'#f7f09a','line-width':2.5,'line-dasharray':[2.5,2]}});
 }
-export function GeoMap({compact=false,province,focus,boundary}:Props){
+function drawAoi(map:MapLibreMap,aoi:PointAoi|null){
+ if(!map.getLayer('osm-base-raster'))return;
+ for(const id of ['aoi-fill','aoi-outline'])if(map.getLayer(id))map.removeLayer(id);
+ if(map.getSource('aoi-rectangle'))map.removeSource('aoi-rectangle');
+ if(!aoi)return;
+ map.addSource('aoi-rectangle',{type:'geojson',data:aoiRectangle(aoi) as never});
+ map.addLayer({id:'aoi-fill',source:'aoi-rectangle',type:'fill',
+  paint:{'fill-color':'#58ddc0','fill-opacity':0.12}});
+ map.addLayer({id:'aoi-outline',source:'aoi-rectangle',type:'line',
+  paint:{'line-color':'#53e6ca','line-width':3,'line-dasharray':[2,1.5]}});
+}
+export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
  const element=useRef<HTMLDivElement|null>(null);
  const mapRef=useRef<MapLibreMap|null>(null);
  const [status,setStatus]=useState<'loading'|'ready'|'unavailable'>('loading');
@@ -101,6 +117,9 @@ export function GeoMap({compact=false,province,focus,boundary}:Props){
  const [ignProblem,setIgnProblem]=useState('');
  const ignTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const [layer,setLayer]=useState<WorkingLayer|null>(stored);
+ const [aoiLocal,setAoiLocal]=useState<PointAoi|null>(()=>readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null);
+ const clipped=useMemo(()=>layer&&aoiLocal?clipGeoJsonToBbox(layer.geojson,aoiLocal.bbox):null,[layer,aoiLocal]);
+ const displayed=useMemo<WorkingLayer|null>(()=>layer&&clipped?{...layer,geojson:clipped.geojson as WorkingLayer['geojson']}:layer,[layer,clipped]);
  const [source,setSource]=useState('');
  const [layerType,setLayerType]=useState<'general'|'hydrology'>(()=>stored()?.metadata?.category==='hydrology'?'hydrology':'general');
  const [institution,setInstitution]=useState('');
@@ -120,7 +139,16 @@ export function GeoMap({compact=false,province,focus,boundary}:Props){
    mapRef.current=map;
    map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
    map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
-   map.on('load',()=>{if(alive){setStatus('ready');mountWorking(map,stored(),!compact);drawAdministrativeBoundary(map,readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));}});
+   map.on('load',()=>{if(alive){
+     setStatus('ready');
+     const initialAoi=readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null;
+     const initialLayer=stored();
+     const derived=initialAoi&&initialLayer?clipGeoJsonToBbox(initialLayer.geojson,initialAoi.bbox):null;
+     mountWorking(map,derived&&initialLayer?{...initialLayer,geojson:derived.geojson as WorkingLayer['geojson']}:initialLayer,!compact&&!initialAoi);
+     drawAdministrativeBoundary(map,readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
+     drawAoi(map,initialAoi);
+     if(initialAoi)map.fitBounds([[initialAoi.bbox[0],initialAoi.bbox[1]],[initialAoi.bbox[2],initialAoi.bbox[3]]],{padding:55,maxZoom:13,duration:0});
+   }});
    map.on('idle',()=>{if(alive&&map.isStyleLoaded())setTilesLoaded(true);});
    map.on('sourcedata',event=>{
      if(!alive)return;
@@ -148,6 +176,15 @@ export function GeoMap({compact=false,province,focus,boundary}:Props){
     if(mapRef.current)drawAdministrativeBoundary(mapRef.current,boundary);
   }
  },[boundary]);
+ useEffect(()=>{if(aoi!==undefined)setAoiLocal(aoi);},[aoi]);
+ useEffect(()=>{
+  const map=mapRef.current;
+  if(!map||!map.getLayer('osm-base-raster'))return;
+  mountWorking(map,displayed,!aoiLocal&&!compact);
+  drawAoi(map,aoiLocal);
+  if(aoiLocal)map.fitBounds([[aoiLocal.bbox[0],aoiLocal.bbox[1]],[aoiLocal.bbox[2],aoiLocal.bbox[3]]],
+   {padding:55,maxZoom:13,duration:250});
+ },[aoiLocal,displayed,compact]);
   useEffect(()=>{
    if(!focus||!Number.isFinite(focus.lat)||!Number.isFinite(focus.lon)||!mapRef.current)return;
    const map=mapRef.current;
@@ -178,7 +215,7 @@ export function GeoMap({compact=false,province,focus,boundary}:Props){
    setLayer(next);
    if(mapRef.current){
     setTilesLoaded(false);
-    mountWorking(mapRef.current,next,true);
+    if(!aoiLocal)mountWorking(mapRef.current,next,true);
    }
   }catch(cause){setError(cause instanceof Error?cause.message:'No fue posible validar o guardar el archivo.');}
   finally{setBusy(false);}
@@ -202,7 +239,21 @@ export function GeoMap({compact=false,province,focus,boundary}:Props){
     },12000);
   }
  }
-  function removeLayer(){
+  function exportClip(){
+  if(!clipped||!layer||clipped.unsupportedCount||!clipped.selectedCount)return;
+  const manifest={status:'LOCAL_NO_VERIFICADO',inputSha256:layer.sha256,
+   sourceDeclared:layer.source,sourceFile:layer.fileName,
+   bbox:clipped.bbox,method:clipped.method,
+   sourceCount:clipped.sourceCount,selectedCount:clipped.selectedCount,
+   outsideCount:clipped.outsideCount,
+   warning:'No es un área oficial de proyecto ni geometría validada por autoridad.'};
+  const output={type:'FeatureCollection',features:clipped.geojson.features,
+   properties:{ambientaClip:manifest}};
+  const href=URL.createObjectURL(new Blob([JSON.stringify(output,null,2)],{type:'application/geo+json'}));
+  const link=document.createElement('a');link.href=href;link.download='ambienta-recorte-local-no-verificado.geojson';
+  link.click();setTimeout(()=>URL.revokeObjectURL(href),500);
+ }
+ function removeLayer(){
   try{localStorage.removeItem(WORKING_LAYER_KEY);}catch{/* No remote mutation. */}
   setLayer(null);setError('');
   if(mapRef.current)clearWorking(mapRef.current);
@@ -237,13 +288,27 @@ export function GeoMap({compact=false,province,focus,boundary}:Props){
    </div>
    <div className="geo-layers" aria-label="Capas disponibles">
     <strong>Capas</strong>
-    {boundaryLocal&&<span className="geo-layer-working" data-map-boundary="unverified">Límite administrativo <small>Local · No verificado</small></span>}
+    {aoiLocal&&<span className="geo-layer-working" data-aoi-map="active">Ventana AOI <small>Consulta local · no perímetro</small></span>}
+     {boundaryLocal&&<span className="geo-layer-working" data-map-boundary="unverified">Límite administrativo <small>Local · No verificado</small></span>}
     <span className="geo-layer-active">{basemap==='osm'?'Base OSM':basemap==='ign'?'Argenmap IGN':'IGN topográfico'} <small>{basemap==='osm'?'Activa':ignTiles?'Teselas recibidas':'Solicitando teselas'}</small></span>
     {layer&&<span className="geo-layer-working">{layer.metadata?.category==='hydrology'?'Capa hídrica local':'GeoJSON local'} <small>No verificado</small></span>}
     <span className="geo-layer-disabled" title="No hay productos ambientales vinculados">NDVI <small>Sin datos</small></span>
     {layer?.metadata?.category==='hydrology'?<span className="geo-layer-working" data-hydro-active="unverified">Hidrología <small>Declarada · no validada</small></span>:<span className="geo-layer-disabled" title="Falta integrar capa hidrográfica oficial">Hidrología <small>Sin datos</small></span>}
    </div>
-   {!compact&&<div className="geo-import-panel">
+   {!compact&&aoiLocal&&<div className="geo-aoi-status" data-aoi-map-status="active">
+     <strong>Recorte por coordenadas activo</strong>
+     <span>Centro {aoiLocal.center.lat}°, {aoiLocal.center.lon}° · distancia nominal {aoiLocal.radiusKm} km · EPSG:4326</span>
+     <small>El rectángulo verde es una ventana de consulta, no el límite ni área de influencia del proyecto. El límite administrativo contextual no se recorta.</small>
+     {clipped&&<div data-aoi-clip={clipped.status}>
+      <strong>{clipped.selectedCount} de {clipped.sourceCount} entidades locales intersectan el área</strong>
+      <span>{clipped.outsideCount} fuera · {clipped.unsupportedCount} requieren motor SIG topológico</span>
+      {clipped.unsupportedCount>0&&<p role="alert">Recorte incompleto: se omitieron polígonos complejos para evitar geometrías incorrectas. No exportar como resultado definitivo.</p>}
+      {clipped.selectedCount===0&&clipped.unsupportedCount===0&&<p>La capa importada no tiene geometrías dentro de la ventana.</p>}
+      <button type="button" onClick={exportClip} disabled={clipped.unsupportedCount>0||clipped.selectedCount===0}>Descargar recorte GeoJSON</button>
+     </div>}
+     {!layer&&<span>Importá una capa GeoJSON local para recortarla automáticamente.</span>}
+    </div>}
+    {!compact&&<div className="geo-import-panel">
     <strong>GeoJSON · Capa de trabajo local</strong>
     <label>Tipo de capa<select aria-label="Tipo de capa ambiental" value={layerType} onChange={ev=>setLayerType(ev.target.value as 'general'|'hydrology')}>
      <option value="general">Geometría general de trabajo</option>
@@ -264,6 +329,7 @@ export function GeoMap({compact=false,province,focus,boundary}:Props){
     {busy&&<span role="status">Validando geometría y calculando SHA-256…</span>}
     {error&&<p role="alert" className="geo-import-error">{error}</p>}
     {layer&&<div className="geo-layer-details" data-geojson-loaded="true">
+      {aoiLocal&&<small>Original preservado en el navegador; solo la vista y la exportación derivada se recortan.</small>}
      <strong>Capa local sin validar: {layer.fileName}</strong>
      <small>{layer.featureCount} entidades · {layer.coordinateCount} vértices · fuente declarada: {layer.source}</small>
      {layer.metadata?.category==='hydrology'&&<div className="geo-hydro-provenance" data-hydro-provenance="unverified"><strong>Hidrología NO VERIFICADA</strong><small>{layer.metadata.institution} · {layer.metadata.date}</small><small>Origen declarado: {layer.metadata.sourceUrl}</small><small>Este material NO acredita una cuenca, un cauce oficial ni la situación ambiental de Diablillos.</small></div>}

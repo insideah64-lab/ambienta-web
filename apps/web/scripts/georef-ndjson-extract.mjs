@@ -26,6 +26,7 @@ function ensureGeometry(geometry){
 }
 export async function extractGeorefBoundary(file,resource,id){
  if(!ID_RULES[resource]?.test(id))throw Error('Recurso o ID Georef inválido.');
+ if(resource==='departamentos'&&!['66'].includes(id.slice(0,2)))throw Error('Esta etapa experimental procesa solo departamentos de Salta (66).');
  const st=await fs.promises.stat(file);
  if(!st.isFile()||st.size>2_000_000_000)throw Error('Archivo no válido o mayor de 2 GB.');
  const reader=createInterface({input:fs.createReadStream(file,{encoding:'utf8'}),crlfDelay:Infinity});
@@ -45,6 +46,7 @@ export async function extractGeorefBoundary(file,resource,id){
   const count=ensureGeometry(entity.geometria);
   const provinceId=resource==='provincias'?id:String(entity.provincia?.id||'');
   if(!/^\d{2}$/.test(provinceId))throw Error('Falta provincia oficial del departamento.');
+  if(resource==='departamentos'&&provinceId!==id.slice(0,2))throw Error('El ID y la provincia del departamento no coinciden.');
   found={entity,count,provinceId};
  }
  if(!found)throw Error('No se encontró la unidad '+id+' en el archivo NDJSON.');
