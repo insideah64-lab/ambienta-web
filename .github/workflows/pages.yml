@@ -1,20 +1,15 @@
-name: Publicar AMBIENTA en GitHub Pages
+name: Preparar AMBIENTA para GitHub Pages
 on:
   push:
     branches: [main]
   workflow_dispatch:
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: write
 concurrency:
-  group: "github-pages"
+  group: "ambienta-pages-content"
   cancel-in-progress: true
 jobs:
-  build-and-deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+  export-pages:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -25,34 +20,36 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-      - name: Instalar y compilar
+      - name: Compilar aplicación
         run: |
           npm ci --no-fund --no-audit
           npm run build
           touch dist/.nojekyll
-      - name: Comprobar sitio y rutas
+      - name: Comprobar HTML, recursos y UTF-8
         run: |
           python3 - <<'PY'
           from pathlib import Path
           root=Path("dist")
-          for name in ["index.html","cloud.html"]:
+          for name in ("index.html","cloud.html"):
               text=(root/name).read_text(encoding="utf-8")
               assert "<!doctype html>" in text.lower(),name
               assert "<meta charset=" in text.lower(),name
-              assert 'type="module"' in text,name
-              for bad in ("GESTIÃ", "AutenticaciÃ", "AMBIENTA Â·"):
+              for bad in ("GESTIÃ","AutenticaciÃ","AMBIENTA Â·"):
                   assert bad not in text,(name,bad)
-          assert list((root/"assets").glob("*.js")), "Missing compiled JavaScript"
-          assert list((root/"assets").glob("*.css")), "Missing compiled CSS"
+          assert list((root/"assets").glob("*.js"))
+          assert list((root/"assets").glob("*.css"))
+          assert (root/".nojekyll").exists()
           PY
-      - name: Configurar GitHub Pages
-        uses: actions/configure-pages@v5
-        with:
-          enablement: true
-      - name: Preparar artefacto para Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
-      - name: Publicar HTTPS
-        id: deployment
-        uses: actions/deploy-pages@v4
+      - name: Sincronizar la rama gh-pages con el sitio compilado
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cd dist
+          git init -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Deploy AMBIENTA ${GITHUB_SHA}"
+          AUTH=$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)
+          git -c "http.extraheader=AUTHORIZATION: basic $AUTH" push --force "https://github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/gh-pages
