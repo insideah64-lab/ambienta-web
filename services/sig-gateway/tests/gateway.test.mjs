@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {createServer} from 'node:http';
 import {createHandler,validateRequest,upstreamUrl,retrieveAndClip} from '../gateway.mjs';
-const BBOX=[0,0,3,3];
-const closed=[[-1,-1],[4,-1],[4,4],[-1,4],[-1,-1]];
+const BBOX=[0,0,0.3,0.3];
+const closed=[[-0.1,-0.1],[0.4,-0.1],[0.4,0.4],[-0.1,0.4],[-0.1,-0.1]];
 const feature=(geometry,properties={nombre:'Polígono oficial de laboratorio',secretField:'no propagar'})=>({
  type:'Feature',properties,geometry});
 const polygon=feature({type:'Polygon',coordinates:[closed]});
@@ -51,11 +51,11 @@ test('fully reported Polygon intersects BBOX, preserves raw SHA and sanitizes so
  assert.deepEqual(result.source.features[0].properties,{name:'Polígono oficial de laboratorio'});
  assert.equal(result.clip.features[0].geometry.type,'Polygon');
  for(const ring of result.clip.features[0].geometry.coordinates)for(const [x,y] of ring)
-  assert(x>=0&&x<=3&&y>=0&&y<=3);
+  assert(x>=0&&x<=0.3&&y>=0&&y<=0.3);
 });
 test('hole clipping retains ring and yields correct planar area',async()=>{
- const outer=[[-2,-2],[5,-2],[5,5],[-2,5],[-2,-2]];
- const hole=[[1,1],[2,1],[2,2],[1,2],[1,1]];
+ const outer=[[-0.1,-0.1],[0.4,-0.1],[0.4,0.4],[-0.1,0.4],[-0.1,-0.1]];
+ const hole=[[0.1,0.1],[0.2,0.1],[0.2,0.2],[0.1,0.2],[0.1,0.1]];
  const result=await retrieveAndClip(req,{fetchImpl:mock(source([
   feature({type:'Polygon',coordinates:[outer,hole]})
  ]))});
@@ -76,7 +76,7 @@ test('source >1MiB blocked before geometry JSON parse',async()=>{
  await assert.rejects(()=>retrieveAndClip(req,{fetchImpl:async()=>response}),e=>e.code==='SOURCE_TOO_LARGE');
 });
 test('topology failure rejects instead of silently excluding an invalid source',async()=>{
- const bowtie=[[-1,-1],[4,4],[-1,4],[4,-1],[-1,-1]];
+ const bowtie=[[-0.1,-0.1],[0.4,0.4],[-0.1,0.4],[0.4,-0.1],[-0.1,-0.1]];
  await assert.rejects(()=>retrieveAndClip(req,{fetchImpl:mock(source([
   feature({type:'Polygon',coordinates:[bowtie]})
  ]))}),e=>e.code==='TOPOLOGY_REVIEW');
