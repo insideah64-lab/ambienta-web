@@ -22,9 +22,14 @@ for(const endpoint of endpoints){
    raw+=decoder.decode(value,{stream:true});
   }
   // Extract a bounded list of advertised WFS FeatureType identifiers.
-  const ids=[...raw.matchAll(/<(?:(?:[a-zA-Z0-9]+):)?FeatureType\b[\s\S]*?<(?:(?:[a-zA-Z0-9]+):)?Name>([^<]+)<\/(?:(?:[a-zA-Z0-9]+):)?Name>/g)]
-    .map(m=>m[1]).filter(n=>/depart|limite|cuenca|rio|agua|hidro|provincia/i.test(n));
-  item.matchingNames=ids.slice(0,45);
+  const entries=[...raw.matchAll(/<(?:[a-zA-Z0-9]+:)?FeatureType>([\\s\\S]*?)<\\/(?:[a-zA-Z0-9]+:)?FeatureType>/g)].map(match=>{
+    const text=match[1], name=text.match(/<(?:[a-zA-Z0-9]+:)?Name>([^<]+)<\\/(?:[a-zA-Z0-9]+:)?Name>/)?.[1],
+      title=text.match(/<(?:[a-zA-Z0-9]+:)?Title>([^<]+)<\\/(?:[a-zA-Z0-9]+:)?Title>/)?.[1];
+    return {name,title};
+   }).filter(x=>x.name);
+  item.featureTypeCount=entries.length;
+  item.allNames=entries.slice(0,65);
+  item.matchingNames=entries.filter(x=>/depart|limite|cuenca|hidro|provincia|riesgo|rio|agua/i.test(x.name+' '+x.title)).slice(0,45);
   if(!r.ok)item.error='HTTP '+r.status+' '+raw.slice(0,140);
   else if(!/<(?:[a-zA-Z0-9]+:)?WFS_Capabilities/.test(raw))item.error='Not WFS XML: '+raw.slice(0,170);
  }catch(e){item.error=String(e.message||e)+' | '+String(e.cause?.message||'');}
