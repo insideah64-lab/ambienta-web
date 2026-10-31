@@ -50,6 +50,7 @@ jobs:
           python3 -m http.server 8787 --bind 127.0.0.1 --directory dist >/tmp/ambienta-v3-preview.log 2>&1 &
           for i in $(seq 1 15); do curl -fsS http://127.0.0.1:8787/v3/index.html >/dev/null && break || sleep 1; done
           node apps/web-v3/scripts/topology-smoke.mjs
+          node apps/web-v3/scripts/georef-real-smoke.mjs
           sha256sum -c /tmp/ambienta-v1-v2.sha
       - name: Keep QA build (not a deployment)
         if: always()
