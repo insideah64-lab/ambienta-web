@@ -3,6 +3,10 @@
 // @ts-ignore: Legacy ESM domain is intentionally not yet converted to TypeScript.
 import { createDemoState, validateState, summary, exportJson, STATUS_LABELS } from '../../../../web/domain.mjs';
 
+// @ts-ignore: native JS fixture is validated by existing domain contract.
+import { createDiablillosState } from './diablillosDemo.mjs';
+export const IS_DIABLILLOS_CASE = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('caso') === 'diablillos';
+
 export type DemoProject = {
   id: string; name: string; province: string; phase: string;
   status: string; kind: string; proponent: string; technicalLead: string;
@@ -32,7 +36,7 @@ export type Summary = {
   inspectionsPending: number; inspectionsObserved: number;
   evidencePending: number; findingsOpen: number; correctiveOpen: number;
 };
-export const STORAGE_KEY = 'ambienta-pga-demo-v05';
+export const STORAGE_KEY = IS_DIABLILLOS_CASE ? 'ambienta-v2-diablillos-2026-demo' : 'ambienta-pga-demo-v05';
 
 export function readDemoState(): DemoState {
   try {
@@ -43,9 +47,9 @@ export function readDemoState(): DemoState {
       return parsed as DemoState;
     }
   } catch { /* Corrupt/missing local demo data: safely show original fixture in memory. */ }
-  return createDemoState() as DemoState;
+  return IS_DIABLILLOS_CASE ? createDiablillosState() as DemoState : createDemoState() as DemoState;
 }
-export function initialDemoState(): DemoState { return createDemoState() as DemoState; }
+export function initialDemoState(): DemoState { return IS_DIABLILLOS_CASE ? createDiablillosState() as DemoState : createDemoState() as DemoState; }
 export function demoSummary(data: DemoState): Summary { return summary(data) as Summary; }
 export function demoExport(data: DemoState): string { return exportJson(data) as string; }
 export function statusText(status: string): string {

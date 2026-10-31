@@ -549,3 +549,23 @@ a{text-decoration:none;color:inherit}
 .ref-shell .ref-map-polygon{stroke-width:4;stroke-dasharray:0;fill:#8bd0af35}
 .ref-shell .ref-hero h1{font-size:clamp(23px,2.1vw,32px)}
 .ref-shell .ref-dashboard-column .ref-panel{box-shadow:inset 0 1px #ffffff12,0 8px 22px #00000017}
+
+/* Isolated audit lab: Diablillos is a high-altitude Puna setting, never forest/Yungas.
+   Abstract mineral palette intentionally avoids inventing a location-specific photo. */
+.audit-diablillos .ref-hero{
+ background-image:linear-gradient(102deg,#091e2be8 4%,#122b365d 64%,#7a513a3f),
+ radial-gradient(ellipse at 84% 55%,#f1ae6663 0%,transparent 32%),
+ linear-gradient(156deg,#19303e 0%,#3c5b63 38%,#94735d 69%,#493b32 100%)!important;
+}
+.audit-diablillos .v2-scenic{background-image:linear-gradient(90deg,#172b33,#7e5949)!important;opacity:.25!important}
+.audit-diablillos .ref-about-photo{background-image:linear-gradient(135deg,#1b3943,#c59264)!important}
+.v2-case-banner{display:flex;gap:9px;align-items:center;margin-bottom:14px;border:1px solid #e8bd707c;background:#382b1bcf;color:#ffe4ae;border-radius:9px;padding:12px 16px;font-size:11px;font-weight:800;letter-spacing:.045em}
+.v2-case-banner svg{flex-shrink:0}
+.v2-case-sources{margin-top:18px;border:1px solid #6b967b8a;border-radius:11px;padding:18px;background:#102d2b}
+.v2-case-sources>strong{color:#99eec0;font-size:11px;letter-spacing:.09em}
+.v2-case-sources p{font-size:12px;color:#bddcd0;line-height:1.8}
+.v2-case-sources ul{padding-left:20px;display:grid;gap:8px}
+.v2-case-sources li{font-size:12px}
+.v2-case-sources a{display:inline-flex;gap:5px;align-items:center;color:#a2eed1;text-decoration:underline;text-underline-offset:4px}
+.v2-case-sources a:hover{color:#ffffff}
+@media(max-width:700px){.v2-case-banner{font-size:10px;line-height:1.5}}

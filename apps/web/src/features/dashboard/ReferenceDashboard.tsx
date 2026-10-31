@@ -7,7 +7,7 @@ import {
   ShieldCheck, Sprout, Wind, Volume2
 } from 'lucide-react';
 import type { DemoState, Summary } from '../../lib/demo';
-import { statusText } from '../../lib/demo';
+import { statusText, IS_DIABLILLOS_CASE } from '../../lib/demo';
 
 type Props = {data:DemoState;k:Summary;onExport:()=>void};
 const STATUS_STAGE:Record<string,number>={
@@ -29,7 +29,7 @@ function Hero({data}:{data:DemoState}) {
   const p=data.project;
   return <section className="ref-hero">
     <div className="ref-hero-copy">
-      <span className="ref-hero-label">PROYECTO DE EJEMPLO</span>
+      <span className="ref-hero-label">{IS_DIABLILLOS_CASE ? "CASO DOCUMENTAL · PRUEBA SIMULADA" : "PROYECTO DE EJEMPLO"}</span>
       <h1>{p.name}</h1>
       <div className="ref-hero-meta">
         <span><ClipboardCheck size={16}/> Código: {p.id}</span>
@@ -200,8 +200,8 @@ function Indicators() {
 function About({onExport}:{onExport:()=>void}) {
   return <section className="ref-panel ref-about">
     <div className="ref-about-photo" aria-hidden="true"/>
-    <div className="ref-about-text"><strong>Proyecto de ejemplo</strong>
-      <p>Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental.</p>
+    <div className="ref-about-text"><strong>{IS_DIABLILLOS_CASE?'Diablillos · escenario documental DEMO':'Proyecto de ejemplo'}</strong>
+      <p>{IS_DIABLILLOS_CASE?'Antecedentes públicos y registros sintéticos; no se realizaron inspecciones en campo ni se verificó cumplimiento ambiental.':'Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental.'}</p>
       <button type="button" aria-label="Exportar JSON" onClick={onExport}>
         <ArrowDownToLine size={16}/> Exportar resumen</button>
     </div>
@@ -242,6 +242,6 @@ export function ReferenceDashboard({data,k,onExport}:Props) {
         <About onExport={onExport}/>
       </div>
     </div>
-    <p className="ref-dashboard-disclaimer">AMBIENTA V2 · Vista conceptual basada en el diseño de referencia · Datos de demostración separados de Supabase.</p>
+    <p className="ref-dashboard-disclaimer">{IS_DIABLILLOS_CASE?"AMBIENTA V2 · Caso documental Diablillos: todas las inspecciones, resultados y evidencias operativas son SIMULADOS.":"AMBIENTA V2 · Vista conceptual basada en el diseño de referencia · Datos de demostración separados de Supabase."}</p>
   </div>;
 }

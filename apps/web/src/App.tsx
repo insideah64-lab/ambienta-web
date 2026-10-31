@@ -10,7 +10,9 @@ import {
   demoExport, demoSummary, readDemoState, statusText
 } from './lib/demo';
 import type { DemoState } from './lib/demo';
-import { STORAGE_KEY } from './lib/demo';
+import { STORAGE_KEY, IS_DIABLILLOS_CASE } from './lib/demo';
+// @ts-ignore: public-source metadata from deliberately isolated JS fixture.
+import { DIABLILLOS_SOURCES } from './lib/diablillosDemo.mjs';
 import { applyAndPersist, type Transaction } from './lib/transactions';
 import { DemoActionDialog, type DemoActionKind } from './features/demo/DemoActionDialog';
 import { CloudWorkspace } from './features/cloud/CloudWorkspace';
@@ -73,7 +75,10 @@ function Expediente({data}: {data:DemoState}) {
         <Info icon={Leaf} label="Actividad" value={p.kind}/>
         <Info icon={ShieldCheck} label="Responsable" value={p.technicalLead}/>
       </div>
-      <p className="v2-panel-note">Expediente ficticio. La edición completa sigue disponible en la aplicación V1 durante la migración.</p>
+      {IS_DIABLILLOS_CASE ? <div className="v2-case-sources"><strong>CONTEXTO DOCUMENTAL PÚBLICO · SIN AUDITORÍA OFICIAL</strong>
+        <p>Referencia administrativa según informe: <b>0090302-188367/2024-0</b>. DIA informada: Resolución 048/2026 SM. Fuentes citadas, no equivalentes a evidencias de cumplimiento.</p>
+        <ul>{DIABLILLOS_SOURCES.map((src:{id:string;label:string;url:string})=><li key={src.id}><a href={src.url} target="_blank" rel="noreferrer">{src.id} · {src.label} <ExternalLink size={13}/></a></li>)}</ul>
+        <p>Las medidas, inspecciones, revisiones, hallazgos y acciones en este expediente son <b>simulaciones del laboratorio</b>. No se realizaron visitas de campo.</p></div> : <p className="v2-panel-note">Expediente ficticio. La edición completa sigue disponible en la aplicación V1 durante la migración.</p>}
     </Panel>
     <Panel kicker="GIS — PENDIENTE DE INTEGRACIÓN" title="Ubicación y geometría">
       <MapPreview province={p.province}/>
@@ -233,7 +238,7 @@ export default function App() {
   const isPrivate=location.pathname==='/nube';
   const isOverview=location.pathname==='/';
   useEffect(()=>setSidebarOpen(false),[location.pathname]);
-  return <div className={"v2-app ref-shell"+(bright?" ref-bright":"")}>
+  return <div className={"v2-app ref-shell"+(bright?" ref-bright":"")+(IS_DIABLILLOS_CASE?" audit-diablillos":"")}>
     <aside className={'v2-sidebar '+(sidebarOpen?'sidebar-open':'')} aria-label="Navegación de AMBIENTA">
       <div className="v2-brand"><span className="v2-logo"><Leaf size={30}/></span><div><strong>AMBIENTA</strong><small>PLATAFORMA AMBIENTAL</small></div>
         <button className="v2-close" aria-label="Cerrar navegación" onClick={()=>setSidebarOpen(false)}><X size={20}/></button>
@@ -269,9 +274,10 @@ export default function App() {
         </div>
       </header>
       <div className="v2-content">
+        {IS_DIABLILLOS_CASE&&!isPrivate&&<div className="v2-case-banner" role="note"><ShieldCheck size={17}/> CASO DIABLILLOS · AUDITORÍA DOCUMENTAL DEMO · RESULTADOS SIMULADOS · SIN VISITA DE CAMPO</div>}
         {!isOverview&&<div className="v2-page-intro"><div><p className="v2-kicker">PLATAFORMA AMBIENTAL ARGENTINA · V2 EXPERIMENTAL</p>
           <h1>{active.label}</h1><p>{active.description}</p></div></div>}
-        {!isPrivate&&!isOverview&&<div className="v2-warning"><span>!</span><p><strong>Ambiente de demostración.</strong> Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental.</p></div>}
+        {!isPrivate&&!isOverview&&<div className="v2-warning"><span>!</span><p><strong>Ambiente de demostración.</strong> {IS_DIABLILLOS_CASE ? "Diablillos es un caso documental basado en fuentes públicas; medidas, inspecciones, evidencias y hallazgos son SIMULADOS. No se realizó auditoría de campo ni se certifica cumplimiento." : "Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental."}</p></div>}
         {notice&&<div className="v2-success" role="status"><CheckCircle2 size={17}/><span>{notice}</span>
           <button type="button" onClick={()=>setNotice('')} aria-label="Cerrar confirmación"><X size={16}/></button></div>}
         <Routes>
