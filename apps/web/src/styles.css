@@ -667,3 +667,20 @@ a{text-decoration:none;color:inherit}
 .v2-area-stack .geo-import-panel>.geo-import-note,.v2-area-stack .geo-import-panel>.geo-hydro-fields,
 .v2-area-stack .geo-import-panel>[role=alert],.v2-area-stack .geo-import-panel>[role=status]{grid-column:1/-1}
 @media(max-width:740px){.v2-area-stack .geo-map{height:330px}.v2-area-stack .geo-import-panel{display:grid;grid-template-columns:minmax(0,1fr);padding:13px}.v2-area-stack .geo-import-panel>*{grid-column:1/-1}.v2-area-stack .v2-area-overview .v2-panel-note{min-width:0}}
+
+/* WMS catalog + live overlay are user-supplied, not official cartography. */
+.geo-wms-workbench{display:grid;gap:12px;padding:18px 20px;background:#102d38;border-top:1px solid #538b94}
+.geo-wms-workbench h3{color:#b8f0f6;font-size:14px;margin:0}
+.geo-wms-workbench p{font-size:11px;color:#c9e2e2;line-height:1.6;margin:0}
+.geo-wms-workbench form,.geo-wms-inspected{display:grid;gap:11px}
+.geo-wms-workbench form{grid-template-columns:repeat(2,minmax(0,1fr))}
+.geo-wms-workbench label{display:grid;gap:6px;color:#c4e9e9;font-size:11px;font-weight:750}
+.geo-wms-workbench label:first-child{grid-column:1/-1}
+.geo-wms-workbench input,.geo-wms-workbench select{background:#0a3039;border:1px solid #65939b;color:#e7ffff;border-radius:8px;padding:10px;width:100%;font-size:12px}
+.geo-wms-workbench form>button{grid-column:1/-1}
+.geo-wms-action{background:#205e64;color:#e8ffff;border:1px solid #7cbbc4;border-radius:8px;padding:10px 14px;font-weight:800;cursor:pointer;font-size:12px}
+.geo-wms-action:disabled{opacity:.5;cursor:default}
+.geo-wms-inspected{border:1px solid #387f87;background:#0f3b45;border-radius:9px;padding:13px}
+.geo-wms-inspected>strong{color:#a6f0ff;font-size:12px}
+.geo-wms-active{background:#2c4d3f;border:1px solid #d7ad72;border-radius:8px;color:#ffe5ad!important;padding:10px}
+@media(max-width:700px){.geo-wms-workbench{padding:12px}.geo-wms-workbench form{grid-template-columns:1fr}.geo-wms-workbench form>*{grid-column:1/-1}}

@@ -7,6 +7,7 @@ import {IS_DIABLILLOS_CASE} from '../../lib/demo';
 import {validateGeoJson} from './geojson-validate.mjs';
 // @ts-ignore: hydrology validation is plain JS and unit-tested in Node
 import {validateHydrologyImport} from './hydrology-validation.mjs';
+import {WmsWorkbench} from './WmsWorkbench';
 
 type Props={compact?:boolean;province:string};
 type WorkingLayer={
@@ -205,6 +206,7 @@ export function GeoMap({compact=false,province}:Props){
     </div>
     <p className="geo-import-note">Persistencia exclusiva en este navegador. No apto para información sensible ni almacenamiento probatorio; no sube archivos al servidor.</p>
    </div>}
+   {!compact&&<WmsWorkbench mapRef={mapRef} disabled={status!=='ready'}/>}
    <div className="geo-source">
     <a target="_blank" rel="noreferrer" href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a> · Cartografía base externa
     {tilesLoaded&&<span className="geo-render-ok"> · Teselas procesadas</span>}
