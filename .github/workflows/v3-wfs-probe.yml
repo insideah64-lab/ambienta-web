@@ -17,5 +17,5 @@ jobs:
           node-version: '22'
       - name: Consultar cuatro combinaciones de WFS sin bajar bases completas
         run: |
-          node v3/ogc/probe-ign.mjs
+          node --check v3/ogc/probe-salta.mjs
           node v3/ogc/probe-salta.mjs
