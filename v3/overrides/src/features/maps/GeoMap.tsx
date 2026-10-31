@@ -7,6 +7,8 @@ import {IS_DIABLILLOS_CASE} from '../../lib/demo';
 import {buildIdesaWfsUrl,IDESA_WFS_CAPABILITIES} from './idesa-wfs.mjs';
 // @ts-ignore: bounded provider client shared with browser/Node verification
 import {requestOfficialPolygons} from './sig-gateway-client.mjs';
+// @ts-ignore: scoped browser-safe Supabase anon key and Edge gateway route
+import {SIG_API_BASE,SIG_API_ANON} from './sig-gateway-config.mjs';
 // @ts-ignore: shared Georef public API adapter
 import {queryGeoref,georefUrl} from '../georef/georef-service.mjs';
 // @ts-ignore: legacy pure JS parser intentionally shared with Node's native test runner
@@ -36,7 +38,8 @@ type WorkingLayer={
 };
 const PUNA_CENTER:[number,number]=[-67.2,-24.7];
 const SALTA_CENTER:[number,number]=[-65.45,-24.82];
-const SIG_GATEWAY_URL=(import.meta.env.VITE_SIG_GATEWAY_URL||'').trim();
+const SIG_GATEWAY_URL=(import.meta.env.VITE_SIG_GATEWAY_URL||SIG_API_BASE).trim();
+const SIG_GATEWAY_TOKEN=(import.meta.env.VITE_SIG_GATEWAY_TOKEN||SIG_API_ANON).trim();
 const TILE_URL='https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const BASE_STYLE:maplibregl.StyleSpecification={
  version:8,
@@ -256,7 +259,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),19000);
   try{
-   const response=await requestOfficialPolygons(SIG_GATEWAY_URL,selection,aoiLocal.bbox,{signal:controller.signal});
+   const response=await requestOfficialPolygons(SIG_GATEWAY_URL,selection,aoiLocal.bbox,{signal:controller.signal,token:SIG_GATEWAY_TOKEN});
    if(response.status==='empty'){setError('IDESA no informó polígonos en esta ventana. No se creó una capa ficticia.');return;}
    const checked=validateGeoJson(response.source);
    const local=clipGeoJsonToBbox(checked.geojson,aoiLocal.bbox);
