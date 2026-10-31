@@ -30,7 +30,9 @@ export async function requestOfficialPolygons(base,layer,bbox,{fetchImpl=fetch,s
  if(!response.ok){
   const data=await response.json().catch(()=>null);
   const reason=typeof data?.error?.message==='string'?data.error.message:'Error HTTP '+response.status+' del servicio SIG.';
-  throw new Error(reason.slice(0,300));
+  const retry=response.status===429?Number(response.headers.get('retry-after')||0):0;
+  const hint=Number.isInteger(retry)&&retry>0&&retry<=86400?' Volvé a intentar en '+Math.ceil(retry/60)+' minuto(s).':'';
+  throw new Error(reason.slice(0,260)+hint);
  }
  const size=Number(response.headers.get('content-length')||0);
  if(size>1_600_000)throw Error('La respuesta SIG supera el límite de seguridad.');
