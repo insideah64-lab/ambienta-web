@@ -24,7 +24,7 @@ export function validateGeoJson(input){
    if(key==='numberMatched'&&declared==='unknown')
     fail('el WFS no informa cantidad total; consultar en un SIG antes de exportar.');
    if(!(typeof declared==='number'&&Number.isSafeInteger(declared)&&declared>=0) &&
-      !(typeof declared==='string'&&/^\\d+$/.test(declared)))
+      !(typeof declared==='string'&&/^[0-9]+$/.test(declared)))
     fail('contador WFS inválido: '+key+'.');
    const number=Number(declared);
    if(!Number.isSafeInteger(number)||number!==features.length)
