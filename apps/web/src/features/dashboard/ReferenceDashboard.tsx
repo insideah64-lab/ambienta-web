@@ -220,7 +220,7 @@ export function ReferenceDashboard({data,k,onExport}:Props) {
       <Metric icon={ClipboardCheck} label="MEDIDAS AMBIENTALES" value={k.measures}
         subtitle={k.verified+' verificadas · '+data.measures.filter(m=>m.status==='en_ejecucion').length+' en ejecución'}
         accent="green" fill={k.measures?k.verified/k.measures*100:0}/>
-      <Metric icon={ShieldCheck} label="INSPECCIONES" value={k.inspectionsPending}
+      <Metric icon={ShieldCheck} label="INSPECCIONES" value={data.inspections.length}
         subtitle={data.inspections.length+' registradas · '+k.inspectionsPending+' pendientes'} accent="cyan"
         fill={data.inspections.length?completedInspections/data.inspections.length*100:0}/>
       <Metric icon={FileText} label="EVIDENCIAS" value={data.evidence.length}
