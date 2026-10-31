@@ -1,7 +1,7 @@
 name: AMBIENTA V3 · Gateway SIG seguro (sin desplegar)
 on:
   push:
-    branches: ['feature/ambienta-v3-sig-gateway-2026-10-31']
+    branches: ['feature/ambienta-v3-sig-gateway-2026-10-31', 'feature/ambienta-v31-distributed-quotas-2026-10-31']
     paths:
       - 'services/sig-gateway/**'
       - '.github/workflows/sig-gateway-ci.yml'
@@ -40,8 +40,13 @@ jobs:
         run: |
           cmp lib/aoi-clip.mjs edge/lib/aoi-clip.mjs
           cmp lib/geojson-validate.mjs edge/lib/geojson-validate.mjs
+          cmp lib/aoi-clip.mjs edge-v31/lib/aoi-clip.mjs
+          cmp lib/geojson-validate.mjs edge-v31/lib/geojson-validate.mjs
           cd edge
           deno check index.ts
+          cd ../edge-v31
+          deno check index.ts
+          deno test --allow-env quota.test.ts
       - name: Clean dependency install from lockfile
         run: npm ci --no-fund --no-audit
       - name: Unit HTTP, polygon, source integrity and security tests
