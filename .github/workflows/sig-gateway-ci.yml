@@ -1,0 +1,40 @@
+name: AMBIENTA V3 · Gateway SIG seguro (sin desplegar)
+on:
+  push:
+    branches: ['feature/ambienta-v3-sig-gateway-2026-10-31']
+    paths:
+      - 'services/sig-gateway/**'
+      - '.github/workflows/sig-gateway-ci.yml'
+      - 'v3/overrides/src/features/maps/aoi-clip.mjs'
+      - 'v3/overrides/src/features/maps/geojson-validate.mjs'
+  pull_request:
+    paths:
+      - 'services/sig-gateway/**'
+      - '.github/workflows/sig-gateway-ci.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  gateway:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    defaults:
+      run:
+        working-directory: services/sig-gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: services/sig-gateway/package-lock.json
+      - name: Verify backend/client topology implementation parity
+        run: |
+          cmp lib/aoi-clip.mjs ../../v3/overrides/src/features/maps/aoi-clip.mjs
+          cmp lib/geojson-validate.mjs ../../v3/overrides/src/features/maps/geojson-validate.mjs
+      - name: Clean dependency install from lockfile
+        run: npm ci --no-fund --no-audit
+      - name: Unit HTTP, polygon, source integrity and security tests
+        run: npm test
+      - name: IDESA WFS live limited BBOX smoke
+        run: node tests/live-idesa.mjs
