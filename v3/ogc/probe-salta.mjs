@@ -22,11 +22,14 @@ for(const endpoint of endpoints){
    raw+=decoder.decode(value,{stream:true});
   }
   // Extract a bounded list of advertised WFS FeatureType identifiers.
-  const entries=[...raw.matchAll(/<(?:[a-zA-Z0-9]+:)?FeatureType>([\\s\\S]*?)<\\/(?:[a-zA-Z0-9]+:)?FeatureType>/g)].map(match=>{
-    const text=match[1], name=text.match(/<(?:[a-zA-Z0-9]+:)?Name>([^<]+)<\\/(?:[a-zA-Z0-9]+:)?Name>/)?.[1],
-      title=text.match(/<(?:[a-zA-Z0-9]+:)?Title>([^<]+)<\\/(?:[a-zA-Z0-9]+:)?Title>/)?.[1];
-    return {name,title};
-   }).filter(x=>x.name);
+  const normalized=raw.replaceAll('wfs:FeatureType','FeatureType')
+    .replaceAll('wfs:Name','Name').replaceAll('wfs:Title','Title');
+  const entries=normalized.split('<FeatureType>').slice(1).map(group=>{
+   const block=group.split('</FeatureType>')[0];
+   const name=block.includes('<Name>')?block.split('<Name>')[1].split('</Name>')[0]:null;
+   const title=block.includes('<Title>')?block.split('<Title>')[1].split('</Title>')[0]:null;
+   return {name,title};
+  }).filter(x=>x.name);
   item.featureTypeCount=entries.length;
   item.allNames=entries.slice(0,65);
   item.matchingNames=entries.filter(x=>/depart|limite|cuenca|hidro|provincia|riesgo|rio|agua/i.test(x.name+' '+x.title)).slice(0,45);
