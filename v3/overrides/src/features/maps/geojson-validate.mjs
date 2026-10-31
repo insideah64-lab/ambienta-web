@@ -71,8 +71,9 @@ export function validateGeoJson(input){
  }
  const clean=features.map((f,i)=>{
    if(!object(f)||f.type!=='Feature')fail('entidad '+(i+1)+' no es Feature.');
-   const name=typeof f.properties?.name==='string'?f.properties.name.slice(0,100):
-       'Entidad '+(i+1);
+   const rawName=typeof f.properties?.name==='string'?f.properties.name:
+      typeof f.properties?.nombre==='string'?f.properties.nombre:null;
+   const name=rawName?.trim().slice(0,100)||'Entidad '+(i+1);
    return {type:'Feature',properties:{name},geometry:geometry(f.geometry)};
  });
  return {geojson:{type:'FeatureCollection',features:clean},
