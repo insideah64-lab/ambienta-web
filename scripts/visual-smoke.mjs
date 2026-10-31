@@ -10,6 +10,9 @@ page.on('pageerror',error=>errors.push(String(error)));
 const base='http://127.0.0.1:8981';
 try{
  await page.goto(base+'/index.html',{waitUntil:'domcontentloaded'});
+ await page.waitForTimeout(1000);
+ console.log('DIAGNOSTIC',JSON.stringify({pageErrors:errors,screen:await page.locator('#screen').innerHTML(),stylesheets:await page.locator('link[rel=stylesheet]').count()} ).slice(0,2500));
+ await page.screenshot({path:'visual-captures/debug-desktop.png',fullPage:true,animations:'disabled'});
  await page.locator('#screen .overview-kpis').waitFor({timeout:15000});
  await page.locator('#screen .dash-map').waitFor();
  await page.screenshot({path:'visual-captures/ambienta-dark-desktop.png',fullPage:true,animations:'disabled'});
