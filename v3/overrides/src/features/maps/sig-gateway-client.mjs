@@ -15,6 +15,8 @@ export function normalizeGatewayUrl(raw,{allowLocal=false}={}){
   throw Error('Ruta del gateway SIG no autorizada.');
  return isSupabase?endpoint.origin+endpoint.pathname:endpoint.origin;
 }
+/** @param {string} base @param {string} layer @param {number[]} bbox
+ * @param {{fetchImpl?: typeof fetch, signal?: AbortSignal, allowLocal?:boolean, token?:string}} [options] */
 export async function requestOfficialPolygons(base,layer,bbox,{fetchImpl=fetch,signal,allowLocal=false,token=''}={}){
  if(!LAYERS.has(layer))throw Error('La capa solicitada no está autorizada.');
  if(!Array.isArray(bbox)||bbox.length!==4||bbox.some(x=>!Number.isFinite(x)))
