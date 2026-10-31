@@ -8,7 +8,7 @@ try{
  // Preview runs at localhost, while Edge intentionally allows only the production
  // github.io Origin. Relay only the fixed real Edge endpoint from Node and translate
  // CORS headers for this local browser QA; production CORS is tested separately.
- await page.route('https://rqzeejnhszbbohaqdpgp.supabase.co/functions/v1/ambienta-sig-v3',async route=>{
+ await page.route('https://rqzeejnhszbbohaqdpgp.supabase.co/functions/v1/ambienta-sig-v31',async route=>{
   const req=route.request();
   const cors={'access-control-allow-origin':'http://127.0.0.1:8787',
    'access-control-allow-methods':'POST, OPTIONS',
