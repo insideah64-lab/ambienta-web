@@ -7,17 +7,22 @@ export function normalizeGatewayUrl(raw,{allowLocal=false}={}){
  try{endpoint=new URL(raw);}catch{throw Error('Dirección del servicio SIG inválida.');}
  const local=allowLocal&&endpoint.protocol==='http:'&&['localhost','127.0.0.1'].includes(endpoint.hostname);
  if(endpoint.protocol!=='https:'&&!local)throw Error('El servicio SIG requiere HTTPS.');
- if(endpoint.username||endpoint.password||endpoint.search||endpoint.hash||endpoint.pathname!=='/')
-  throw Error('La dirección del servicio SIG no debe contener credenciales, rutas ni parámetros.');
- return endpoint.origin;
+ if(endpoint.username||endpoint.password||endpoint.search||endpoint.hash)
+  throw Error('La dirección del servicio SIG no debe contener credenciales ni parámetros.');
+ const isSupabase=endpoint.hostname==='rqzeejnhszbbohaqdpgp.supabase.co'&&
+  endpoint.pathname==='/functions/v1/ambienta-sig-v3';
+ if(!isSupabase&&endpoint.pathname!=='/')
+  throw Error('Ruta del gateway SIG no autorizada.');
+ return isSupabase?endpoint.origin+endpoint.pathname:endpoint.origin;
 }
-export async function requestOfficialPolygons(base,layer,bbox,{fetchImpl=fetch,signal,allowLocal=false}={}){
+export async function requestOfficialPolygons(base,layer,bbox,{fetchImpl=fetch,signal,allowLocal=false,token=''}={}){
  if(!LAYERS.has(layer))throw Error('La capa solicitada no está autorizada.');
  if(!Array.isArray(bbox)||bbox.length!==4||bbox.some(x=>!Number.isFinite(x)))
   throw Error('La ventana BBOX debe tener cuatro valores válidos.');
- const origin=normalizeGatewayUrl(base,{allowLocal});
- const response=await fetchImpl(origin+'/v1/clip',{method:'POST',
-  headers:{'content-type':'application/json'},
+ const endpoint=normalizeGatewayUrl(base,{allowLocal});
+ const url=endpoint.includes('/functions/v1/')?endpoint:endpoint+'/v1/clip';
+ const response=await fetchImpl(url,{method:'POST',
+  headers:{'content-type':'application/json',...(token?{'authorization':'Bearer '+token,'apikey':token}:{})},
   body:JSON.stringify({layer,bbox}),
   signal});
  if(!response.ok){
