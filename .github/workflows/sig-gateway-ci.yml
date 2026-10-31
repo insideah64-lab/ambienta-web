@@ -57,3 +57,5 @@ jobs:
         run: node tests/live-supabase-edge.mjs
       - name: Confirm browser CORS preflight without JWT
         run: node tests/live-cors.mjs
+      - name: Isolated Edge V3.1 and Postgres shared quota integration
+        run: node tests/live-supabase-v31.mjs
