@@ -10,7 +10,7 @@ export function normalizeGatewayUrl(raw,{allowLocal=false}={}){
  if(endpoint.username||endpoint.password||endpoint.search||endpoint.hash)
   throw Error('La dirección del servicio SIG no debe contener credenciales ni parámetros.');
  const isSupabase=endpoint.hostname==='rqzeejnhszbbohaqdpgp.supabase.co'&&
-  endpoint.pathname==='/functions/v1/ambienta-sig-v3';
+  ['/functions/v1/ambienta-sig-v3','/functions/v1/ambienta-sig-v31'].includes(endpoint.pathname);
  if(!isSupabase&&endpoint.pathname!=='/')
   throw Error('Ruta del gateway SIG no autorizada.');
  return isSupabase?endpoint.origin+endpoint.pathname:endpoint.origin;
@@ -30,7 +30,9 @@ export async function requestOfficialPolygons(base,layer,bbox,{fetchImpl=fetch,s
  if(!response.ok){
   const data=await response.json().catch(()=>null);
   const reason=typeof data?.error?.message==='string'?data.error.message:'Error HTTP '+response.status+' del servicio SIG.';
-  throw new Error(reason.slice(0,300));
+  const retry=response.status===429?Number(response.headers.get('retry-after')||0):0;
+  const hint=Number.isInteger(retry)&&retry>0&&retry<=86400?' Volvé a intentar en '+Math.ceil(retry/60)+' minuto(s).':'';
+  throw new Error(reason.slice(0,260)+hint);
  }
  const size=Number(response.headers.get('content-length')||0);
  if(size>1_600_000)throw Error('La respuesta SIG supera el límite de seguridad.');
