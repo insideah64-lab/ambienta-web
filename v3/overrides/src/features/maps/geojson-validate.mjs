@@ -8,7 +8,7 @@ export function validateGeoJson(input){
  if(!object(input))fail('debe ser un objeto Feature o FeatureCollection.');
  if(input.crs){
    const name=input.crs?.properties?.name;
-   if(!['EPSG:4326','urn:ogc:def:crs:OGC:1.3:CRS84','OGC:CRS84'].includes(name))
+   if(!['EPSG:4326','urn:ogc:def:crs:EPSG::4326','urn:ogc:def:crs:EPSG:6.6:4326','http://www.opengis.net/def/crs/EPSG/0/4326','urn:ogc:def:crs:OGC:1.3:CRS84','OGC:CRS84'].includes(name))
      fail('CRS distinto de WGS84/EPSG:4326; reproyectá previamente en un SIG.');
  }
  const features=input.type==='FeatureCollection'?input.features:
