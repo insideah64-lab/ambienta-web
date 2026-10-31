@@ -33,6 +33,11 @@ jobs:
           cd ../..
           mkdir -p dist/v2
           cp -a apps/web/dist/. dist/v2/
+          # V3 is an independent build; never overwrite V1 or V2.
+          sha256sum dist/index.html dist/v2/index.html > /tmp/ambienta-v1-v2-before.sha
+          bash v3/scripts/build-v3.sh
+          node --test tests/react-v3/aoi-clip.test.mjs
+          sha256sum -c /tmp/ambienta-v1-v2-before.sha
           touch dist/.nojekyll
       - name: Comprobar HTML, recursos y UTF-8
         run: |
@@ -52,6 +57,10 @@ jobs:
           assert '<div id="root"></div>' in v2
           assert list((root/"v2"/"assets").glob("*.js"))
           assert list((root/"v2"/"assets").glob("*.css"))
+          v3=(root/"v3"/"index.html").read_text(encoding="utf-8")
+          assert '<div id="root"></div>' in v3
+          assert list((root/"v3"/"assets").glob("*.js"))
+          assert list((root/"v3"/"assets").glob("*.css"))
           PY
       - name: Sincronizar la rama gh-pages con el sitio compilado
         env:
