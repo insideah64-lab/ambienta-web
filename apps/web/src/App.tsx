@@ -18,6 +18,7 @@ import { DemoActionDialog, type DemoActionKind } from './features/demo/DemoActio
 import { CloudWorkspace } from './features/cloud/CloudWorkspace';
 import { ReferenceDashboard } from './features/dashboard/ReferenceDashboard';
 import { GeoMap } from './features/maps/GeoMap';
+import {GeorefTerritory,GeorefSavedSummary,type TerritoryFocus} from './features/georef/GeorefTerritory';
 import { EvidenceIntegrityLab } from './features/evidence/EvidenceIntegrityLab';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
@@ -52,8 +53,8 @@ function measureTone(status: string): 'neutral'|'mint'|'amber'|'blue' {
 function Panel({kicker, title, children, action}: {kicker:string;title:string;children:React.ReactNode;action?:React.ReactNode}) {
   return <section className="v2-panel"><header className="v2-panel-title"><div><p className="v2-kicker">{kicker}</p><h2>{title}</h2></div>{action}</header>{children}</section>;
 }
-function MapPreview({province}:{province:string}) {
- return <GeoMap province={province}/>;
+function MapPreview({province,focus}:{province:string;focus?:TerritoryFocus|null}) {
+ return <GeoMap province={province} focus={focus}/>;
 }
 function Info({label,value,icon:Icon}:{label:string;value:string;icon:LucideIcon}) {
   return <div className="v2-info"><Icon size={18}/><div><small>{label}</small><strong>{value}</strong></div></div>;
@@ -63,6 +64,7 @@ function Expediente({data}: {data:DemoState}) {
   return <div className="v2-detail-grid">
     <Panel kicker="FICHA DEL PROYECTO" title={p.name}>
       <div className="v2-project-code">{p.id} · {p.province}</div>
+      <GeorefSavedSummary/>
       <div className="v2-project-fields">
         <Info icon={ShieldCheck} label="Estado" value={p.status}/>
         <Info icon={Clock3} label="Fase" value={p.phase}/>
@@ -82,6 +84,7 @@ function Expediente({data}: {data:DemoState}) {
   </div>;
 }
 function AreaEstudio({data}:{data:DemoState}) {
+ const [territoryFocus,setTerritoryFocus]=useState<TerritoryFocus|null>(null);
  return <div className="v2-area-stack">
    <Panel kicker="ÁREA DE ESTUDIO" title="Ficha territorial y trazabilidad">
     <div className="v2-area-overview">
@@ -92,8 +95,9 @@ function AreaEstudio({data}:{data:DemoState}) {
      <p className="v2-panel-note">La cartografía OSM representa el entorno regional. Sin límites del proyecto, puntos de muestreo ni inventarios hidrográficos oficialmente verificados. Las capas importadas permanecen como material local NO VERIFICADO.</p>
     </div>
    </Panel>
+   <GeorefTerritory onFocus={setTerritoryFocus}/>
    <Panel kicker="SIG · MAPA INTERACTIVO" title="Cartografía regional, capas y procedencia">
-    <MapPreview province={data.project.province}/>
+    <MapPreview province={data.project.province} focus={territoryFocus}/>
     <p className="v2-panel-note">No se presenta esta cartografía como evaluación de calidad del agua, georreferenciación de instalaciones ni certificación ambiental.</p>
    </Panel>
  </div>;

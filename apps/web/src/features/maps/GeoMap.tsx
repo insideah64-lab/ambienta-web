@@ -9,7 +9,7 @@ import {validateGeoJson} from './geojson-validate.mjs';
 import {validateHydrologyImport} from './hydrology-validation.mjs';
 import {WmsWorkbench} from './WmsWorkbench';
 
-type Props={compact?:boolean;province:string};
+type Props={compact?:boolean;province:string;focus?:{lat:number;lon:number;zoom:number;seq:number}|null};
 type WorkingLayer={
  label:string;source:string;fileName:string;sha256:string;savedAt:string;
  featureCount:number;coordinateCount:number;bounds:[number,number,number,number];
@@ -65,7 +65,7 @@ function mountWorking(map:MapLibreMap,layer:WorkingLayer|null,fit:boolean){
   else map.fitBounds([[west,south],[east,north]],{padding:45,maxZoom:12,duration:0});
  }
 }
-export function GeoMap({compact=false,province}:Props){
+export function GeoMap({compact=false,province,focus}:Props){
  const element=useRef<HTMLDivElement|null>(null);
  const mapRef=useRef<MapLibreMap|null>(null);
  const [status,setStatus]=useState<'loading'|'ready'|'unavailable'>('loading');
@@ -105,7 +105,13 @@ export function GeoMap({compact=false,province}:Props){
    return ()=>{alive=false;observer?.disconnect();map.remove();mapRef.current=null;};
   }catch{if(alive)setStatus('unavailable');return ()=>{alive=false;};}
  },[compact]);
- async function loadFile(ev:ChangeEvent<HTMLInputElement>){
+ useEffect(()=>{
+   if(!focus||!Number.isFinite(focus.lat)||!Number.isFinite(focus.lon)||!mapRef.current)return;
+   const map=mapRef.current;
+   // Centroid is administrative reference only, never a claimed installation point.
+   map.flyTo({center:[focus.lon,focus.lat],zoom:focus.zoom,essential:false,duration:500});
+ },[focus?.seq]);
+  async function loadFile(ev:ChangeEvent<HTMLInputElement>){
   const file=ev.target.files?.[0];ev.target.value='';
   if(!file)return;
   setError('');
@@ -152,7 +158,7 @@ export function GeoMap({compact=false,province}:Props){
    <div className="geo-map" ref={element} role="region" aria-label={'Mapa base OpenStreetMap interactivo · '+province}/>
    <div className="geo-mode"><span className="geo-live-dot"/> Base real · OpenStreetMap</div>
    <div className="geo-canvas-info">
-    <strong>{IS_DIABLILLOS_CASE?'Puna de Salta · contexto regional':'Provincia de Salta · contexto regional'}</strong>
+    <strong>{focus?'Centroide administrativo · Georef':IS_DIABLILLOS_CASE?'Puna de Salta · contexto regional':'Provincia de Salta · contexto regional'}</strong>
     <span>{layer?'Capa importada: NO VERIFICADA, sin asociación oficial al proyecto.':'Vista regional orientativa, NO ubicación ni perímetro del proyecto.'}</span>
    </div>
    {status==='loading'&&<div className="geo-status" role="status">Preparando cartografía…</div>}
