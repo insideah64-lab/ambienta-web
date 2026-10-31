@@ -1,0 +1,60 @@
+/* AMBIENTA Cloud — dark visual system matched to approved dashboard */
+:root{color-scheme:dark;--cloud-bg:#071d20;--cloud-surface:#102f2d;--cloud-card:#0d2c2b;--cloud-text:#edfbf3;--cloud-muted:#9fbfb0;--cloud-line:#34564b}
+body{background:#081e20;color:#e9fbf3}
+.cloud-shell{background:radial-gradient(circle at 90% 0,#19463d 0,transparent 33%),linear-gradient(145deg,#0a2d2b,#071a20 75%)}
+.cloud-side{background:linear-gradient(160deg,#0b4034,#06241f 70%,#081d1b);border-right:1px solid #3d736050}
+.cloud-side .brand strong{color:#f0fff8}.cloud-side .brand small{color:#9dddbb}
+.cloud-side .brand-icon{background:#8dedb6;color:#0a3b2d}
+.cloud-side-info h2{color:#eefff4}
+.cloud-side-info p{color:#adcfbd}
+.cloud-pill{background:#215e456e;border-color:#5fad785c;color:#baffd5}
+.cloud-proof{color:#afdfc2}
+.cloud-demo-link{color:#b4f2d0;border-color:#6a9b7b37}
+.cloud-main{position:relative;isolation:isolate;background:linear-gradient(115deg,#0c302d,#081e23 70%)}
+.cloud-main:before{content:"";position:absolute;left:0;top:0;width:100%;height:185px;z-index:-1;pointer-events:none;background:linear-gradient(0deg,#0c302d 0%,transparent 70%),linear-gradient(120deg,#0f312da8,#1e4d48a4 45%,#0c282ea6),radial-gradient(ellipse at 75% -20%,#63827d5c,transparent 65%)}
+.cloud-topbar{border-color:#4e746550;color:#b6d5c2}
+.cloud-topbar strong{color:#80f0b6}
+.cloud-session{color:#c0dcd0}
+.cloud-footer{color:#82aaa0}
+.cloud-content{color:#effbf4}
+.cloud-eyebrow{color:#78e2a4}
+.cloud-header h1,.cloud-auth h1{color:#f7fff9}
+.cloud-header p,.cloud-muted{color:#a1c2b3}
+.cloud-card{background:linear-gradient(145deg,#113331,#092528);border-color:#41695a65;box-shadow:0 12px 28px #0004;color:#d9f4e5}
+.cloud-card h2,.cloud-card h3{color:#f3fff8}
+.cloud-grid .cloud-card{transition:transform .18s ease,box-shadow .18s ease}
+.cloud-grid .cloud-card:hover{transform:translateY(-3px);box-shadow:0 17px 30px #0006}
+.cloud-primary{background:#146d4e;color:#f3fff8;border:1px solid #6ad69b55}
+.cloud-primary:hover{background:#218766}
+.cloud-secondary{background:#173f37;border-color:#578e6d;color:#dcffeb}
+.cloud-secondary:hover{background:#245c47}
+.cloud-quiet{background:#194a3b;border-color:#528e73;color:#a8f5c4}
+.cloud-quiet:hover{background:#205a46}
+.cloud-nav button{background:#0e2f2d;border-color:#375d53;color:#b9d6c5}
+.cloud-nav button.active{background:#207752;border-color:#63c78c;color:#f1fff5}
+.cloud-total{background:#153c33;color:#b9f3d0;border:1px solid #3e765959}
+.cloud-total b{color:#f2fff7}
+.cloud-total span{color:#a1bcad}
+.cloud-record{background:#163b35;border:1px solid #3e614e}
+.cloud-table th{color:#97d5af;border-color:#3d6555}
+.cloud-table td{color:#d4eade;border-color:#365748}
+.cloud-table td strong{color:#ecfff5}
+.cloud-table td small{color:#9cbaaa}
+.cloud-tag{background:#1e563b;color:#a6f8c5}
+.cloud-tag.pending{background:#533e2a;color:#ffcc92}
+.cloud-form label{color:#b2d9bd}
+.cloud-form input,.cloud-form select,.cloud-form textarea{background:#0b282a;color:#edfdf3;border:1px solid #4b7862}
+.cloud-form input:focus,.cloud-form select:focus,.cloud-form textarea:focus{outline:2px solid #70d9a1;outline-offset:2px}
+.cloud-form input::placeholder{color:#82a796}
+.cloud-alert{background:#3a3328;border:1px solid #806a40;color:#ffdbac}
+.cloud-alert.success{background:#153d2e;border-color:#488363;color:#b6f9cb}
+.cloud-loading{color:#b8dcc3}
+.cloud-blurb{background:#11392f;border-color:#4cc083;color:#aedfc2}
+.cloud-empty{background:#14332f;color:#abcfba}
+.cloud-inline-link{color:#8ef0b5}
+.cloud-auth .cloud-card{background:linear-gradient(140deg,#103730,#0a2729);border:1px solid #477a626b}
+.cloud-auth-choices button{font-weight:800}
+#notification{color:#e3f5e9}
+@media(max-width:950px){.cloud-side{border-right:none;border-bottom:1px solid #4a775c}}
+@media(max-width:580px){.cloud-main{padding:0 14px 24px}.cloud-header h1,.cloud-auth h1{font-size:27px}.cloud-card{padding:17px}.cloud-side{padding:14px}}
+@media(prefers-reduced-motion:reduce){.cloud-grid .cloud-card{transition:none}}

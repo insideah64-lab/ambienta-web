@@ -1,0 +1,44 @@
+name: QA visual AMBIENTA — escritorio y móvil
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'app.mjs'
+      - 'index.html'
+      - 'styles.css'
+      - 'theme-dark.css'
+      - 'cloud/**'
+      - 'cloud.html'
+      - 'scripts/visual-smoke.mjs'
+      - '.github/workflows/visual-qa.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  visual-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Instalar dependencias
+        run: |
+          npm ci --no-fund --no-audit
+          npm install --no-save playwright@1.56.1 --ignore-scripts --no-fund --no-audit
+          npx playwright install chromium
+      - name: Compilar y servir frontend localmente
+        run: |
+          npm run build
+          python3 -m http.server 8981 --bind 127.0.0.1 --directory dist >/tmp/ambienta-qa-server.log 2>&1 &
+          for i in 1 2 3 4 5 6 7 8 9 10; do curl -fsS http://127.0.0.1:8981/index.html >/dev/null && break || sleep 1; done
+      - name: Ejecutar navegador y tomar capturas reales
+        run: node scripts/visual-smoke.mjs
+      - name: Guardar capturas y evidencia visual
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-qa-visual
+          path: visual-captures/
+          retention-days: 14

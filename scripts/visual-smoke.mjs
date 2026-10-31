@@ -1,0 +1,41 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { chromium } from 'playwright';
+
+fs.mkdirSync('visual-captures',{recursive:true});
+const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+const page=await browser.newPage({viewport:{width:1672,height:950},deviceScaleFactor:1});
+const errors=[];
+page.on('pageerror',error=>errors.push(String(error)));
+const base='http://127.0.0.1:8981';
+try{
+ await page.goto(base+'/index.html',{waitUntil:'domcontentloaded'});
+ await page.locator('#screen .overview-kpis').waitFor({timeout:15000});
+ await page.locator('#screen .dash-map').waitFor();
+ await page.screenshot({path:'visual-captures/ambienta-dark-desktop.png',fullPage:true,animations:'disabled'});
+ const metricValues=await page.locator('.overview-kpis .metric-value').allTextContents();
+ assert.deepEqual(metricValues.map(s=>Number(s.trim())),[6,4,2,0],'Demo figures must come from existing state');
+ const home=await page.locator('h1').innerText();
+ assert.equal(home,'Vista general');
+ const html=await page.locator('#screen').innerText();
+ assert.match(html,/Mapa ilustrativo/);
+ assert.match(html,/0 de 4 medidas verificadas/);
+ assert.doesNotMatch(html,/calidad de aire buena/i);
+ await page.locator('#nav [data-route="pga"]').click();
+ assert.match(await page.locator('h1').innerText(),/Plan de Gestión/);
+ await page.locator('#nav [data-route="monitoreo"]').click();
+ assert.match(await page.locator('h1').innerText(),/Monitoreo/);
+ await page.locator('#nav [data-route="resumen"]').click();
+ await page.setViewportSize({width:390,height:844});
+ await page.screenshot({path:'visual-captures/ambienta-dark-mobile.png',fullPage:true,animations:'disabled'});
+ assert.equal(await page.locator('#screen .metric-card').count(),4);
+ const cloud=await browser.newPage({viewport:{width:1440,height:900}});
+ await cloud.goto(base+'/cloud.html',{waitUntil:'domcontentloaded'});
+ await cloud.locator('.cloud-shell').waitFor({timeout:15000});
+ await cloud.waitForTimeout(2000);
+ await cloud.screenshot({path:'visual-captures/ambienta-cloud-dark.png',fullPage:true,animations:'disabled'});
+ const bg=await cloud.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
+ assert.match(bg,/rgb\(8, 30, 32\)/,'Cloud screen must be dark');
+ assert.deepEqual(errors,[],'Browser runtime must not throw JavaScript exceptions');
+ console.log(JSON.stringify({result:'PASS',metrics:metricValues,cloudBackground:bg,screenshots:3}));
+}finally{await browser.close();}
