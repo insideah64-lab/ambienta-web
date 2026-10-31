@@ -10,7 +10,7 @@ export function normalizeGatewayUrl(raw,{allowLocal=false}={}){
  if(endpoint.username||endpoint.password||endpoint.search||endpoint.hash)
   throw Error('La dirección del servicio SIG no debe contener credenciales ni parámetros.');
  const isSupabase=endpoint.hostname==='rqzeejnhszbbohaqdpgp.supabase.co'&&
-  endpoint.pathname==='/functions/v1/ambienta-sig-v3';
+  ['/functions/v1/ambienta-sig-v3','/functions/v1/ambienta-sig-v31'].includes(endpoint.pathname);
  if(!isSupabase&&endpoint.pathname!=='/')
   throw Error('Ruta del gateway SIG no autorizada.');
  return isSupabase?endpoint.origin+endpoint.pathname:endpoint.origin;
