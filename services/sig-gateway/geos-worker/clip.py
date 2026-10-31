@@ -67,6 +67,7 @@ def inspect_rings(geom: dict[str, Any]) -> int:
         for ring in poly:
             if not isinstance(ring, list) or len(ring) < 4:
                 raise GeoReviewError("Anillo con menos de cuatro puntos.")
+            previous_lon = None
             for point in ring:
                 if not isinstance(point, list) or len(point) != 2 or any(
                     not isinstance(a, (int, float)) or isinstance(a, bool) or
@@ -74,6 +75,9 @@ def inspect_rings(geom: dict[str, Any]) -> int:
                 ):
                     raise GeoReviewError("Punto no finito o con coordenadas distintas de lon/lat.")
                 lon, lat = point
+                if previous_lon is not None and abs(lon - previous_lon) > 180:
+                    raise GeoReviewError("Anillo cruza el antimeridiano: requiere SIG geodésico especializado.")
+                previous_lon = lon
                 if not (-180 <= lon <= 180 and -90 <= lat <= 90):
                     raise GeoReviewError("Coordenada fuera de WGS84 EPSG:4326.")
                 count += 1
@@ -214,6 +218,8 @@ def main() -> int:
     args = parser.parse_args()
     if args.input.resolve() in (args.output.resolve(), args.report.resolve()) or args.output.resolve() == args.report.resolve():
         parser.error("La entrada, el recorte y el informe deben ser archivos diferentes.")
+    if args.output.exists() or args.report.exists():
+        parser.error("La salida o el informe ya existen: usá rutas nuevas para preservar auditorías anteriores.")
     try:
         bbox = [float(x) for x in args.bbox.split(",")]
         result, manifest = prepare(args.input, bbox)
