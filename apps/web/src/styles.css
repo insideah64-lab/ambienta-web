@@ -711,3 +711,26 @@ a{text-decoration:none;color:inherit}
 .v2-georef-attrib{display:flex;gap:3px;flex-wrap:wrap;font-size:10px;color:#abcac5}
 .v2-georef-attrib a{color:#99eec6;text-decoration:underline}
 @media(max-width:750px){.v2-georef{padding:12px}.v2-georef-fields{grid-template-columns:1fr}.v2-georef-locality{flex-wrap:wrap}}
+
+/* Base IGN official TMS renders administrative boundaries as raster, never topology. */
+.geo-basemap{position:absolute;top:54px;left:10px;z-index:2;display:flex;flex-wrap:wrap;gap:5px;max-width:calc(100% - 68px)}
+.geo-basemap button{border:1px solid #a7d6c8;border-radius:6px;padding:7px 9px;background:#133942ef;color:#daeee9;font-weight:750;font-size:11px;cursor:pointer}
+.geo-basemap button[aria-pressed=true]{background:#267256;color:#ffffff;border-color:#9cedc7}
+.geo-ign-provenance{display:grid;gap:7px;padding:13px 17px;background:#102e35;border-top:1px solid #50887e;line-height:1.5}
+.geo-ign-provenance strong{font-size:12px;color:#b3f6de}
+.geo-ign-provenance span{font-size:11px;color:#c6dfdc}
+.geo-ign-provenance a{font-size:11px;color:#98e9d0;text-decoration:underline}
+.geo-ign-provenance .geo-ign-state{font-size:11px;color:#ffe2ad}
+@media(max-width:700px){.geo-basemap{top:51px}.geo-basemap button{font-size:10px;padding:6px}}
+
+/* Separate admin polygon QA from actual project boundaries. */
+.v2-admin-boundary{display:grid;gap:11px;border-top:1px solid #598f80;padding-top:14px}
+.v2-admin-boundary h4{margin:0;font-size:13px;color:#b4f1c3}
+.v2-admin-boundary p{font-size:11px;line-height:1.6;color:#c2dcd4;margin:0}
+.v2-admin-upload{border:1px dashed #9dc4a7;border-radius:8px;padding:10px}
+.v2-admin-upload input[type=file]{font-size:11px;padding:6px}
+.v2-admin-boundary code{font-size:10px;overflow-wrap:anywhere;color:#deefc0}
+.v2-boundary-ready{display:grid;gap:7px;border-radius:9px;padding:13px;background:#2a4734;border:1px solid #bcd795}
+.v2-boundary-ready strong{color:#e8fbb4;font-size:12px}
+.v2-boundary-ready span,.v2-boundary-ready small{font-size:11px;color:#e1f1d2}
+.v2-boundary-ready button{justify-self:start}

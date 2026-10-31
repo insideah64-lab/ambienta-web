@@ -8,8 +8,13 @@ import {validateGeoJson} from './geojson-validate.mjs';
 // @ts-ignore: hydrology validation is plain JS and unit-tested in Node
 import {validateHydrologyImport} from './hydrology-validation.mjs';
 import {WmsWorkbench} from './WmsWorkbench';
+import type {BoundaryOverlay} from '../georef/GeorefTerritory';
+// @ts-ignore: validated administrative boundary import shared with Node tests
+import {readAdminBoundary,adminBoundaryKey} from '../georef/admin-boundary.mjs';
+// @ts-ignore: official IGN base source specs shared with native Node tests
+import {IGN_MAPS,buildIgnRasterSource,IGN_DOCS} from './ign-basemap.mjs';
 
-type Props={compact?:boolean;province:string;focus?:{lat:number;lon:number;zoom:number;seq:number}|null};
+type Props={compact?:boolean;province:string;focus?:{lat:number;lon:number;zoom:number;seq:number}|null;boundary?:BoundaryOverlay|null};
 type WorkingLayer={
  label:string;source:string;fileName:string;sha256:string;savedAt:string;
  featureCount:number;coordinateCount:number;bounds:[number,number,number,number];
@@ -21,8 +26,16 @@ const SALTA_CENTER:[number,number]=[-65.45,-24.82];
 const TILE_URL='https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const BASE_STYLE:maplibregl.StyleSpecification={
  version:8,
- sources:{'osm-base':{type:'raster',tiles:[TILE_URL],tileSize:256,minzoom:0,maxzoom:19,attribution:'© OpenStreetMap contributors'}},
- layers:[{id:'osm-base-raster',type:'raster',source:'osm-base'}]
+ sources:{
+  'osm-base':{type:'raster',tiles:[TILE_URL],tileSize:256,minzoom:0,maxzoom:19,attribution:'© OpenStreetMap contributors'},
+  'ign-base':{...buildIgnRasterSource('ign'),type:'raster' as const,scheme:'tms' as const},
+  'ign-topo':{...buildIgnRasterSource('ign-topo'),type:'raster' as const,scheme:'tms' as const}
+ },
+ layers:[
+  {id:'osm-base-raster',type:'raster',source:'osm-base'},
+  {id:'ign-raster-ign',type:'raster',source:'ign-base',layout:{visibility:'none'}},
+  {id:'ign-raster-ign-topo',type:'raster',source:'ign-topo',layout:{visibility:'none'}}
+ ]
 };
 export const WORKING_LAYER_KEY=IS_DIABLILLOS_CASE?'ambienta-gis-diablillos-working-v1':'ambienta-gis-demo-working-v1';
 function stored():WorkingLayer|null{
@@ -65,12 +78,28 @@ function mountWorking(map:MapLibreMap,layer:WorkingLayer|null,fit:boolean){
   else map.fitBounds([[west,south],[east,north]],{padding:45,maxZoom:12,duration:0});
  }
 }
-export function GeoMap({compact=false,province,focus}:Props){
+function drawAdministrativeBoundary(map:MapLibreMap,boundary:BoundaryOverlay|null){
+ if(!map.isStyleLoaded())return;
+ for(const id of ['admin-border-fill','admin-border-line'])if(map.getLayer(id))map.removeLayer(id);
+ if(map.getSource('admin-border-src'))map.removeSource('admin-border-src');
+ if(!boundary)return;
+ map.addSource('admin-border-src',{type:'geojson',data:boundary.geojson as never});
+ map.addLayer({id:'admin-border-fill',type:'fill',source:'admin-border-src',
+  paint:{'fill-color':'#b9e483','fill-opacity':0.14}});
+ map.addLayer({id:'admin-border-line',type:'line',source:'admin-border-src',
+  paint:{'line-color':'#f7f09a','line-width':2.5,'line-dasharray':[2.5,2]}});
+}
+export function GeoMap({compact=false,province,focus,boundary}:Props){
  const element=useRef<HTMLDivElement|null>(null);
  const mapRef=useRef<MapLibreMap|null>(null);
  const [status,setStatus]=useState<'loading'|'ready'|'unavailable'>('loading');
  const [cursor,setCursor]=useState('');
  const [tilesLoaded,setTilesLoaded]=useState(false);
+ const [basemap,setBasemap]=useState<'osm'|'ign'|'ign-topo'>('osm');
+ const [boundaryLocal,setBoundaryLocal]=useState<BoundaryOverlay|null>(()=>readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
+ const [ignTiles,setIgnTiles]=useState(false);
+ const [ignProblem,setIgnProblem]=useState('');
+ const ignTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const [layer,setLayer]=useState<WorkingLayer|null>(stored);
  const [source,setSource]=useState('');
  const [layerType,setLayerType]=useState<'general'|'hydrology'>(()=>stored()?.metadata?.category==='hydrology'?'hydrology':'general');
@@ -91,8 +120,15 @@ export function GeoMap({compact=false,province,focus}:Props){
    mapRef.current=map;
    map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
    map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
-   map.on('load',()=>{if(alive){setStatus('ready');mountWorking(map,stored(),!compact);}});
+   map.on('load',()=>{if(alive){setStatus('ready');mountWorking(map,stored(),!compact);drawAdministrativeBoundary(map,readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));}});
    map.on('idle',()=>{if(alive&&map.isStyleLoaded())setTilesLoaded(true);});
+   map.on('sourcedata',event=>{
+     if(!alive)return;
+     if((event.sourceId==='ign-base'||event.sourceId==='ign-topo')&&event.isSourceLoaded){
+       setIgnTiles(true);
+       if(ignTimer.current!==null){clearTimeout(ignTimer.current);ignTimer.current=null;}
+     }
+   });
    map.on('error',e=>{
     if(alive&&String(e.error?.message||'').match(/tile|failed|network|fetch|load/i))
       setStatus('unavailable');
@@ -102,10 +138,17 @@ export function GeoMap({compact=false,province,focus}:Props){
    });
    const observer=typeof ResizeObserver!=='undefined'?new ResizeObserver(()=>map.resize()):null;
    observer?.observe(element.current);
-   return ()=>{alive=false;observer?.disconnect();map.remove();mapRef.current=null;};
+   return ()=>{alive=false;if(ignTimer.current!==null)clearTimeout(ignTimer.current);observer?.disconnect();map.remove();mapRef.current=null;};
   }catch{if(alive)setStatus('unavailable');return ()=>{alive=false;};}
  },[compact]);
  useEffect(()=>{
+  // Explicit boundary change on the area panel, independent from the working layer.
+  if(boundary!==undefined){
+    setBoundaryLocal(boundary);
+    if(mapRef.current)drawAdministrativeBoundary(mapRef.current,boundary);
+  }
+ },[boundary]);
+  useEffect(()=>{
    if(!focus||!Number.isFinite(focus.lat)||!Number.isFinite(focus.lon)||!mapRef.current)return;
    const map=mapRef.current;
    // Centroid is administrative reference only, never a claimed installation point.
@@ -140,7 +183,26 @@ export function GeoMap({compact=false,province,focus}:Props){
   }catch(cause){setError(cause instanceof Error?cause.message:'No fue posible validar o guardar el archivo.');}
   finally{setBusy(false);}
  }
- function removeLayer(){
+ function selectBase(next:'osm'|'ign'|'ign-topo'){
+  const map=mapRef.current;
+  if(!map||!map.getLayer('ign-raster-ign'))return;
+  setBasemap(next);setIgnTiles(false);setIgnProblem('');
+  if(ignTimer.current!==null){clearTimeout(ignTimer.current);ignTimer.current=null;}
+  map.setLayoutProperty('ign-raster-ign','visibility',next==='ign'?'visible':'none');
+  map.setLayoutProperty('ign-raster-ign-topo','visibility',next==='ign-topo'?'visible':'none');
+  if(next!=='osm'){
+    ignTimer.current=setTimeout(()=>{
+      if(mapRef.current!==map)return;
+      // Failed external TMS is not silently misrepresented by OSM tiles.
+      map.setLayoutProperty('ign-raster-ign','visibility','none');
+      map.setLayoutProperty('ign-raster-ign-topo','visibility','none');
+      setBasemap('osm');setIgnTiles(false);
+      setIgnProblem('El servidor IGN no completó la carga de teselas. Se restauró OpenStreetMap. Esta disponibilidad externa aún no está garantizada.');
+      ignTimer.current=null;
+    },12000);
+  }
+ }
+  function removeLayer(){
   try{localStorage.removeItem(WORKING_LAYER_KEY);}catch{/* No remote mutation. */}
   setLayer(null);setError('');
   if(mapRef.current)clearWorking(mapRef.current);
@@ -155,8 +217,13 @@ export function GeoMap({compact=false,province,focus}:Props){
  }
  return <div className={'geo-shell '+(compact?'geo-compact':'geo-full')}
     data-map-engine="maplibre" data-georef={layer?'unverified-local-layer':'regional-only'}>
-   <div className="geo-map" ref={element} role="region" aria-label={'Mapa base OpenStreetMap interactivo · '+province}/>
-   <div className="geo-mode"><span className="geo-live-dot"/> Base real · OpenStreetMap</div>
+   <div className="geo-map" ref={element} role="region" aria-label={'Mapa cartográfico interactivo de '+province}/>
+   <div className="geo-mode"><span className="geo-live-dot"/> Base real · {basemap==='osm'?'OpenStreetMap':IGN_MAPS[basemap].label}</div>
+   {!compact&&<div className="geo-basemap" role="group" aria-label="Elegir mapa base">
+     <button type="button" aria-pressed={basemap==='osm'} onClick={()=>selectBase('osm')}>OSM</button>
+     <button type="button" aria-pressed={basemap==='ign'} onClick={()=>selectBase('ign')}>IGN · Límites</button>
+     <button type="button" aria-pressed={basemap==='ign-topo'} onClick={()=>selectBase('ign-topo')}>IGN · Topográfico</button>
+   </div>}
    <div className="geo-canvas-info">
     <strong>{focus?'Centroide administrativo · Georef':IS_DIABLILLOS_CASE?'Puna de Salta · contexto regional':'Provincia de Salta · contexto regional'}</strong>
     <span>{layer?'Capa importada: NO VERIFICADA, sin asociación oficial al proyecto.':'Vista regional orientativa, NO ubicación ni perímetro del proyecto.'}</span>
@@ -170,7 +237,8 @@ export function GeoMap({compact=false,province,focus}:Props){
    </div>
    <div className="geo-layers" aria-label="Capas disponibles">
     <strong>Capas</strong>
-    <span className="geo-layer-active">Base OSM <small>Activa</small></span>
+    {boundaryLocal&&<span className="geo-layer-working" data-map-boundary="unverified">Límite administrativo <small>Local · No verificado</small></span>}
+    <span className="geo-layer-active">{basemap==='osm'?'Base OSM':basemap==='ign'?'Argenmap IGN':'IGN topográfico'} <small>{basemap==='osm'?'Activa':ignTiles?'Teselas recibidas':'Solicitando teselas'}</small></span>
     {layer&&<span className="geo-layer-working">{layer.metadata?.category==='hydrology'?'Capa hídrica local':'GeoJSON local'} <small>No verificado</small></span>}
     <span className="geo-layer-disabled" title="No hay productos ambientales vinculados">NDVI <small>Sin datos</small></span>
     {layer?.metadata?.category==='hydrology'?<span className="geo-layer-working" data-hydro-active="unverified">Hidrología <small>Declarada · no validada</small></span>:<span className="geo-layer-disabled" title="Falta integrar capa hidrográfica oficial">Hidrología <small>Sin datos</small></span>}
@@ -212,9 +280,17 @@ export function GeoMap({compact=false,province,focus}:Props){
     </div>
     <p className="geo-import-note">Persistencia exclusiva en este navegador. No apto para información sensible ni almacenamiento probatorio; no sube archivos al servidor.</p>
    </div>}
+   {!compact&&<div className="geo-ign-provenance" data-official-base={basemap}>
+    <strong>Cartografía base y límites administrativos visibles</strong>
+    <span>{basemap==='osm'?'Vista OpenStreetMap (alternativa de referencia).':'Argenmap del Instituto Geográfico Nacional (IGN) · cartografía base raster publicada por TMS.'}</span>
+    <span>Los trazos de divisiones administrativas impresos en la cartografía NO son polígonos vectoriales exportables ni delimitan el proyecto ambiental.</span>
+    {ignProblem&&<span role="alert" className="geo-ign-issue">{ignProblem}</span>}
+    <a href={IGN_DOCS} target="_blank" rel="noreferrer">Ver fuente IGN, TMS y geoservicios WFS</a>
+    {basemap!=='osm'&&<span role="status" className="geo-ign-state">{ignTiles?'El proveedor IGN indicó carga completa; verificá visualmente el mapa.':'Solicitando cartografía del IGN; se volverá a OSM si no responde.'}</span>}
+   </div>}
    {!compact&&<WmsWorkbench mapRef={mapRef} disabled={status!=='ready'}/>}
    <div className="geo-source">
-    <a target="_blank" rel="noreferrer" href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a> · Cartografía base externa
+    {basemap==='osm'?<a target="_blank" rel="noreferrer" href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors</a>:<a target="_blank" rel="noreferrer" href={IGN_DOCS}>© Instituto Geográfico Nacional · Argenmap</a>} · Cartografía base externa
     {tilesLoaded&&<span className="geo-render-ok"> · Teselas procesadas</span>}
    </div>
  </div>;

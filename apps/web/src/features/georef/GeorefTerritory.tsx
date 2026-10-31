@@ -1,15 +1,27 @@
-import {useEffect,useState,type FormEvent} from 'react';
+import {useEffect,useState,type FormEvent,type ChangeEvent} from 'react';
+// @ts-ignore: validated administrative polygons in native JS module
+import {adminBoundaryKey,readAdminBoundary,validateAdminBoundary} from './admin-boundary.mjs';
 import {MapPin,RefreshCcw} from 'lucide-react';
 import {IS_DIABLILLOS_CASE} from '../../lib/demo';
 // @ts-ignore: reused native pure JS client, tested in Node
 import {queryGeoref,readTerritory,georefStorageKey,GEOREF_CITATION,GEOREF_LICENSE,cleanTerritorialSelection} from './georef-service.mjs';
 export type TerritoryFocus={lat:number;lon:number;zoom:number;seq:number};
 type Admin={id:string;name:string;lat:number;lon:number;provinciaId:string;departamentoId:string;source:string};
-type Props={onFocus:(focus:TerritoryFocus)=>void};
+export type BoundaryOverlay={
+ geojson:{type:'FeatureCollection';features:unknown[]};bounds:number[];sha256:string;
+ admin:{type:'provincias'|'departamentos';id:string;provinceId:string};
+ verification:'operator_declared_unverified';sourceUrl:string;savedAt:string;fileName:string
+};
+type Props={onFocus:(focus:TerritoryFocus)=>void;onBoundary:(value:BoundaryOverlay|null)=>void};
 const key=georefStorageKey(IS_DIABLILLOS_CASE);
 const saved=()=>readTerritory(key);
 function errText(error:unknown){return error instanceof Error?error.message:'Error de consulta al servicio Georef.';}
-export function GeorefTerritory({onFocus}:Props){
+export function GeorefTerritory({onFocus,onBoundary}:Props){
+ const bkey=adminBoundaryKey(IS_DIABLILLOS_CASE);
+ const [boundary,setBoundary]=useState<BoundaryOverlay|null>(()=>readAdminBoundary(bkey));
+ const [boundaryUrl,setBoundaryUrl]=useState('');
+ const [boundaryError,setBoundaryError]=useState('');
+ const [boundaryBusy,setBoundaryBusy]=useState(false);
  const [provinces,setProvinces]=useState<Admin[]>([]);
  const [departments,setDepartments]=useState<Admin[]>([]);
  const [municipalities,setMunicipalities]=useState<Admin[]>([]);
@@ -84,19 +96,50 @@ export function GeorefTerritory({onFocus}:Props){
  function clear(){
   localStorage.removeItem(key);setStored(null);setStatus('Referencia local retirada.');setError('');
  }
- return <section className="v2-georef" aria-label="Referencia territorial oficial Georef" data-georef-selector="true">
+ async function importBoundary(ev:ChangeEvent<HTMLInputElement>){
+  const file=ev.target.files?.[0];ev.target.value='';
+  if(!file)return;
+  setBoundaryError('');
+  if(file.size>1024*1024){setBoundaryError('Límite demasiado grande para este laboratorio (máximo 1 MiB). Preparalo en QGIS sin modificar su identificación.');return;}
+  if(!/\.geojson$|\.json$/i.test(file.name)){setBoundaryError('Solo GeoJSON .geojson o .json.');return;}
+  if(!/^https:\/\/(www\.)?(argentina\.gob\.ar|datos\.gob\.ar|ign\.gob\.ar)(\/|$)/i.test(boundaryUrl.trim())){
+   setBoundaryError('Declarar una URL de fuente oficial argentina.gob.ar, datos.gob.ar o ign.gob.ar. No se verifica automáticamente su autenticidad.');return;
+  }
+  const t=dId?'departamentos':'provincias',code=dId||pId;
+  if(!pId){setBoundaryError('Seleccioná primero una provincia Georef.');return;}
+  setBoundaryBusy(true);
+  try{
+   const bytes=await file.arrayBuffer();
+   const text=new TextDecoder().decode(bytes);
+   const check=validateAdminBoundary(JSON.parse(text),{type:t,id:code,provinceId:pId});
+   const digest=await crypto.subtle.digest('SHA-256',bytes);
+   const sha=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
+   const next:BoundaryOverlay={...check,geojson:check.geojson as BoundaryOverlay['geojson'],
+    admin:{type:t,id:code,provinceId:pId},
+    bounds:check.bounds,sha256:sha,
+    sourceUrl:boundaryUrl.trim(),savedAt:new Date().toISOString(),
+    fileName:file.name.slice(0,130),verification:'operator_declared_unverified'};
+   localStorage.setItem(bkey,JSON.stringify(next));
+   setBoundary(next);onBoundary(next);setStatus('Límite vectorial local cargado y asociado al ID administrativo. Su procedencia aún NO está verificada.');
+  }catch(e){setBoundaryError(errText(e));}
+  finally{setBoundaryBusy(false);}
+ }
+ function removeBoundary(){
+  localStorage.removeItem(bkey);setBoundary(null);onBoundary(null);setBoundaryError('');
+ }
+  return <section className="v2-georef" aria-label="Referencia territorial oficial Georef" data-georef-selector="true">
    <div className="v2-georef-heading"><MapPin size={19}/>
     <div><h3>Georef · normalización territorial oficial</h3>
      <p>Seleccioná unidades administrativas de Argentina. Esta consulta NO determina el perímetro ni la ubicación real del proyecto ambiental.</p></div>
    </div>
    <div className="v2-georef-fields">
     <label>Provincia
-     <select aria-label="Provincia Georef" value={pId} onChange={e=>{setPId(e.target.value);setDId('');setMId('');setLId('');setLocalities([]);setStatus('');}}>
+     <select aria-label="Provincia Georef" value={pId} onChange={e=>{setPId(e.target.value);setDId('');setMId('');setLId('');setLocalities([]);setStatus('');removeBoundary();}}>
       <option value="">Seleccionar provincia</option>{provinces.map(p=><option key={p.id} value={p.id}>{p.name} (ID {p.id})</option>)}
      </select>
     </label>
     <label>Departamento
-     <select aria-label="Departamento Georef" value={dId} onChange={e=>{setDId(e.target.value);setLId('');setLocalities([]);}} disabled={!pId||loading}>
+     <select aria-label="Departamento Georef" value={dId} onChange={e=>{setDId(e.target.value);setLId('');setLocalities([]);removeBoundary();}} disabled={!pId||loading}>
       <option value="">No seleccionado</option>{departments.map(p=><option key={p.id} value={p.id}>{p.name} (ID {p.id})</option>)}
      </select>
     </label>
@@ -132,6 +175,28 @@ export function GeorefTerritory({onFocus}:Props){
     <span>{stored.province.name} ({stored.province.id}) {stored.department?'/ '+stored.department.name+' ('+stored.department.id+')':''} {stored.municipality?'/ Municipio: '+stored.municipality.name:''} {stored.locality?'/ Localidad: '+stored.locality.name:''}</span>
     <small>No incorporada al expediente oficial, no auditada y no compartida con Supabase.</small>
    </div>}
+   <div className="v2-admin-boundary" data-boundary-workbench="true">
+    <h4>Límites administrativos vectoriales · importación controlada</h4>
+    <p>El mapa base IGN permite <strong>ver</strong> divisiones administrativas. Para operaciones SIG, importá un GeoJSON con un único polígono cuya propiedad <code>id</code> coincida con {dId?'el departamento '+dId:'la provincia '+(pId||'elegida')}. No se acepta un centroide ni se convierte en perímetro del proyecto.</p>
+    <label>URL pública de procedencia declarada
+      <input aria-label="URL de procedencia del límite" type="url" value={boundaryUrl}
+        onChange={e=>setBoundaryUrl(e.target.value)} placeholder="https://www.ign.gob.ar/..." maxLength={450}/>
+    </label>
+    <label className="v2-admin-upload">GeoJSON poligonal con propiedades.id
+      <input aria-label="Importar límite administrativo" type="file" accept=".geojson,.json,application/geo+json,application/json"
+        disabled={boundaryBusy||!pId} onChange={e=>void importBoundary(e)}/>
+    </label>
+    {boundaryBusy&&<span role="status">Validando identificador territorial y calculando SHA-256…</span>}
+    {boundaryError&&<p role="alert" className="v2-georef-error">{boundaryError}</p>}
+    {boundary&&<div className="v2-boundary-ready" data-boundary-loaded="unverified">
+      <strong>Límite vectorial local · NO VERIFICADO</strong>
+      <span>{boundary.admin.type} · código {boundary.admin.id} · {boundary.fileName}</span>
+      <code>SHA-256 {boundary.sha256}</code>
+      <small>Origen declarado: {boundary.sourceUrl}. No implica certificación cartográfica, congruencia topológica ni ubicación de Diablillos.</small>
+      <button type="button" onClick={removeBoundary}>Quitar límite local</button>
+    </div>}
+    <p className="v2-georef-note">Los archivos completos Georef pueden superar los límites del navegador: su procesamiento nacional necesita ETL/servidor y revisión de geometrías. En esta etapa solo se admite una entidad de hasta 1 MiB para QA.</p>
+   </div>
    <div className="v2-georef-attrib">
     <a href="https://www.argentina.gob.ar/georef/" target="_blank" rel="noreferrer">{GEOREF_CITATION}</a>
     <span> · </span><a href={GEOREF_LICENSE} target="_blank" rel="noreferrer">CC BY 4.0 y condiciones de uso</a>

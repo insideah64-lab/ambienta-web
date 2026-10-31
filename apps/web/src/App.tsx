@@ -18,7 +18,9 @@ import { DemoActionDialog, type DemoActionKind } from './features/demo/DemoActio
 import { CloudWorkspace } from './features/cloud/CloudWorkspace';
 import { ReferenceDashboard } from './features/dashboard/ReferenceDashboard';
 import { GeoMap } from './features/maps/GeoMap';
-import {GeorefTerritory,GeorefSavedSummary,type TerritoryFocus} from './features/georef/GeorefTerritory';
+// @ts-ignore: native JS validator used to restore browser-local admin polygon
+import {readAdminBoundary,adminBoundaryKey} from './features/georef/admin-boundary.mjs';
+import {GeorefTerritory,GeorefSavedSummary,type TerritoryFocus,type BoundaryOverlay} from './features/georef/GeorefTerritory';
 import { EvidenceIntegrityLab } from './features/evidence/EvidenceIntegrityLab';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
@@ -53,8 +55,8 @@ function measureTone(status: string): 'neutral'|'mint'|'amber'|'blue' {
 function Panel({kicker, title, children, action}: {kicker:string;title:string;children:React.ReactNode;action?:React.ReactNode}) {
   return <section className="v2-panel"><header className="v2-panel-title"><div><p className="v2-kicker">{kicker}</p><h2>{title}</h2></div>{action}</header>{children}</section>;
 }
-function MapPreview({province,focus}:{province:string;focus?:TerritoryFocus|null}) {
- return <GeoMap province={province} focus={focus}/>;
+function MapPreview({province,focus,boundary}:{province:string;focus?:TerritoryFocus|null;boundary?:BoundaryOverlay|null}) {
+ return <GeoMap province={province} focus={focus} boundary={boundary}/>;
 }
 function Info({label,value,icon:Icon}:{label:string;value:string;icon:LucideIcon}) {
   return <div className="v2-info"><Icon size={18}/><div><small>{label}</small><strong>{value}</strong></div></div>;
@@ -85,6 +87,7 @@ function Expediente({data}: {data:DemoState}) {
 }
 function AreaEstudio({data}:{data:DemoState}) {
  const [territoryFocus,setTerritoryFocus]=useState<TerritoryFocus|null>(null);
+ const [boundary,setBoundary]=useState<BoundaryOverlay|null>(()=>readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
  return <div className="v2-area-stack">
    <Panel kicker="ÁREA DE ESTUDIO" title="Ficha territorial y trazabilidad">
     <div className="v2-area-overview">
@@ -95,9 +98,9 @@ function AreaEstudio({data}:{data:DemoState}) {
      <p className="v2-panel-note">La cartografía OSM representa el entorno regional. Sin límites del proyecto, puntos de muestreo ni inventarios hidrográficos oficialmente verificados. Las capas importadas permanecen como material local NO VERIFICADO.</p>
     </div>
    </Panel>
-   <GeorefTerritory onFocus={setTerritoryFocus}/>
+   <GeorefTerritory onFocus={setTerritoryFocus} onBoundary={setBoundary}/>
    <Panel kicker="SIG · MAPA INTERACTIVO" title="Cartografía regional, capas y procedencia">
-    <MapPreview province={data.project.province} focus={territoryFocus}/>
+    <MapPreview province={data.project.province} focus={territoryFocus} boundary={boundary}/>
     <p className="v2-panel-note">No se presenta esta cartografía como evaluación de calidad del agua, georreferenciación de instalaciones ni certificación ambiental.</p>
    </Panel>
  </div>;
