@@ -5,6 +5,8 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import {IS_DIABLILLOS_CASE} from '../../lib/demo';
 // @ts-ignore: shared official WFS URL allowlist is a pure JS GIS adapter
 import {buildIdesaWfsUrl,IDESA_WFS_CAPABILITIES} from './idesa-wfs.mjs';
+// @ts-ignore: bounded provider client shared with browser/Node verification
+import {requestOfficialPolygons} from './sig-gateway-client.mjs';
 // @ts-ignore: shared Georef public API adapter
 import {queryGeoref,georefUrl} from '../georef/georef-service.mjs';
 // @ts-ignore: legacy pure JS parser intentionally shared with Node's native test runner
@@ -29,10 +31,12 @@ type WorkingLayer={
  featureCount:number;coordinateCount:number;bounds:[number,number,number,number];
  geojson:{type:'FeatureCollection';features:unknown[]};
  metadata?:{category:'hydrology';institution:string;date:string;sourceUrl:string;verification:'source_declared_unverified';description:string}
- |{category:'georef-centroids';sourceUrl:string;retrievedAt:string;license:'CC BY 4.0';verification:'api_centroids_not_boundaries'};
+ |{category:'georef-centroids';sourceUrl:string;retrievedAt:string;license:'CC BY 4.0';verification:'api_centroids_not_boundaries'}
+ |{category:'idesa-wfs';sourceUrl:string;retrievedAt:string;typeName:string;verification:'official_wfs_query_not_project_boundary';hashScope:'raw_upstream_wfs_response'};
 };
 const PUNA_CENTER:[number,number]=[-67.2,-24.7];
 const SALTA_CENTER:[number,number]=[-65.45,-24.82];
+const SIG_GATEWAY_URL=(import.meta.env.VITE_SIG_GATEWAY_URL||'').trim();
 const TILE_URL='https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const BASE_STYLE:maplibregl.StyleSpecification={
  version:8,
@@ -244,7 +248,39 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
     },12000);
   }
  }
-  async function loadGeorefCentroids(){
+ async function loadIdesaPolygons(selection:'municipios'|'otbn'){
+  if(!SIG_GATEWAY_URL){setError('El gateway SIG no está configurado. Utilizá el enlace WFS de descarga manual.');return;}
+  if(!aoiLocal){setError('Primero activá una ventana de consulta con coordenadas válidas.');return;}
+  if(layer){setError('Ya existe una capa de trabajo. Exportala o quitála explícitamente antes de cargar otra.');return;}
+  setBusy(true);setError('');
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),19000);
+  try{
+   const response=await requestOfficialPolygons(SIG_GATEWAY_URL,selection,aoiLocal.bbox,{signal:controller.signal});
+   if(response.status==='empty'){setError('IDESA no informó polígonos en esta ventana. No se creó una capa ficticia.');return;}
+   const checked=validateGeoJson(response.source);
+   const local=clipGeoJsonToBbox(checked.geojson,aoiLocal.bbox);
+   if(local.unsupportedCount||local.sourceCount!==response.provenance.sourceCount||
+      local.selectedCount!==response.provenance.selectedCount||
+      JSON.stringify(local.geojson)!==JSON.stringify(response.clip))
+    throw Error('La validación del recorte local no coincide con el servicio SIG. No se importaron datos.');
+   const capturedAt=response.provenance.fetchedAt as string;
+   const next:WorkingLayer={...checked,geojson:checked.geojson as WorkingLayer['geojson'],
+    bounds:checked.bounds as [number,number,number,number],label:'IDESA · polígonos WFS · '+selection,
+    source:'Infraestructura de Datos Espaciales de Salta (IDESA), '+response.provenance.typeName,
+    fileName:'idesa-'+selection+'-wfs-original.geojson',
+    sha256:response.provenance.originalResponseSha256,savedAt:capturedAt,
+    metadata:{category:'idesa-wfs',sourceUrl:response.provenance.sourceUrl,
+     retrievedAt:capturedAt,typeName:response.provenance.typeName,
+     verification:'official_wfs_query_not_project_boundary',
+     hashScope:'raw_upstream_wfs_response'}
+   };
+   localStorage.setItem(WORKING_LAYER_KEY,JSON.stringify(next));
+   setLayer(next);
+  }catch(cause){setError(cause instanceof Error?cause.message:'La consulta SIG no pudo completarse.');}
+  finally{clearTimeout(timer);setBusy(false);}
+ }
+ async function loadGeorefCentroids(){
   if(!aoiLocal){setError('Primero activá una ventana de consulta con coordenadas válidas.');return;}
   if(layer){setError('Ya hay una capa de trabajo. Exportala si es necesario y quitála explícitamente antes de consultar Georef.');return;}
   setBusy(true);setError('');
@@ -276,8 +312,10 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
  function exportClip(){
   if(!clipped||!layer||clipped.unsupportedCount||!clipped.selectedCount)return;
   const isApi=layer.metadata?.category==='georef-centroids';
+  const isWfs=layer.metadata?.category==='idesa-wfs';
   const manifest={status:'LOCAL_NO_VERIFICADO',inputSha256:isApi?null:layer.sha256,
-   derivedLayerSha256:isApi?layer.sha256:null,hashScope:isApi?'normalized_georef_geojson':'original_imported_file',
+   derivedLayerSha256:isApi?layer.sha256:null,
+   hashScope:isApi?'normalized_georef_geojson':isWfs?'raw_upstream_wfs_response':'original_imported_file',
    sourceDeclared:layer.source,sourceFile:layer.fileName,
    bbox:clipped.bbox,method:clipped.method,
    sourceCount:clipped.sourceCount,selectedCount:clipped.selectedCount,
@@ -313,7 +351,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
    </div>}
    <div className="geo-canvas-info">
     <strong>{focus?'Centroide administrativo · Georef':IS_DIABLILLOS_CASE?'Puna de Salta · contexto regional':'Provincia de Salta · contexto regional'}</strong>
-    <span>{layer?.metadata?.category==='georef-centroids'?'Centroides administrativos de Georef: no son polígonos, límites ni ubicación del proyecto.':layer?'Capa importada: NO VERIFICADA, sin asociación oficial al proyecto.':'Vista regional orientativa, NO ubicación ni perímetro del proyecto.'}</span>
+    <span>{layer?.metadata?.category==='georef-centroids'?'Centroides administrativos de Georef: no son polígonos, límites ni ubicación del proyecto.':layer?.metadata?.category==='idesa-wfs'?'Capa WFS de IDESA: referencia territorial, NO perímetro de proyecto.':layer?'Capa importada: NO VERIFICADA, sin asociación oficial al proyecto.':'Vista regional orientativa, NO ubicación ni perímetro del proyecto.'}</span>
    </div>
    {status==='loading'&&<div className="geo-status" role="status">Preparando cartografía…</div>}
    {!tilesLoaded&&status==='ready'&&<div className="geo-status" role="status">Cargando teselas para esta vista…</div>}
@@ -343,6 +381,12 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
       <button type="button" onClick={exportClip} disabled={clipped.unsupportedCount>0||clipped.selectedCount===0}>Descargar recorte GeoJSON</button>
      </div>}
      <div className="geo-catalogue" data-idesa-wfs="bounded-official-provider">
+      <div data-sig-gateway={SIG_GATEWAY_URL?'configured':'unconfigured'}>
+       <strong>Recorte automático de polígonos IDESA</strong>
+       <button type="button" disabled={busy||!!layer||!SIG_GATEWAY_URL} onClick={()=>loadIdesaPolygons('municipios')}>Consultar y recortar municipios automáticamente</button>
+       <button type="button" disabled={busy||!!layer||!SIG_GATEWAY_URL} onClick={()=>loadIdesaPolygons('otbn')}>Consultar y recortar OTBN automáticamente</button>
+       <small>{SIG_GATEWAY_URL?'Gateway SIG: consulta WFS acotada, verificaciones de integridad, original preservado localmente y recorte topológico separado.':'Consulta automática aún no activada en este despliegue; utilizá los enlaces manuales.'}</small>
+      </div>
       <strong>IDESA Salta · polígonos vectoriales oficiales (WFS)</strong>
       <p>La ventana se envía al servidor provincial como BBOX EPSG:4326. Su respuesta contiene polígonos completos de las entidades intersectadas; AMBIENTA los recorta después de importar.</p>
       <a href={buildIdesaWfsUrl(aoiLocal.bbox,'municipios')} target="_blank" rel="noopener noreferrer">Abrir consulta WFS de municipios · GeoJSON</a>
@@ -381,7 +425,8 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
      <small>{layer.featureCount} entidades · {layer.coordinateCount} vértices · fuente declarada: {layer.source}</small>
      {layer.metadata?.category==='hydrology'&&<div className="geo-hydro-provenance" data-hydro-provenance="unverified"><strong>Hidrología NO VERIFICADA</strong><small>{layer.metadata.institution} · {layer.metadata.date}</small><small>Origen declarado: {layer.metadata.sourceUrl}</small><small>Este material NO acredita una cuenca, un cauce oficial ni la situación ambiental de Diablillos.</small></div>}
      {layer.metadata?.category==='georef-centroids'&&<div className="geo-hydro-provenance" data-georef-centroids="true"><strong>Georef · centroides administrativos, NO límites</strong><small>Consulta API v2.1: {layer.metadata.retrievedAt}</small><small>Origen: {layer.metadata.sourceUrl}</small><small>Georef · CC BY 4.0. Los centroides NO son perímetros ni emplazamientos del proyecto.</small></div>}
-     <code>SHA-256 {layer.metadata?.category==='georef-centroids'?'GeoJSON derivado, no respuesta API: ':'archivo original: '}{layer.sha256}</code>
+     {layer.metadata?.category==='idesa-wfs'&&<div className="geo-hydro-provenance" data-idesa-source="official-wfs"><strong>IDESA Salta · WFS · geometría de referencia, NO perímetro del proyecto</strong><small>Capa: {layer.metadata.typeName}</small><small>Consulta: {layer.metadata.retrievedAt}</small><small>Petición: {layer.metadata.sourceUrl}</small><small>SHA-256 de la respuesta WFS ORIGINAL; la copia local está depurada. Verificá la licencia y vigencia en IDESA.</small></div>}
+     <code>SHA-256 {layer.metadata?.category==='georef-centroids'?'GeoJSON derivado, no respuesta API: ':layer.metadata?.category==='idesa-wfs'?'respuesta WFS original: ':'archivo original: '}{layer.sha256}</code>
      <div className="geo-actions">
       <button type="button" onClick={exportLayer}>Exportar GeoJSON depurado</button>
       <button type="button" onClick={removeLayer}>Quitar capa local</button>
