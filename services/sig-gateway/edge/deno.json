@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "@turf/intersect": "npm:@turf/intersect@7.4.0"
+  },
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false
+  },
+  "tasks": {
+    "check": "deno check index.ts"
+  }
+}
