@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {normalizeGatewayUrl,requestOfficialPolygons} from '../../apps/web-v3/src/features/maps/sig-gateway-client.mjs';
 
-const base='https://rqzeejnhszbbohaqdpgp.supabase.co/functions/v1/ambienta-sig-v3';
+const base='https://rqzeejnhszbbohaqdpgp.supabase.co/functions/v1/ambienta-sig-v31';
 const bbox=[-66.22,-25.05,-66.18,-25.02];
 test('Supabase Edge gateway URL is fixed and credentials cannot enter route',()=>{
  assert.equal(normalizeGatewayUrl(base),base);
