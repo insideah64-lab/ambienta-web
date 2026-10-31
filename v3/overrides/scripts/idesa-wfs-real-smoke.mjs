@@ -13,7 +13,7 @@ const raw=await response.text();
 assert(Buffer.byteLength(raw)<=1048576,'source WFS must fit browser size budget');
 const collection=JSON.parse(raw);
 assert.equal(collection.type,'FeatureCollection');
-assert.equal(collection.features.length,collection.numberOfFeatures,'No silently truncated WFS records');
+assert.equal(collection.features.length,collection.totalFeatures??collection.numberOfFeatures,'No silently truncated WFS records');
 assert.equal(collection.features.length,5,'Laboratory fixture review required if official dataset changes');
 const originalHash=createHash('sha256').update(raw).digest('hex');
 
