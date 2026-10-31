@@ -89,6 +89,7 @@ class TestAdvancedGeoClip(unittest.TestCase):
         self.assertEqual(p.returncode,2,p.stderr)
         self.assertFalse(output.exists())
         self.assertEqual(json.loads(report.read_text())["status"],"requires_review")
+        self.assertEqual(json.loads(report.read_text())["sourceSha256"],start_sha)
         self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(),start_sha)
 
     def test_truncated_wfs_and_unsupported_crs_blocked(self):
