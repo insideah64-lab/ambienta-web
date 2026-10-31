@@ -16,6 +16,7 @@ assert.equal(collection.type,'FeatureCollection');
 assert.equal(collection.features.length,collection.totalFeatures??collection.numberOfFeatures,'No silently truncated WFS records');
 assert.equal(collection.features.length,5,'Laboratory fixture review required if official dataset changes');
 const originalHash=createHash('sha256').update(raw).digest('hex');
+console.log(JSON.stringify({wfsSourceCrs:collection.crs,fullMatchCount:collection.totalFeatures??collection.numberOfFeatures}));
 
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 try{
