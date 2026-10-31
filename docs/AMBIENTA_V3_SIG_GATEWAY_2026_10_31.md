@@ -1,6 +1,6 @@
 # AMBIENTA V3 — Gateway SIG automático de IDESA Salta
 
-**Fecha:** 31 de octubre de 2026. **Estado:** servicio Supabase Edge aislado y frontend experimental, sujeto a QA de navegador y publicación de V3.
+**Fecha:** 31 de octubre de 2026. **Estado:** Supabase Edge activo, frontend V3 publicado y comprobado en navegador público. V1 y V2 sin cambios.
 
 ## Infraestructura y separación
 - Sitio estático: `https://insideah64-lab.github.io/ambienta-web/v3/`.
@@ -37,3 +37,13 @@ Una solicitud HTTP POST a la función Edge con JSON `{"layer":"municipios","bbox
 - Frontend React + Chromium: pruebas de botón automático, procedencia, exportación y persistencia pendientes del dictamen del PR.
 
 **Referencias:** [informe inicial IDESA](./AMBIENTA_V3_IDESA_WFS_BBOX_2026_10_31.md), [IDESA Geoportal](https://geoportal.salta.gob.ar/developer/).
+
+## Cierre de aceptación y publicación (2026-10-31)
+
+- PR público [#3](https://github.com/insideah64-lab/ambienta-web/pull/3) fusionado (commit `534b4ab8069b5c63dbcbe04f516946c4351a93d2`).
+- [GitHub Pages SUCCESS](https://github.com/insideah64-lab/ambienta-web/actions/runs/41250615960): V3 publicada en [Área de estudio](https://insideah64-lab.github.io/ambienta-web/v3/?caso=diablillos#/area), compilación aislada V1/V2 conservadas.
+- [QA automatizada con Chromium](https://github.com/insideah64-lab/ambienta-web/actions/runs/41250492856): **23/23** pruebas unitarias; consulta de centroides Georef, polígonos IDESA automáticos, topología, huecos, originales y SHA-256, recarga y descargas PASS; 0 errores JS.
+- [QA del backend y CORS real](https://github.com/insideah64-lab/ambienta-web/actions/runs/41250496806): Node y Deno PASS; consulta WFS real, API Supabase autenticada y preflight de CORS sin JWT PASS.
+- Verificación adicional con navegador TinyFish sobre la **URL pública de V3**: AOI de prueba Cachi lat `-25.038755786`, lon `-66.202620089`, radio 2 km. Consulta automática IDESA devuelve **2 municipios fuente (2.292 vértices)**; **1 intersección recortada**, cero errores topológicos y descarga GeoJSON operativa. La respuesta expuso SHA-256 del WFS original `1960a41b22a3204f4e18fa4c77ce6375ba0dd553b29634cec3a8ba77f95e0b66` (observación, no digest estable garantizado).
+
+**Limitaciones abiertas:** no es procesamiento ilimitado de bases nacionales. Las consultas demasiado grandes, las respuestas WFS incompletas y las topologías que requieren revisión quedan bloqueadas. La tasa de solicitudes actual se controla por instancia; para exposición pública amplia se requiere una cuota distribuida y observabilidad. Confirmar licencias de cada producto antes de redistribuirlo. El hash corresponde a la respuesta cruda de origen, mientras que la fuente conservada localmente es una copia depurada, no una copia de todos los bytes originales.
