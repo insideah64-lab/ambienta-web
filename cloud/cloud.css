@@ -1,0 +1,43 @@
+/* Complemento aislado: el PGA demostrativo de index.html no cambia de modo. */
+body{background:#f5f8f4}
+.cloud-shell{min-height:100vh;display:grid;grid-template-columns:310px minmax(0,1fr)}
+.cloud-side{background:linear-gradient(155deg,#164a39,#102e27);color:white;min-height:100vh;padding:35px 25px;display:flex;flex-direction:column;gap:75px}
+.cloud-side .brand{padding:0}.cloud-side .brand strong{color:#fff}
+.cloud-side-info{margin-top:50px}.cloud-side-info h2{font-size:31px;line-height:1.25;margin:25px 0 15px;color:white}.cloud-side-info p{line-height:1.8;color:#cadfd1}
+.cloud-pill{border:1px solid #9bcbb54f;border-radius:20px;padding:7px 12px;font-size:10px;letter-spacing:.09em;color:#bcdfc8;font-weight:800}
+.cloud-proof{line-height:2.6;font-size:13px;font-weight:700;color:#d7e9dc;margin-top:35px}
+.cloud-demo-link{display:block;margin-top:auto;color:#dcece1;font-size:12px;text-decoration:none;border-top:1px solid #ffffff22;padding-top:20px}
+.cloud-main{min-width:0;padding:0 clamp(18px,4vw,65px) 30px;display:flex;flex-direction:column}
+.cloud-topbar{height:83px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e2ebe3;color:#789081;letter-spacing:.06em;font-size:11px;gap:20px}
+.cloud-topbar strong{color:#2b7451}.cloud-session{display:flex;align-items:center;gap:14px;letter-spacing:0}.cloud-session small{max-width:235px;overflow:hidden;text-overflow:ellipsis}
+.cloud-content{max-width:1200px;width:100%;margin:32px auto 0}.cloud-header{display:flex;justify-content:space-between;gap:15px;align-items:flex-end;margin-bottom:25px}
+.cloud-header h1{font-size:30px;margin:0}.cloud-header p{font-size:13px;color:#758779;line-height:1.6}
+.cloud-card{background:white;border:1px solid #e1ebe3;border-radius:17px;padding:24px;box-shadow:0 5px 16px #15432a08;margin-bottom:18px}
+.cloud-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}.cloud-grid .cloud-card{margin:0}
+.cloud-eyebrow{font-size:11px;color:#2e7f59;letter-spacing:.11em;font-weight:800;margin:0 0 11px}
+.cloud-card h2{font-size:20px;margin:0 0 11px}.cloud-card h3{font-size:16px;margin:0 0 6px}
+.cloud-muted{color:#768c7d;line-height:1.7;font-size:12px}.cloud-actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}
+.cloud-actions button,.cloud-actions a{border-radius:10px;padding:11px 14px;font-size:12px;font-weight:800;cursor:pointer;text-decoration:none}
+.cloud-primary{border:0;background:#1e684a;color:white}.cloud-primary:hover{background:#174d39}
+.cloud-quiet{border:1px solid #d8e8dc;background:#edf5ef;color:#246d4b}.cloud-quiet:hover{background:#ddede2}
+.cloud-secondary{border:1px solid #e0e9e1;background:#fff;color:#466c52}.cloud-secondary:hover{background:#f3f7f4}
+.cloud-nav{display:flex;gap:8px;flex-wrap:wrap;margin:17px 0 22px}.cloud-nav button{padding:10px 15px;border:1px solid #dce9df;border-radius:9px;background:white;color:#53705c;font-weight:700;cursor:pointer}.cloud-nav button.active{background:#276f50;color:white;border-color:#276f50}
+.cloud-totals{display:flex;gap:14px;flex-wrap:wrap}.cloud-total{padding:16px 20px;background:#eff7f0;border-radius:11px;min-width:130px}.cloud-total b{display:block;font-size:25px}.cloud-total span{font-size:11px;color:#6d8a76}
+.cloud-list{display:grid;gap:10px}.cloud-record{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px;background:#f6faf7;border-radius:11px}.cloud-record .cloud-muted{margin-top:6px}
+.cloud-table-wrap{overflow:auto}.cloud-table{width:100%;border-collapse:collapse;min-width:470px;font-size:12px}.cloud-table th{text-align:left;color:#829788;font-size:10px;letter-spacing:.09em;padding:12px;border-bottom:1px solid #e8eee9}.cloud-table td{border-bottom:1px solid #eef2ee;padding:15px 12px;vertical-align:top}.cloud-table td strong{display:block}.cloud-table td small{display:block;color:#799084;margin-top:6px}
+.cloud-tag{border-radius:20px;background:#e2f2e7;color:#23704d;font-size:10px;font-weight:800;padding:7px 11px;white-space:nowrap}.cloud-tag.pending{background:#fff0d7;color:#936b24}
+.cloud-form{display:grid;gap:15px}.cloud-form label{display:block;color:#4b7056;font-weight:700;font-size:12px}.cloud-form input,.cloud-form select,.cloud-form textarea{display:block;margin-top:6px;width:100%;padding:12px;border:1px solid #d7e5da;border-radius:9px;background:white;color:#183b2d;font-size:13px}.cloud-form textarea{min-height:85px;resize:vertical}
+.cloud-form .cloud-actions{margin-top:5px}
+.cloud-auth{max-width:470px;margin:clamp(35px,10vh,120px) auto}.cloud-auth h1{font-size:31px}
+.cloud-auth .cloud-card{padding:33px}
+.cloud-auth-choices{display:flex;gap:10px;margin:21px 0}.cloud-auth-choices button{flex:1}
+.cloud-alert{margin:14px 0;padding:13px 15px;border-radius:10px;background:#fff3de;color:#805d29;font-size:12px}
+.cloud-alert.success{background:#e6f5ea;color:#216343}.cloud-loading{margin:60px auto;text-align:center;color:#63826c}
+.cloud-footer{margin-top:auto;padding:34px 0 0;font-size:11px;color:#8a9b8d}
+#notification:empty{display:none}
+#notification{margin-top:16px;max-width:1150px}
+.cloud-inline-link{text-decoration:underline;color:#236e4d}
+.cloud-empty{padding:45px 20px;text-align:center;color:#779080;background:#f6faf7;border-radius:13px}
+.cloud-blurb{border-left:3px solid #82b99b;padding:13px 18px;background:#f1f8f2;color:#56735e;line-height:1.7;font-size:12px;margin:18px 0}
+@media(max-width:950px){.cloud-shell{grid-template-columns:1fr}.cloud-side{min-height:0;padding:18px 22px;gap:0;flex-direction:row;justify-content:space-between;align-items:center}.cloud-side-info{display:none}.cloud-demo-link{margin:0;border:0;padding:0}.cloud-main{min-height:calc(100vh - 84px)}}
+@media(max-width:580px){.cloud-topbar{height:auto;min-height:72px}.cloud-session{flex-wrap:wrap;justify-content:flex-end}.cloud-header{align-items:stretch;flex-direction:column}.cloud-side .brand small{display:none}.cloud-side .brand strong{font-size:14px}.cloud-demo-link{font-size:11px}.cloud-auth .cloud-card{padding:23px}.cloud-record{align-items:flex-start;flex-direction:column}.cloud-topbar>span{font-size:10px}.cloud-main{padding:0 15px 25px}}

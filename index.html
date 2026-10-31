@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#123b30">
+  <meta name="description" content="Plataforma Ambiental Argentina. Laboratorio funcional PGA, monitoreo y auditorías.">
+  <title>Ambienta · Gestión ambiental</title>
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Menú principal">
+      <div class="brand"><span class="brand-icon">A</span><div><strong>AMBIENTA</strong><small>PLATAFORMA AMBIENTAL</small></div></div>
+      <div class="nav-caption">ESPACIO DE TRABAJO</div>
+      <nav id="nav" class="nav-list" aria-label="Secciones del proyecto">
+        <button type="button" data-route="resumen"><span>◫</span> Resumen</button>
+        <button type="button" data-route="expediente"><span>▤</span> Expediente</button>
+        <button type="button" data-route="pga"><span>▦</span> Plan de Gestión</button>
+        <button type="button" data-route="monitoreo"><span>◉</span> Monitoreo</button>
+        <button type="button" data-route="auditorias"><span>◇</span> Auditorías</button>
+        <button type="button" data-route="historial"><span>☷</span> Historial</button>
+      </nav>
+      <a class="cloud-link-sidebar" href="./cloud.html">☁  Expedientes en la nube</a>
+      <div class="sidebar-bottom">
+        <div class="avatar">DE</div>
+        <div><strong>Entorno de demostración</strong><span>Salta · Argentina</span></div>
+      </div>
+    </aside>
+    <main class="main-area" id="main">
+      <div class="topline"><div class="crumbs">PROYECTOS <span>/</span> <strong>DEMO-001</strong> <span>/</span> <span id="breadcrumb">PGA</span></div><div class="topline-actions"><span class="province">◎ Salta · AR</span><button class="ghost-btn" id="export" type="button">↓ Exportar JSON</button></div></div>
+      <header class="page-head"><div><p class="eyebrow">PLATAFORMA AMBIENTAL ARGENTINA</p><h1 id="heading">Plan de Gestión Ambiental</h1><p class="subheading" id="subtitle">Trazabilidad de medidas, indicadores y evidencias.</p></div><div id="main-action"></div></header>
+      <div class="demo-warning" role="note"><span class="warn-dot">!</span><div><strong>Ambiente de prueba</strong> · Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental.</div></div>
+      <section id="screen" aria-live="polite"></section>
+      <footer class="footer"><span>AMBIENTA · MITA <strong>V0.5</strong> · Prototipo funcional</span><span>Datos en este navegador · Sin conexión a base de datos</span></footer>
+    </main>
+  </div>
+  <dialog id="modal" aria-label="Editor de registros"><div id="modal-content"></div></dialog>
+  <div id="toast" aria-live="polite" aria-atomic="true"></div>
+  <script type="module" src="./app.mjs"></script>
+</body>
+</html>

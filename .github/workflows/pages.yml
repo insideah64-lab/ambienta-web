@@ -1,0 +1,56 @@
+name: Publicar AMBIENTA en GitHub Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "github-pages"
+  cancel-in-progress: true
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Obtener frontend público
+        uses: actions/checkout@v4
+      - name: Preparar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Instalar y compilar
+        run: |
+          npm ci --no-fund --no-audit
+          npm run build
+          touch dist/.nojekyll
+      - name: Comprobar sitio y rutas
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          root=Path("dist")
+          for name in ["index.html","cloud.html"]:
+              text=(root/name).read_text(encoding="utf-8")
+              assert "<!doctype html>" in text.lower(),name
+              assert "<meta charset=" in text.lower(),name
+              assert 'type="module"' in text,name
+              for bad in ("GESTIÃ", "AutenticaciÃ", "AMBIENTA Â·"):
+                  assert bad not in text,(name,bad)
+          assert list((root/"assets").glob("*.js")), "Missing compiled JavaScript"
+          assert list((root/"assets").glob("*.css")), "Missing compiled CSS"
+          PY
+      - name: Configurar GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Preparar artefacto para Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Publicar HTTPS
+        id: deployment
+        uses: actions/deploy-pages@v4

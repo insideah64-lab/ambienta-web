@@ -1,0 +1,19 @@
+{
+  "name": "ambienta-ambiental-web",
+  "version": "0.7.0",
+  "private": true,
+  "type": "module",
+  "description": "Plataforma Ambiental Argentina: demo y acceso Supabase",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build --base ./",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "node --test ../tests/web/*.test.mjs"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "2.118.0"
+  },
+  "devDependencies": {
+    "vite": "7.1.9"
+  }
+}
