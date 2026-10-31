@@ -48,3 +48,5 @@ jobs:
         run: npm test
       - name: IDESA WFS live limited BBOX smoke
         run: node tests/live-idesa.mjs
+      - name: Supabase Edge gateway authenticated E2E
+        run: node tests/live-supabase-edge.mjs
