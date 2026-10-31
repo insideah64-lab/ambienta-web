@@ -5,12 +5,15 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import {IS_DIABLILLOS_CASE} from '../../lib/demo';
 // @ts-ignore: legacy pure JS parser intentionally shared with Node's native test runner
 import {validateGeoJson} from './geojson-validate.mjs';
+// @ts-ignore: hydrology validation is plain JS and unit-tested in Node
+import {validateHydrologyImport} from './hydrology-validation.mjs';
 
 type Props={compact?:boolean;province:string};
 type WorkingLayer={
  label:string;source:string;fileName:string;sha256:string;savedAt:string;
  featureCount:number;coordinateCount:number;bounds:[number,number,number,number];
  geojson:{type:'FeatureCollection';features:unknown[]};
+ metadata?:{category:'hydrology';institution:string;date:string;sourceUrl:string;verification:'source_declared_unverified';description:string};
 };
 const PUNA_CENTER:[number,number]=[-67.2,-24.7];
 const SALTA_CENTER:[number,number]=[-65.45,-24.82];
@@ -27,8 +30,9 @@ function stored():WorkingLayer|null{
   if(!value||value.length>1400000)return null;
   const candidate=JSON.parse(value);
   if(!candidate||typeof candidate.source!=='string'||typeof candidate.sha256!=='string')return null;
-  const checked=validateGeoJson(candidate.geojson);
-  return {...candidate,...checked};
+  const checked=candidate.metadata?.category==='hydrology'?
+    validateHydrologyImport(candidate.geojson,{institution:candidate.metadata.institution,date:candidate.metadata.date,url:candidate.metadata.sourceUrl}):validateGeoJson(candidate.geojson);
+  return {...candidate,...checked,geojson:checked.geojson};
  }catch{return null;}
 }
 const LAYERS=['qa-fill','qa-outline','qa-line','qa-points'];
@@ -41,18 +45,19 @@ function mountWorking(map:MapLibreMap,layer:WorkingLayer|null,fit:boolean){
  clearWorking(map);
  if(!layer)return;
  map.addSource('qa-geojson',{type:'geojson',data:layer.geojson as never});
+ const isHydro=layer.metadata?.category==='hydrology';
  map.addLayer({id:'qa-fill',source:'qa-geojson',type:'fill',
   filter:['in',['geometry-type'],['literal',['Polygon','MultiPolygon']]],
-  paint:{'fill-color':'#f6be73','fill-opacity':0.28}});
+  paint:{'fill-color':isHydro?'#20a7db':'#f6be73','fill-opacity':0.28}});
  map.addLayer({id:'qa-outline',source:'qa-geojson',type:'line',
   filter:['in',['geometry-type'],['literal',['Polygon','MultiPolygon']]],
-  paint:{'line-color':'#ffa342','line-width':2.5,'line-dasharray':[3,2]}});
+  paint:{'line-color':isHydro?'#0a82bd':'#ffa342','line-width':2.5,'line-dasharray':[3,2]}});
  map.addLayer({id:'qa-line',source:'qa-geojson',type:'line',
   filter:['in',['geometry-type'],['literal',['LineString','MultiLineString']]],
-  paint:{'line-color':'#e36ca3','line-width':3}});
+  paint:{'line-color':isHydro?'#00b7ea':'#e36ca3','line-width':3}});
  map.addLayer({id:'qa-points',source:'qa-geojson',type:'circle',
   filter:['in',['geometry-type'],['literal',['Point','MultiPoint']]],
-  paint:{'circle-radius':7,'circle-color':'#ffe36e','circle-stroke-width':2,'circle-stroke-color':'#5d3c10'}});
+  paint:{'circle-radius':7,'circle-color':isHydro?'#00e4ec':'#ffe36e','circle-stroke-width':2,'circle-stroke-color':'#5d3c10'}});
  if(fit){
   const [west,south,east,north]=layer.bounds;
   if(west===east&&south===north)map.easeTo({center:[west,south],zoom:11,duration:0});
@@ -67,6 +72,10 @@ export function GeoMap({compact=false,province}:Props){
  const [tilesLoaded,setTilesLoaded]=useState(false);
  const [layer,setLayer]=useState<WorkingLayer|null>(stored);
  const [source,setSource]=useState('');
+ const [layerType,setLayerType]=useState<'general'|'hydrology'>('general');
+ const [institution,setInstitution]=useState('');
+ const [sourceDate,setSourceDate]=useState('');
+ const [hydroUrl,setHydroUrl]=useState('');
  const [error,setError]=useState('');
  const [busy,setBusy]=useState(false);
  const center=IS_DIABLILLOS_CASE?PUNA_CENTER:SALTA_CENTER;
@@ -105,12 +114,15 @@ export function GeoMap({compact=false,province}:Props){
   setBusy(true);
   try{
    const text=await file.text();const parsed=JSON.parse(text);
-   const result=validateGeoJson(parsed);
+   const hydroInfo=layerType==='hydrology'?validateHydrologyImport(parsed,{institution,date:sourceDate,url:hydroUrl}):null;
+   const result=hydroInfo??validateGeoJson(parsed);
    const digest=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(text));
    const sha256=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
    const next:WorkingLayer={...result,geojson:result.geojson as WorkingLayer['geojson'],bounds:result.bounds as [number,number,number,number],label:'Capa de trabajo NO VERIFICADA',
     source:source.trim().slice(0,180),fileName:file.name.slice(0,160),
-    sha256,savedAt:new Date().toISOString()};
+    sha256,savedAt:new Date().toISOString(),
+    ...(hydroInfo?{metadata:hydroInfo.metadata as WorkingLayer['metadata']}:{}),
+   };
    // Browser-local only: do not send geometry to Supabase or claim ownership of a real project perimeter.
    localStorage.setItem(WORKING_LAYER_KEY,JSON.stringify(next));
    setLayer(next);
@@ -152,15 +164,26 @@ export function GeoMap({compact=false,province}:Props){
    <div className="geo-layers" aria-label="Capas disponibles">
     <strong>Capas</strong>
     <span className="geo-layer-active">Base OSM <small>Activa</small></span>
-    {layer&&<span className="geo-layer-working">GeoJSON local <small>No verificado</small></span>}
+    {layer&&<span className="geo-layer-working">{layer.metadata?.category==='hydrology'?'Capa hídrica local':'GeoJSON local'} <small>No verificado</small></span>}
     <span className="geo-layer-disabled" title="No hay productos ambientales vinculados">NDVI <small>Sin datos</small></span>
-    <span className="geo-layer-disabled" title="Falta integrar capa hidrográfica oficial">Hidrología <small>Sin datos</small></span>
+    {layer?.metadata?.category==='hydrology'?<span className="geo-layer-working" data-hydro-active="unverified">Hidrología <small>Declarada · no validada</small></span>:<span className="geo-layer-disabled" title="Falta integrar capa hidrográfica oficial">Hidrología <small>Sin datos</small></span>}
    </div>
    {!compact&&<div className="geo-import-panel">
     <strong>GeoJSON · Capa de trabajo local</strong>
+    <label>Tipo de capa<select aria-label="Tipo de capa ambiental" value={layerType} onChange={ev=>setLayerType(ev.target.value as 'general'|'hydrology')}>
+     <option value="general">Geometría general de trabajo</option>
+     <option value="hydrology">Hidrología · trazado o puntos declarados</option>
+    </select></label>
     <p>Importá geometrías WGS84/EPSG:4326 (hasta 1 MiB, 100 entidades y 12.000 vértices). No se convierten automáticamente en el área oficial del expediente.</p>
     <label>Procedencia o descripción<input value={source} onChange={e=>setSource(e.target.value)}
       maxLength={180} placeholder="Ej.: polígono sintético de QA, no perímetro minero"/></label>
+    {layerType==='hydrology'&&<div className="geo-hydro-fields" data-hydro-form="true">
+     <strong>Procedencia hídrica obligatoria</strong>
+     <label>Organismo o entidad de origen<input aria-label="Organismo de origen hídrico" value={institution} onChange={e=>setInstitution(e.target.value)} placeholder="Organismo declarante (no verificado)" maxLength={120}/></label>
+     <label>Fecha de la fuente<input type="date" aria-label="Fecha de fuente hídrica" value={sourceDate} onChange={e=>setSourceDate(e.target.value)}/></label>
+     <label>URL de origen HTTPS<input type="url" aria-label="URL fuente hídrica" value={hydroUrl} onChange={e=>setHydroUrl(e.target.value)} placeholder="https://..." maxLength={450}/></label>
+     <p>La URL y el organismo son declarados por el operador; no se verifican contra el organismo ni acreditan calidad del agua, caudales o permisos.</p>
+    </div>}
     <label className="geo-file">Seleccionar GeoJSON<input type="file" accept=".geojson,.json,application/geo+json,application/json"
       disabled={busy} onChange={loadFile} aria-label="Importar GeoJSON"/></label>
     {busy&&<span role="status">Validando geometría y calculando SHA-256…</span>}
@@ -168,6 +191,7 @@ export function GeoMap({compact=false,province}:Props){
     {layer&&<div className="geo-layer-details" data-geojson-loaded="true">
      <strong>Capa local sin validar: {layer.fileName}</strong>
      <small>{layer.featureCount} entidades · {layer.coordinateCount} vértices · fuente declarada: {layer.source}</small>
+     {layer.metadata?.category==='hydrology'&&<div className="geo-hydro-provenance" data-hydro-provenance="unverified"><strong>Hidrología NO VERIFICADA</strong><small>{layer.metadata.institution} · {layer.metadata.date}</small><small>Origen declarado: {layer.metadata.sourceUrl}</small><small>Este material NO acredita una cuenca, un cauce oficial ni la situación ambiental de Diablillos.</small></div>}
      <code>SHA-256 {layer.sha256}</code>
      <div className="geo-actions">
       <button type="button" onClick={exportLayer}>Exportar GeoJSON depurado</button>

@@ -4,14 +4,19 @@ import type { User } from '@supabase/supabase-js';
 import { getSupabaseClient } from '../../lib/supabase';
 // @ts-ignore: Reuse the V1 cloud repository; this legacy ESM module has no TS declarations.
 import { createEnvironmentalRepository } from '../../../../../web/cloud/repository.mjs';
+import {CloudEvidencePilot} from './CloudEvidencePilot';
 import './cloud.css';
 
-type ProjectRow = { id:string; name:string; province:string; project_phase:string; status:string; created_at:string };
+type ProjectRow = { id:string; owner_id?:string; name:string; province:string; project_phase:string; status:string; created_at:string };
+type MeasureRow = {id:string;title?:string};
+type EvidenceRow = {id:string;measure_id?:string;label?:string;storage_path?:string|null;original_file_name?:string|null;file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
 type ProjectDetail = { project:ProjectRow; environmental_impacts:unknown[];
-  management_programs:unknown[]; management_measures:unknown[];
-  monitoring_inspections:unknown[]; environmental_evidence:unknown[];
+  management_programs:unknown[]; management_measures:MeasureRow[];
+  monitoring_inspections:unknown[]; environmental_evidence:EvidenceRow[];
   audit_findings:unknown[]; corrective_actions:unknown[] };
-type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>Promise<ProjectDetail> };
+type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>Promise<ProjectDetail>;
+  uploadEvidenceFile:(projectId:string,measureId:string,values:{label:string;file:File})=>Promise<unknown>;
+  downloadEvidence:(row:EvidenceRow)=>Promise<{blob:Blob;name:string}> };
 function message(cause:unknown):string {
   return cause instanceof Error ? cause.message : 'No se pudo completar la operación.';
 }
@@ -114,7 +119,7 @@ export function CloudWorkspace() {
       <p>Esta compilación experimental no incluye las variables públicas de Supabase. La demostración local sigue funcionando; no se intentó acceder a ningún expediente.</p>
       <p>Configurar VITE_SUPABASE_URL y VITE_SUPABASE_PUBLISHABLE_KEY para habilitar el inicio de sesión. Nunca agregar una clave secreta.</p></div></div>}
     {client&&<div className="v2-cloud-note"><ShieldCheck size={18}/>
-      <span>El acceso lo controla Supabase Auth y las políticas RLS de la base de datos. Esta fase permite <strong>solo consultar</strong> expedientes; no aprueba medidas ni evidencias.</span></div>}
+      <span>El acceso lo controla Supabase Auth y las políticas RLS del servidor. El piloto de carga privada está <strong>desactivado por defecto</strong> y no aprueba medidas ni evidencias.</span></div>}
     {error&&<p className="v2-cloud-error" role="alert">{error}</p>}
     {info&&<p className="v2-cloud-info" role="status">{info}</p>}
     {client&&loading&&<p className="v2-cloud-state" role="status"><RefreshCw size={18}/> Verificando sesión…</p>}
@@ -152,7 +157,11 @@ export function CloudWorkspace() {
             ['Acciones correctivas',selected.corrective_actions.length]] as [string,number][]).map(([label,count])=>
               <div key={label}><span>{label}</span><strong>{count}</strong></div>)}
         </div>
-        <p className="v2-cloud-readonly">Vista de consulta. Los formularios de edición y las evidencias privadas siguen en V1 hasta completar pruebas de Auth, RLS y Storage con dos usuarios.</p>
+        <CloudEvidencePilot projectId={selected.project.id} measures={selected.management_measures}
+          evidence={selected.environmental_evidence} reader={reader!} onUploaded={async()=>{
+           if(user&&reader){const latest=await reader.loadProject(selected.project.id);setSelected(latest);}
+          }}/>
+        <p className="v2-cloud-readonly">Los demás formularios de edición y las aprobaciones siguen fuera de esta V2 experimental. No se certificó autorización cruzada con dos usuarios.</p>
       </div>}
     </div>}
   </div>;

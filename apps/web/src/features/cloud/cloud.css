@@ -22,3 +22,18 @@
 .v2-cloud-counts span{color:#abcac2}.v2-cloud-counts strong{font-size:27px;color:#8debba}
 .v2-cloud-readonly{color:#c5dad3;line-height:1.6}
 @media(max-width:700px){.v2-cloud-heading{flex-wrap:wrap;padding:16px}.v2-cloud-form,.v2-cloud-list,.v2-cloud-detail{padding:18px}}
+
+.v2-private-evidence{display:grid;gap:14px;padding:18px;border-radius:13px;border:1px solid #4b796b;background:#102b33}
+.v2-private-evidence h3{display:flex;gap:9px;align-items:center;font-size:16px;color:#c3f1e5;margin:0}
+.v2-private-evidence>p{font-size:12px;line-height:1.65;color:#c4dfd6;margin:0}
+.v2-private-hold{border:1px solid #9b7137;background:#42331e;padding:13px;border-radius:8px;color:#ffe0a7!important}
+.v2-private-evidence form{display:grid;gap:12px}
+.v2-private-evidence label{display:grid;gap:6px;color:#d4e9e4;font-size:12px}
+.v2-private-evidence select,.v2-private-evidence input{width:100%;border:1px solid #527e75;background:#0d2930;color:#edfff6;border-radius:7px;padding:10px;font:inherit}
+.v2-private-records{display:grid;gap:10px;border-top:1px solid #486f61;padding-top:13px}
+.v2-private-records>strong{color:#d7f5e9}
+.v2-private-file{display:flex;gap:14px;align-items:center;border:1px solid #385c56;border-radius:9px;padding:12px}
+.v2-private-file span{display:grid;gap:5px;flex:1}
+.v2-private-file small{color:#abcac2}
+.v2-private-file button{display:flex;gap:6px;align-items:center;border:1px solid #599b84;color:#e5f9ef;background:#1c5147;border-radius:7px;padding:8px;cursor:pointer}
+@media(max-width:700px){.v2-private-file{flex-wrap:wrap}}
