@@ -16,6 +16,7 @@ from typing import Any
 
 from shapely.geometry import GeometryCollection, MultiPolygon, Polygon, box, mapping, shape
 from shapely.validation import explain_validity
+from shapely.errors import GEOSException
 
 MAX_INPUT_BYTES = 20 * 1024 * 1024
 MAX_FEATURES = 2000
@@ -29,9 +30,11 @@ ALLOWED_CRS = {
 
 
 class GeoReviewError(ValueError):
-    def __init__(self, message: str, issues: list[dict[str, Any]] | None = None):
+    def __init__(self, message: str, issues: list[dict[str, Any]] | None = None,
+                 manifest: dict[str, Any] | None = None):
         super().__init__(message)
         self.issues = issues or []
+        self.manifest = manifest or {}
 
 
 def validate_bbox(bbox: list[float]) -> list[float]:
@@ -162,7 +165,7 @@ def prepare(input_path: Path, bbox: list[float]) -> tuple[dict[str, Any], dict[s
             label = str(label).strip()[:120]
             out.append({"type": "Feature", "properties": {"name": label, "sourceIndex": index},
                         "geometry": mapping(result)})
-        except (GeoReviewError, ValueError, TypeError, KeyError) as exc:
+        except (GeoReviewError, GEOSException, ValueError, TypeError, KeyError) as exc:
             issues.append({"index": index, "reason": str(exc)[:250]})
 
     manifest = {
@@ -184,7 +187,7 @@ def prepare(input_path: Path, bbox: list[float]) -> tuple[dict[str, Any], dict[s
         "license": "not_verified_for_redistribution",
     }
     if issues:
-        raise GeoReviewError("Hay geometrías que requieren revisión; ninguna exportación parcial.", issues)
+        raise GeoReviewError("Hay geometrías que requieren revisión; ninguna exportación parcial.", issues, manifest)
     return {"type": "FeatureCollection", "features": out,
             "properties": {"ambientaClip": manifest}}, manifest
 
@@ -220,8 +223,9 @@ def main() -> int:
                           "sourceSha256": manifest["sourceSha256"]}))
         return 0
     except GeoReviewError as exc:
-        atomic_json(args.report, {"status": "requires_review", "reason": str(exc),
-                                  "issues": exc.issues, "outputWritten": False})
+        atomic_json(args.report, {**exc.manifest, "status": "requires_review",
+                                  "reason": str(exc), "issues": exc.issues,
+                                  "outputWritten": False})
         print(json.dumps({"status": "BLOCKED", "error": str(exc), "issues": exc.issues}))
         return 2
 
