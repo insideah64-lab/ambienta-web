@@ -22,7 +22,6 @@ function download(name:string,content:string,mime:string){
  a.remove();setTimeout(()=>URL.revokeObjectURL(url),500);
 }
 export function PerimeterWorkbench({aoi}:Props){
- const [revision,setRevision]=useState(0);
  const [saved,setSaved]=useState<any|null>(()=>readPerimeter(localStorage,KEY));
  const [vertices,setVertices]=useState<number[][]>([]);
  const [drawing,setDrawing]=useState(false);
@@ -33,7 +32,7 @@ export function PerimeterWorkbench({aoi}:Props){
  const [error,setError]=useState('');
  const [notice,setNotice]=useState('');
  useEffect(()=>{
-  const refresh=()=>{setSaved(readPerimeter(localStorage,KEY));setRevision(v=>v+1);};
+  const refresh=()=>setSaved(readPerimeter(localStorage,KEY));
   window.addEventListener('focus',refresh);window.addEventListener('storage',refresh);
   return ()=>{window.removeEventListener('focus',refresh);window.removeEventListener('storage',refresh);};
  },[]);
