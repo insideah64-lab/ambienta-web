@@ -211,8 +211,10 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
      const derived=initialAoi&&initialLayer?clipGeoJsonToBbox(initialLayer.geojson,initialAoi.bbox):null;
      mountWorking(map,derived&&initialLayer?{...initialLayer,geojson:derived.geojson as WorkingLayer['geojson']}:initialLayer,!compact&&!initialAoi);
      drawAdministrativeBoundary(map,readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
-     drawAoi(map,initialAoi);
      const own=readPerimeter(localStorage,PERIMETER_KEY);
+     // Query BBOX is not the study perimeter; never paint the green rectangle
+     // on top of an already declared user or QA polygon during initial map load.
+     drawAoi(map,own?null:initialAoi);
      const originalScenario=restoreStudyScenario(STUDY_KEY,initialAoi?.bbox,
       own?.sourceSha256||initialLayer?.sha256||null) as StudyAreaRecord|null;
      drawStudyAreas(map,own&&originalScenario?.sourceHash!==own.sourceSha256?null:originalScenario);
