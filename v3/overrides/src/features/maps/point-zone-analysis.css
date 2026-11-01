@@ -1,0 +1,43 @@
+/* V3.5 GIS point-in-zone diagnostics. */
+.sig-point-analysis{display:grid;gap:13px;margin-top:15px;padding:16px;border:1px solid #6aa99b;border-radius:12px;background:linear-gradient(135deg,#102c35,#143830);color:#e8fff3}
+.sig-point-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.sig-point-heading small{font-size:10px;letter-spacing:.13em;font-weight:800;color:#91e0c4}
+.sig-point-heading h3{font-size:17px;margin:6px 0 0;color:#f4fff7}
+.sig-point-heading>span{border:1px solid #d1b078;color:#ffe7b7;border-radius:20px;padding:7px 10px;font-size:9px;font-weight:800}
+.sig-point-analysis p,.sig-point-analysis small{line-height:1.6}
+.sig-point-analysis>p{font-size:11px;color:#cce4d8}
+.sig-point-source{display:flex;flex-wrap:wrap;gap:9px 20px;background:#0c2730;padding:12px;border-radius:9px;border:1px solid #618d8280}
+.sig-point-source span{font-size:11px;color:#d0e6de;overflow-wrap:anywhere}
+.sig-point-source code{font-size:10px}
+.sig-point-hint{border-left:3px solid #b4d5b2;padding:9px}
+.sig-point-hint a{color:#b6ffd4}
+.sig-point-actions{display:flex;flex-wrap:wrap;gap:8px}
+.sig-point-actions button{border:1px solid #74bda4;border-radius:8px;padding:10px 12px;background:#1b6857;color:#effff5;cursor:pointer;font-size:11px;font-weight:750;min-height:38px}
+.sig-point-actions button:disabled{opacity:.45;cursor:not-allowed}
+.sig-point-actions button:hover:not(:disabled){background:#23816b}
+.sig-point-error{color:#ffcfb1;border:1px solid #d4a084;padding:9px;border-radius:8px}
+.sig-point-result{display:grid;gap:13px;border-top:1px solid #80c7b264;padding-top:13px}
+.sig-point-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sig-point-stats>div{display:grid;gap:7px;padding:12px;border:1px solid #699b8a77;background:#102732;border-radius:9px}
+.sig-point-stats small{font-size:10px;color:#b5d7c8}
+.sig-point-stats strong{font-size:24px;color:#f1fff7;font-variant-numeric:tabular-nums}
+.sig-point-zones{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.sig-point-zones>div{display:grid;gap:6px;min-width:0;padding:11px 12px;border:1px solid #7da69a6e;background:#0e2c32;border-radius:8px}
+.sig-point-zones i{display:block;width:24px;height:5px;border-radius:4px}
+.sig-point-zones span{font-size:10px;color:#cbdfd7}
+.sig-point-zones strong{font-size:12px;color:#f5fff7}
+.sig-point-filter{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;font-size:11px;font-weight:700}
+.sig-point-filter select{background:#112d35;border:1px solid #76b5a2;border-radius:7px;color:#effff8;padding:9px;font-size:11px}
+.sig-point-list{display:grid;border-radius:9px;overflow:hidden;border:1px solid #6596867a}
+.sig-point-list-head,.sig-point-row{display:grid;grid-template-columns:1fr minmax(130px,1.1fr) 150px;gap:12px;align-items:center;padding:9px 12px}
+.sig-point-list-head{background:#234b48;font-size:11px;font-weight:800}
+.sig-point-row{background:#0d2a30;border-top:1px solid #749e9062}
+.sig-point-row>span:first-child{display:grid;gap:4px;min-width:0;font-size:11px}
+.sig-point-row>span:first-child small{color:#b6d2c5;overflow-wrap:anywhere}
+.sig-point-status{display:grid;gap:4px;font-size:11px;font-weight:750;color:#9fe2be}
+.sig-point-status.outside_perimeter{color:#c2cfda}
+.sig-point-status.review_boundary,.sig-point-status.review_topology{color:#ffe0aa}
+.sig-point-status small{font-size:10px;font-weight:400;color:#bdcfca}
+.sig-point-row code{font-size:10px;color:#c8eee1;word-break:break-word}
+.sig-point-caveat{padding-top:10px;border-top:1px solid #6a9d8973;color:#cadfd5;font-size:10px!important}
+@media(max-width:700px){.sig-point-stats,.sig-point-zones{grid-template-columns:repeat(2,minmax(0,1fr))}.sig-point-list-head,.sig-point-row{grid-template-columns:1fr 1.2fr;gap:7px}.sig-point-list-head span:last-child{display:none}.sig-point-row code{grid-column:1/-1}}
