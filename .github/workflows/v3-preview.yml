@@ -58,6 +58,7 @@ jobs:
           node apps/web-v3/scripts/point-zone-imported-source-smoke.mjs
           node apps/web-v3/scripts/documentary-review-smoke.mjs
           node apps/web-v3/scripts/documentary-evidence-smoke.mjs
+          node apps/web-v3/scripts/measurements-smoke.mjs
           node apps/web-v3/scripts/georef-real-smoke.mjs
           node apps/web-v3/scripts/sig-gateway-smoke.mjs
           sha256sum -c /tmp/ambienta-v1-v2.sha
