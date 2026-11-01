@@ -101,7 +101,7 @@ function AreaEstudio({data}:{data:DemoState}) {
      <Info icon={MapPin} label="Provincia" value={data.project.province}/>
      <Info icon={FolderOpen} label="Expediente" value={data.project.id}/>
     </div>
-    <p className="v2-panel-note">En este módulo se declara la ventana de referencia, se caracteriza el territorio y se delimita un polígono de estudio con sus subáreas. Las consultas de capas WFS/WMS, el recorte y la importación GeoJSON se realizan exclusivamente en <Link to="/mapas">Mapas y SIG</Link>.</p>
+    <p className="v2-panel-note">En este módulo se declara la ventana de referencia, se caracteriza el territorio y se delimita un polígono de estudio con sus subáreas. Las consultas de capas WFS/WMS, el recorte y la importación GeoJSON se realizan exclusivamente en <Link to="/mapas">laboratorio cartográfico</Link>.</p>
    </Panel>
    <AoiWorkbench onChange={setAoi}/>
    <GeorefTerritory onFocus={setTerritoryFocus} onBoundary={setBoundary}/>
@@ -122,9 +122,9 @@ function AreaEstudio({data}:{data:DemoState}) {
 function MapasSIG({data}:{data:DemoState}){
  return <div className="v2-area-stack" data-page-role="gis-analysis">
   <Panel kicker="MAPAS Y SIG · ANÁLISIS" title="Laboratorio cartográfico y geoprocesamiento">
-   <p className="v2-panel-note">Este módulo concentra las bases cartográficas, consulta de datos IDESA/Georef, capas WMS, importación GeoJSON, recortes topológicos, revisión y exportación. La ventana AOI y el polígono de ensayo proceden de <Link to="/area">Área de estudio</Link> y no se redefinen aquí.</p>
+   <p className="v2-panel-note">Este módulo concentra las bases cartográficas, consulta de datos IDESA/Georef, capas WMS, importación GeoJSON, recortes topológicos, revisión y exportación. La ventana AOI y el polígono de ensayo proceden de <Link to="/area">la definición territorial</Link> y no se redefinen aquí.</p>
    <GeoMap province={data.project.province}/>
-   <p className="v2-panel-note">Las cuatro subáreas son capas visibles de solo lectura. Para cambiar el perímetro, asignar zonas o revisar superficies, <Link to="/area">volvé a Área de estudio</Link>. Ninguna ventana de consulta ni geometría importada constituye automáticamente un perímetro ambiental acreditado.</p>
+   <p className="v2-panel-note">Las cuatro subáreas son capas visibles de solo lectura. Para cambiar el perímetro, asignar zonas o revisar superficies, <Link to="/area">volvé al módulo de delimitación</Link>. Ninguna ventana de consulta ni geometría importada constituye automáticamente un perímetro ambiental acreditado.</p>
   </Panel>
  </div>;
 }
