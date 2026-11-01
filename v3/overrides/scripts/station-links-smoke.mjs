@@ -86,6 +86,7 @@ try{
  await page.getByLabel('Responsable de anulación').fill('Revisor QA');
  await page.getByRole('button',{name:'Confirmar anulación'}).click();
  await page.locator('[data-measurement-id=MUE-0001][data-measurement-status=voided]').waitFor();
+ await page.locator('[data-station-monitoring=stale]').waitFor();
  await page.getByRole('link',{name:'Mapas y SIG',exact:true}).click();
  await gis.locator('[data-point-context=ready]').waitFor();
  await gis.getByRole('button',{name:'Analizar puntos contra las subáreas'}).click();
