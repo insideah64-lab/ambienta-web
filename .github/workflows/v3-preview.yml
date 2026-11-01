@@ -60,6 +60,7 @@ jobs:
           node apps/web-v3/scripts/compact-work-smoke.mjs
           node apps/web-v3/scripts/kpi-documentary-smoke.mjs
           node apps/web-v3/scripts/commitment-status-smoke.mjs
+          node apps/web-v3/scripts/measure-trace-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
           node apps/web-v3/scripts/area-gis-separation-smoke.mjs
           node apps/web-v3/scripts/point-zone-analysis-smoke.mjs
@@ -113,6 +114,14 @@ jobs:
         with:
           name: ambienta-v359-compromisos-desktop
           path: qa/ambienta-v359-commitments/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Guardar capturas de trazabilidad documental V3.6.0
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-v360-trazabilidad-capturas
+          path: qa/ambienta-v360-trace/
           retention-days: 30
           if-no-files-found: warn
       - name: Keep QA build (not a deployment)
