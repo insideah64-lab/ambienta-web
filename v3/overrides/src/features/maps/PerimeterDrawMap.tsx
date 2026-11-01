@@ -16,7 +16,7 @@ export function PerimeterDrawMap({vertices,onAdd,bounds,perimeter,center,enabled
  useEffect(()=>{
   if(!root.current)return;
   const map=new maplibregl.Map({container:root.current,style:STYLE,
-   center:[center?.lon??-67.2,center?.lat??-24.7],zoom:11,
+   center:[center?.lon??-66.833333,center?.lat??-25.3],zoom:11,
    minZoom:3,maxZoom:18,attributionControl:false,dragRotate:false});
   mapRef.current=map;map.doubleClickZoom.disable();
   map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
