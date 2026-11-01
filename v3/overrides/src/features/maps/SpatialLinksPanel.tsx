@@ -10,6 +10,12 @@ import './spatial-links.css';
 type Kind='impact'|'measure'|'inspection'|'evidence';
 type Mode=Kind|'overview'|'report';
 type Props={data:DemoState;mode:Mode};
+type SpatialState={records:Record<Kind,Record<string,{zoneIds:string[];updatedAt:string}>>};
+type ZoneTotals={id:string;label:string;color:string;impact:number;measure:number;inspection:number;evidence:number};
+type SpatialSummary={totalLinked:number;totalRecords:number;
+ counts:Record<Kind,{linked:number;total:number}>;
+ byZone:ZoneTotals[];
+ conflicts:{kind:string;id:string;relatedKind:string;relatedId:string}[]};
 const kinds:Kind[]=['impact','measure','inspection','evidence'];
 const titles:Record<Kind,string>={impact:'Impactos',measure:'Medidas PGA',
  inspection:'Inspecciones',evidence:'Evidencias'};
@@ -41,9 +47,10 @@ export function SpatialLinksPanel({data,mode}:Props){
  },[]);
  const context=useMemo(()=>readSpatialBrowserContext(data,IS_DIABLILLOS_CASE),
   [data,revision]);
- const {scenario,state,status,reason,key}=context;
- const summary=useMemo(()=>scenario&&state&&status!=='blocked'?
-  summarizeSpatialLinks(state,data,scenario):null,[scenario,state,status,data]);
+ const {scenario,status,reason,key}=context;
+ const state=context.state as SpatialState|null;
+ const summary=useMemo<SpatialSummary|null>(()=>scenario&&state&&status!=='blocked'?
+  summarizeSpatialLinks(state,data,scenario) as SpatialSummary:null,[scenario,state,status,data]);
  function notify(){
   setRevision(n=>n+1);
   window.dispatchEvent(new Event('ambienta:spatial-updated'));
