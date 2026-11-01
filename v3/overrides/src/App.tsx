@@ -18,6 +18,8 @@ import { DemoActionDialog, type DemoActionKind } from './features/demo/DemoActio
 import { CloudWorkspace } from './features/cloud/CloudWorkspace';
 import { ReferenceDashboard } from './features/dashboard/ReferenceDashboard';
 import { GeoMap } from './features/maps/GeoMap';
+import { StudyAreasWorkbench } from './features/maps/StudyAreasWorkbench';
+import './area-gis-pages.css';
 import { SpatialLinksPanel } from './features/maps/SpatialLinksPanel';
 // @ts-ignore: native JS validator used to restore browser-local admin polygon
 import {readAdminBoundary,adminBoundaryKey} from './features/georef/admin-boundary.mjs';
@@ -31,13 +33,13 @@ type Navigation = { path: string; label: string; icon: LucideIcon; description: 
 const NAV_PRIMARY: Navigation[] = [
   {path:'/',label:'Resumen',icon:LayoutDashboard,description:'Resumen visual del expediente y sus compromisos.'},
   {path:'/expediente',label:'Expediente',icon:FolderOpen,description:'Alcance, responsables y fases del proyecto.'},
-  {path:'/area',label:'Área de estudio',icon:Globe2,description:'Cartografía regional real; ubicación y polígonos del proyecto pendientes de respaldo.'},
+  {path:'/area',label:'Área de estudio',icon:Globe2,description:'Definir ventana, territorio, perímetro, superficies y subáreas del proyecto.'},
   {path:'/impactos',label:'Impactos',icon:Leaf,description:'Impactos ambientales vinculados al proyecto.'},
   {path:'/pga',label:'Plan de Gestión',icon:Layers3,description:'Programas, medidas, indicadores y trazabilidad ambiental.'},
   {path:'/monitoreo',label:'Monitoreo',icon:Activity,description:'Inspecciones, resultados y seguimiento en campo.'},
   {path:'/auditorias',label:'Auditorías',icon:ShieldCheck,description:'Hallazgos, controles y acciones correctivas.'},
   {path:'/evidencias',label:'Evidencias',icon:FileText,description:'Referencias documentales, huellas SHA-256 y revisiones en demostración.'},
-  {path:'/mapas',label:'Mapas y SIG',icon:Map,description:'Mapa interactivo OSM regional, sin perímetro de proyecto.'},
+  {path:'/mapas',label:'Mapas y SIG',icon:Map,description:'Analizar capas WFS/WMS, importar GeoJSON, recortar y exportar cartografía.'},
   {path:'/reportes',label:'Reportes',icon:FolderOpen,description:'Resumen exportable del expediente de demostración.'}
 ];
 const NAV_TOOLS: Navigation[] = [
@@ -60,7 +62,7 @@ function Panel({kicker, title, children, action}: {kicker:string;title:string;ch
   return <section className="v2-panel"><header className="v2-panel-title"><div><p className="v2-kicker">{kicker}</p><h2>{title}</h2></div>{action}</header>{children}</section>;
 }
 function MapPreview({province,focus,boundary,aoi}:{province:string;focus?:TerritoryFocus|null;boundary?:BoundaryOverlay|null;aoi?:PointAoi|null}) {
- return <GeoMap province={province} focus={focus} boundary={boundary} aoi={aoi}/>;
+ return <GeoMap compact province={province} focus={focus} boundary={boundary} aoi={aoi}/>;
 }
 function Info({label,value,icon:Icon}:{label:string;value:string;icon:LucideIcon}) {
   return <div className="v2-info"><Icon size={18}/><div><small>{label}</small><strong>{value}</strong></div></div>;
@@ -93,23 +95,37 @@ function AreaEstudio({data}:{data:DemoState}) {
  const [territoryFocus,setTerritoryFocus]=useState<TerritoryFocus|null>(null);
  const [boundary,setBoundary]=useState<BoundaryOverlay|null>(()=>readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
  const [aoi,setAoi]=useState<PointAoi|null>(()=>readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null);
- return <div className="v2-area-stack">
-   <Panel kicker="ÁREA DE ESTUDIO" title="Ficha territorial y trazabilidad">
-    <div className="v2-area-overview">
-     <div className="v2-project-fields">
-      <Info icon={MapPin} label="Provincia" value={data.project.province}/>
-      <Info icon={FolderOpen} label="Expediente" value={data.project.id}/>
-     </div>
-     <p className="v2-panel-note">La cartografía OSM representa el entorno regional. Sin límites del proyecto, puntos de muestreo ni inventarios hidrográficos oficialmente verificados. Las capas importadas permanecen como material local NO VERIFICADO.</p>
+ return <div className="v2-area-stack" data-page-role="territory-definition">
+   <Panel kicker="ÁREA DE ESTUDIO · DEFINICIÓN" title="Territorio, perímetro y superficies">
+    <div className="v2-project-fields">
+     <Info icon={MapPin} label="Provincia" value={data.project.province}/>
+     <Info icon={FolderOpen} label="Expediente" value={data.project.id}/>
     </div>
+    <p className="v2-panel-note">En este módulo se declara la ventana de referencia, se caracteriza el territorio y se delimita un polígono de estudio con sus subáreas. Las consultas de capas WFS/WMS, el recorte y la importación GeoJSON se realizan exclusivamente en <Link to="/mapas">Mapas y SIG</Link>.</p>
    </Panel>
    <AoiWorkbench onChange={setAoi}/>
    <GeorefTerritory onFocus={setTerritoryFocus} onBoundary={setBoundary}/>
-   <Panel kicker="SIG · MAPA INTERACTIVO" title="Cartografía regional, capas y procedencia">
-    <MapPreview province={data.project.province} focus={territoryFocus} boundary={boundary} aoi={aoi}/>
-    <p className="v2-panel-note">No se presenta esta cartografía como evaluación de calidad del agua, georreferenciación de instalaciones ni certificación ambiental.</p>
+   <Panel kicker="POLÍGONO DEL CASO · ZONIFICACIÓN" title="Delimitación y distribución de superficies">
+    <StudyAreasWorkbench aoi={aoi}/>
+   </Panel>
+   <Panel kicker="VISTA TERRITORIAL · LECTURA" title="Ubicación del escenario">
+    <div className="v2-territory-preview" data-study-map-preview="true">
+     <MapPreview province={data.project.province} focus={territoryFocus} boundary={boundary} aoi={aoi}/>
+    </div>
+    <p className="v2-panel-note">Vista cartográfica compacta de consulta: muestra la ventana y las subáreas ya definidas, pero no permite importar capas ni ejecutar análisis SIG. <Link to="/mapas">Abrir laboratorio Mapas y SIG para analizar y exportar capas</Link>.</p>
+   </Panel>
+   <Panel kicker="VÍNCULOS AMBIENTALES · QA" title="Relación documental con las subáreas">
     <SpatialLinksPanel data={data} mode="overview"/>
    </Panel>
+ </div>;
+}
+function MapasSIG({data}:{data:DemoState}){
+ return <div className="v2-area-stack" data-page-role="gis-analysis">
+  <Panel kicker="MAPAS Y SIG · ANÁLISIS" title="Laboratorio cartográfico y geoprocesamiento">
+   <p className="v2-panel-note">Este módulo concentra las bases cartográficas, consulta de datos IDESA/Georef, capas WMS, importación GeoJSON, recortes topológicos, revisión y exportación. La ventana AOI y el polígono de ensayo proceden de <Link to="/area">Área de estudio</Link> y no se redefinen aquí.</p>
+   <GeoMap province={data.project.province}/>
+   <p className="v2-panel-note">Las cuatro subáreas son capas visibles de solo lectura. Para cambiar el perímetro, asignar zonas o revisar superficies, <Link to="/area">volvé a Área de estudio</Link>. Ninguna ventana de consulta ni geometría importada constituye automáticamente un perímetro ambiental acreditado.</p>
+  </Panel>
  </div>;
 }
 function Impactos({data}:{data:DemoState}) {
@@ -307,7 +323,7 @@ export default function App() {
           <Route path="/area" element={<AreaEstudio data={data}/>}/>
           <Route path="/impactos" element={<Impactos data={data}/>}/>
           <Route path="/evidencias" element={<Evidencias data={data} onAction={openAction} onApply={applyTransaction}/>}/>
-          <Route path="/mapas" element={<AreaEstudio data={data}/>}/>
+          <Route path="/mapas" element={<MapasSIG data={data}/>}/>
           <Route path="/reportes" element={<Reportes data={data} onExport={()=>exportDemo(data)}/>}/>
           <Route path="/mita" element={<ToolSection kind="mita"/>}/>
           <Route path="/normativa" element={<ToolSection kind="normativa"/>}/>
