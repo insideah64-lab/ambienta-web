@@ -52,6 +52,7 @@ jobs:
           for i in $(seq 1 15); do curl -fsS http://127.0.0.1:8787/v3/index.html >/dev/null && break || sleep 1; done
           node apps/web-v3/scripts/topology-smoke.mjs
           node apps/web-v3/scripts/study-areas-smoke.mjs
+          node apps/web-v3/scripts/diablillos-preview-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
           node apps/web-v3/scripts/area-gis-separation-smoke.mjs
           node apps/web-v3/scripts/point-zone-analysis-smoke.mjs
