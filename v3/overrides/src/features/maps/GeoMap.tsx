@@ -24,6 +24,8 @@ import {clipGeoJsonToBbox} from './aoi-clip.mjs';
 import {aoiRectangle,aoiKey,readPointAoi} from './aoi-model.mjs';
 // @ts-ignore: pure geospatial area model is verified by Node + Chromium
 import {studyAreaStorageKey,restoreStudyScenario,scenarioMatchesAoi} from './study-areas.mjs';
+// @ts-ignore: user-declared polygon kept separate from GIS layers and simulated zones
+import {readPerimeter,perimeterKey} from './perimeter-source.mjs';
 // @ts-ignore: validated administrative boundary import shared with Node tests
 import {readAdminBoundary,adminBoundaryKey} from '../georef/admin-boundary.mjs';
 // @ts-ignore: official IGN base source specs shared with native Node tests
@@ -44,6 +46,7 @@ const SIG_GATEWAY_URL=(import.meta.env.VITE_SIG_GATEWAY_URL||SIG_API_BASE).trim(
 const SIG_GATEWAY_TOKEN=(import.meta.env.VITE_SIG_GATEWAY_TOKEN||SIG_API_ANON).trim();
 const TILE_URL='https://tile.openstreetmap.org/{z}/{x}/{y}.png';
 const STUDY_KEY=studyAreaStorageKey(IS_DIABLILLOS_CASE);
+const PERIMETER_KEY=perimeterKey(IS_DIABLILLOS_CASE);
 type StudyAreaRecord={kind:'study_area_demo';sourceKind:'synthetic'|'imported';sourceHash:string;
  sourceHashScope:string;status:string;bbox:number[];createdAt:string;crs:string;areaMethod:string;
  parent:{type:'FeatureCollection';features:unknown[]};zones:{type:'FeatureCollection';features:unknown[]};
@@ -122,6 +125,18 @@ function drawStudyAreas(map:MapLibreMap,scenario:StudyAreaRecord|null){
  map.addLayer({id:'study-parent-outline',type:'line',source:'study-parent-src',
   paint:{'line-color':'#fcf9d2','line-width':3,'line-dasharray':[2,1],'line-opacity':0.96}});
 }
+function drawUserPerimeter(map:MapLibreMap,perimeter:any|null){
+ if(!map.getLayer('osm-base-raster'))return;
+ for(const id of ['user-perimeter-outline','user-perimeter-fill'])
+  if(map.getLayer(id))map.removeLayer(id);
+ if(map.getSource('user-perimeter-geojson'))map.removeSource('user-perimeter-geojson');
+ if(!perimeter)return;
+ map.addSource('user-perimeter-geojson',{type:'geojson',data:perimeter.geojson as never});
+ map.addLayer({id:'user-perimeter-fill',type:'fill',source:'user-perimeter-geojson',
+  paint:{'fill-color':'#30a8c4','fill-opacity':0.14}});
+ map.addLayer({id:'user-perimeter-outline',type:'line',source:'user-perimeter-geojson',
+  paint:{'line-color':'#ffcf80','line-width':4,'line-opacity':0.99}});
+}
 function drawAdministrativeBoundary(map:MapLibreMap,boundary:BoundaryOverlay|null){
  if(!map.getLayer('osm-base-raster'))return;
  for(const id of ['admin-border-fill','admin-border-line'])if(map.getLayer(id))map.removeLayer(id);
@@ -158,13 +173,16 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
  const [layer,setLayer]=useState<WorkingLayer|null>(stored);
  const [pointReport,setPointReport]=useState<{points:{ref:string;coordinate:number[];status:string;zoneId:string|null}[];
   summary:{insideCount:number;outsideCount:number;reviewCount:number}}|null>(null);
+ const [perimeter,setPerimeter]=useState<any|null>(()=>readPerimeter(localStorage,PERIMETER_KEY));
  const [scenario,setScenario]=useState<StudyAreaRecord|null>(()=>restoreStudyScenario(
   STUDY_KEY,(readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null)?.bbox,
   stored()?.sha256||null) as StudyAreaRecord|null);
  const [aoiLocal,setAoiLocal]=useState<PointAoi|null>(()=>readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null);
  const validScenario=useMemo(()=>scenario&&aoiLocal&&scenarioMatchesAoi(scenario,aoiLocal.bbox)&&
-  (scenario.sourceKind==='synthetic'||scenario.sourceHash===layer?.sha256)?scenario:null,
-  [scenario,aoiLocal,layer]);
+  (!perimeter||scenario.sourceHash===perimeter.sourceSha256)&&
+  (scenario.sourceKind==='synthetic'||scenario.sourceHash===layer?.sha256||
+   scenario.sourceHash===perimeter?.sourceSha256)?scenario:null,
+  [scenario,aoiLocal,layer,perimeter]);
  const clipped=useMemo(()=>layer&&aoiLocal?clipGeoJsonToBbox(layer.geojson,aoiLocal.bbox):null,[layer,aoiLocal]);
  const displayed=useMemo<WorkingLayer|null>(()=>layer&&clipped?{...layer,geojson:clipped.geojson as WorkingLayer['geojson']}:layer,[layer,clipped]);
  const [source,setSource]=useState('');
@@ -194,9 +212,15 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
      mountWorking(map,derived&&initialLayer?{...initialLayer,geojson:derived.geojson as WorkingLayer['geojson']}:initialLayer,!compact&&!initialAoi);
      drawAdministrativeBoundary(map,readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
      drawAoi(map,initialAoi);
-     drawStudyAreas(map,restoreStudyScenario(STUDY_KEY,initialAoi?.bbox,
-      initialLayer?.sha256||null) as StudyAreaRecord|null);
-     if(initialAoi)map.fitBounds([[initialAoi.bbox[0],initialAoi.bbox[1]],[initialAoi.bbox[2],initialAoi.bbox[3]]],{padding:55,maxZoom:13,duration:0});
+     const own=readPerimeter(localStorage,PERIMETER_KEY);
+     const originalScenario=restoreStudyScenario(STUDY_KEY,initialAoi?.bbox,
+      own?.sourceSha256||initialLayer?.sha256||null) as StudyAreaRecord|null;
+     drawStudyAreas(map,own&&originalScenario?.sourceHash!==own.sourceSha256?null:originalScenario);
+     drawUserPerimeter(map,own);
+     if(own?.bounds?.length===4)map.fitBounds(
+      [[own.bounds[0],own.bounds[1]],[own.bounds[2],own.bounds[3]]],
+      {padding:65,maxZoom:14,duration:0});
+     else if(initialAoi)map.fitBounds([[initialAoi.bbox[0],initialAoi.bbox[1]],[initialAoi.bbox[2],initialAoi.bbox[3]]],{padding:55,maxZoom:13,duration:0});
    }});
    map.on('idle',()=>{if(alive&&map.isStyleLoaded())setTilesLoaded(true);});
    map.on('sourcedata',event=>{
@@ -261,8 +285,10 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
    const updatedLayer=stored();
    if(aoi===undefined)setAoiLocal(updatedAoi);
    setLayer(updatedLayer);
+   const own=readPerimeter(localStorage,PERIMETER_KEY);
+   setPerimeter(own);
    setScenario(restoreStudyScenario(STUDY_KEY,updatedAoi?.bbox,
-    updatedLayer?.sha256||null) as StudyAreaRecord|null);
+    own?.sourceSha256||updatedLayer?.sha256||null) as StudyAreaRecord|null);
   };
   window.addEventListener('ambienta:spatial-updated',refresh);
   window.addEventListener('storage',refresh);
@@ -277,11 +303,15 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
   const map=mapRef.current;
   if(!map||!map.getLayer('osm-base-raster'))return;
   mountWorking(map,displayed,!aoiLocal&&!compact);
-  drawAoi(map,aoiLocal);
+  drawAoi(map,perimeter?null:aoiLocal);
   drawStudyAreas(map,validScenario);
-  if(aoiLocal)map.fitBounds([[aoiLocal.bbox[0],aoiLocal.bbox[1]],[aoiLocal.bbox[2],aoiLocal.bbox[3]]],
+  drawUserPerimeter(map,perimeter);
+  if(perimeter?.bounds?.length===4)map.fitBounds(
+   [[perimeter.bounds[0],perimeter.bounds[1]],[perimeter.bounds[2],perimeter.bounds[3]]],
+   {padding:65,maxZoom:14,duration:250});
+  else if(aoiLocal)map.fitBounds([[aoiLocal.bbox[0],aoiLocal.bbox[1]],[aoiLocal.bbox[2],aoiLocal.bbox[3]]],
    {padding:55,maxZoom:13,duration:250});
- },[aoiLocal,displayed,compact,validScenario]);
+ },[aoiLocal,displayed,compact,validScenario,perimeter]);
   useEffect(()=>{
    if(!focus||!Number.isFinite(focus.lat)||!Number.isFinite(focus.lon)||!mapRef.current)return;
    const map=mapRef.current;
@@ -438,6 +468,9 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
     data-map-engine="maplibre" data-georef={layer?'unverified-local-layer':'regional-only'}>
    <div className="geo-map" ref={element} role="region" aria-label={'Mapa cartográfico interactivo de '+province}/>
    <div className="geo-mode"><span className="geo-live-dot"/> Base real · {basemap==='osm'?'OpenStreetMap':IGN_MAPS[basemap].label}</div>
+   {perimeter&&<div className="geo-user-perimeter-badge" data-user-perimeter-visible="true">
+    Perímetro de usuario · fuente no verificada · {perimeter.sourceName}
+   </div>}
    {!compact&&<div className="geo-basemap" role="group" aria-label="Elegir mapa base">
      <button type="button" aria-pressed={basemap==='osm'} onClick={()=>selectBase('osm')}>OSM</button>
      <button type="button" aria-pressed={basemap==='ign'} onClick={()=>selectBase('ign')}>IGN · Límites</button>
