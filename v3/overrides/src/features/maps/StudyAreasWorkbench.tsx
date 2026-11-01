@@ -30,7 +30,7 @@ function sourceLayer():Candidate|null{
   const validated=validateGeoJson(record.geojson);
   if(validated.featureCount!==1||!['Polygon','MultiPolygon'].includes(validated.geojson.features[0]?.geometry?.type))
    return null;
-  return {geojson:validated.geojson,sha256:record.sha256,label:record.fileName||'Polígono local'};
+  return {geojson:validated.geojson as Candidate['geojson'],sha256:record.sha256,label:record.fileName||'Polígono local'};
  }catch{return null;}
 }
 function download(part:'zones'|'parent',scenario:Scenario){
