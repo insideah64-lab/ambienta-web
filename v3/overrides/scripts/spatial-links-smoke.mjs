@@ -12,7 +12,7 @@ try{
  await page.getByRole('textbox',{name:'Longitud de consulta'}).fill('-67.20');
  await page.getByRole('textbox',{name:'Distancia de consulta'}).fill('5');
  await page.locator('[data-aoi-active=true]').waitFor();
- await page.getByRole('button',{name:'Crear polígono sintético y 4 áreas'}).click();
+ await page.getByRole('button',{name:'Cargar solo ejemplo de geometría de ensayo (4 franjas)'}).click();
  await page.locator('[data-study-areas-ready=true]').waitFor();
  const overview=page.locator('[data-spatial-links=overview]');
  await overview.locator('[data-spatial-context=empty]').waitFor();
