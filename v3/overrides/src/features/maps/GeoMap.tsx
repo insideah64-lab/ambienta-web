@@ -468,9 +468,13 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
     data-map-engine="maplibre" data-georef={layer?'unverified-local-layer':'regional-only'}>
    <div className="geo-map" ref={element} role="region" aria-label={'Mapa cartográfico interactivo de '+province}/>
    <div className="geo-mode"><span className="geo-live-dot"/> Base real · {basemap==='osm'?'OpenStreetMap':IGN_MAPS[basemap].label}</div>
-   {perimeter&&<div className="geo-user-perimeter-badge" data-user-perimeter-visible="true">
-    Perímetro de usuario · fuente no verificada · {perimeter.sourceName}
-   </div>}
+   {perimeter&&<div className="geo-user-perimeter-badge"
+    data-user-perimeter-visible="true"
+    data-perimeter-qa={perimeter.qaMarker==='ambienta-diablillos-reference-QA-v1'?'true':'false'}>
+    {perimeter.qaMarker==='ambienta-diablillos-reference-QA-v1'
+     ?'DIABLILLOS · PERÍMETRO ILUSTRATIVO QA · NO OFICIAL'
+     :'Perímetro declarado · fuente no certificada'} · {perimeter.sourceName}
+   </div>
    {!compact&&<div className="geo-basemap" role="group" aria-label="Elegir mapa base">
      <button type="button" aria-pressed={basemap==='osm'} onClick={()=>selectBase('osm')}>OSM</button>
      <button type="button" aria-pressed={basemap==='ign'} onClick={()=>selectBase('ign')}>IGN · Límites</button>
