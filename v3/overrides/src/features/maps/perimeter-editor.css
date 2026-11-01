@@ -42,3 +42,20 @@
  background-color:#eef5f2!important;transform:none!important}
 .geo-perimeter-editor .maplibregl-ctrl-group button .maplibregl-ctrl-icon{
  display:block!important;visibility:visible!important;opacity:1!important}
+
+
+/* MapLibre context must be part of document flow, not an absolutely positioned
+   floating panel that obscures geometry or WMS controls on long GIS pages. */
+.geo-shell > .geo-canvas-info{
+ position:relative;left:auto;right:auto;top:auto;bottom:auto;
+ z-index:auto;display:flex;flex-wrap:wrap;align-items:center;
+ gap:5px 12px;width:100%;max-width:none;margin:0;
+ background:#112f33;border:0;border-top:1px solid #3b625c;
+ border-radius:0;padding:7px 12px;pointer-events:auto;
+}
+.geo-shell > .geo-canvas-info strong{
+ flex:none;font-size:10px;color:#e4f9ef;
+}
+.geo-shell > .geo-canvas-info span{
+ flex:1 1 220px;min-width:0;font-size:10px;line-height:1.4;color:#bdcfcd;
+}
