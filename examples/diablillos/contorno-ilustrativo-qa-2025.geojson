@@ -1,0 +1,91 @@
+{
+  "type": "FeatureCollection",
+  "description": "GEOMETRIA ILUSTRATIVA GENERADA POR IA PARA QA. NO CATASTRAL, NO OFICIAL. Solo el centro y la superficie reportada proceden de NI 43-101 PFS 2025 de AbraSilver.",
+  "sourceUrl": "https://www.abrasilver.com/_resources/tech-reports/NI-43-101-Technical-Report-PFS-Diablillos-Project.pdf?v=040611",
+  "centreReportedWgs84": [
+    -66.83333333333333,
+    -25.3
+  ],
+  "referenceReportedArea2025Ha": 11403,
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Diablillos — contorno ilustrativo QA, NO catastral",
+        "verification": "synthetic_not_surveyed",
+        "warning": "VERTICES FICTICIOS PARA PRUEBAS, NO LIMITES DEL PROYECTO"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              -66.770979,
+              -25.3
+            ],
+            [
+              -66.780167,
+              -25.278599
+            ],
+            [
+              -66.789226,
+              -25.255712
+            ],
+            [
+              -66.815353,
+              -25.252789
+            ],
+            [
+              -66.840037,
+              -25.242333
+            ],
+            [
+              -66.867895,
+              -25.247997
+            ],
+            [
+              -66.878087,
+              -25.271669
+            ],
+            [
+              -66.895487,
+              -25.288056
+            ],
+            [
+              -66.889678,
+              -25.310828
+            ],
+            [
+              -66.884809,
+              -25.33636
+            ],
+            [
+              -66.859245,
+              -25.342262
+            ],
+            [
+              -66.837973,
+              -25.359985
+            ],
+            [
+              -66.813806,
+              -25.351272
+            ],
+            [
+              -66.795263,
+              -25.33691
+            ],
+            [
+              -66.774296,
+              -25.322656
+            ],
+            [
+              -66.770979,
+              -25.3
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
