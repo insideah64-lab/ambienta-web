@@ -146,7 +146,7 @@ export function StudyAreasWorkbench({aoi}:{aoi:PointAoi|null}){
    {error&&<p role="alert" className="geo-import-error">{error}</p>}
    {success&&<p role="status">{success}</p>}
    <small>Las áreas A–D son asignaciones geográficas de prueba, no usos oficiales del suelo.
-    Podés analizarlas como capas de solo lectura en <Link to="/mapas">Mapas y SIG</Link>;
+    Podés analizarlas como capas de solo lectura en <Link to="/mapas">el laboratorio cartográfico</Link>;
     los recortes WFS y la gestión de capas se realizan exclusivamente allí.</small>
   </section>;
 }
