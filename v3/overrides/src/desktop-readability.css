@@ -346,3 +346,35 @@
   flex:none;color:#79dfc3;opacity:.8;width:16px;height:16px;
  }
 }
+
+
+/* V3.5.9 — Desktop only: categorical measure states, no false completion bars. */
+@media(min-width:1100px){
+ .ref-shell .ref-commitments{min-height:0}
+ .ref-shell .ref-commitment-list{padding:4px 19px}
+ .ref-shell .ref-commitment{
+  min-height:77px;padding:11px 0;gap:12px;
+  text-decoration:none;
+ }
+ .ref-shell .ref-commitment:hover,
+ .ref-shell .ref-commitment:focus-visible{background:#173c45}
+ .ref-shell .ref-commitment:focus-visible{outline:2px solid #8cebd5;outline-offset:2px}
+ .ref-shell .ref-commitment-icon{
+  flex:0 0 41px;width:41px;height:41px;
+ }
+ .ref-shell .ref-commitment-title{align-items:center;gap:9px}
+ .ref-shell .ref-commitment-title strong{font-size:15px!important;line-height:1.4}
+ .ref-shell .ref-commitment-title .ref-stage-tag{
+  font-size:12px!important;line-height:1.25;
+  padding:6px 10px;flex:none;
+ }
+ .ref-shell .ref-commitment-info>small{
+  font-size:13px!important;line-height:1.4;margin:5px 0 0;
+  color:#b1cfd0;
+ }
+ .ref-shell .ref-commitments .ref-panel-foot{
+  font-size:13px!important;line-height:1.5;padding:12px 17px;
+  color:#c5d9dc;
+ }
+ .ref-shell .ref-commitments .ref-progress-track{display:none!important}
+}
