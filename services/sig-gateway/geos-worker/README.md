@@ -41,3 +41,33 @@ Escenarios: recorte cóncavo que produce dos fragmentos, polígonos con agujero,
 
 ## Próximo paso
 Integrar un **trabajador GIS asíncrono autenticado** para cargas mayores a las del navegador, con cola, aislamiento de procesos, memoria/CPU acotadas y caducidad de archivos temporales. Esto requiere alojamiento que permita ejecutar GEOS y cuotas individuales reales. **No** conectar directamente este script a un endpoint público sin esas protecciones.
+
+## V3.2 — adquirir WFS por subventanas sin perder los originales
+
+El recolector `wfs_collect.py` crea **un único ZIP de auditoría** con todas las respuestas WFS crudas recibidas, sus huellas SHA-256, un GeoJSON ensamblado, un recorte GEOS y el informe topológico. Es una herramienta **local de laboratorio** y no tiene endpoint público ni cola de trabajos.
+
+```bash
+python services/sig-gateway/geos-worker/wfs_collect.py \
+  --layer municipios \
+  --bbox=-66.222472174,-25.056742206,-66.182768004,-25.020769366 \
+  --output adquisicion_municipios_01.zip \
+  --review adquisicion_municipios_01_bloqueo.json
+```
+
+**Esta orden sí consulta el WFS real de IDESA**. Usala solo cuando necesites efectuar una adquisición controlada. No ejecutes llamadas reales en cada commit, ni descargues automáticamente colecciones nacionales o provinciales completas.
+
+Para comprobar el archivo resultante sin volver a consultar Internet:
+
+```bash
+python services/sig-gateway/geos-worker/verify_bundle.py adquisicion_municipios_01.zip
+```
+
+El ZIP incluye `raw_wfs/000.geojson` y las demás respuestas originales, `assembled_source.geojson`, `clip.geojson`, `clip_report.json` y `acquisition_manifest.json`. El validador verifica los hashes originales, reconstruye el mosaico a partir de las subventanas, vuelve a ejecutar GEOS y compara exactamente el recorte y su informe.
+
+**Por qué no usar `startIndex` sin comprobarlo:** ciertos servidores WFS 1.0 tienen paginación dependiente de la implementación, sin orden estable garantizado. Esta versión subdivide geométricamente la BBOX cuando una respuesta tiene **20 o más entidades**, consulta cada ventana hija y exige que todas estén completas. La repetición exacta de 20 también se subdivide porque puede ocultar truncamiento. Todas las entidades deben tener ID estable; las duplicadas entre teselas se reconcilian y el total final debe coincidir con el anunciado por la consulta raíz. Si falla cualquier prueba, **no se genera ZIP con recorte**.
+
+Límites conservadores: BBOX de hasta 0,7° por eje y 0,12 grados cuadrados, como máximo 20 entidades por respuesta, 1 MiB por respuesta, 64 peticiones por trabajo, 90 segundos de duración, 20 MiB acumulados, 2.000 entidades y 200.000 vértices. Las subventanas que no puedan completarse dentro de estos límites quedan `requires_review`, nunca `complete`.
+
+La prueba automática utiliza un **WFS simulado**, sin llamadas a IDESA. Como un WFS mutable puede cambiar durante las consultas, la reconciliación de entidades **no garantiza una instantánea atómica**; el manifiesto consigna `snapshotAtomic: false`. El ZIP usa hashes para detectar alteraciones, pero **no está firmado digitalmente**, por lo que no acredita por sí mismo autenticidad institucional. Se debe verificar licencia y vigencia de cada conjunto de datos antes de redistribuirlo. La BBOX de Cachi es solo un ensayo, no la ubicación real de Diablillos.
+
+**Estado de promoción:** sistema experimental local. La V3.1 pública continúa utilizando consultas acotadas y cuota compartida; esta vía avanzada requiere infraestructura posterior con trabajos autenticados, aislamiento de CPU/RAM y almacenamiento temporal controlado.
