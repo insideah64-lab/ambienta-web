@@ -228,6 +228,7 @@ function Monitoreo({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKin
         <td><Badge tone={i.result==='pendiente'?'amber':'mint'}>{i.result}</Badge></td></tr>)}</tbody></table></div>
     <p className="v2-panel-note">No existen mediciones de calidad del aire cargadas en esta demostración.</p>
     <MeasurementWorkbench data={data}/>
+    <StationLocationSummary data={data}/>
     <SpatialLinksPanel data={data} mode="inspection"/>
     <DocumentaryReviewSummary data={data}/>
   </Panel>;
