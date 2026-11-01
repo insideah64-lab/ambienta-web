@@ -15,17 +15,19 @@ type Props = {data:DemoState;k:Summary;onExport:()=>void};
 const STATUS_STAGE:Record<string,number>={
   borrador:10,en_revision:42,en_ejecucion:72,verificada:100
 };
-function Metric({icon:Icon,label,value,subtitle,accent,fill}:{
+function Metric({icon:Icon,label,value,subtitle,accent,to}:{
   icon:typeof Leaf;label:string;value:number;subtitle:string;
-  accent:'green'|'cyan'|'blue'|'purple';fill:number
+  accent:'green'|'cyan'|'blue'|'purple';to:string
 }) {
-  return <div className={'v2-metric ref-metric ref-accent-'+accent}>
-    <span className="v2-metric-icon"><Icon size={27} strokeWidth={2}/></span>
-    <div className="ref-metric-body">
-      <p>{label}</p><strong>{value}</strong><span>{subtitle}</span>
-      <div className="ref-metric-track" aria-hidden="true"><i style={{width:Math.max(0,Math.min(100,fill))+'%'}}/></div>
-    </div>
-  </div>;
+  return <Link to={to} className={'v2-metric ref-metric ref-accent-'+accent}
+   aria-label={label+': '+value+'. '+subtitle+'. Abrir módulo'}>
+    <span className="v2-metric-icon" aria-hidden="true"><Icon size={23} strokeWidth={2}/></span>
+    <span className="ref-metric-body">
+      <span className="ref-metric-top"><span className="ref-metric-label">{label}</span><strong>{value}</strong></span>
+      <span className="ref-metric-subtitle">{subtitle}</span>
+    </span>
+    <ArrowRight className="ref-metric-link-arrow" size={17} aria-hidden="true"/>
+  </Link>;
 }
 function Hero({data}:{data:DemoState}) {
   const p=data.project;
@@ -188,24 +190,24 @@ function About({onExport}:{onExport:()=>void}) {
 export function ReferenceDashboard({data,k,onExport}:Props) {
   const measuresInPrograms=new Set(data.measures.map(m=>m.programId)).size;
   const reviewedEvidence=data.evidence.filter(e=>e.status!=='pendiente').length;
-  const completedInspections=data.inspections.filter(i=>i.result!=='pendiente').length;
   return <div className="ref-dashboard">
     <Hero data={data}/>
     <WorkAttention data={data}/>
-    <div className="v2-metrics ref-metrics">
+    <section className="ref-metric-section" aria-label="Registros del expediente">
+     <div className="ref-metric-section-head"><h2>Registros del expediente</h2>
+      <p>Recuentos documentales, no porcentajes de cumplimiento.</p></div>
+     <div className="v2-metrics ref-metrics">
       <Metric icon={Leaf} label="PROGRAMAS DEL PGA" value={k.programs}
-        subtitle={measuresInPrograms+' con medidas registradas'} accent="green"
-        fill={k.programs?measuresInPrograms/k.programs*100:0}/>
+        subtitle={measuresInPrograms+' con medidas asociadas'} accent="green" to="/pga"/>
       <Metric icon={ClipboardCheck} label="MEDIDAS AMBIENTALES" value={k.measures}
         subtitle={k.verified+' verificadas · '+data.measures.filter(m=>m.status==='en_ejecucion').length+' en ejecución'}
-        accent="green" fill={k.measures?k.verified/k.measures*100:0}/>
+        accent="green" to="/pga"/>
       <Metric icon={ShieldCheck} label="INSPECCIONES" value={data.inspections.length}
-        subtitle={data.inspections.length+' registradas · '+k.inspectionsPending+' pendientes'} accent="cyan"
-        fill={data.inspections.length?completedInspections/data.inspections.length*100:0}/>
+        subtitle={k.inspectionsPending+' pendientes · registros documentales'} accent="cyan" to="/monitoreo"/>
       <Metric icon={FileText} label="EVIDENCIAS" value={data.evidence.length}
-        subtitle={reviewedEvidence+' revisadas · '+k.evidencePending+' pendientes'} accent="blue"
-        fill={data.evidence.length?reviewedEvidence/data.evidence.length*100:0}/>
-    </div>
+        subtitle={reviewedEvidence+' revisadas · '+k.evidencePending+' pendientes'} accent="blue" to="/evidencias"/>
+     </div>
+    </section>
     <div className="ref-section-heading">
       <div><span>SEGUIMIENTO DEL EXPEDIENTE</span><h2>Operación y territorio</h2></div>
       <p>Información de consulta. Las medidas del PGA son documentales y el perímetro QA no es oficial.</p>

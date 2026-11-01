@@ -32,9 +32,9 @@ try{
   const selectors={
    nav:'.ref-shell .v2-sidebar .v2-nav-item',
    heading:'.ref-shell .ref-hero h1',
-   metricLabel:'.ref-shell .ref-metric.v2-metric p',
-   metricNumber:'.ref-shell .ref-metric.v2-metric strong',
-   metricDescription:'.ref-shell .ref-metric.v2-metric .ref-metric-body>span',
+   metricLabel:'.ref-shell .ref-metric .ref-metric-label',
+   metricNumber:'.ref-shell .ref-metric .ref-metric-top>strong',
+   metricDescription:'.ref-shell .ref-metric .ref-metric-subtitle',
    panelHeading:'.ref-shell .ref-panel-head h2',
    commitment:'.ref-shell .ref-commitment-title strong',
    schedule:'.ref-shell .ref-schedule-row>span',
@@ -42,7 +42,7 @@ try{
    mapHeading:'.ref-shell .geo-mode'
   };
   const values=Object.fromEntries(await Promise.all(Object.entries(selectors).map(async ([k,v])=>[k,await measure(page,v)])));
-  const min={nav:15,heading:32,metricLabel:13,metricNumber:34,metricDescription:13,
+  const min={nav:15,heading:32,metricLabel:13,metricNumber:27,metricDescription:13,
    panelHeading:18,commitment:15,schedule:13,caption:12,mapHeading:13};
   for(const [k,minimum] of Object.entries(min)){
    assert(values[k].fontSize>=minimum, k+' too small '+values[k].fontSize+'px, target '+minimum+'px');
