@@ -1,7 +1,7 @@
 name: AMBIENTA V3 — validación de versión pública (sin desplegar)
 on:
   push:
-    branches: ['feature/ambienta-v3-topologia-publicacion-2026-10-31', 'feature/ambienta-v32-areas-ensayo-2026-10-31', 'feature/ambienta-v33-zone-links-2026-10-31', 'feature/ambienta-v34-separacion-area-sig-2026-11-01']
+    branches: ['feature/ambienta-v3-topologia-publicacion-2026-10-31', 'feature/ambienta-v32-areas-ensayo-2026-10-31', 'feature/ambienta-v33-zone-links-2026-10-31', 'feature/ambienta-v34-separacion-area-sig-2026-11-01', 'feature/ambienta-v35-analisis-puntos-zonas-2026-11-01']
     paths:
       - 'v3/**'
       - 'tests/react-v3/**'
@@ -54,6 +54,7 @@ jobs:
           node apps/web-v3/scripts/study-areas-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
           node apps/web-v3/scripts/area-gis-separation-smoke.mjs
+          node apps/web-v3/scripts/point-zone-analysis-smoke.mjs
           node apps/web-v3/scripts/georef-real-smoke.mjs
           node apps/web-v3/scripts/sig-gateway-smoke.mjs
           sha256sum -c /tmp/ambienta-v1-v2.sha
