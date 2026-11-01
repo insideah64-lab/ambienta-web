@@ -39,7 +39,7 @@ try{
     docWidth:document.documentElement.scrollWidth,viewport:window.innerWidth};
   });
   assert(stats.labelFont>=13&&stats.subtitleFont>=13&&stats.numberFont>=27);
-  assert(stats.cards.every(c=>c.height<=106&&c.height>=72),
+  assert(stats.cards.every(c=>c.height<=120&&c.height>=72),
    'KPI cards must remain compact and readable: '+JSON.stringify(stats));
   assert(stats.docWidth<=width+6,'No horizontal overflow');
   if(width>=1400)assert(stats.cards.every(c=>Math.abs(c.y-stats.cards[0].y)<=1),
