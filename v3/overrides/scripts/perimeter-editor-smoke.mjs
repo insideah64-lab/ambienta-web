@@ -70,6 +70,22 @@ try{
  await page3.getByRole('button',{name:'Guardar este perímetro'}).click();
  await page3.locator('[data-perimeter-saved=true]').waitFor();
  assert.equal(await page3.evaluate(()=>JSON.parse(localStorage.getItem('ambienta-perimeter-diablillos-v352')).sourceType),'drawn');
+ // Also exercise original KML intake (not merely a renamed GeoJSON).
+ const kml=`<?xml version="1.0"?><kml xmlns="http://www.opengis.net/kml/2.2"><Placemark>
+ <Polygon><outerBoundaryIs><LinearRing><coordinates>
+ -67.25,-24.73 -67.18,-24.73 -67.17,-24.68 -67.21,-24.66 -67.25,-24.73
+ </coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark></kml>`;
+ const fourth=await browser.newContext();
+ const page4=await fourth.newPage();await page4.goto(url);
+ await page4.getByLabel('Importar perímetro GeoJSON o KML').setInputFiles({
+  name:'perimetro-qa.kml',mimeType:'application/vnd.google-earth.kml+xml',buffer:Buffer.from(kml)});
+ await page4.locator('[data-perimeter-candidate=true]').waitFor();
+ await page4.getByLabel('Procedencia del perímetro').fill('KML de laboratorio con geometría no oficial');
+ await page4.getByRole('button',{name:'Guardar este perímetro'}).click();
+ await page4.locator('[data-perimeter-saved=true]').waitFor();
+ const kmlSaved=await page4.evaluate(()=>JSON.parse(localStorage.getItem('ambienta-perimeter-diablillos-v352')));
+ assert.equal(kmlSaved.sourceType,'kml');
+ assert.equal(kmlSaved.rawText,kml);
  assert.deepEqual(errors,[]);
  console.log(JSON.stringify({result:'PASS',importPreservesHoles:true,noRectangularZones:true,
   exportOriginalGeometry:true,displayOnGIS:true,drawingFunctional:true,noOverwrite:true,
