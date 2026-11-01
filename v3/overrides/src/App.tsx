@@ -28,6 +28,8 @@ import {GeorefTerritory,GeorefSavedSummary,type TerritoryFocus,type BoundaryOver
 import {AoiWorkbench,type PointAoi} from './features/georef/AoiWorkbench';
 // @ts-ignore: browser-local AOI model
 import {aoiKey,readPointAoi} from './features/maps/aoi-model.mjs';
+// @ts-ignore: pure browser-local non-destructive synthetic Diablillos preview initializer
+import {prepareDiablillosPreview} from './features/maps/diablillos-preview.mjs';
 import { EvidenceIntegrityLab } from './features/evidence/EvidenceIntegrityLab';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
@@ -256,7 +258,15 @@ function exportDemo(data: DemoState) {
   document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(href);
 }
 export default function App() {
-  const [data,setData]=useState<DemoState>(()=>readDemoState());
+  const [data,setData]=useState<DemoState>(()=>{
+    // Only the Diablillos DEMO and only in an empty local workspace:
+    // the example geometry is never a verified project boundary.
+    if(IS_DIABLILLOS_CASE&&new URLSearchParams(window.location.search).get('poligono')==='ensayo'){
+      try{prepareDiablillosPreview(window.localStorage,new Date().toISOString());}
+      catch{/* Local storage may be blocked; the application remains usable. */}
+    }
+    return readDemoState();
+  });
   const [sidebarOpen,setSidebarOpen]=useState(false);
   const [bright,setBright]=useState(false);
   const [action,setAction]=useState<{kind:DemoActionKind;measureId?:string}|null>(null);
