@@ -17,6 +17,8 @@ try{
  await page.getByRole('textbox',{name:'Longitud de consulta'}).fill('-65.45');
  await page.getByRole('textbox',{name:'Distancia de consulta'}).fill('20');
  await page.locator('[data-aoi-active="true"]').waitFor();
+ await page.getByRole('link',{name:'Mapas y SIG',exact:true}).click();
+ await page.locator('[data-page-role="gis-analysis"]').waitFor();
  await page.getByRole('textbox',{name:'Procedencia o descripción'}).fill('GeoJSON sintético para QA topológico');
  const original=fc({type:'Polygon',coordinates:[
   square(-67,-26,-64,-23),

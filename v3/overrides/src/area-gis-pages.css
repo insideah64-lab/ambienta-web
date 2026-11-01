@@ -1,0 +1,37 @@
+/* V3.4: territory definition and GIS analysis are separate routes.
+   The readonly compact preview reuses MapLibre but not the GIS editing toolbox. */
+[data-page-role="territory-definition"] .geo-study-areas{margin-top:0}
+[data-page-role="territory-definition"] .geo-study-buttons button{
+ border:1px solid #82d3b6;background:linear-gradient(125deg,#186d59,#165547);
+ color:#f4fff7;padding:10px 13px;border-radius:8px;font-size:11px;
+ font-weight:760;min-height:38px;cursor:pointer}
+[data-page-role="territory-definition"] .geo-study-buttons button:disabled{opacity:.43;cursor:not-allowed}
+[data-page-role="territory-definition"] .geo-study-buttons button:hover:not(:disabled){background:#238469}
+[data-page-role="territory-definition"] .geo-study-total{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;border:0;padding:0;background:none}
+[data-page-role="territory-definition"] .geo-study-zones{
+ display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;border:0;padding:0;background:none}
+.v2-study-navlink{display:inline-flex;align-items:center;min-height:38px;padding:9px 12px;
+ border-radius:8px;border:1px solid #b0d2b7;color:#e9ffee;background:#1b4947;
+ font-size:11px;font-weight:700;text-decoration:none}
+.v2-study-navlink:hover{background:#286659;color:#fff}
+[data-page-role="territory-definition"] .v2-territory-preview{border-radius:10px;overflow:hidden}
+[data-page-role="territory-definition"] .v2-territory-preview .geo-map{
+ height:300px!important}
+[data-page-role="territory-definition"] .v2-territory-preview .geo-shell{min-height:300px}
+[data-page-role="gis-analysis"] .geo-shell{width:100%}
+[data-page-role="gis-analysis"] .geo-map{height:clamp(460px,55vh,720px)}
+[data-page-role="gis-analysis"] .geo-aoi-status{
+ border-left:3px solid #61d6b3}
+[data-page-role="gis-analysis"] .geo-ign-provenance{
+ margin-top:10px}
+@media(max-width:700px){
+ [data-page-role="territory-definition"] .geo-study-total{grid-template-columns:repeat(2,minmax(0,1fr))}
+ [data-page-role="territory-definition"] .geo-study-total>div:first-child{grid-column:1/-1}
+ [data-page-role="territory-definition"] .geo-study-zones{grid-template-columns:1fr}
+ [data-page-role="territory-definition"] .v2-territory-preview .geo-map{height:275px!important}
+ [data-page-role="gis-analysis"] .geo-map{height:350px}
+}
+@media(prefers-reduced-motion:reduce){
+ [data-page-role="territory-definition"] .geo-study-buttons button{transition:none}
+}

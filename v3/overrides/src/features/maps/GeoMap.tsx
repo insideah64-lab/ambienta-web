@@ -23,8 +23,7 @@ import {clipGeoJsonToBbox} from './aoi-clip.mjs';
 // @ts-ignore: browser/Node AOI model
 import {aoiRectangle,aoiKey,readPointAoi} from './aoi-model.mjs';
 // @ts-ignore: pure geospatial area model is verified by Node + Chromium
-import {syntheticStudyPolygon,createStudyScenario,studyAreaStorageKey,restoreStudyScenario,scenarioMatchesAoi,studyScenarioExport} from './study-areas.mjs';
-import './study-areas.css';
+import {studyAreaStorageKey,restoreStudyScenario,scenarioMatchesAoi} from './study-areas.mjs';
 // @ts-ignore: validated administrative boundary import shared with Node tests
 import {readAdminBoundary,adminBoundaryKey} from '../georef/admin-boundary.mjs';
 // @ts-ignore: official IGN base source specs shared with native Node tests
@@ -225,6 +224,26 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
   }
  },[boundary]);
  useEffect(()=>{if(aoi!==undefined)setAoiLocal(aoi);},[aoi]);
+ // Share geography with Area de estudio, without duplicating its editor.
+ // Mapas y SIG reads validated source layers; it owns WFS/import/clip tooling.
+ useEffect(()=>{
+  const refresh=()=>{
+   const updatedAoi=readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null;
+   const updatedLayer=stored();
+   if(aoi===undefined)setAoiLocal(updatedAoi);
+   setLayer(updatedLayer);
+   setScenario(restoreStudyScenario(STUDY_KEY,updatedAoi?.bbox,
+    updatedLayer?.sha256||null) as StudyAreaRecord|null);
+  };
+  window.addEventListener('ambienta:spatial-updated',refresh);
+  window.addEventListener('storage',refresh);
+  window.addEventListener('focus',refresh);
+  return ()=>{
+   window.removeEventListener('ambienta:spatial-updated',refresh);
+   window.removeEventListener('storage',refresh);
+   window.removeEventListener('focus',refresh);
+  };
+ },[aoi]);
  useEffect(()=>{
   const map=mapRef.current;
   if(!map||!map.getLayer('osm-base-raster'))return;
@@ -288,43 +307,6 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
       ignTimer.current=null;
     },12000);
   }
- }
- async function assignStudyAreas(sourceKind:'synthetic'|'imported'){
-  if(!aoiLocal){setError('Ingresá primero coordenadas para crear una ventana AOI.');return;}
-  if(busy)return;
-  setError('');setBusy(true);
-  try{
-   const parent=sourceKind==='synthetic'?{type:'FeatureCollection',
-    features:[syntheticStudyPolygon(aoiLocal.bbox)]}:layer?.geojson;
-   if(!parent)throw Error('Primero importá un GeoJSON poligonal para crear áreas sobre él.');
-   let sha:string;
-   if(sourceKind==='imported'){
-    sha=layer!.sha256;
-   }else{
-    const bytes=new TextEncoder().encode(JSON.stringify(parent));
-    const digest=await crypto.subtle.digest('SHA-256',bytes);
-    sha=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
-   }
-   const created=createStudyScenario({bbox:aoiLocal.bbox,geojson:parent,sourceHash:sha,
-    sourceKind,generatedAt:new Date().toISOString()}) as StudyAreaRecord;
-   // Keep the uncut source in the scenario and never overwrite an imported layer.
-   localStorage.setItem(STUDY_KEY,JSON.stringify(created));
-   setScenario(created);
-   window.dispatchEvent(new Event('ambienta:spatial-updated'));
-  }catch(cause){setError(cause instanceof Error?cause.message:'No fue posible generar las áreas de ensayo.');}
-  finally{setBusy(false);}
- }
- function removeStudyAreas(){
-  localStorage.removeItem(STUDY_KEY);setScenario(null);setError('');
-  window.dispatchEvent(new Event('ambienta:spatial-updated'));
- }
- function downloadStudyAreas(part:'parent'|'zones'){
-  if(!validScenario)return;
-  const output=studyScenarioExport(validScenario,part);
-  const href=URL.createObjectURL(new Blob([JSON.stringify(output,null,2)],{type:'application/geo+json'}));
-  const a=document.createElement('a');a.href=href;
-  a.download=part==='zones'?'ambienta-subareas-simuladas.geojson':'ambienta-poligono-ensayo-no-oficial.geojson';
-  a.click();setTimeout(()=>URL.revokeObjectURL(href),500);
  }
  async function loadIdesaPolygons(selection:'municipios'|'otbn'){
   if(!SIG_GATEWAY_URL){setError('El gateway SIG no está configurado. Utilizá el enlace WFS de descarga manual.');return;}
@@ -407,7 +389,9 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
   link.click();setTimeout(()=>URL.revokeObjectURL(href),500);
  }
  function removeLayer(){
-  if(scenario?.sourceKind==='imported')removeStudyAreas();
+  if(scenario?.sourceKind==='imported'){
+   localStorage.removeItem(STUDY_KEY);setScenario(null);
+  }
   try{localStorage.removeItem(WORKING_LAYER_KEY);}catch{/* No remote mutation. */}
   setLayer(null);setError('');
   window.dispatchEvent(new Event('ambienta:spatial-updated'));
@@ -462,37 +446,6 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
       {clipped.selectedCount===0&&clipped.unsupportedCount===0&&<p>La capa importada no tiene geometrías dentro de la ventana.</p>}
       <button type="button" onClick={exportClip} disabled={clipped.unsupportedCount>0||clipped.selectedCount===0}>Descargar recorte GeoJSON</button>
      </div>}
-     <section className="geo-study-areas" aria-label="Áreas asignadas al polígono de ensayo" data-study-area-panel="true">
-      <div className="geo-study-heading">
-       <div><small className="geo-study-kicker">ENSAYO ESPACIAL · V3.2</small>
-       <strong>Subáreas del polígono de estudio</strong></div>
-       <span className="geo-study-warning">SIMULADO · NO OFICIAL</span>
-      </div>
-      <p>Creá un polígono irregular con un hueco, o elegí explícitamente un polígono importado contenido en la ventana. Las áreas A–D se asignan por intersección real, no por porcentajes inventados.</p>
-      <div className="geo-study-buttons">
-       <button type="button" onClick={()=>assignStudyAreas('synthetic')} disabled={busy}>Crear polígono sintético y 4 áreas</button>
-       <button type="button" onClick={()=>assignStudyAreas('imported')} disabled={busy||!layer}>Asignar 4 áreas a un polígono importado</button>
-      </div>
-      {validScenario&&<div data-study-areas-ready="true" className="geo-study-results">
-       <div className="geo-study-total"><div><small>Superficie del polígono de ensayo</small><strong>{validScenario.summary.parentHa.toLocaleString('es-AR',{maximumFractionDigits:2})} ha</strong></div>
-        <div><small>Distribución comprobada</small><strong>{(validScenario.summary.assignedHa/validScenario.summary.parentHa*100).toLocaleString('es-AR',{maximumFractionDigits:2})}%</strong></div>
-        <div><small>Superficie sin asignar</small><strong>{Math.abs(validScenario.summary.residualHa).toLocaleString('es-AR',{maximumFractionDigits:4})} ha</strong></div></div>
-       <div className="geo-study-zones" aria-label="Zonas funcionales de ensayo">
-        {validScenario.summary.areas.map(zone=><div className="geo-study-zone" key={zone.id} data-study-zone={zone.id}>
-         <span className="geo-study-color" style={{backgroundColor:zone.color}} aria-hidden="true"/>
-         <div><strong>{zone.label}</strong><small>{zone.status==='empty'?'Sin intersección':zone.areaHa.toLocaleString('es-AR',{maximumFractionDigits:2})+' ha'}</small></div>
-         <b>{zone.percent.toLocaleString('es-AR',{maximumFractionDigits:1})}%</b>
-        </div>)}
-       </div>
-       <small className="geo-study-footnote">Cálculo aproximado de superficie esférica WGS84 (R = 6.371.008,8 m). No reemplaza cálculo geodésico/pericial ni certifica usos del suelo. Procedencia: SHA-256 {validScenario.sourceHash.slice(0,14)}… ({validScenario.sourceKind==='synthetic'?'geometría generada':'fuente importada'}).</small>
-       <div className="geo-study-buttons">
-        <button type="button" onClick={()=>downloadStudyAreas('zones')}>Descargar subáreas GeoJSON</button>
-        <button type="button" onClick={()=>downloadStudyAreas('parent')}>Descargar polígono base</button>
-        <button type="button" onClick={removeStudyAreas}>Quitar ensayo</button>
-       </div>
-      </div>}
-      <small>Las zonas simuladas no representan superficies oficiales de Diablillos, concesiones mineras, categorías reales de suelo ni permisos ambientales. Las coordenadas nunca salen de este navegador para generar estas áreas.</small>
-     </section>
      <div className="geo-catalogue" data-idesa-wfs="bounded-official-provider">
       <div data-sig-gateway={SIG_GATEWAY_URL?'configured':'unconfigured'}>
        <strong>Recorte automático de polígonos IDESA</strong>

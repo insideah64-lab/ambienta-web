@@ -61,6 +61,8 @@ try{
  await page.getByRole('textbox',{name:'Longitud de consulta'}).fill('-66.202620089');
  await page.getByRole('textbox',{name:'Distancia de consulta'}).fill('2');
  await page.locator('[data-aoi-active="true"]').waitFor();
+ await page.getByRole('link',{name:'Mapas y SIG',exact:true}).click();
+ await page.locator('[data-page-role="gis-analysis"]').waitFor();
  await page.locator('[data-sig-gateway="configured"]').waitFor();
  const btn=page.getByRole('button',{name:'Consultar y recortar municipios automáticamente'});
  assert(await btn.isEnabled(),'Gateway action should be available');
