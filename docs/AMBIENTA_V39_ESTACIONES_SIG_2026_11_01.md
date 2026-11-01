@@ -26,3 +26,10 @@ Los próximos requisitos son autenticación/autorización, políticas de custodi
 - V3.5 pública sigue estable; V3.6, V3.7, V3.8 y V3.9 permanecen en PR separados, sin fusionar.
 - Primer respaldo: `backup/ambienta-v39-estaciones-checkpoint-2026-11-01`.
 - Conservar cambios y hashes V1/V2.
+
+
+## Integración de consulta desde Monitoreo (posterior al primer checkpoint)
+- `v3/overrides/src/features/monitoring/StationLocationSummary.tsx` muestra una vista **solo lectura** de las propuestas, que vuelve a analizar puntos y a validar mediciones y escenario con las fuentes locales.
+- Cuando la capa original no está accesible desde Monitoreo (por ejemplo, importación puntual temporal solo en memoria de Mapas y SIG), **no** indica vínculos verificados ni reutiliza la ubicación; invita a reimportar el GeoJSON en el módulo GIS. Esto impide adjudicar coordenadas no conservadas en expediente.
+- `MeasurementWorkbench.tsx` emite `ambienta:measurements-updated` al guardar/anular para invalidar la vista inmediatamente. No modifica el dominio V1/V2 ni crea datos ambientales.
+- `station-links-smoke.mjs` comprueba la consulta y su invalidez al anular una muestra en la misma sesión.
