@@ -159,7 +159,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
  const [layer,setLayer]=useState<WorkingLayer|null>(stored);
  const [scenario,setScenario]=useState<StudyAreaRecord|null>(()=>restoreStudyScenario(
   STUDY_KEY,(readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null)?.bbox,
-  stored()?.sha256) as StudyAreaRecord|null);
+  stored()?.sha256||null) as StudyAreaRecord|null);
  const [aoiLocal,setAoiLocal]=useState<PointAoi|null>(()=>readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null);
  const validScenario=useMemo(()=>scenario&&aoiLocal&&scenarioMatchesAoi(scenario,aoiLocal.bbox)&&
   (scenario.sourceKind==='synthetic'||scenario.sourceHash===layer?.sha256)?scenario:null,
@@ -194,7 +194,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
      drawAdministrativeBoundary(map,readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
      drawAoi(map,initialAoi);
      drawStudyAreas(map,restoreStudyScenario(STUDY_KEY,initialAoi?.bbox,
-      initialLayer?.sha256) as StudyAreaRecord|null);
+      initialLayer?.sha256||null) as StudyAreaRecord|null);
      if(initialAoi)map.fitBounds([[initialAoi.bbox[0],initialAoi.bbox[1]],[initialAoi.bbox[2],initialAoi.bbox[3]]],{padding:55,maxZoom:13,duration:0});
    }});
    map.on('idle',()=>{if(alive&&map.isStyleLoaded())setTilesLoaded(true);});
