@@ -237,7 +237,9 @@ class Acquisition:
             self.root_count = page.total
             if page.total > MAX_FEATURES:
                 raise AcquisitionError("FEATURE_BUDGET", "Más de 2.000 entidades en la ventana solicitada.")
-        if page.total > PAGE_LIMIT:
+        # A response exactly at the maxFeatures boundary may hide truncation.
+        # Split it too: never claim completeness from an ambiguous full page.
+        if page.total >= PAGE_LIMIT:
             w,s,e,n = tile
             if depth >= MAX_DEPTH or e-w <= MIN_TILE_DEGREES or n-s <= MIN_TILE_DEGREES:
                 raise AcquisitionError("UNRESOLVED_TILE", "Se alcanzó el límite de subdivisión: datos incompletos.")
@@ -286,6 +288,10 @@ def build_archive(layer: str, bbox: list[float], output: Path, *,
         source_path = Path(tmp)/"assembled.geojson"
         source_path.write_bytes(source_bytes)
         clip, clip_report = prepare(source_path,result.bbox)
+        clip_bytes=canonical_json(clip)
+        clip_report_bytes=canonical_json(clip_report)
+        if len(clip_bytes)>MAX_INPUT_BYTES or len(clip_report_bytes)>256000:
+            raise AcquisitionError("DERIVED_TOO_LARGE","El recorte GEOS o su informe excede el tamaño auditable.")
         page_manifest = []
         for index,page in enumerate(result.pages):
             page_manifest.append({
@@ -293,7 +299,7 @@ def build_archive(layer: str, bbox: list[float], output: Path, *,
                 "bbox":page.bbox,"depth":page.depth,
                 "sourceUrl":page.url,"reportedCount":page.total,
                 "returnedCount":len(page.features),
-                "completeTile":page.is_complete,
+                "completeTile":page.is_complete and page.total < PAGE_LIMIT,
                 "rawSha256":page.digest,"rawBytes":len(page.raw),
             })
         manifest = {
@@ -312,6 +318,9 @@ def build_archive(layer: str, bbox: list[float], output: Path, *,
             "license":"unverified_before_redistribution",
             "clipMethod":"GEOS / Shapely 2.1 strict",
         }
+        manifest_bytes=canonical_json(manifest)
+        if len(manifest_bytes)>256000:
+            raise AcquisitionError("MANIFEST_TOO_LARGE","El inventario WFS excede el límite de auditoría.")
         output.parent.mkdir(parents=True,exist_ok=True)
         fd,temp_name=tempfile.mkstemp(prefix=".ambienta-",suffix=".zip",dir=output.parent)
         try:
@@ -320,9 +329,9 @@ def build_archive(layer: str, bbox: list[float], output: Path, *,
                 for index,page in enumerate(result.pages):
                     bundle.writestr(f"raw_wfs/{index:03d}.geojson",page.raw)
                 bundle.writestr("assembled_source.geojson",source_bytes)
-                bundle.writestr("clip.geojson",canonical_json(clip))
-                bundle.writestr("clip_report.json",canonical_json(clip_report))
-                bundle.writestr("acquisition_manifest.json",canonical_json(manifest))
+                bundle.writestr("clip.geojson",clip_bytes)
+                bundle.writestr("clip_report.json",clip_report_bytes)
+                bundle.writestr("acquisition_manifest.json",manifest_bytes)
             # Hard-link creation refuses existing targets, including symlinks.
             os.link(temp_name,output)
         finally:
