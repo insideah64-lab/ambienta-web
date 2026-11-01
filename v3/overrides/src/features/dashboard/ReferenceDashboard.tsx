@@ -70,7 +70,7 @@ function Commitments({data}:{data:DemoState}) {
     <div className="ref-panel-head"><h2>Seguimiento de compromisos</h2>
       <Link to="/pga">Ver todos <ArrowRight size={14}/></Link></div>
     <div className="ref-commitment-list">{data.measures.slice(0,5).map(m=>
-      <Link key={m.id} className="ref-commitment" to="/pga">
+      <Link key={m.id} className="ref-commitment" to={'/pga?medida='+encodeURIComponent(m.id)}>
         <span className="ref-commitment-icon">{iconFor(m.programId)}</span>
         <span className="ref-commitment-info">
           <span className="ref-commitment-title"><strong>{m.title}</strong>
