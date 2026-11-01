@@ -1,6 +1,6 @@
 # AMBIENTA V3.4 — Separación funcional: Área de estudio y Mapas y SIG
 
-**Estado:** desarrollo React V3 en rama experimental. V1 y V2 conservadas.
+**Estado:** V3.4 fusionada y publicada en GitHub Pages. V1 y V2 conservadas.
 
 ## Problema
 
@@ -46,4 +46,11 @@ Se añadió `v3/overrides/scripts/area-gis-separation-smoke.mjs` para comprobar:
 
 Los ensayos automáticos `topology-smoke.mjs`, `study-areas-smoke.mjs`, `georef-real-smoke.mjs` y `sig-gateway-smoke.mjs` se adaptaron a la nueva navegación. Los datos de QA procedentes de fuentes oficiales deben mantener sus límites y restricciones; ninguna prueba convierte una BBOX en perímetro del proyecto.
 
-Referencia: `.github/workflows/v3-preview.yml` y PR de esta rama. La publicación en GitHub Pages queda retenida hasta PASS de CI y navegador.
+### Cierre de QA y publicación
+
+- [PR público #8 fusionado](https://github.com/insideah64-lab/ambienta-web/pull/8), commit `3754ea5fbf0078077c82dd2578919b980dc90e15`.
+- [CI de V3.4 — SUCCESS](https://github.com/insideah64-lab/ambienta-web/actions/runs/41269892584): 44/44 pruebas Node, seis recorridos Chromium PASS (topologías, subáreas, vínculos ambientales, separación, Georef e IDESA sintético) y cero errores JavaScript.
+- [GitHub Pages — SUCCESS](https://github.com/insideah64-lab/ambienta-web/actions/runs/41269999833), con V3.4 separada y V1/V2 intactas.
+- Rutas públicas: [Área de estudio](https://insideah64-lab.github.io/ambienta-web/v3/?caso=diablillos#/area) · [Mapas y SIG](https://insideah64-lab.github.io/ambienta-web/v3/?caso=diablillos#/mapas).
+
+La CI verifica las interfaces en Chromium. La ejecución de Pages demuestra la publicación, sin sustituir una auditoría de uso con datos reales de Diablillos ni una revisión territorial experta.
