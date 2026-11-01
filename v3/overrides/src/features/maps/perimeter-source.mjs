@@ -71,6 +71,8 @@ export function validatePerimeterGeoJson(input){
   fail('geometría inválida, autointersecada o con huecos/topología que requieren revisión GIS.');
  return checked;
 }
+/** @param {{geojson:any,sha256:string,sourceName:string,sourceType:'drawn'|'geojson'|'kml',
+ description:string,createdAt:string,rawText?:string|null}} options */
 export function buildPerimeterRecord({geojson,sha256,sourceName,sourceType,description,createdAt,rawText=null}){
  const parsed=validatePerimeterGeoJson(geojson);
  if(!SHA.test(sha256||'')||!safeName(sourceName)||!safeName(description)||
