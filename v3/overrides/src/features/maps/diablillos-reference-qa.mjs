@@ -31,11 +31,8 @@ export const DIABLILLOS_QA_GEOJSON={
  ]};
 
 export const DIABLILLOS_QA_SOURCE_DESCRIPTION=
- 'REFERENCIA CARTOGRÁFICA FICTICIA PARA QA; centro de propiedad y superficie histórica ('+
- '11.403 ha) publicados por AbraSilver, NI 43-101 PFS, 17-01-2025. '+
- 'Los 15 vértices y el contorno son generados con IA para probar el editor; '+
- 'NO son límites del proyecto, concesiones, EIA, infraestructura ni zona de impacto. '+
- 'Las adquisiciones de 2026 pueden cambiar las superficies.';
+ 'QA ILUSTRATIVO: centro y superficie reportados por AbraSilver, PFS 2025. '+
+ 'Vértices generados por IA; NO es límite oficial, concesión ni área de influencia.';
 
 export function seedDiablillosQaReference(storage,createdAt){
  const key=perimeterKey(true),aoiStorage=aoiKey(true);
