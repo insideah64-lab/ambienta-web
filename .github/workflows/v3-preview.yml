@@ -53,6 +53,7 @@ jobs:
           node apps/web-v3/scripts/topology-smoke.mjs
           node apps/web-v3/scripts/study-areas-smoke.mjs
           node apps/web-v3/scripts/perimeter-editor-smoke.mjs
+          node apps/web-v3/scripts/diablillos-reference-qa-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
           node apps/web-v3/scripts/area-gis-separation-smoke.mjs
           node apps/web-v3/scripts/point-zone-analysis-smoke.mjs
@@ -60,6 +61,14 @@ jobs:
           node apps/web-v3/scripts/georef-real-smoke.mjs
           node apps/web-v3/scripts/sig-gateway-smoke.mjs
           sha256sum -c /tmp/ambienta-v1-v2.sha
+      - name: Guardar capturas QA Diablillos (Área y SIG)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-diablillos-v353-capturas
+          path: qa/diablillos-v353/screenshots/
+          retention-days: 30
+          if-no-files-found: warn
       - name: Keep QA build (not a deployment)
         if: always()
         uses: actions/upload-artifact@v4
