@@ -378,3 +378,106 @@
  }
  .ref-shell .ref-commitments .ref-progress-track{display:none!important}
 }
+
+
+/* V3.6.0 — Desktop documentary trace panel. NO severity, percentage or
+   compliance inference. Existing mobile layout deliberately unchanged. */
+@media(min-width:1100px){
+ .ref-shell .ref-trace-open,.ref-shell .ref-trace-close{
+  display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;border:1px solid #79c4aa;background:#174b47;
+  color:#e9fff5;border-radius:8px;padding:8px 12px;
+  font-size:13px!important;font-weight:720;white-space:nowrap;
+ }
+ .ref-shell .ref-trace-open[aria-pressed="true"]{
+  background:#326d5e;border-color:#a2f0c6;color:#fff;
+ }
+ .ref-shell .ref-trace-open:hover,.ref-shell .ref-trace-close:hover{
+  background:#2b6860;
+ }
+ .ref-shell .ref-trace-open:focus-visible,.ref-shell .ref-trace-close:focus-visible{
+  outline:2px solid #c1ffe3;outline-offset:3px;
+ }
+ .ref-shell .ref-trace-choose{
+  padding:16px 18px;border:1px dashed #4b857e;
+  border-radius:9px;background:#133c3d;
+  color:#cce8df;font-size:14px!important;line-height:1.55;
+ }
+ .ref-shell .ref-trace-panel{
+  display:grid;gap:18px;margin:20px 0;padding:22px;
+  border:1px solid #5c9686;border-radius:13px;
+  background:linear-gradient(145deg,#123338,#183a3b);
+  min-width:0;
+ }
+ .ref-shell .ref-trace-head{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:18px;
+ }
+ .ref-shell .ref-trace-head>div{min-width:0}
+ .ref-shell .ref-trace-eyebrow{
+  font-size:12px!important;font-weight:800;letter-spacing:.08em;
+  color:#8cdec5;margin:0 0 5px;
+ }
+ .ref-shell .ref-trace-head h3{
+  font-size:23px!important;line-height:1.25;color:#f2fff8;margin:0 0 8px;
+ }
+ .ref-shell .ref-trace-head p{font-size:15px!important;line-height:1.4;margin:0 0 9px}
+ .ref-shell .ref-trace-head small{font-size:13px!important;color:#c4ddd6}
+ .ref-shell .ref-trace-disclaimer{
+  display:flex;gap:10px;align-items:flex-start;padding:12px;
+  font-size:13px!important;line-height:1.5;color:#f4e5c4;
+  background:#3c3327;border:1px solid #8c7957;border-radius:8px;margin:0;
+ }
+ .ref-shell .ref-trace-disclaimer svg{flex:none}
+ .ref-shell .ref-trace-counts{
+  display:flex;gap:9px;flex-wrap:wrap;
+ }
+ .ref-shell .ref-trace-counts span{
+  font-size:13px!important;display:flex;align-items:center;gap:7px;
+  padding:9px 12px;background:#20494b;border:1px solid #4a8080;border-radius:8px;
+  color:#d9f0e5;
+ }
+ .ref-shell .ref-trace-counts strong{
+  color:#fff;font-size:21px!important;line-height:1.1;
+ }
+ .ref-shell .ref-trace-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
+ }
+ .ref-shell .ref-trace-grid>section{
+  padding:16px;min-width:0;border:1px solid #446d6e;border-radius:10px;
+  background:#17383e;
+ }
+ .ref-shell .ref-trace-grid h4{
+  font-size:17px!important;display:flex;align-items:center;
+  gap:8px;margin:0 0 12px;color:#e3fff0;
+ }
+ .ref-shell .ref-trace-grid h4 a{
+  display:inline-flex;align-items:center;gap:4px;
+  margin-left:auto;color:#8eeaca;font-size:13px!important;
+  text-decoration:none;
+ }
+ .ref-shell .ref-trace-record{
+  display:grid;gap:5px;padding:11px 0;
+  border-bottom:1px solid #4f76766b;
+  overflow-wrap:anywhere;
+ }
+ .ref-shell .ref-trace-record:last-child{border-bottom:0}
+ .ref-shell .ref-trace-record strong{font-size:14px!important;line-height:1.4;color:#effcf4}
+ .ref-shell .ref-trace-record span,.ref-shell .ref-trace-record small{
+  font-size:13px!important;line-height:1.45;color:#c5dbd6;
+ }
+ .ref-shell .ref-trace-empty{
+  font-size:13px!important;color:#afccc7;line-height:1.5;margin:0;
+ }
+ .ref-shell .ref-trace-conflicts{
+  padding:12px 15px;border:1px solid #e4aa73;border-radius:8px;
+  background:#49392e;color:#ffe5c9;
+ }
+ .ref-shell .ref-trace-conflicts strong{font-size:14px!important}
+ .ref-shell .ref-trace-conflicts p{font-size:13px!important;margin:7px 0 0}
+ .ref-shell .ref-trace-foot{
+  font-size:13px!important;color:#b5d2d0;line-height:1.5;margin:0;
+ }
+}
+@media(min-width:1100px) and (max-width:1350px){
+ .ref-shell .ref-trace-grid{grid-template-columns:minmax(0,1fr)}
+}
