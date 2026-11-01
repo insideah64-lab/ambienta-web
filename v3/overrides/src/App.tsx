@@ -19,6 +19,7 @@ import { CloudWorkspace } from './features/cloud/CloudWorkspace';
 import { ReferenceDashboard } from './features/dashboard/ReferenceDashboard';
 import { GeoMap } from './features/maps/GeoMap';
 import { PointZoneAnalysis } from './features/maps/PointZoneAnalysis';
+import { DocumentaryReviewSummary } from './features/maps/DocumentaryReviewSummary';
 import { StudyAreasWorkbench } from './features/maps/StudyAreasWorkbench';
 import './area-gis-pages.css';
 import { SpatialLinksPanel } from './features/maps/SpatialLinksPanel';
@@ -225,6 +226,7 @@ function Monitoreo({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKin
         <td><Badge tone={i.result==='pendiente'?'amber':'mint'}>{i.result}</Badge></td></tr>)}</tbody></table></div>
     <p className="v2-panel-note">No existen mediciones de calidad del aire cargadas en esta demostración.</p>
     <SpatialLinksPanel data={data} mode="inspection"/>
+    <DocumentaryReviewSummary data={data}/>
   </Panel>;
 }
 function Auditorias({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind)=>void}) {
