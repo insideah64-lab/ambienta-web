@@ -102,7 +102,9 @@ export function PerimeterWorkbench({aoi}:Props){
   try{
    const result=seedDiablillosQaReference(localStorage,new Date().toISOString());
    if(result.status!=='seeded_illustrative_qa')throw Error('Existe otro perímetro. No se reemplazó.');
-   setSaved(result.record);setError('');setCandidate(null);setVertices([]);setDrawing(false);
+   const stored=readPerimeter(localStorage,KEY);
+   if(!stored)throw Error('No se pudo verificar el perímetro QA guardado.');
+   setSaved(stored);setError('');setCandidate(null);setVertices([]);setDrawing(false);
    setNotice('Referencia cartográfica ficticia de Diablillos cargada solo para QA. NO es un límite catastral.');
    window.dispatchEvent(new Event('ambienta:perimeter-aoi-updated'));
    window.dispatchEvent(new Event('ambienta:spatial-updated'));
