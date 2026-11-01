@@ -64,8 +64,29 @@ try{
  await page.getByRole('button',{name:'Quitar ensayo'}).click();
  await ready.waitFor({state:'detached'});
  assert.equal(await page.evaluate(()=>localStorage.getItem('ambienta-study-areas-diablillos-v1')),null);
+ // An explicitly imported polygon (not the BBOX) can be split into four
+ // zones without overwriting its uncut original.
+ const importedBytes=JSON.stringify(fixture(originalFeature));
+ const importedHash=createHash('sha256').update(importedBytes).digest('hex');
+ await page.getByRole('textbox',{name:'Procedencia o descripción'}).fill('Límite ficticio creado para pruebas de asignación espacial');
+ await page.getByLabel('Importar GeoJSON').setInputFiles({name:'poligono-ensayo.geojson',
+  mimeType:'application/geo+json',buffer:Buffer.from(importedBytes)});
+ await page.locator('[data-geojson-loaded=true]').waitFor();
+ await page.getByRole('button',{name:'Asignar 4 áreas a un polígono importado'}).click();
+ await ready.waitFor();
+ assert.equal(await ready.locator('[data-study-zone]').count(),4);
+ const d3=page.waitForEvent('download');
+ await page.getByRole('button',{name:'Descargar subáreas GeoJSON'}).click();
+ const importedZones=JSON.parse(fs.readFileSync(await (await d3).path(),'utf8'));
+ assert.equal(importedZones.properties.ambientaStudyAreas.sourceSha256,importedHash);
+ assert.equal(importedZones.properties.ambientaStudyAreas.kind,'imported');
+ assert.equal(importedZones.features.length,4);
+ const d4=page.waitForEvent('download');
+ await page.getByRole('button',{name:'Exportar GeoJSON depurado'}).click();
+ const intact=JSON.parse(fs.readFileSync(await (await d4).path(),'utf8'));
+ assert.deepEqual(intact.features[0].geometry.coordinates,originalFeature.geometry.coordinates);
  assert.deepEqual(errors,[]);
  console.log(JSON.stringify({result:'PASS',scenario:'Diablillos synthetic AOI study polygons',
   zones:rows,distributionPercent:pct,hasInnerHole:true,sourceUnchanged:true,
-  reloadPersisted:true,staleAoiBlocked:true,exportSufficient:true,pageErrors:errors.length}));
+  reloadPersisted:true,staleAoiBlocked:true,importedCaseHashVerified:true,exportSufficient:true,pageErrors:errors.length}));
 }finally{await browser.close();}
