@@ -43,7 +43,7 @@ try{
  const workingBefore=await page.evaluate(()=>localStorage.getItem('ambienta-gis-diablillos-working-v3'));
  await gis.getByRole('button',{name:'Analizar puntos contra las subáreas'}).click();
  await gis.locator('[data-point-analysis-ready=true]').waitFor();
- const stations=gis.locator('[data-station-panel=empty]');await stations.waitFor();
+ const stations=gis.locator('[data-station-panel]');await gis.locator('[data-station-panel=empty]').waitFor();
  assert.equal(await stations.locator('[data-station-id]').count(),0);
  await stations.getByLabel('Estación de medición V3.9').selectOption('EST-V39-QA');
  await stations.getByLabel('Punto GIS V3.9').selectOption('F1');
