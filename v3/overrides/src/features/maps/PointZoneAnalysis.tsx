@@ -1,4 +1,6 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useState,type ChangeEvent} from 'react';
+// @ts-ignore: shared local GeoJSON validation
+import {validateGeoJson} from './geojson-validate.mjs';
 import {Link} from 'react-router-dom';
 import {IS_DIABLILLOS_CASE} from '../../lib/demo';
 // @ts-ignore: GIS point classification is shared with Node tests
@@ -15,12 +17,13 @@ type Report={schema:string;points:Row[];status:string;
   perZone:{id:string;label:string;color:string;count:number}[]};
  provenance:{inputSha256:string;scenarioSha256:string;scenarioCreatedAt:string;scenarioBbox:number[]}};
 const GIS_KEY=IS_DIABLILLOS_CASE?'ambienta-gis-diablillos-working-v3':'ambienta-gis-demo-working-v3';
-function readInputs(){
+function readInputs(override:any|null){
  const aoi=readPointAoi(aoiKey(IS_DIABLILLOS_CASE));
- let layer:any=null;
- try{const value=localStorage.getItem(GIS_KEY);if(value&&value.length<=1400000)layer=JSON.parse(value);}catch{}
+ let working:any=null;
+ try{const value=localStorage.getItem(GIS_KEY);if(value&&value.length<=1400000)working=JSON.parse(value);}catch{}
+ const layer=override||working;
  const scenario=aoi?restoreStudyScenario(studyAreaStorageKey(IS_DIABLILLOS_CASE),
-  aoi.bbox,layer?.sha256||null):null;
+  aoi.bbox,working?.sha256||null):null;
  const types=layer?.geojson?.features?.map((f:any)=>f?.geometry?.type);
  const valid=Boolean(scenario&&layer&&Array.isArray(types)&&types.length&&
   types.every((x:string)=>x==='Point'||x==='MultiPoint'));
@@ -41,10 +44,11 @@ const mapEvent=(detail:unknown)=>window.dispatchEvent(new CustomEvent('ambienta:
 export function PointZoneAnalysis(){
  const [revision,setRevision]=useState(0);
  const [report,setReport]=useState<Report|null>(null);
+ const [override,setOverride]=useState<any|null>(null);
  const [filter,setFilter]=useState('all');
  const [error,setError]=useState('');
  useEffect(()=>{
-  const refresh=()=>{setRevision(x=>x+1);setError('');mapEvent(null);};
+  const refresh=()=>{setRevision(x=>x+1);setError('');setReport(null);mapEvent(null);};
   window.addEventListener('storage',refresh);
   window.addEventListener('ambienta:spatial-updated',refresh);
   window.addEventListener('focus',refresh);
@@ -55,11 +59,31 @@ export function PointZoneAnalysis(){
    mapEvent(null);
   };
  },[]);
- const context=useMemo(()=>readInputs(),[revision]);
+ const context=useMemo(()=>readInputs(override),[revision,override]);
  const result=report&&context.valid&&analysisMatchesContext(report,context.layer,context.scenario)?report:null;
  const visible=(result?.points||[]).filter(p=>filter==='all'||filter===p.zoneId||
   (filter==='review'&&p.status.startsWith('review_'))||
   (filter==='outside'&&p.status==='outside_perimeter'));
+ async function loadIndependentPoints(event:ChangeEvent<HTMLInputElement>){
+  const file=event.target.files?.[0];event.target.value='';
+  if(!file)return;
+  setReport(null);mapEvent(null);setError('');
+  try{
+   if(file.size>1048576)throw Error('El archivo puntual supera 1 MiB.');
+   const raw=await file.text();
+   const checked=validateGeoJson(JSON.parse(raw));
+   if(checked.geometryTypes.some((x:string)=>x!=='Point'&&x!=='MultiPoint'))
+    throw Error('El archivo independiente admite únicamente Point o MultiPoint.');
+   const bytes=new TextEncoder().encode(raw);
+   const digest=await crypto.subtle.digest('SHA-256',bytes);
+   const sha=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
+   setOverride({geojson:checked.geojson,sha256:sha,source:'Archivo puntual independiente sin verificar',
+    fileName:file.name});
+  }catch(cause){
+   setOverride(null);
+   setError(cause instanceof Error?cause.message:'No se pudo validar la capa puntual.');
+  }
+ }
  function run(){
   if(!context.valid){setError(context.message);return;}
   try{
@@ -78,6 +102,17 @@ export function PointZoneAnalysis(){
    <span>SIMULADO · NO OFICIAL</span></div>
   <p>Clasificación espacial de puntos locales contra el polígono de ensayo. Conserva huecos,
    multipolígonos y bordes: los puntos en límites se envían a revisión, sin asignación automática.</p>
+  <div className="sig-point-actions">
+   <label className="sig-point-upload">Importar puntos independientes para análisis
+    <input type="file" accept=".geojson,.json,application/geo+json,application/json"
+     aria-label="Importar puntos para análisis SIG" onChange={loadIndependentPoints}/>
+   </label>
+   {override&&<button type="button" onClick={()=>{setOverride(null);setReport(null);mapEvent(null);}}>
+    Usar la capa de trabajo SIG</button>}
+  </div>
+  <small>Esta importación puntual es independiente de la capa cartográfica principal:
+   permite analizar puntos sin reemplazar el polígono de estudio importado.
+   El archivo se procesa solo en memoria del navegador.</small>
   <div className="sig-point-source" data-point-context={context.valid?'ready':'missing'}>
    <span><strong>Polígono:</strong> {context.scenario?'Escenario A–D':'Sin delimitar'}</span>
    <span><strong>Capa:</strong> {context.layer?.fileName||'Sin capa'}</span>
