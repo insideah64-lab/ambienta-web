@@ -18,6 +18,7 @@ import { DemoActionDialog, type DemoActionKind } from './features/demo/DemoActio
 import { CloudWorkspace } from './features/cloud/CloudWorkspace';
 import { ReferenceDashboard } from './features/dashboard/ReferenceDashboard';
 import { GeoMap } from './features/maps/GeoMap';
+import { SpatialLinksPanel } from './features/maps/SpatialLinksPanel';
 // @ts-ignore: native JS validator used to restore browser-local admin polygon
 import {readAdminBoundary,adminBoundaryKey} from './features/georef/admin-boundary.mjs';
 import {GeorefTerritory,GeorefSavedSummary,type TerritoryFocus,type BoundaryOverlay} from './features/georef/GeorefTerritory';
@@ -107,6 +108,7 @@ function AreaEstudio({data}:{data:DemoState}) {
    <Panel kicker="SIG · MAPA INTERACTIVO" title="Cartografía regional, capas y procedencia">
     <MapPreview province={data.project.province} focus={territoryFocus} boundary={boundary} aoi={aoi}/>
     <p className="v2-panel-note">No se presenta esta cartografía como evaluación de calidad del agua, georreferenciación de instalaciones ni certificación ambiental.</p>
+    <SpatialLinksPanel data={data} mode="overview"/>
    </Panel>
  </div>;
 }
@@ -120,6 +122,7 @@ function Impactos({data}:{data:DemoState}) {
       <td>{data.measures.filter(m=>m.impactIds.includes(impact.id)).length}</td>
     </tr>)}</tbody></table></div>
     <p className="v2-panel-note">No hay puntuaciones de significancia ambiental calculadas automáticamente.</p>
+    <SpatialLinksPanel data={data} mode="impact"/>
   </Panel>;
 }
 function Evidencias({data,onAction,onApply}:{data:DemoState;onAction:(kind:DemoActionKind)=>void;onApply:(operation:Transaction,message:string)=>void}) {
@@ -133,6 +136,7 @@ function Evidencias({data,onAction,onApply}:{data:DemoState;onAction:(kind:DemoA
     </div>):<p className="v2-empty">Todavía no se registraron evidencias documentales.</p>}
     <p className="v2-panel-note">La demo conserva referencias textuales, no el contenido ni la autenticidad de los archivos. Los documentos privados se gestionan por separado.</p>
     <EvidenceIntegrityLab data={data} onApply={onApply}/>
+    <SpatialLinksPanel data={data} mode="evidence"/>
   </Panel>;
 }
 function Reportes({data,onExport}:{data:DemoState;onExport:()=>void}) {
@@ -146,6 +150,7 @@ function Reportes({data,onExport}:{data:DemoState;onExport:()=>void}) {
     <p className="v2-panel-note">El archivo JSON conserva referencias, eventos y datos ficticios; no es un informe de cumplimiento ni un certificado ambiental.</p>
     <button className="v2-action-button" style={{marginTop:16}} onClick={onExport}>
       <ArrowDownToLine size={16}/> Exportar JSON de la demostración</button>
+    <SpatialLinksPanel data={data} mode="report"/>
   </Panel>;
 }
 function ToolSection({kind}:{kind:'mita'|'normativa'|'biblioteca'}) {
@@ -190,6 +195,7 @@ function PGA({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind,meas
       <div><strong>{e.label}</strong><small>{e.id} · {e.reference} · Autor: {e.author}</small></div>
       <Badge tone={e.status==='validada'?'blue':e.status==='rechazada'?'amber':'neutral'}>{e.status}</Badge>
     </div>)}
+    <SpatialLinksPanel data={data} mode="measure"/>
   </Panel>;
 }
 function Monitoreo({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind)=>void}) {
@@ -200,6 +206,7 @@ function Monitoreo({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKin
         <td>{data.measures.find(m=>m.id===i.measureId)?.title||'—'}</td><td>{i.assignee}</td>
         <td><Badge tone={i.result==='pendiente'?'amber':'mint'}>{i.result}</Badge></td></tr>)}</tbody></table></div>
     <p className="v2-panel-note">No existen mediciones de calidad del aire cargadas en esta demostración.</p>
+    <SpatialLinksPanel data={data} mode="inspection"/>
   </Panel>;
 }
 function Auditorias({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind)=>void}) {
