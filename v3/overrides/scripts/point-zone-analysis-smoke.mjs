@@ -10,7 +10,7 @@ try{
  for(const [name,value] of [['Latitud de consulta','-24.70'],['Longitud de consulta','-67.20'],['Distancia de consulta','5']])
   await page.getByRole('textbox',{name}).fill(value);
  await page.locator('[data-aoi-active=true]').waitFor();
- await page.getByRole('button',{name:'Crear polígono sintético y 4 áreas'}).click();
+ await page.getByRole('button',{name:'Cargar solo ejemplo de geometría de ensayo (4 franjas)'}).click();
  await page.locator('[data-study-areas-ready=true]').waitFor();
  assert.equal(await page.locator('[data-point-zone-panel=true]').count(),0);
  const bbox=await page.evaluate(()=>JSON.parse(localStorage.getItem('ambienta-aoi-diablillos-v3')).bbox);
