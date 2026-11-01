@@ -23,7 +23,8 @@ try{
    assert.equal(await row.locator('.ref-stage-tag').innerText(),expected[i],
     'State must come from the actual case fixture, not a modeled percentage');
    assert.match(await row.locator('small').innerText(),new RegExp('MED-DIAB-00'+(i+1)));
-   assert.match(await row.getAttribute('href'),/\/pga$/);
+   assert((await row.getAttribute('href'))?.endsWith('/pga?medida=MED-DIAB-00'+(i+1)),
+    'Dashboard must deep-link to exact measure');
   }
   const footer=await panel.locator('.ref-panel-foot').innerText();
   assert.match(footer,/sin estimación de avance físico ni de cumplimiento ambiental/i);

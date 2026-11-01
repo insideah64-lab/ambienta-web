@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, NavLink, Route, Routes, useLocation } from 'react-router-dom';
+import { Link, NavLink, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 import {
   Activity, ArrowDownToLine, BookOpen, CheckCircle2, Clock3,
   Cloud, ExternalLink, FileText, FolderOpen, Globe2, History, LayoutDashboard,
@@ -35,6 +35,7 @@ import {retractSeededDiablillosPreview} from './features/maps/diablillos-preview
 import {seedDiablillosQaReference} from './features/maps/diablillos-reference-qa.mjs';
 import {PerimeterWorkbench} from './features/maps/PerimeterWorkbench';
 import { EvidenceIntegrityLab } from './features/evidence/EvidenceIntegrityLab';
+import {MeasureTracePanel} from './features/traceability/MeasureTracePanel';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
 const NAV_PRIMARY: Navigation[] = [
@@ -188,6 +189,16 @@ function ToolSection({kind}:{kind:'mita'|'normativa'|'biblioteca'}) {
 function PGA({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind,measureId?:string)=>void}) {
   const [term,setTerm]=useState('');
   const [program,setProgram]=useState('todos');
+  const [searchParams,setSearchParams]=useSearchParams();
+  const selectedId=searchParams.get('medida');
+  const chooseMeasure=(id:string|null)=>{
+   setSearchParams(prev=>{
+    const next=new URLSearchParams(prev);
+    if(id)next.set('medida',id);
+    else next.delete('medida');
+    return next;
+   });
+  };
   const filtered=useMemo(()=>data.measures.filter(m=>
     (program==='todos'||m.programId===program) &&
     (m.title+' '+m.id+' '+m.owner).toLocaleLowerCase('es').includes(term.toLocaleLowerCase('es'))
@@ -203,19 +214,22 @@ function PGA({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind,meas
       <label className="v2-search"><Search size={17}/><input aria-label="Buscar medida" value={term} onChange={e=>setTerm(e.target.value)} placeholder="Buscar medida o responsable…"/></label>
       <label className="v2-select-label">Programa <select value={program} onChange={e=>setProgram(e.target.value)}><option value="todos">Todos los programas</option>{data.programs.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
     </div>
-    <div className="v2-table-scroll"><table className="v2-table"><thead><tr><th>Medida</th><th>Programa</th><th>Responsable</th><th>Estado</th><th>Vencimiento</th></tr></thead>
+    <div className="v2-table-scroll"><table className="v2-table"><thead><tr><th>Medida</th><th>Programa</th><th>Responsable</th><th>Estado</th><th>Vencimiento</th><th>Consulta</th></tr></thead>
       <tbody>{filtered.map(m=><tr key={m.id}><td><strong>{m.title}</strong><small>{m.id}</small></td>
         <td>{data.programs.find(p=>p.id===m.programId)?.name||'Sin programa'}</td><td>{m.owner}</td>
         <td><Badge tone={measureTone(m.status)}>{statusText(m.status)}</Badge></td><td>{m.due}</td>
+        <td><button type="button" className="ref-trace-open" data-select-measure={m.id}
+          aria-pressed={selectedId===m.id} onClick={()=>chooseMeasure(m.id)}>
+          {selectedId===m.id?'Seleccionada':'Ver trazabilidad'}
+        </button></td>
       </tr>)}</tbody></table></div>
     {!filtered.length&&<p className="v2-empty">No hay medidas que coincidan con los filtros.</p>}
     <p className="v2-panel-note">Medidas creadas localmente mediante el dominio original. Verificar requiere inspección conforme y evidencia revisada por otra persona. No equivale a aprobación ambiental.</p>
-    <div className="v2-evidence-overview"><strong>Evidencias registradas (solo referencias)</strong>
-      <span>{data.evidence.length} registros · {data.evidence.filter(e=>e.status==='pendiente').length} pendientes</span></div>
-    {data.evidence.slice(-5).reverse().map(e=><div className="v2-evidence-row" key={e.id}>
-      <div><strong>{e.label}</strong><small>{e.id} · {e.reference} · Autor: {e.author}</small></div>
-      <Badge tone={e.status==='validada'?'blue':e.status==='rechazada'?'amber':'neutral'}>{e.status}</Badge>
-    </div>)}
+    {selectedId?<MeasureTracePanel data={data} measureId={selectedId} onClear={()=>chooseMeasure(null)}/>
+      :<div className="ref-trace-choose" data-trace-empty-selection="true">
+        Seleccioná <strong>Ver trazabilidad</strong> en una medida para consultar solo sus inspecciones,
+        evidencias, hallazgos y acciones con identificadores asociados.
+       </div>}
     <SpatialLinksPanel data={data} mode="measure"/>
   </Panel>;
 }
