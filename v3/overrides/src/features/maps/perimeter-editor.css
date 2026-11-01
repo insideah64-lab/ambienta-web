@@ -17,3 +17,15 @@
  background:#493920;border-radius:8px;border:1px solid #d69b50;
  padding:10px 12px;color:#ffe4bd;font-weight:760;font-size:11px}
 .geo-user-perimeter-badge[data-perimeter-qa=true]{background:#544021ee;border-color:#ffc370;color:#ffeac8}
+
+/* MapLibre navigation icons must remain legible despite generic form-button skin. */
+.geo-perimeter-editor .maplibregl-ctrl-group button,
+.geo-perimeter-editor .maplibregl-ctrl-group button:not(:disabled){
+ background-color:#fff!important;color:#263d3d!important;
+ border:0!important;border-radius:0!important;
+ padding:0!important;min-height:29px!important;width:29px!important;
+ opacity:1!important;box-shadow:none!important}
+.geo-perimeter-editor .maplibregl-ctrl-group button:hover:not(:disabled){
+ background-color:#eef5f2!important;transform:none!important}
+.geo-perimeter-editor .maplibregl-ctrl-group button .maplibregl-ctrl-icon{
+ display:block!important;visibility:visible!important;opacity:1!important}
