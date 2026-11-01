@@ -29,7 +29,8 @@ import {AoiWorkbench,type PointAoi} from './features/georef/AoiWorkbench';
 // @ts-ignore: browser-local AOI model
 import {aoiKey,readPointAoi} from './features/maps/aoi-model.mjs';
 // @ts-ignore: pure browser-local non-destructive synthetic Diablillos preview initializer
-import {prepareDiablillosPreview} from './features/maps/diablillos-preview.mjs';
+import {retractSeededDiablillosPreview} from './features/maps/diablillos-preview.mjs';
+import {PerimeterWorkbench} from './features/maps/PerimeterWorkbench';
 import { EvidenceIntegrityLab } from './features/evidence/EvidenceIntegrityLab';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
@@ -109,13 +110,8 @@ function AreaEstudio({data}:{data:DemoState}) {
    <AoiWorkbench onChange={setAoi}/>
    <GeorefTerritory onFocus={setTerritoryFocus} onBoundary={setBoundary}/>
    <Panel kicker="POLÍGONO DEL CASO · ZONIFICACIÓN" title="Delimitación y distribución de superficies">
+    <PerimeterWorkbench aoi={aoi}/>
     <StudyAreasWorkbench aoi={aoi}/>
-   </Panel>
-   <Panel kicker="VISTA TERRITORIAL · LECTURA" title="Ubicación del escenario">
-    <div className="v2-territory-preview" data-study-map-preview="true">
-     <MapPreview province={data.project.province} focus={territoryFocus} boundary={boundary} aoi={aoi}/>
-    </div>
-    <p className="v2-panel-note">Vista cartográfica compacta de consulta: muestra la ventana y las subáreas ya definidas, pero no permite importar capas ni ejecutar análisis SIG. <Link to="/mapas">Abrir laboratorio Mapas y SIG para analizar y exportar capas</Link>.</p>
    </Panel>
    <Panel kicker="VÍNCULOS AMBIENTALES · QA" title="Relación documental con las subáreas">
     <SpatialLinksPanel data={data} mode="overview"/>
@@ -261,9 +257,9 @@ export default function App() {
   const [data,setData]=useState<DemoState>(()=>{
     // Only the Diablillos DEMO and only in an empty local workspace:
     // the example geometry is never a verified project boundary.
-    if(IS_DIABLILLOS_CASE&&new URLSearchParams(window.location.search).get('poligono')==='ensayo'){
-      try{prepareDiablillosPreview(window.localStorage,new Date().toISOString());}
-      catch{/* Local storage may be blocked; the application remains usable. */}
+    if(IS_DIABLILLOS_CASE){
+      // Retire only the automatically injected V3.5.1 example; never touch user-created boundaries.
+      try{retractSeededDiablillosPreview(window.localStorage);}catch{/* keep local data unchanged */}
     }
     return readDemoState();
   });
