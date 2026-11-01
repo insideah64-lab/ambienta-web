@@ -21,6 +21,7 @@ import { GeoMap } from './features/maps/GeoMap';
 import { PointZoneAnalysis } from './features/maps/PointZoneAnalysis';
 import { DocumentaryReviewSummary } from './features/maps/DocumentaryReviewSummary';
 import { MeasurementWorkbench } from './features/monitoring/MeasurementWorkbench';
+import { StationLocationSummary } from './features/monitoring/StationLocationSummary';
 import { StudyAreasWorkbench } from './features/maps/StudyAreasWorkbench';
 import './area-gis-pages.css';
 import { SpatialLinksPanel } from './features/maps/SpatialLinksPanel';
