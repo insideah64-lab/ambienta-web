@@ -6,7 +6,7 @@ try{
  const ctx=await browser.newContext({viewport:{width:1360,height:900}});
  const page=await ctx.newPage();
  const errors=[];page.on('pageerror',e=>errors.push(String(e)));
- await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/area');
+ await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos&poligono=ensayo#/area');
  await page.locator('[data-study-areas-ready=true]').waitFor();
  await page.locator('[data-diablillos-demo-polygon=true]').waitFor();
  assert.equal(await page.getByRole('textbox',{name:'Latitud de consulta'}).inputValue(),'-24.7');
@@ -39,7 +39,7 @@ try{
   localStorage.setItem('ambienta-aoi-diablillos-v3',JSON.stringify(value));
  },previous);
  const page2=await own.newPage();
- await page2.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/area');
+ await page2.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos&poligono=ensayo#/area');
  await page2.locator('[data-aoi-active=true]').waitFor();
  const preserved=await page2.evaluate(()=>({
   aoi:JSON.parse(localStorage.getItem('ambienta-aoi-diablillos-v3')),
