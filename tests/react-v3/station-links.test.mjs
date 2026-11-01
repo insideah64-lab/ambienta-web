@@ -1,12 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
-import {syntheticStudyPolygon,createStudyScenario} from '../../v3/overrides/src/features/maps/study-areas.mjs';
-import {analyzePointsInStudyAreas} from '../../v3/overrides/src/features/maps/point-zone-analysis.mjs';
-import {blankMeasurementBook,addMeasurement,voidMeasurement} from '../../v3/overrides/src/features/monitoring/measurements.mjs';
+import {syntheticStudyPolygon,createStudyScenario} from '../../apps/web-v3/src/features/maps/study-areas.mjs';
+import {analyzePointsInStudyAreas} from '../../apps/web-v3/src/features/maps/point-zone-analysis.mjs';
+import {blankMeasurementBook,addMeasurement,voidMeasurement} from '../../apps/web-v3/src/features/monitoring/measurements.mjs';
 import {stationContext,blankStationLinks,proposeStationLink,reviewStationLink,
  readStationLinks,stationLinkSummary,exportStationLinks,validateStationLinks}
- from '../../v3/overrides/src/features/maps/station-links.mjs';
+ from '../../apps/web-v3/src/features/maps/station-links.mjs';
 const time='2026-11-01T12:00:00.000Z',later='2026-11-01T13:00:00.000Z';
 const sha=x=>createHash('sha256').update(JSON.stringify(x)).digest('hex');
 const bbox=[-67.254,-24.75,-67.146,-24.65];
