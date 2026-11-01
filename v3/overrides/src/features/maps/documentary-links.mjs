@@ -22,7 +22,7 @@ function segmentDistanceMeters(p,a,b){
  const ratio=len===0?0:Math.max(0,Math.min(1,-(ax*dx+ay*dy)/len));
  return Math.hypot(ax+ratio*dx,ay+ratio*dy);
 }
-function boundaryDistance(point,scenario){
+export function boundaryDistance(point,scenario){
  if(!scenario||scenario.sourceHash===undefined||!Array.isArray(scenario.zones?.features)||
  !Array.isArray(scenario.parent?.features))return null;
  let closest=Infinity;
