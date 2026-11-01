@@ -331,7 +331,7 @@
  .ref-shell .ref-metric .ref-metric-top{display:flex;gap:8px;
   justify-content:space-between;align-items:center;min-width:0}
  .ref-shell .ref-metric .ref-metric-label{
-  font-size:12px!important;line-height:1.35;letter-spacing:.055em;
+  font-size:13px!important;line-height:1.35;letter-spacing:.035em;
   font-weight:800;color:#c8dfe1;overflow-wrap:anywhere;
  }
  .ref-shell .ref-metric.v2-metric .ref-metric-top>strong{
@@ -339,7 +339,7 @@
   color:#f6fff9;
  }
  .ref-shell .ref-metric .ref-metric-subtitle{
-  font-size:12px!important;color:#bcd4d2;line-height:1.4;
+  font-size:13px!important;color:#bcd4d2;line-height:1.4;
   white-space:normal;overflow-wrap:anywhere;
  }
  .ref-shell .ref-metric-link-arrow{
