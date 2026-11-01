@@ -16,7 +16,12 @@ try{
   const map=view.locator('.geo-map');
   const label=view.locator('[data-user-perimeter-visible=true]');
   const mapBox=await map.boundingBox(),labelBox=await label.boundingBox();
-  assert(mapBox&&labelBox,'Map and legend must exist');
+  const contextBox=await view.locator('.geo-canvas-info').boundingBox();
+  assert(mapBox&&labelBox&&contextBox,'Map, context row and legend must exist');
+  assert(contextBox.y>=mapBox.y+mapBox.height-1,
+   'Regional context must not float on top of the map');
+  assert(contextBox.y+contextBox.height<=labelBox.y+1,
+   'Regional context row must not cover the perimeter legend');
   assert(labelBox.y>=mapBox.y+mapBox.height-1,
    'The legend must appear BELOW the map, never over polygon or controls');
   assert(labelBox.x>=mapBox.x-1&&labelBox.x+labelBox.width<=mapBox.x+mapBox.width+2,
@@ -30,7 +35,12 @@ try{
   const small=page.locator('.geo-compact');
   const previewBox=await small.locator('.geo-map').boundingBox();
   const captionBox=await small.locator('[data-user-perimeter-visible=true]').boundingBox();
-  assert(previewBox&&captionBox);
+  const previewContextBox=await small.locator('.geo-canvas-info').boundingBox();
+  assert(previewBox&&captionBox&&previewContextBox);
+  assert(previewContextBox.y>=previewBox.y+previewBox.height-1,
+   'Compact context must not float over map geometry');
+  assert(previewContextBox.y+previewContextBox.height<=captionBox.y+1,
+   'Compact context must not obstruct source legend');
   assert(captionBox.y>=previewBox.y+previewBox.height-1,
    'Compact preview must not obscure map geometry');
   assert.match(await small.locator('[data-user-perimeter-visible=true]').innerText(),/NO OFICIAL/);
