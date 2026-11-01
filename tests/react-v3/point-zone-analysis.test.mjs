@@ -60,7 +60,7 @@ test('inner hole, concave notch and beyond perimeter are NOT assigned zones',()=
 });
 test('outer, hole and zone boundaries are marked review, not silently put into A or B',()=>{
  const s=scenario();
- const coords=[xy(.08,.5),xy(.15,.35),xy(.29,.5),xy(.5,.73)];
+ const coords=[xy(.08,.5),xy(.15,.35),xy(.29,.5),xy(.5,.5)];
  const r=analyzePointsInStudyAreas({layer:layer(coords.map((p,i)=>asPoint('Borde '+i,p))),scenario:s});
  assert.equal(r.summary.reviewCount,4);
  assert(r.points.every(p=>p.status==='review_boundary'&&p.zoneId===null));
