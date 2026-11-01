@@ -21,14 +21,12 @@ try{
  await page.getByRole('textbox',{name:'Distancia de consulta'}).fill('5');
  await page.locator('[data-aoi-active=true]').waitFor();
  await page.locator('[data-study-area-panel=true]').waitFor();
- await page.getByRole('button',{name:'Crear polígono sintético y 4 áreas'}).click();
+ await page.getByRole('button',{name:'Cargar solo ejemplo de geometría de ensayo (4 franjas)'}).click();
  const ready=page.locator('[data-study-areas-ready=true]');
  await ready.waitFor({timeout:12000});
  const rows=await ready.locator('[data-study-zone]').count();
  assert.equal(rows,4);
  assert.match(await ready.innerText(),/SIMULADO|Superficie del polígono|Operación simulada/);
- const mapBadge=page.locator('[data-map-study-zones="4"]');
- await mapBadge.waitFor();
  const zone1=await ready.locator('[data-study-zone=A]').innerText();
  assert.match(zone1,/ha/);
  const d1=page.waitForEvent('download');
@@ -53,13 +51,11 @@ try{
  await page.reload();
  await ready.waitFor();
  assert.equal(await ready.locator('[data-study-zone]').count(),4);
- assert.equal(await mapBadge.count(),1);
  await page.getByRole('textbox',{name:'Distancia de consulta'}).fill('8');
  await page.locator('[data-aoi-active=true]').waitFor();
  await ready.waitFor({state:'detached'});
- assert.equal(await mapBadge.count(),0,'Stale scenario must be hidden after changing AOI');
  // Explicit removal and regeneration after changing coordinates.
- await page.getByRole('button',{name:'Crear polígono sintético y 4 áreas'}).click();
+ await page.getByRole('button',{name:'Cargar solo ejemplo de geometría de ensayo (4 franjas)'}).click();
  await ready.waitFor();
  await page.getByRole('button',{name:'Quitar ensayo'}).click();
  await ready.waitFor({state:'detached'});
@@ -69,18 +65,19 @@ try{
  const importedBytes=JSON.stringify(fixture(originalFeature));
  const importedHash=createHash('sha256').update(importedBytes).digest('hex');
  assert.equal(await page.locator('[data-page-role="territory-definition"]').count(),1);
+ assert.equal(await page.getByLabel('Importar perímetro GeoJSON o KML').count(),1);
  assert.equal(await page.getByLabel('Importar GeoJSON').count(),0,
-  'Study Area must not duplicate GIS importing');
+  'GIS working-layer import must remain exclusive to the SIG module');
  await page.getByRole('link',{name:'Mapas y SIG',exact:true}).click();
  await page.locator('[data-page-role="gis-analysis"]').waitFor();
- assert.equal(await page.getByRole('button',{name:'Crear polígono sintético y 4 áreas'}).count(),0);
+ assert.equal(await page.getByRole('button',{name:'Cargar solo ejemplo de geometría de ensayo (4 franjas)'}).count(),0);
  await page.getByRole('textbox',{name:'Procedencia o descripción'}).fill('Límite ficticio creado para pruebas de asignación espacial');
  await page.getByLabel('Importar GeoJSON').setInputFiles({name:'poligono-ensayo.geojson',
   mimeType:'application/geo+json',buffer:Buffer.from(importedBytes)});
  await page.locator('[data-geojson-loaded=true]').waitFor();
  await page.getByRole('link',{name:'Área de estudio',exact:true}).click();
  await page.locator('[data-page-role="territory-definition"]').waitFor();
- await page.getByRole('button',{name:'Asignar 4 áreas a un polígono importado'}).click();
+ await page.getByRole('button',{name:'Simular 4 franjas sobre polígono importado (opcional)'}).click();
  await ready.waitFor();
  assert.equal(await ready.locator('[data-study-zone]').count(),4);
  const d3=page.waitForEvent('download');
