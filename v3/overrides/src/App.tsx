@@ -107,10 +107,12 @@ function AreaEstudio({data}:{data:DemoState}) {
     </div>
     <p className="v2-panel-note">En este módulo se declara la ventana de referencia, se caracteriza el territorio y se delimita un polígono de estudio con sus subáreas. Las consultas de capas WFS/WMS, el recorte y la importación GeoJSON se realizan exclusivamente en <Link to="/mapas">laboratorio cartográfico</Link>.</p>
    </Panel>
+   <Panel kicker="PASO 1 · PERÍMETRO DEL ESTUDIO" title="Importar o dibujar el contorno">
+    <PerimeterWorkbench aoi={aoi}/>
+   </Panel>
    <AoiWorkbench onChange={setAoi}/>
    <GeorefTerritory onFocus={setTerritoryFocus} onBoundary={setBoundary}/>
-   <Panel kicker="POLÍGONO DEL CASO · ZONIFICACIÓN" title="Delimitación y distribución de superficies">
-    <PerimeterWorkbench aoi={aoi}/>
+   <Panel kicker="PASO 3 · ZONIFICACIÓN OPCIONAL" title="Subáreas experimentales, solo a pedido">
     <StudyAreasWorkbench aoi={aoi}/>
    </Panel>
    <Panel kicker="VÍNCULOS AMBIENTALES · QA" title="Relación documental con las subáreas">
