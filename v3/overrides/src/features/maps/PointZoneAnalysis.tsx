@@ -2,7 +2,7 @@ import {useEffect,useMemo,useState,type ChangeEvent} from 'react';
 // @ts-ignore: shared local GeoJSON validation
 import {validateGeoJson} from './geojson-validate.mjs';
 import {Link} from 'react-router-dom';
-import {IS_DIABLILLOS_CASE} from '../../lib/demo';
+import {IS_DIABLILLOS_CASE,type DemoState} from '../../lib/demo';
 // @ts-ignore: GIS point classification is shared with Node tests
 import {analyzePointsInStudyAreas,analysisMatchesContext} from './point-zone-analysis.mjs';
 // @ts-ignore: browser/Node study scenario contract
@@ -42,7 +42,7 @@ function exportResult(report:Report){
  setTimeout(()=>URL.revokeObjectURL(url),500);
 }
 const mapEvent=(detail:unknown)=>window.dispatchEvent(new CustomEvent('ambienta:point-zone-map',{detail}));
-export function PointZoneAnalysis(){
+export function PointZoneAnalysis({data}:{data:DemoState}){
  const [revision,setRevision]=useState(0);
  const [report,setReport]=useState<Report|null>(null);
  const [override,setOverride]=useState<any|null>(null);
@@ -162,6 +162,6 @@ export function PointZoneAnalysis(){
     de estaciones ni el cumplimiento ambiental. No vincula automáticamente puntos a impactos, PGA
     o evidencias. El JSON contiene coordenadas que pueden ser sensibles.</p>
   </div>}
-  {result&&context.scenario&&<DocumentaryLinksPanel report={result} scenario={context.scenario}/>}
+  {result&&context.scenario&&<DocumentaryLinksPanel report={result} scenario={context.scenario} data={data}/>}
  </section>;
 }

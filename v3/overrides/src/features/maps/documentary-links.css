@@ -4,3 +4,11 @@
 .sig-doc-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.55rem;margin:1rem 0}.sig-doc-stats span{display:flex;align-items:baseline;gap:.4rem;padding:.7rem;background:rgba(114,180,184,.12);border-radius:10px;font-size:.78rem}.sig-doc-stats strong{font-size:1.35rem}.sig-doc-reviewer{display:grid;grid-template-columns:1fr 2fr;gap:.75rem}.sig-doc-reviewer label,.sig-doc-filter{display:flex;flex-direction:column;gap:.4rem;font-size:.82rem}.sig-doc-reviewer input,.sig-doc-filter select{background:rgba(11,30,41,.16);border:1px solid #709f9c;color:inherit;padding:.65rem;border-radius:8px;min-width:0}.sig-doc-filter{margin:.8rem 0;max-width:290px}.sig-doc-filter option{color:#17232b}
 .sig-doc-records{display:grid;gap:.5rem}.sig-doc-record{display:grid;grid-template-columns:minmax(115px,1fr) 2fr auto;gap:.7rem;padding:.75rem;border:1px solid rgba(122,173,176,.35);border-radius:10px;align-items:center;min-width:0}.sig-doc-record small{display:block;opacity:.78;font-size:.73rem;margin-top:.22rem;overflow-wrap:anywhere}.sig-doc-record strong{overflow-wrap:anywhere}.sig-doc-record b{font-size:.83rem}.sig-doc-decision{display:flex;gap:.35rem;flex-wrap:wrap}.sig-doc-error{color:#ffaaa9}.sig-doc-notice{color:#a5e5cd}
 @media(max-width:750px){.sig-doc-reviewer{grid-template-columns:1fr}.sig-doc-record{grid-template-columns:1fr}.sig-doc-stats{grid-template-columns:1fr}.sig-doc-actions>*{max-width:100%}}
+
+/* V3.7 integrity check: aligned with the existing GIS review cards. */
+.sig-doc-evidence{margin:1.2rem 0;padding:1rem;border:1px solid rgba(99,205,221,.5);border-radius:12px;background:rgba(77,161,161,.09)}
+.sig-doc-evidence .sig-doc-reviewer{grid-template-columns:repeat(2,minmax(0,1fr));margin:.8rem 0}
+.sig-doc-evidence .sig-doc-reviewer select,.sig-doc-evidence .sig-doc-reviewer input{width:100%;max-width:100%}
+.sig-doc-evidence .sig-doc-notice{border:1px solid #6cba94;padding:.85rem;border-radius:10px;background:rgba(110,215,157,.08)}
+.sig-doc-evidence button{border:1px solid #72ada8;border-radius:8px;padding:.5rem .75rem;font:inherit;color:inherit;background:rgba(30,77,82,.35);cursor:pointer}
+@media(max-width:750px){.sig-doc-evidence .sig-doc-reviewer{grid-template-columns:1fr}}

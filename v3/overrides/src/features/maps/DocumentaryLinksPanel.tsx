@@ -1,6 +1,7 @@
 import {useEffect,useState,type ChangeEvent} from 'react';
 import {Link} from 'react-router-dom';
-import {IS_DIABLILLOS_CASE} from '../../lib/demo';
+import {IS_DIABLILLOS_CASE,type DemoState} from '../../lib/demo';
+import {ExistingEvidenceVerifier} from './ExistingEvidenceVerifier';
 // @ts-ignore: pure Node/browser contract
 import {proposeDocumentLinks,reviewDocumentLink,matchesDocumentContext,exportDocumentReview} from './documentary-links.mjs';
 import './documentary-links.css';
@@ -10,7 +11,7 @@ type Entry={recordId:string;recordType:string;pointRef:string;zoneId:string|null
  reviewer:string;reason:string;reviewedAt:string;decision:string}};
 type Proposal={schema:string;origin:{inputSha256:string;scenarioSha256:string;scenarioCreatedAt:string;
  scenarioBbox:number[]};entries:Entry[]};
-type Props={report:any;scenario:any};
+type Props={report:any;scenario:any;data:DemoState};
 export const DOC_REVIEW_KEY=IS_DIABLILLOS_CASE?
  'ambienta-documentary-review-diablillos-v36':'ambienta-documentary-review-demo-v36';
 const labels:Record<string,string>={
@@ -22,7 +23,7 @@ function download(name:string,value:unknown){
  const el=document.createElement('a');el.href=url;el.download=name;document.body.appendChild(el);el.click();el.remove();
  setTimeout(()=>URL.revokeObjectURL(url),500);
 }
-export function DocumentaryLinksPanel({report,scenario}:Props){
+export function DocumentaryLinksPanel({report,scenario,data}:Props){
  const [records,setRecords]=useState<any[]|null>(null);
  const [proposals,setProposals]=useState<Proposal|null>(null);
  const [reviewer,setReviewer]=useState('');
@@ -146,6 +147,7 @@ export function DocumentaryLinksPanel({report,scenario}:Props){
    </article>)}</div>
    {shown.length>80&&<small>La lista presenta 80 entradas; el archivo exportado incluye todas.</small>}
    {!shown.length&&<p>Sin registros con ese estado.</p>}
+   <ExistingEvidenceVerifier proposals={current} report={report} data={data}/>
    <div className="sig-doc-actions">
     <button type="button" onClick={exportReport}>Exportar auditoría JSON</button>
     <button type="button" onClick={saveSummary}>Guardar resumen QA para Monitoreo</button>
