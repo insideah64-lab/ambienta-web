@@ -21,6 +21,7 @@ import { GeoMap } from './features/maps/GeoMap';
 import { PointZoneAnalysis } from './features/maps/PointZoneAnalysis';
 import { DocumentaryReviewSummary } from './features/maps/DocumentaryReviewSummary';
 import { MeasurementWorkbench } from './features/monitoring/MeasurementWorkbench';
+import { StationLocationSummary } from './features/monitoring/StationLocationSummary';
 import { StudyAreasWorkbench } from './features/maps/StudyAreasWorkbench';
 import './area-gis-pages.css';
 import { SpatialLinksPanel } from './features/maps/SpatialLinksPanel';
@@ -227,6 +228,7 @@ function Monitoreo({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKin
         <td><Badge tone={i.result==='pendiente'?'amber':'mint'}>{i.result}</Badge></td></tr>)}</tbody></table></div>
     <p className="v2-panel-note">No existen mediciones de calidad del aire cargadas en esta demostración.</p>
     <MeasurementWorkbench data={data}/>
+    <StationLocationSummary data={data}/>
     <SpatialLinksPanel data={data} mode="inspection"/>
     <DocumentaryReviewSummary data={data}/>
   </Panel>;

@@ -11,6 +11,7 @@ import {restoreStudyScenario,studyAreaStorageKey} from './study-areas.mjs';
 import {readPointAoi,aoiKey} from './aoi-model.mjs';
 import './point-zone-analysis.css';
 import {DocumentaryLinksPanel} from './DocumentaryLinksPanel';
+import {StationLinkPanel} from './StationLinkPanel';
 
 type Row={ref:string;name:string;coordinate:number[];status:string;zoneId:string|null;reason:string};
 type Report={schema:string;points:Row[];status:string;
@@ -163,5 +164,6 @@ export function PointZoneAnalysis({data}:{data:DemoState}){
     o evidencias. El JSON contiene coordenadas que pueden ser sensibles.</p>
   </div>}
   {result&&context.scenario&&<DocumentaryLinksPanel report={result} scenario={context.scenario} data={data}/>}
+  {result&&context.scenario&&<StationLinkPanel report={result} layer={context.layer} scenario={context.scenario} data={data}/>}
  </section>;
 }
