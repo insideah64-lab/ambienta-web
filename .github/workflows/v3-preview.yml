@@ -55,6 +55,7 @@ jobs:
           node apps/web-v3/scripts/perimeter-editor-smoke.mjs
           node apps/web-v3/scripts/diablillos-reference-qa-smoke.mjs
           node apps/web-v3/scripts/perimeter-legend-smoke.mjs
+          node apps/web-v3/scripts/desktop-readability-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
           node apps/web-v3/scripts/area-gis-separation-smoke.mjs
           node apps/web-v3/scripts/point-zone-analysis-smoke.mjs
@@ -70,6 +71,14 @@ jobs:
           path: qa/diablillos-v353/screenshots/
           retention-days: 30
           if-no-files-found: warn
+      - name: Capturas de legibilidad web de escritorio
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-v355-desktop-capturas
+          path: qa/ambienta-v355-desktop/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Keep QA build (not a deployment)
         if: always()
         uses: actions/upload-artifact@v4
