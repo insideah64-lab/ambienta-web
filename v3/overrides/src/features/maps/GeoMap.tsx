@@ -40,7 +40,7 @@ type WorkingLayer={
  |{category:'georef-centroids';sourceUrl:string;retrievedAt:string;license:'CC BY 4.0';verification:'api_centroids_not_boundaries'}
  |{category:'idesa-wfs';sourceUrl:string;retrievedAt:string;typeName:string;verification:'official_wfs_query_not_project_boundary';hashScope:'raw_upstream_wfs_response'};
 };
-const PUNA_CENTER:[number,number]=[-67.2,-24.7];
+const PUNA_CENTER:[number,number]=[-66.833333,-25.3];
 const SALTA_CENTER:[number,number]=[-65.45,-24.82];
 const SIG_GATEWAY_URL=(import.meta.env.VITE_SIG_GATEWAY_URL||SIG_API_BASE).trim();
 const SIG_GATEWAY_TOKEN=(import.meta.env.VITE_SIG_GATEWAY_TOKEN||SIG_API_ANON).trim();
