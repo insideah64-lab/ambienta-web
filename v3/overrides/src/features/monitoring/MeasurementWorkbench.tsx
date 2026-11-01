@@ -99,8 +99,8 @@ export function MeasurementWorkbench({data}:Props){
      {select('qualifier','Calificador del resultado',MEASUREMENT_QUALIFIERS.map((x:string)=>({value:x,label:qualifierLabels[x]})))}
      {select('unit','Unidad',MEASUREMENT_UNITS.map((x:string)=>({value:x,label:x})))}
      {form.qualifier==='quantified'&&field('value','Valor numérico declarado',true,'number')}
-     {field('detectionLimit','Límite de detección (LDM)','', 'number')}
-     {field('quantificationLimit','Límite de cuantificación (LCM)','', 'number')}
+     {field('detectionLimit','Límite de detección (LDM)',false,'number')}
+     {field('quantificationLimit','Límite de cuantificación (LCM)',false,'number')}
      {field('uncertainty','Incertidumbre absoluta opcional',false,'number')}
      {field('collectedAt','Fecha y hora de toma',true,'datetime-local')}
      {field('analyzedAt','Fecha y hora de análisis opcional',false,'datetime-local')}
