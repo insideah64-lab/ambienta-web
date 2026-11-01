@@ -117,7 +117,8 @@ export function PerimeterWorkbench({aoi}:Props){
    Activá «Dibujar perímetro», agregá vértices alrededor del área y cerrá el dibujo.
    No es obligatorio crear un rectángulo ni dividirlo en cuatro franjas.</p>
   <PerimeterDrawMap vertices={vertices} onAdd={addVertex} enabled={drawing}
-   center={aoi?.center??null} bounds={bounds??null}/>
+   center={aoi?.center??null} bounds={bounds??null}
+   perimeter={candidate?.geojson??saved?.geojson??null}/>
   <div className="geo-perimeter-meta">
    <span data-perimeter-vertices="true">{vertices.length} vértices del trazado actual</span>
    {candidate&&<span data-perimeter-candidate="true">Fuente preparada: {candidate.sourceName} ·
