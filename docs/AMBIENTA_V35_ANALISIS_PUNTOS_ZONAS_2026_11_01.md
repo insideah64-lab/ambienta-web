@@ -10,7 +10,7 @@ No hay un segundo editor de perímetros, de ventana o de subáreas en SIG. Tampo
 
 ## Método y resultados
 
-La operación admite exclusivamente FeatureCollection de **Point/MultiPoint** EPSG:4326 ya importados en la herramienta SIG (el límite de la capa sigue siendo 100 entidades y 12.000 vértices). Cada punto obtiene una referencia determinista F1, F2…; los componentes MultiPoint usan F1:P1, F1:P2.
+La operación admite exclusivamente FeatureCollection de **Point/MultiPoint** EPSG:4326 como capa de trabajo SIG **o como archivo puntual independiente cargado en memoria** (el límite de la capa sigue siendo 100 entidades y 12.000 vértices). Cada punto obtiene una referencia determinista F1, F2…; los componentes MultiPoint usan F1:P1, F1:P2.
 
 Se calcula la relación geométrica con el perímetro original y luego con cada subárea A–D:
 - **inside_zone:** un único interior de zona confirmado sin estar en sus límites;
@@ -19,6 +19,8 @@ Se calcula la relación geométrica con el perímetro original y luego con cada 
 - **review_topology:** conflicto de solapamiento o falta de cobertura de las subáreas para un punto interior, siempre pendiente de revisión.
 
 Las subáreas pueden ser Polygon o MultiPolygon. Se aplica prueba de cruce de rayos y detección explícita de segmento para anillos. Las relaciones en límites nunca se asignan automáticamente: la tolerancia angular del laboratorio no equivale a un control de precisión instrumental, datum ni mensura geodésica.
+
+Un archivo puntual independiente se valida localmente (hasta 1 MiB), se identifica por su SHA-256 y no reemplaza la capa de trabajo que puede contener el perímetro original. Esto permite cotejar un polígono importado contra puntos distintos sin perder la fuente del perímetro.
 
 El mapa MapLibre muestra una **superposición de puntos derivados en memoria** con las categorías de colores A ámbar / B cian / C violeta / D verde, gris para exteriores y naranja para revisión. También hay tabla filtrable, contadores y descarga JSON con todos los puntos, coordenadas, origen SHA-256, alcance del hash, BBOX, huella del escenario, método y advertencias. No se guarda esa capa derivada en `localStorage`, ni se reescribe el GeoJSON importado.
 
@@ -30,7 +32,7 @@ El mapa MapLibre muestra una **superposición de puntos derivados en memoria** c
 4. Exportar JSON y comparar SHA-256 de la fuente, geometrias fuente sin modificar, estados de puntos y suma de contadores.
 5. Regresar a Área, cambiar BBOX y confirmar que SIG no ofrece ninguna asignación anterior, que se oculta la superposición y que el informe debe recalcularse contra el contexto actual.
 
-**Pruebas:** `tests/react-v3/point-zone-analysis.test.mjs` (módulo puro) y `v3/overrides/scripts/point-zone-analysis-smoke.mjs` (Chromium), incluidas en `.github/workflows/v3-preview.yml`. El pipeline preserva los hashes originales V1/V2 y ejecuta los ensayos previos de cartografía, subáreas, IDESA simulado, Georef y los 16 vínculos documentales del caso.
+**Pruebas:** `tests/react-v3/point-zone-analysis.test.mjs` (módulo puro), `v3/overrides/scripts/point-zone-analysis-smoke.mjs` (Chromium para 10 puntos) y `v3/overrides/scripts/point-zone-imported-source-smoke.mjs` (Chromium para perímetro importado más fuente puntual independiente), incluidas en `.github/workflows/v3-preview.yml`. El pipeline preserva los hashes originales V1/V2 y ejecuta los ensayos previos de cartografía, subáreas, IDESA simulado, Georef y los 16 vínculos documentales del caso.
 
 ## Restricciones científicas
 
