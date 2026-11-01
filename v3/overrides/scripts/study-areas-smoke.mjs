@@ -68,10 +68,18 @@ try{
  // zones without overwriting its uncut original.
  const importedBytes=JSON.stringify(fixture(originalFeature));
  const importedHash=createHash('sha256').update(importedBytes).digest('hex');
+ assert.equal(await page.locator('[data-page-role="territory-definition"]').count(),1);
+ assert.equal(await page.getByLabel('Importar GeoJSON').count(),0,
+  'Study Area must not duplicate GIS importing');
+ await page.getByRole('link',{name:'Mapas y SIG',exact:true}).click();
+ await page.locator('[data-page-role="gis-analysis"]').waitFor();
+ assert.equal(await page.getByRole('button',{name:'Crear polígono sintético y 4 áreas'}).count(),0);
  await page.getByRole('textbox',{name:'Procedencia o descripción'}).fill('Límite ficticio creado para pruebas de asignación espacial');
  await page.getByLabel('Importar GeoJSON').setInputFiles({name:'poligono-ensayo.geojson',
   mimeType:'application/geo+json',buffer:Buffer.from(importedBytes)});
  await page.locator('[data-geojson-loaded=true]').waitFor();
+ await page.getByRole('link',{name:'Área de estudio',exact:true}).click();
+ await page.locator('[data-page-role="territory-definition"]').waitFor();
  await page.getByRole('button',{name:'Asignar 4 áreas a un polígono importado'}).click();
  await ready.waitFor();
  assert.equal(await ready.locator('[data-study-zone]').count(),4);
@@ -81,6 +89,9 @@ try{
  assert.equal(importedZones.properties.ambientaStudyAreas.sourceSha256,importedHash);
  assert.equal(importedZones.properties.ambientaStudyAreas.kind,'imported');
  assert.equal(importedZones.features.length,4);
+ await page.getByRole('link',{name:'Mapas y SIG',exact:true}).click();
+ await page.locator('[data-page-role="gis-analysis"]').waitFor();
+ await page.locator('[data-map-study-zones="4"]').waitFor();
  const d4=page.waitForEvent('download');
  await page.getByRole('button',{name:'Exportar GeoJSON depurado'}).click();
  const intact=JSON.parse(fs.readFileSync(await (await d4).path(),'utf8'));
