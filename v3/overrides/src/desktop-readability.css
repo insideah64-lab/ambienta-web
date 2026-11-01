@@ -293,3 +293,56 @@
 @media(min-width:1100px) and (max-width:1240px){
  .ref-shell .ref-attention-top{flex-wrap:wrap}
 }
+
+
+/* V3.5.8 — DESKTOP compact linked documentary indicators.
+   No invented completion bars. Preserve the written status as the source of truth. */
+@media(min-width:1100px){
+ .ref-shell .ref-metric-section{display:grid;gap:9px;min-width:0}
+ .ref-shell .ref-metric-section-head{display:flex;justify-content:space-between;
+  align-items:center;gap:16px;flex-wrap:wrap}
+ .ref-shell .ref-metric-section-head h2{
+  font-size:17px!important;line-height:1.3;margin:0;color:#ebf9f4;
+ }
+ .ref-shell .ref-metric-section-head p{
+  font-size:13px!important;line-height:1.4;margin:0;color:#aaccce;
+ }
+ .ref-shell .ref-metrics.v2-metrics{gap:12px}
+ .ref-shell .ref-metric.v2-metric{
+  display:flex;align-items:center;min-height:86px;
+  padding:13px 14px;gap:11px;border-radius:10px;
+  text-decoration:none;color:#f2fff8;
+  transition:background .15s ease,border-color .15s ease;
+ }
+ .ref-shell .ref-metric.v2-metric:hover,
+ .ref-shell .ref-metric.v2-metric:focus-visible{
+  background:#1c414b;border-color:#8bd8c6;
+ }
+ .ref-shell .ref-metric.v2-metric:focus-visible{
+  outline:2px solid #8ef0d4;outline-offset:2px;
+ }
+ .ref-shell .ref-metric .v2-metric-icon{
+  flex:0 0 40px;width:40px;height:40px;border-radius:9px;
+ }
+ .ref-shell .ref-metric .v2-metric-icon svg{width:22px;height:22px}
+ .ref-shell .ref-metric-body{
+  flex:1;display:grid;gap:5px;min-width:0;
+ }
+ .ref-shell .ref-metric .ref-metric-top{display:flex;gap:8px;
+  justify-content:space-between;align-items:center;min-width:0}
+ .ref-shell .ref-metric .ref-metric-label{
+  font-size:12px!important;line-height:1.35;letter-spacing:.055em;
+  font-weight:800;color:#c8dfe1;overflow-wrap:anywhere;
+ }
+ .ref-shell .ref-metric.v2-metric .ref-metric-top>strong{
+  flex:none;margin:0;font-size:28px!important;line-height:1;
+  color:#f6fff9;
+ }
+ .ref-shell .ref-metric .ref-metric-subtitle{
+  font-size:12px!important;color:#bcd4d2;line-height:1.4;
+  white-space:normal;overflow-wrap:anywhere;
+ }
+ .ref-shell .ref-metric-link-arrow{
+  flex:none;color:#79dfc3;opacity:.8;width:16px;height:16px;
+ }
+}
