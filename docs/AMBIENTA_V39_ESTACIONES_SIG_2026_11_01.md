@@ -33,3 +33,9 @@ Los próximos requisitos son autenticación/autorización, políticas de custodi
 - Cuando la capa original no está accesible desde Monitoreo (por ejemplo, importación puntual temporal solo en memoria de Mapas y SIG), **no** indica vínculos verificados ni reutiliza la ubicación; invita a reimportar el GeoJSON en el módulo GIS. Esto impide adjudicar coordenadas no conservadas en expediente.
 - `MeasurementWorkbench.tsx` emite `ambienta:measurements-updated` al guardar/anular para invalidar la vista inmediatamente. No modifica el dominio V1/V2 ni crea datos ambientales.
 - `station-links-smoke.mjs` comprueba la consulta y su invalidez al anular una muestra en la misma sesión.
+
+
+## Validación final de código
+La ejecución [GitHub Actions #41339090035](https://github.com/insideah64-lab/ambienta-web/actions/runs/41339090035) finalizó **SUCCESS** sobre SHA `9d9b13a18eee4024f78f4d62f11be4dff7de93a2`. Contiene compilación inmutable de V1/V2, build V3, pruebas Node de estaciones y módulos anteriores, controles de SHA y todos los flujos Chromium incluido `station-links-smoke.mjs` con Monitoreo, aceptación manual, exportación e invalidación. Los cambios posteriores a ese SHA son documentales.
+
+**Promoción:** PR #13 continúa draft. V3.5 es la versión pública; no mezclar la aceptación QA de una estación con verificación geográfica oficial.
