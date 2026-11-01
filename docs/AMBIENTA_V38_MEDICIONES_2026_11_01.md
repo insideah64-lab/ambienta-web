@@ -36,3 +36,7 @@ La futura integración con expediente real requiere almacenamiento seguro con au
 - [PR V3.8 #12](https://github.com/insideah64-lab/ambienta-web/pull/12)
 - Checkpoint preliminar: `backup/ambienta-v38-mediciones-checkpoint-2026-11-01`
 - Mantener V3.5 como web pública estable hasta ratificación.
+
+
+## Cierre de QA V3.8
+[GitHub Actions #41336486845](https://github.com/insideah64-lab/ambienta-web/actions/runs/41336486845) terminó **SUCCESS** sobre código commit `08bdbee71f5230ee9349eddc2521aa3e42df81d2`. Se completaron compilación React V3, pruebas Node nativas de mediciones, ensayos anteriores SIG/V3.6/V3.7, Chromium incluyendo `measurements-smoke.mjs`, comparación de hashes de V1/V2 y artefacto de QA. Los cambios posteriores a ese código son únicamente documentación y registro de continuidad. PR #12 sigue en borrador, sin fusionar a `main`.
