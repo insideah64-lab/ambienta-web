@@ -19,6 +19,8 @@ try{
  await page.getByRole('textbox',{name:'Longitud de consulta'}).fill(String(cachi.centroide.lon));
  await page.getByRole('textbox',{name:'Distancia de consulta'}).fill('10');
  await page.locator('[data-aoi-active="true"]').waitFor();
+ await page.getByRole('link',{name:'Mapas y SIG',exact:true}).click();
+ await page.locator('[data-page-role="gis-analysis"]').waitFor();
  await page.getByRole('button',{name:'Consultar centroides departamentales Georef · Salta'}).click();
  await page.locator('[data-georef-centroids="true"]').waitFor({timeout:20000});
  const state=page.locator('[data-aoi-clip="clipped_local"]');
