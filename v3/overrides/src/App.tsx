@@ -18,6 +18,7 @@ import { DemoActionDialog, type DemoActionKind } from './features/demo/DemoActio
 import { CloudWorkspace } from './features/cloud/CloudWorkspace';
 import { ReferenceDashboard } from './features/dashboard/ReferenceDashboard';
 import { GeoMap } from './features/maps/GeoMap';
+import { PointZoneAnalysis } from './features/maps/PointZoneAnalysis';
 import { StudyAreasWorkbench } from './features/maps/StudyAreasWorkbench';
 import './area-gis-pages.css';
 import { SpatialLinksPanel } from './features/maps/SpatialLinksPanel';
@@ -124,6 +125,7 @@ function MapasSIG({data}:{data:DemoState}){
   <Panel kicker="MAPAS Y SIG · ANÁLISIS" title="Laboratorio cartográfico y geoprocesamiento">
    <p className="v2-panel-note">Este módulo concentra las bases cartográficas, consulta de datos IDESA/Georef, capas WMS, importación GeoJSON, recortes topológicos, revisión y exportación. La ventana AOI y el polígono de ensayo proceden de <Link to="/area">la definición territorial</Link> y no se redefinen aquí.</p>
    <GeoMap province={data.project.province}/>
+   <PointZoneAnalysis/>
    <p className="v2-panel-note">Las cuatro subáreas son capas visibles de solo lectura. Para cambiar el perímetro, asignar zonas o revisar superficies, <Link to="/area">volvé al módulo de delimitación</Link>. Ninguna ventana de consulta ni geometría importada constituye automáticamente un perímetro ambiental acreditado.</p>
   </Panel>
  </div>;

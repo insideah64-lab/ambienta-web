@@ -156,6 +156,8 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
  const [ignProblem,setIgnProblem]=useState('');
  const ignTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  const [layer,setLayer]=useState<WorkingLayer|null>(stored);
+ const [pointReport,setPointReport]=useState<{points:{ref:string;coordinate:number[];status:string;zoneId:string|null}[];
+  summary:{insideCount:number;outsideCount:number;reviewCount:number}}|null>(null);
  const [scenario,setScenario]=useState<StudyAreaRecord|null>(()=>restoreStudyScenario(
   STUDY_KEY,(readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null)?.bbox,
   stored()?.sha256||null) as StudyAreaRecord|null);
@@ -224,6 +226,33 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
   }
  },[boundary]);
  useEffect(()=>{if(aoi!==undefined)setAoiLocal(aoi);},[aoi]);
+ useEffect(()=>{
+  const receive=(event:Event)=>{
+   const value=(event as CustomEvent).detail;
+   setPointReport(value&&Array.isArray(value.points)?value:null);
+  };
+  window.addEventListener('ambienta:point-zone-map',receive);
+  return ()=>window.removeEventListener('ambienta:point-zone-map',receive);
+ },[]);
+ useEffect(()=>{
+  const map=mapRef.current;
+  if(!map?.getLayer('osm-base-raster'))return;
+  if(map.getLayer('point-zone-analysis-markers'))map.removeLayer('point-zone-analysis-markers');
+  if(map.getSource('point-zone-analysis-src'))map.removeSource('point-zone-analysis-src');
+  if(!pointReport)return;
+  const collection={type:'FeatureCollection',features:pointReport.points.map(p=>({
+   type:'Feature',properties:{ref:p.ref,status:p.status,zoneId:p.zoneId||''},
+   geometry:{type:'Point',coordinates:p.coordinate}
+  }))};
+  map.addSource('point-zone-analysis-src',{type:'geojson',data:collection as never});
+  map.addLayer({id:'point-zone-analysis-markers',type:'circle',source:'point-zone-analysis-src',
+   paint:{'circle-radius':8,'circle-stroke-width':2,'circle-stroke-color':'#123139',
+    'circle-color':['match',['get','status'],
+     'inside_zone',['match',['get','zoneId'],'A','#f4b466','B','#63cddd',
+      'C','#b8a2f6','D','#8de0a7','#dee9d8'],
+     'outside_perimeter','#b8c6d1','review_boundary','#ff8658',
+     'review_topology','#ff8658','#eee1b9'] as never}});
+ },[pointReport,status]);
  // Share geography with Area de estudio, without duplicating its editor.
  // Mapas y SIG reads validated source layers; it owns WFS/import/clip tooling.
  useEffect(()=>{
@@ -431,6 +460,9 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
      {boundaryLocal&&<span className="geo-layer-working" data-map-boundary="unverified">Límite administrativo <small>Local · No verificado</small></span>}
     <span className="geo-layer-active">{basemap==='osm'?'Base OSM':basemap==='ign'?'Argenmap IGN':'IGN topográfico'} <small>{basemap==='osm'?'Activa':ignTiles?'Teselas recibidas':'Solicitando teselas'}</small></span>
     {validScenario&&<span className="geo-layer-working" data-map-study-zones="4">4 subáreas simuladas <small>Polígono de ensayo · NO oficial</small></span>}
+    {pointReport&&<span className="geo-layer-working" data-map-point-analysis="active">
+     Clasificación puntual <small>{pointReport.summary.insideCount} dentro · {pointReport.summary.outsideCount} fuera · {pointReport.summary.reviewCount} revisar</small>
+    </span>}
     {layer&&<span className="geo-layer-working">{layer.metadata?.category==='hydrology'?'Capa hídrica local':layer.metadata?.category==='georef-centroids'?'Centroides Georef':'GeoJSON local'} <small>{layer.metadata?.category==='georef-centroids'?'Referencia administrativa, no perímetro':'No verificado'}</small></span>}
     <span className="geo-layer-disabled" title="No hay productos ambientales vinculados">NDVI <small>Sin datos</small></span>
     {layer?.metadata?.category==='hydrology'?<span className="geo-layer-working" data-hydro-active="unverified">Hidrología <small>Declarada · no validada</small></span>:<span className="geo-layer-disabled" title="Falta integrar capa hidrográfica oficial">Hidrología <small>Sin datos</small></span>}
