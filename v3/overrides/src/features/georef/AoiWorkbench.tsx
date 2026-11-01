@@ -32,10 +32,12 @@ export function AoiWorkbench({onChange}:Props){
   try{localStorage.setItem(key,JSON.stringify(saved));}
   catch{setError('No se pudo guardar la ventana local.');return;}
   setActive(saved);onChange(saved);
+  window.dispatchEvent(new Event('ambienta:spatial-updated'));
  },[lat,lon,km]);
  function clear(){
   localStorage.removeItem(key);setActive(null);onChange(null);
   setLat('');setLon('');setKm('5');setError('');
+  window.dispatchEvent(new Event('ambienta:spatial-updated'));
  }
  return <section className="v2-aoi" aria-label="Recorte automático por coordenadas" data-aoi-workbench="true">
   <header><strong>Recorte automático por coordenadas</strong>
