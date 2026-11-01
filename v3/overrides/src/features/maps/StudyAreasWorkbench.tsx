@@ -116,6 +116,11 @@ export function StudyAreasWorkbench({aoi}:{aoi:PointAoi|null}){
    </div>
    {imported&&<small data-study-import-ready="true">Disponible desde SIG: {imported.label}. La procedencia declarada no acredita carácter oficial.</small>}
    {!aoi&&<p role="status">Primero completá las coordenadas y la distancia de consulta.</p>}
+   {IS_DIABLILLOS_CASE&&valid?.sourceKind==='synthetic'&&<p role="status" data-diablillos-demo-polygon="true" className="v2-panel-note">
+    <strong>Polígono de demostración Diablillos — NO OFICIAL.</strong> Se muestra el ensayo centrado en
+    latitud −24,70°, longitud −67,20° y ventana nominal de 5 km, con perímetro irregular,
+    un hueco y cuatro subáreas. No delimita una concesión minera ni un área de influencia validada.
+   </p>}
    {valid&&<div className="geo-study-results" data-study-areas-ready="true">
     <div className="geo-study-total">
      <div><small>Superficie del polígono de ensayo</small>
