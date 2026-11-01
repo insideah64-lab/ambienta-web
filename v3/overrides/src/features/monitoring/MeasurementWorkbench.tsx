@@ -55,6 +55,7 @@ export function MeasurementWorkbench({data}:Props){
   if(!latest.book||JSON.stringify(latest.book)!==JSON.stringify(previous))
    throw Error('Los datos cambiaron en otra pestaña. Actualizá antes de editar.');
   localStorage.setItem(key,JSON.stringify(next));setRevision(x=>x+1);
+  window.dispatchEvent(new Event('ambienta:measurements-updated'));
  }
  function submit(e:FormEvent<HTMLFormElement>){
   e.preventDefault();setError('');setNotice('');if(!book)return;
