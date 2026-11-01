@@ -1,0 +1,171 @@
+/* AMBIENTA V3.5.5 — desktop-first readability pass.
+   Affects only desktop viewports; no mobile design or data migration.
+   The 8–11px reference/mockup type scale is not suitable for working reports. */
+@media (min-width:1100px){
+  .ref-shell.v2-app{
+    grid-template-columns:270px minmax(0,1fr) !important;
+    font-size:15px !important;
+    line-height:1.5;
+  }
+  .ref-shell .v2-sidebar{padding:23px 14px 18px}
+  .ref-shell .v2-brand{margin:0 10px 32px}
+  .ref-shell .v2-brand strong{font-size:23px !important}
+  .ref-shell .v2-brand small{font-size:11px !important;letter-spacing:.07em}
+  .ref-shell .v2-sidebar-title{font-size:12px !important;letter-spacing:.08em;padding-left:13px}
+  .ref-shell .v2-nav{gap:4px}
+  .ref-shell .v2-nav-item,
+  .ref-shell .ref-tool-nav .v2-nav-item{
+    min-height:45px;height:auto;padding:9px 13px;gap:13px;
+    font-size:15px !important;font-weight:620;line-height:1.3;
+  }
+  .ref-shell .v2-nav-item svg{width:19px;height:19px}
+  .ref-shell .v2-sidebar-base strong{font-size:14px !important}
+  .ref-shell .v2-sidebar-base small,.ref-shell .v2-sidebar-base a{font-size:12px !important;line-height:1.4}
+  .ref-shell .v2-topbar{height:64px !important;padding-inline:25px}
+  .ref-shell .v2-breadcrumb,.ref-shell .v2-location,
+  .ref-shell .ref-user-chip strong{font-size:13px !important}
+  .ref-shell .v2-content{padding:22px clamp(22px,2vw,38px) 30px;min-width:0}
+  .ref-shell .v2-page-intro h1{font-size:36px !important}
+  .ref-shell .v2-page-intro p:not(.v2-kicker){font-size:16px !important;line-height:1.5}
+  .ref-shell .v2-kicker{font-size:12px !important;letter-spacing:.075em}
+  .ref-shell .v2-warning p,.ref-shell .v2-case-banner{font-size:14px !important;line-height:1.5}
+  .ref-shell .v2-panel{padding:23px}
+  .ref-shell .v2-panel-title h2{font-size:20px !important}
+  .ref-shell .v2-panel-note,.ref-shell .v2-caption,
+  .ref-shell .v2-project-code,.ref-shell .v2-inline-notice,
+  .ref-shell .v2-project-footer{font-size:14px !important;line-height:1.55}
+  .ref-shell .v2-info small,.ref-shell .v2-project-fields small{font-size:13px !important}
+  .ref-shell .v2-info strong{font-size:15px !important}
+  .ref-shell .v2-badge{font-size:12px !important}
+  .ref-shell .v2-measure-copy strong,
+  .ref-shell .v2-activity strong,.ref-shell .v2-audit-item{font-size:15px !important}
+  .ref-shell .v2-measure-copy small,.ref-shell .v2-activity p,
+  .ref-shell .v2-activity small{font-size:13px !important}
+  .ref-shell .v2-select-label{font-size:14px !important}
+  .ref-shell .v2-select-label select,.ref-shell .v2-search input,
+  .ref-shell .v2-action-button,.ref-shell .v2-primary,
+  .ref-shell .v2-export{font-size:15px !important}
+  .ref-shell .v2-table th{font-size:13px !important}
+  .ref-shell .v2-table td,.ref-shell .v2-table td strong{font-size:15px !important}
+  .ref-shell .v2-table td small{font-size:13px !important}
+  .ref-shell .v2-table th,.ref-shell .v2-table td{padding:15px 12px}
+  .ref-shell .v2-footer{font-size:13px !important}
+  .ref-shell .v2-empty{font-size:15px !important}
+
+  /* Project identity and KPI summary: larger type, less compressed metrics. */
+  .ref-shell .ref-dashboard{gap:20px}
+  .ref-shell .ref-hero{min-height:207px;gap:23px}
+  .ref-shell .ref-hero-copy{padding:24px 30px}
+  .ref-shell .ref-hero-label{font-size:12px !important;padding:8px 13px}
+  .ref-shell .ref-hero h1{font-size:clamp(32px,2.2vw,39px) !important;line-height:1.15;margin:14px 0}
+  .ref-shell .ref-hero-meta{font-size:14px !important;gap:10px 18px}
+  .ref-shell .ref-hero-tags{margin-top:15px;gap:10px}
+  .ref-shell .ref-hero-tags span{font-size:13px !important;padding:6px 11px}
+  .ref-shell .ref-hero-location{width:250px;min-height:150px;margin:15px 18px 15px 0;padding:16px}
+  .ref-shell .ref-location-copy small{font-size:12px !important}
+  .ref-shell .ref-location-copy strong{font-size:15px !important}
+  .ref-shell .ref-location-copy>span{font-size:13px !important}
+  .ref-shell .ref-location-copy a{font-size:13px !important}
+  .ref-shell .ref-metrics.v2-metrics{gap:16px;grid-template-columns:repeat(4,minmax(0,1fr))}
+  .ref-shell .ref-metric.v2-metric{min-height:137px;padding:18px;gap:15px}
+  .ref-shell .ref-metric .v2-metric-icon{width:54px;height:54px}
+  .ref-shell .ref-metric.v2-metric p{font-size:13px !important;letter-spacing:.045em;line-height:1.35}
+  .ref-shell .ref-metric.v2-metric strong{font-size:36px !important;line-height:1.1;margin:7px 0 5px}
+  .ref-shell .ref-metric.v2-metric .ref-metric-body>span{font-size:13px !important;line-height:1.5}
+  .ref-shell .ref-metric-track{height:7px;margin-top:12px}
+
+  /* Panels: readable labels take precedence over showing everything above fold. */
+  .ref-shell .ref-dashboard-columns{gap:20px}
+  .ref-shell .ref-dashboard-column{gap:20px}
+  .ref-shell .ref-panel-head{height:auto;min-height:57px;padding:13px 20px;gap:14px}
+  .ref-shell .ref-panel-head h2{font-size:18px !important;line-height:1.3}
+  .ref-shell .ref-panel-head a,.ref-shell .ref-panel-muted{font-size:13px !important}
+  .ref-shell .ref-map-panel .geo-compact .geo-map{height:365px}
+  .ref-shell .ref-panel-foot{font-size:12px !important;line-height:1.5;padding:12px 17px}
+  .ref-shell .ref-commitment-list{padding:4px 19px}
+  .ref-shell .ref-commitment{min-height:91px;gap:15px;padding:12px 0}
+  .ref-shell .ref-commitment-icon{flex-basis:48px;height:48px}
+  .ref-shell .ref-commitment-title{gap:12px}
+  .ref-shell .ref-commitment-title strong{font-size:15px !important;line-height:1.35}
+  .ref-shell .ref-commitment-info>small{font-size:13px !important;margin:7px 0 10px;line-height:1.45}
+  .ref-shell .ref-stage-tag{font-size:12px !important;padding:6px 10px;line-height:1.25}
+  .ref-shell .ref-progress-track{height:8px}
+  .ref-shell .ref-alert{gap:13px;min-height:74px;padding:14px 18px}
+  .ref-shell .ref-alert strong,.ref-shell .ref-activity strong{font-size:15px !important;line-height:1.35}
+  .ref-shell .ref-alert small,.ref-shell .ref-activity small,
+  .ref-shell .ref-activity time{font-size:13px !important;line-height:1.4}
+  .ref-shell .ref-activity{padding:14px 17px}
+  .ref-shell .ref-alert-count{font-size:12px !important;min-width:21px;height:20px}
+  .ref-shell .ref-schedule-intro{font-size:13px !important;padding:12px 17px 7px}
+  .ref-shell .ref-schedule-months{grid-template-columns:215px repeat(3,minmax(0,1fr));margin:2px 16px 0}
+  .ref-shell .ref-schedule-months>span{font-size:13px !important;padding:10px 4px}
+  .ref-shell .ref-schedule-row{grid-template-columns:215px minmax(0,1fr);min-height:54px}
+  .ref-shell .ref-schedule-rows{padding:0 16px}
+  .ref-shell .ref-schedule-row>span{
+    font-size:13px !important;line-height:1.4;white-space:normal;overflow:visible;
+    text-overflow:clip;padding:8px 12px 8px 6px;overflow-wrap:anywhere;
+  }
+  .ref-shell .ref-schedule-lane{height:48px}
+  .ref-shell .ref-schedule-mark{top:16px;height:15px;max-width:44px}
+  .ref-shell .ref-schedule-note{font-size:12px !important;line-height:1.45;padding:10px 16px}
+  .ref-shell .ref-indicator-grid{gap:12px;padding:16px}
+  .ref-shell .ref-indicator{min-height:84px;gap:13px;padding:15px}
+  .ref-shell .ref-indicator-icon{width:43px;height:43px}
+  .ref-shell .ref-indicator strong{font-size:15px !important}
+  .ref-shell .ref-indicator small{font-size:13px !important;line-height:1.5}
+  .ref-shell .ref-about{min-height:192px;gap:18px;padding:13px}
+  .ref-shell .ref-about-text{gap:11px}
+  .ref-shell .ref-about-text strong{font-size:16px !important}
+  .ref-shell .ref-about-text p{font-size:13px !important;line-height:1.55}
+  .ref-shell .ref-about-text button{font-size:13px !important}
+  .ref-shell .ref-dashboard-disclaimer{font-size:12px !important;line-height:1.5}
+
+  /* Cartographic context belongs underneath the map, not over its contents. */
+  .ref-shell .geo-mode{font-size:13px !important;padding:10px 13px}
+  .ref-shell .geo-shell>.geo-canvas-info strong,
+  .ref-shell .geo-layer-perimeter{font-size:13px !important}
+  .ref-shell .geo-shell>.geo-canvas-info span,
+  .ref-shell .geo-meta,.ref-shell .geo-layers>span,
+  .ref-shell .geo-layers>span small,.ref-shell .geo-source{font-size:12px !important}
+  .ref-shell .geo-layers{gap:10px;padding:13px}
+  .ref-shell .geo-meta{padding:13px}
+  .ref-shell .geo-meta button{font-size:13px !important}
+  .ref-shell .geo-shell>.geo-canvas-info{padding:12px 14px}
+  .ref-shell .geo-layers>span.geo-layer-perimeter{font-size:13px !important;padding:9px 12px}
+  .ref-shell .geo-import-panel>p,.ref-shell .geo-import-panel label,
+  .ref-shell .geo-ign-provenance{font-size:14px !important}
+
+  /* Specialist forms and GIS/AOI copy share a clear desktop reading floor. */
+  .ref-shell .geo-perimeter-editor{gap:17px}
+  .ref-shell .geo-perimeter-head h3{font-size:23px !important}
+  .ref-shell .geo-perimeter-editor p,
+  .ref-shell .geo-perimeter-editor button,
+  .ref-shell .geo-perimeter-toolbar label,
+  .ref-shell .geo-perimeter-save>label,
+  .ref-shell .geo-perimeter-qa p{font-size:14px !important}
+  .ref-shell .geo-perimeter-editor small,
+  .ref-shell .geo-perimeter-head small,
+  .ref-shell .geo-perimeter-map-hint{font-size:12px !important}
+  .ref-shell .geo-perimeter-toolbar input{font-size:13px !important}
+  .ref-shell .geo-study-buttons button,.ref-shell .v2-study-navlink{font-size:14px !important}
+}
+@media (min-width:1400px){
+  .ref-shell .ref-dashboard-columns{
+    grid-template-columns:minmax(0,1.14fr) minmax(0,1fr);gap:20px;
+  }
+  .ref-shell .ref-dashboard-column:nth-child(3){
+    grid-column:1/-1;display:grid;
+    grid-template-columns:minmax(0,1.14fr) minmax(0,1fr);align-items:start;
+  }
+  .ref-shell .ref-dashboard-column:nth-child(3) .ref-about{
+    grid-column:1/-1;max-height:none;
+  }
+}
+@media (min-width:1100px) and (max-width:1399px){
+  .ref-shell .ref-dashboard-columns{grid-template-columns:minmax(0,1fr)}
+  .ref-shell .ref-dashboard-column:nth-child(3){
+    grid-column:auto;display:grid;grid-template-columns:minmax(0,1fr);
+  }
+  .ref-shell .ref-dashboard-column:nth-child(3) .ref-about{grid-column:auto;max-height:none}
+  .ref-shell .ref-metrics.v2-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
