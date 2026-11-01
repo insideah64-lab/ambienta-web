@@ -79,6 +79,8 @@ try{
  assert.equal(await page.evaluate(()=>localStorage.getItem('ambienta-gis-diablillos-working-v3')),workingBefore);
  assert.equal(await page.evaluate(()=>localStorage.getItem('ambienta-v2-diablillos-2026-demo')),domainBefore);
  await page.getByRole('link',{name:'Monitoreo',exact:true}).click();
+ await page.locator('[data-station-monitoring=ready]').waitFor();
+ assert.equal(await page.locator('[data-linked-station=EST-V39-QA][data-linked-station-status=accepted_qa]').count(),1);
  await page.locator('[data-measurement-id=MUE-0001]').getByRole('button',{name:'Anular con motivo'}).click();
  await page.getByLabel('Motivo de anulación').fill('Anulación solo para invalidación V39');
  await page.getByLabel('Responsable de anulación').fill('Revisor QA');
