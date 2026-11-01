@@ -71,9 +71,13 @@ def verify_bundle(path: Path) -> dict[str, Any]:
         if manifest.get("queryIsProjectPerimeter") is not False or manifest.get("snapshotAtomic") is not False:
             broken("El manifiesto declara un perímetro/snapshot no verificado.")
         layer=manifest.get("layer")
+        if not isinstance(layer,str):
+            broken("La capa del paquete no es un nombre autorizado.")
         bbox=manifest.get("queryBbox")
         if not isinstance(bbox,list) or len(bbox)!=4:
             broken("BBOX ausente del manifiesto.")
+        if manifest.get("method")!="WFS 1.0.0 / adaptive_BBOX_quadtree":
+            broken("El método de adquisición no coincide con la política auditada.")
         if manifest.get("hashScope")!="assembled_geojson_not_raw_wfs_response":
             broken("Ámbito de hash incorrecto.")
         validate_request(layer,bbox)
@@ -106,8 +110,13 @@ def verify_bundle(path: Path) -> dict[str, Any]:
                 broken("Contadores del manifiesto no coinciden con los originales.")
             if page.get("completeTile") is not (declared<PAGE_LIMIT and declared==len(items)):
                 broken("Una ventana figura completa sin serlo.")
-            if data.get("numberReturned") is not None and int(data["numberReturned"])!=len(items):
-                broken("numberReturned contradice la respuesta original.")
+            if data.get("numberReturned") is not None:
+                returned=data["numberReturned"]
+                if isinstance(returned,bool) or not (isinstance(returned,int) or
+                     (isinstance(returned,str) and returned.isascii() and returned.isdecimal())):
+                    broken("numberReturned inválido en respuesta original.")
+                if int(returned)!=len(items):
+                    broken("numberReturned contradice la respuesta original.")
             if not isinstance(page.get("bbox"),list) or len(page["bbox"])!=4:
                 broken("Subventana BBOX inválida.")
             if page.get("sourceUrl")!=wfs_url(layer,page["bbox"]):
