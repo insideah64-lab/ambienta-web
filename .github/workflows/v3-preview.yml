@@ -54,6 +54,7 @@ jobs:
           node apps/web-v3/scripts/study-areas-smoke.mjs
           node apps/web-v3/scripts/perimeter-editor-smoke.mjs
           node apps/web-v3/scripts/diablillos-reference-qa-smoke.mjs
+          node apps/web-v3/scripts/perimeter-legend-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
           node apps/web-v3/scripts/area-gis-separation-smoke.mjs
           node apps/web-v3/scripts/point-zone-analysis-smoke.mjs

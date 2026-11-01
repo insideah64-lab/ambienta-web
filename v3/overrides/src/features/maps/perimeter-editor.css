@@ -1,5 +1,18 @@
 .geo-perimeter-editor{background:linear-gradient(150deg,#12333b,#112931);border:1px solid #6eaca59c;border-radius:13px;padding:19px;margin:12px 0;display:grid;gap:14px;color:#effff8}.geo-perimeter-head{display:flex;gap:20px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}.geo-perimeter-head>div{max-width:760px}.geo-perimeter-head h3{margin:5px 0 10px;font-size:19px;color:#f8fff8}.geo-perimeter-head small{font-size:10px;letter-spacing:.13em;color:#8de0c2;font-weight:800}.geo-perimeter-head>span{color:#f4d29a;border:1px solid #ad9168;border-radius:50px;padding:7px 9px;font-size:10px;letter-spacing:.04em;white-space:nowrap}.geo-perimeter-editor p{line-height:1.6;font-size:12px;color:#d1e1dc;margin:0}.geo-perimeter-toolbar{display:flex;flex-wrap:wrap;gap:9px;align-items:stretch}.geo-perimeter-editor button,.geo-perimeter-toolbar label{border:1px solid #74aa9c;border-radius:9px;color:#eafff5;background:#175345;padding:10px 13px;cursor:pointer;font:inherit;font-weight:700;font-size:12px;min-height:43px;transition:background .15s}.geo-perimeter-editor button:hover:not(:disabled){background:#246f5c}.geo-perimeter-editor button[aria-pressed=true]{background:#a9753b;color:#ffffff;border-color:#ecbb77}.geo-perimeter-editor button:disabled{opacity:.4;cursor:not-allowed}.geo-perimeter-toolbar label{display:flex;flex-direction:column;align-items:flex-start;gap:4px;max-width:245px}.geo-perimeter-toolbar input{font-size:10px;max-width:240px;min-width:0}.geo-perimeter-editor .geo-perimeter-guidance{color:#a9d3cb}.geo-perimeter-editor-map{position:relative;border-radius:12px;overflow:hidden;border:1px solid #85b7a6;min-height:400px}.geo-perimeter-map-canvas{height:440px;width:100%;background:#d4dfdc}.geo-perimeter-map-canvas.is-drawing .maplibregl-canvas{cursor:crosshair!important}.geo-perimeter-map-hint{position:absolute;left:12px;bottom:14px;background:#093a37e8;border:1px solid #ffffff4a;color:#f2fff7;padding:9px 12px;border-radius:9px;font-size:11px;pointer-events:none}.geo-perimeter-meta{display:flex;flex-wrap:wrap;gap:9px}.geo-perimeter-meta span{font-size:11px;background:#25464d;border-radius:7px;border:1px solid #718d8a;padding:8px 11px}.geo-perimeter-save{display:grid;gap:10px;padding:13px;background:#0b2830;border:1px solid #638f8c;border-radius:10px}.geo-perimeter-save>label:not(.geo-perimeter-replace){display:grid;gap:6px;font-size:12px}.geo-perimeter-save input[type=text],.geo-perimeter-save input:not([type]){padding:11px;border-radius:7px;border:1px solid #72aba4;background:#062a2b;color:#fff;min-width:0}.geo-perimeter-replace{display:flex;gap:9px;align-items:center;font-size:12px}.geo-perimeter-replace input{width:17px;height:17px}.geo-perimeter-saved-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.geo-perimeter-saved-actions small{font-size:10px;color:#a8d0c8;overflow-wrap:anywhere}.geo-perimeter-error{color:#ffbcb6!important}.geo-perimeter-notice{color:#b0f0ce!important}.geo-perimeter-disclaimer{padding:10px 12px;border-left:3px solid #d7af72;background:#2e363273}.geo-perimeter-editor .maplibregl-ctrl-attrib{font-size:10px!important}@media(max-width:650px){.geo-perimeter-editor{padding:12px}.geo-perimeter-map-canvas{height:360px}.geo-perimeter-toolbar>*{flex:1 1 150px}.geo-perimeter-toolbar label{max-width:none}.geo-perimeter-toolbar input{max-width:100%}.geo-perimeter-map-hint{left:8px;right:8px;bottom:8px}}
-.geo-user-perimeter-badge{position:absolute;left:12px;top:80px;max-width:min(80%,420px);padding:8px 12px;border-radius:9px;background:#173b41ee;border:1px solid #ffcf80;color:#fff1d9;font-size:11px;font-weight:750;pointer-events:none;z-index:2;overflow-wrap:anywhere}
+.geo-layers>span.geo-layer-perimeter{
+ display:inline-flex;align-items:center;gap:7px;max-width:100%;
+ width:fit-content;padding:6px 9px;
+ background:#163f42;border:1px solid #d5ae6c;border-radius:7px;
+ color:#f9eddb;font-size:10px;font-weight:720;
+ line-height:1.35;overflow-wrap:anywhere;white-space:normal;
+ position:static;inset:auto;box-shadow:none;
+}
+.geo-layers>span.geo-layer-perimeter[data-perimeter-qa="true"]{
+ background:#413627;border-color:#b78d57;color:#f4e0bd;
+}
+.geo-perimeter-legend-stroke{display:inline-block;flex:none;width:17px;height:0;
+ border-top:3px solid #ffcf80;border-radius:2px}
+@media(max-width:640px){.geo-layers>span.geo-layer-perimeter{font-size:10px}}
 
 
 /* Clearly segregated 2025 report anchor vs fabricated geometry for QA only. */
@@ -16,7 +29,7 @@
 .geo-perimeter-qa [data-diablillos-qa-active=true]{
  background:#493920;border-radius:8px;border:1px solid #d69b50;
  padding:10px 12px;color:#ffe4bd;font-weight:760;font-size:11px}
-.geo-user-perimeter-badge[data-perimeter-qa=true]{background:#544021ee;border-color:#ffc370;color:#ffeac8}
+
 
 /* MapLibre navigation icons must remain legible despite generic form-button skin. */
 .geo-perimeter-editor .maplibregl-ctrl-group button,
@@ -29,3 +42,20 @@
  background-color:#eef5f2!important;transform:none!important}
 .geo-perimeter-editor .maplibregl-ctrl-group button .maplibregl-ctrl-icon{
  display:block!important;visibility:visible!important;opacity:1!important}
+
+
+/* MapLibre context must be part of document flow, not an absolutely positioned
+   floating panel that obscures geometry or WMS controls on long GIS pages. */
+.geo-shell > .geo-canvas-info{
+ position:relative;left:auto;right:auto;top:auto;bottom:auto;
+ z-index:auto;display:flex;flex-wrap:wrap;align-items:center;
+ gap:5px 12px;width:100%;max-width:none;margin:0;
+ background:#112f33;border:0;border-top:1px solid #3b625c;
+ border-radius:0;padding:7px 12px;pointer-events:auto;
+}
+.geo-shell > .geo-canvas-info strong{
+ flex:none;font-size:10px;color:#e4f9ef;
+}
+.geo-shell > .geo-canvas-info span{
+ flex:1 1 220px;min-width:0;font-size:10px;line-height:1.4;color:#bdcfcd;
+}

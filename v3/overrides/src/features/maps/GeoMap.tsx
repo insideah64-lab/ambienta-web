@@ -470,13 +470,6 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
     data-map-engine="maplibre" data-georef={layer?'unverified-local-layer':'regional-only'}>
    <div className="geo-map" ref={element} role="region" aria-label={'Mapa cartográfico interactivo de '+province}/>
    <div className="geo-mode"><span className="geo-live-dot"/> Base real · {basemap==='osm'?'OpenStreetMap':IGN_MAPS[basemap].label}</div>
-   {perimeter&&<div className="geo-user-perimeter-badge"
-    data-user-perimeter-visible="true"
-    data-perimeter-qa={perimeter.qaMarker==='ambienta-diablillos-reference-QA-v1'?'true':'false'}>
-    {perimeter.qaMarker==='ambienta-diablillos-reference-QA-v1'
-     ?'DIABLILLOS · PERÍMETRO ILUSTRATIVO QA · NO OFICIAL'
-     :'Perímetro declarado · fuente no certificada'} · {perimeter.sourceName}
-   </div>}
    {!compact&&<div className="geo-basemap" role="group" aria-label="Elegir mapa base">
      <button type="button" aria-pressed={basemap==='osm'} onClick={()=>selectBase('osm')}>OSM</button>
      <button type="button" aria-pressed={basemap==='ign'} onClick={()=>selectBase('ign')}>IGN · Límites</button>
@@ -495,6 +488,14 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
    </div>
    <div className="geo-layers" aria-label="Capas disponibles">
     <strong>Capas</strong>
+    {perimeter&&<span className="geo-layer-perimeter" data-user-perimeter-visible="true"
+     data-perimeter-qa={perimeter.qaMarker==='ambienta-diablillos-reference-QA-v1'?'true':'false'}
+     title={'Fuente del contorno: '+perimeter.sourceName}>
+      <i className="geo-perimeter-legend-stroke" aria-hidden="true"/>
+      {perimeter.qaMarker==='ambienta-diablillos-reference-QA-v1'
+       ?'Perímetro ilustrativo · NO OFICIAL'
+       :'Perímetro declarado · NO VERIFICADO'}
+    </span>}
     {aoiLocal&&<span className="geo-layer-working" data-aoi-map="active">Ventana AOI <small>Consulta local · no perímetro</small></span>}
      {boundaryLocal&&<span className="geo-layer-working" data-map-boundary="unverified">Límite administrativo <small>Local · No verificado</small></span>}
     <span className="geo-layer-active">{basemap==='osm'?'Base OSM':basemap==='ign'?'Argenmap IGN':'IGN topográfico'} <small>{basemap==='osm'?'Activa':ignTiles?'Teselas recibidas':'Solicitando teselas'}</small></span>
