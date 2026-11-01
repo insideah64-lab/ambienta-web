@@ -10,6 +10,7 @@ import {restoreStudyScenario,studyAreaStorageKey} from './study-areas.mjs';
 // @ts-ignore: browser/Node AOI contract
 import {readPointAoi,aoiKey} from './aoi-model.mjs';
 import './point-zone-analysis.css';
+import {DocumentaryLinksPanel} from './DocumentaryLinksPanel';
 
 type Row={ref:string;name:string;coordinate:number[];status:string;zoneId:string|null;reason:string};
 type Report={schema:string;points:Row[];status:string;
@@ -161,5 +162,6 @@ export function PointZoneAnalysis(){
     de estaciones ni el cumplimiento ambiental. No vincula automáticamente puntos a impactos, PGA
     o evidencias. El JSON contiene coordenadas que pueden ser sensibles.</p>
   </div>}
+  {result&&context.scenario&&<DocumentaryLinksPanel report={result} scenario={context.scenario}/>}
  </section>;
 }
