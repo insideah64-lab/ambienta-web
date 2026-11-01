@@ -18,6 +18,7 @@ import json
 import os
 from pathlib import Path
 import tempfile
+import time
 from typing import Any, Callable
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -37,6 +38,7 @@ MAX_WFS_REQUESTS = 64
 MAX_PER_RESPONSE_BYTES = 1_048_576
 MAX_ALL_RESPONSES_BYTES = MAX_INPUT_BYTES
 MAX_DEPTH = 6
+MAX_JOB_SECONDS = 90
 MIN_TILE_DEGREES = 0.00001
 CRS_NAMES = {
     "EPSG:4326", "urn:ogc:def:crs:EPSG::4326",
@@ -69,10 +71,11 @@ def canonical_json(value: Any) -> bytes:
 
 
 def numeric_total(document: dict[str, Any]) -> int:
+    observed = []
     for key in ("totalFeatures", "numberOfFeatures", "numberMatched"):
-        value = document.get(key)
-        if value is None:
+        if key not in document or document[key] is None:
             continue
+        value = document[key]
         if isinstance(value, bool) or not (
             isinstance(value, int) or
             (isinstance(value, str) and value.isascii() and value.isdecimal())
@@ -81,8 +84,12 @@ def numeric_total(document: dict[str, Any]) -> int:
         count = int(value)
         if count > 100_000 or count < 0:
             raise AcquisitionError("COUNT_LIMIT", "El conteo WFS excede los límites declarados.")
-        return count
-    raise AcquisitionError("COUNT_UNKNOWN", "El WFS no informó un total de entidades.")
+        observed.append(count)
+    if not observed:
+        raise AcquisitionError("COUNT_UNKNOWN", "El WFS no informó un total de entidades.")
+    if any(value != observed[0] for value in observed[1:]):
+        raise AcquisitionError("COUNT_CONFLICT", "Los contadores del proveedor no coinciden entre sí.")
+    return observed[0]
 
 
 def feature_id(item: Any) -> str:
@@ -92,7 +99,7 @@ def feature_id(item: Any) -> str:
     if isinstance(value, bool) or not isinstance(value, (str, int)):
         raise AcquisitionError("UNSTABLE_FEATURE_ID", "Falta el identificador estable de entidad WFS.")
     label = str(value)
-    if not 1 <= len(label) <= 200:
+    if not label.strip() or len(label) > 200:
         raise AcquisitionError("UNSTABLE_FEATURE_ID", "Identificador WFS vacío o demasiado largo.")
     if not isinstance(item.get("geometry"), dict):
         raise AcquisitionError("INVALID_FEATURE", "No se recibió geometría GeoJSON.")
@@ -152,6 +159,7 @@ class Acquisition:
     fingerprints: dict[str, str] = field(default_factory=dict)
     total_bytes: int = 0
     root_count: int | None = None
+    started: float = field(default_factory=time.monotonic)
 
     @property
     def request_count(self) -> int:
@@ -161,14 +169,17 @@ class Acquisition:
                   timeout: float) -> RawPage:
         if self.request_count >= MAX_WFS_REQUESTS:
             raise AcquisitionError("REQUEST_BUDGET", "Se alcanzó el presupuesto de peticiones WFS.")
+        remaining = MAX_JOB_SECONDS - (time.monotonic() - self.started)
+        if remaining <= 0:
+            raise AcquisitionError("TIME_BUDGET", "Se agotó el tiempo máximo de adquisición WFS.")
         url = wfs_url(self.layer, tile)
         try:
-            with open_fn(url, timeout) as reply:
+            with open_fn(url, min(timeout, remaining)) as reply:
                 status = getattr(reply, "status", 200)
                 if status != 200:
                     raise AcquisitionError("PROVIDER_ERROR", "IDESA devolvió HTTP " + str(status))
                 headers = getattr(reply, "headers", {})
-                content_type = headers.get("Content-Type", "application/json")
+                content_type = headers.get("Content-Type", "")
                 if "json" not in str(content_type).lower():
                     raise AcquisitionError("INVALID_PROVIDER_FORMAT", "El WFS no devolvió JSON.")
                 raw = reply.read(MAX_PER_RESPONSE_BYTES + 1)
@@ -290,7 +301,7 @@ def build_archive(layer: str, bbox: list[float], output: Path, *,
             "provider":"IDESA Salta","layer":layer,"typeName":LAYERS[layer],
             "queryBbox":result.bbox,"queryIsProjectPerimeter":False,
             "observedSourceCount":result.root_count,"uniqueFeatures":len(source["features"]),
-            "selectedCount":clip_report["selectedCount"],"maxWfsRequests":MAX_WFS_REQUESTS,
+            "selectedCount":clip_report["selectedCount"],"maxWfsRequests":MAX_WFS_REQUESTS,"maxJobSeconds":MAX_JOB_SECONDS,
             "requestCount":len(result.pages),"totalResponseBytes":result.total_bytes,
             "sourceFileSha256":hashlib.sha256(source_bytes).hexdigest(),
             "hashScope":"assembled_geojson_not_raw_wfs_response",
