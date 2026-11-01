@@ -50,7 +50,8 @@ try{
    assert.equal(await cell.locator('.ref-metric-label').innerText(),wanted.label);
    assert.equal(await cell.locator('.ref-metric-top strong').innerText(),wanted.number);
    assert.equal(await cell.locator('.ref-metric-subtitle').innerText(),wanted.text);
-   assert.equal(await cell.getAttribute('href'),wanted.href);
+   assert((await cell.getAttribute('href'))?.endsWith(wanted.href),
+    'KPI link must resolve to the intended document module even in HashRouter');
   }
   await kpis.screenshot({path:out+'/desktop-'+width+'-kpi.png',animations:'disabled'});
   await page.screenshot({path:out+'/desktop-'+width+'-dashboard.png',fullPage:true,animations:'disabled'});
