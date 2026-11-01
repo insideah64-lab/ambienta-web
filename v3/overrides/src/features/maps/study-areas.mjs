@@ -143,6 +143,8 @@ export function scenarioMatchesAoi(scenario,bbox){
   scenario.bbox.length===4&&scenario.bbox.every((x,i)=>typeof x==='number'&&Math.abs(x-bbox[i])<1e-9);
 }
 export const studyAreaStorageKey=diablillos=>diablillos?'ambienta-study-areas-diablillos-v1':'ambienta-study-areas-demo-v1';
+/** @param {string} key @param {number[] | null | undefined} bbox
+ * @param {string | null | undefined} [sourceHash] */
 export function restoreStudyScenario(key,bbox,sourceHash=null){
  try{
   if(!bbox)return null;
