@@ -236,3 +236,60 @@
  .ref-shell .ref-supporting-grid{grid-template-columns:minmax(0,1fr)}
  .ref-shell .ref-section-heading p{text-align:left}
 }
+
+
+/* V3.5.7 — COMPACT desktop work summary.
+   Preserve minimum readable text sizes; remove redundant line, not information. */
+@media(min-width:1100px){
+ .ref-shell .ref-attention{
+  padding:16px 19px 17px;
+  box-shadow:none;
+ }
+ .ref-shell .ref-attention-top{
+  gap:16px;margin-bottom:12px;align-items:center;
+ }
+ .ref-shell .ref-attention-eyebrow{margin-bottom:3px;font-size:12px!important}
+ .ref-shell .ref-attention-top h2{font-size:23px!important;margin-bottom:4px}
+ .ref-shell .ref-attention-top p:not(.ref-attention-eyebrow){
+  font-size:14px!important;line-height:1.4;
+ }
+ .ref-shell .ref-attention-summary{gap:8px;align-items:center}
+ .ref-shell .ref-attention-summary>span{
+  min-width:0;padding:8px 12px;gap:6px;
+  display:flex;flex-direction:row;align-items:center;
+  border-radius:8px;white-space:nowrap;
+ }
+ .ref-shell .ref-attention-summary strong{
+  font-size:23px!important;line-height:1.05;
+ }
+ .ref-shell .ref-attention-summary small{
+  font-size:12px!important;line-height:1.25;
+ }
+ .ref-shell .ref-attention-grid{gap:11px}
+ .ref-shell .ref-attention-item{
+  min-height:113px;padding:12px 15px;gap:5px;
+  border-radius:9px;
+  align-content:start;
+ }
+ .ref-shell .ref-attention-item-top{gap:8px}
+ .ref-shell .ref-attention-kind,
+ .ref-shell .ref-attention-count{
+  font-size:12px!important;line-height:1.25;
+ }
+ .ref-shell .ref-attention-item>strong{
+  font-size:17px!important;line-height:1.28;
+ }
+ .ref-shell .ref-attention-bottom{
+  margin-top:auto;align-items:center;gap:10px;
+ }
+ .ref-shell .ref-attention-description{
+  min-width:0;font-size:14px!important;
+  line-height:1.4;color:#d9e7e4;
+  display:-webkit-box;-webkit-box-orient:vertical;
+  -webkit-line-clamp:2;overflow:hidden;
+ }
+ .ref-shell .ref-attention-bottom svg{flex:none;width:18px;height:18px}
+}
+@media(min-width:1100px) and (max-width:1240px){
+ .ref-shell .ref-attention-top{flex-wrap:wrap}
+}

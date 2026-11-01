@@ -124,8 +124,10 @@ function WorkAttention({data}:{data:DemoState}){
        <span className="ref-attention-count">{item.count} {item.count===1?'registro':'registros'}</span>
       </span>
       <strong>{item.label}</strong>
-      <span className="ref-attention-description">{item.description}</span>
-      <span className="ref-attention-bottom"><small>{item.caption}</small><ArrowRight size={18} aria-hidden="true"/></span>
+      <span className="ref-attention-bottom">
+       <span className="ref-attention-description">{item.description}</span>
+       <ArrowRight size={18} aria-hidden="true"/>
+      </span>
      </Link>)}
    </div>}
  </section>;
