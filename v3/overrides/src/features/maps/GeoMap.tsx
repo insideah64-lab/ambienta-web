@@ -262,6 +262,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
    // Browser-local only: do not send geometry to Supabase or claim ownership of a real project perimeter.
    localStorage.setItem(WORKING_LAYER_KEY,JSON.stringify(next));
    setLayer(next);
+   window.dispatchEvent(new Event('ambienta:spatial-updated'));
    if(mapRef.current){
     setTilesLoaded(false);
     if(!aoiLocal)mountWorking(mapRef.current,next,true);
@@ -309,11 +310,13 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
    // Keep the uncut source in the scenario and never overwrite an imported layer.
    localStorage.setItem(STUDY_KEY,JSON.stringify(created));
    setScenario(created);
+   window.dispatchEvent(new Event('ambienta:spatial-updated'));
   }catch(cause){setError(cause instanceof Error?cause.message:'No fue posible generar las áreas de ensayo.');}
   finally{setBusy(false);}
  }
  function removeStudyAreas(){
   localStorage.removeItem(STUDY_KEY);setScenario(null);setError('');
+  window.dispatchEvent(new Event('ambienta:spatial-updated'));
  }
  function downloadStudyAreas(part:'parent'|'zones'){
   if(!validScenario)return;
@@ -352,6 +355,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
    };
    localStorage.setItem(WORKING_LAYER_KEY,JSON.stringify(next));
    setLayer(next);
+   window.dispatchEvent(new Event('ambienta:spatial-updated'));
   }catch(cause){setError(cause instanceof Error?cause.message:'La consulta SIG no pudo completarse.');}
   finally{clearTimeout(timer);setBusy(false);}
  }
@@ -406,6 +410,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
   if(scenario?.sourceKind==='imported')removeStudyAreas();
   try{localStorage.removeItem(WORKING_LAYER_KEY);}catch{/* No remote mutation. */}
   setLayer(null);setError('');
+  window.dispatchEvent(new Event('ambienta:spatial-updated'));
   if(mapRef.current)clearWorking(mapRef.current);
   mapRef.current?.flyTo({center,zoom:compact?5.5:6.8,duration:0});
  }
