@@ -12,9 +12,6 @@ import {GeoMap} from '../maps/GeoMap';
 import {summarizeWork} from './work-priorities.mjs';
 
 type Props = {data:DemoState;k:Summary;onExport:()=>void};
-const STATUS_STAGE:Record<string,number>={
-  borrador:10,en_revision:42,en_ejecucion:72,verificada:100
-};
 function Metric({icon:Icon,label,value,subtitle,accent,to}:{
   icon:typeof Leaf;label:string;value:number;subtitle:string;
   accent:'green'|'cyan'|'blue'|'purple';to:string
@@ -79,11 +76,9 @@ function Commitments({data}:{data:DemoState}) {
           <span className="ref-commitment-title"><strong>{m.title}</strong>
             <span className={'ref-stage-tag ref-stage-'+m.status}>{statusText(m.status)}</span></span>
           <small>{m.id} · {m.owner}</small>
-          <span className="ref-progress-track" title="Etapa del flujo documental, no avance físico">
-            <i style={{width:STATUS_STAGE[m.status]+'%'}}/></span>
         </span>
       </Link>)}</div>
-    <p className="ref-panel-foot">Barras: etapa documental, no porcentaje de obra. {data.measures.filter(m=>m.status==='verificada').length} de {data.measures.length} medidas verificadas.</p>
+    <p className="ref-panel-foot">Estados del expediente, sin estimación de avance físico ni de cumplimiento ambiental. {data.measures.filter(m=>m.status==='verificada').length} de {data.measures.length} medidas figuran como verificadas documentalmente.</p>
   </section>;
 }
 function ActivityPanel({data}:{data:DemoState}) {
