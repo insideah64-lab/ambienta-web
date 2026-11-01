@@ -474,7 +474,7 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
     {perimeter.qaMarker==='ambienta-diablillos-reference-QA-v1'
      ?'DIABLILLOS · PERÍMETRO ILUSTRATIVO QA · NO OFICIAL'
      :'Perímetro declarado · fuente no certificada'} · {perimeter.sourceName}
-   </div>
+   </div>}
    {!compact&&<div className="geo-basemap" role="group" aria-label="Elegir mapa base">
      <button type="button" aria-pressed={basemap==='osm'} onClick={()=>selectBase('osm')}>OSM</button>
      <button type="button" aria-pressed={basemap==='ign'} onClick={()=>selectBase('ign')}>IGN · Límites</button>
