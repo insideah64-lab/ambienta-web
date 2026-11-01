@@ -1,7 +1,7 @@
 // AMBIENTA V3.8 — independent append-only measurement register for V3 laboratory.
 // Declared sampling values are NOT verified laboratory results or compliance findings.
 // The V1/V2 domain, inspection status and evidence bytes are never mutated.
-import {parseRegisteredFingerprint} from './documentary-evidence.mjs';
+import {parseRegisteredFingerprint} from '../maps/documentary-evidence.mjs';
 export const MEASUREMENT_SCHEMA='ambienta-measurements-local-v1';
 export const MEASUREMENT_UNITS=Object.freeze(['mg/L','µg/L','mg/kg','µg/kg','µg/m³','mg/m³','dB(A)','pH','°C','NTU','µS/cm','%']);
 export const MEASUREMENT_MATRICES=Object.freeze(['agua','suelo','aire','ruido','biota','otro']);
