@@ -96,8 +96,8 @@ function Expediente({data}: {data:DemoState}) {
   </div>;
 }
 function AreaEstudio({data}:{data:DemoState}) {
- const [territoryFocus,setTerritoryFocus]=useState<TerritoryFocus|null>(null);
- const [boundary,setBoundary]=useState<BoundaryOverlay|null>(()=>readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
+ const [,setTerritoryFocus]=useState<TerritoryFocus|null>(null);
+ const [,setBoundary]=useState<BoundaryOverlay|null>(()=>readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
  const [aoi,setAoi]=useState<PointAoi|null>(()=>readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null);
  return <div className="v2-area-stack" data-page-role="territory-definition">
    <Panel kicker="ÁREA DE ESTUDIO · DEFINICIÓN" title="Territorio, perímetro y superficies">
