@@ -84,8 +84,8 @@ export function MeasurementWorkbench({data}:Props){
    No se sobrescribirá su contenido. {state.reason}</p>}
   {book&&<>
    <div className="am-stats" data-measurement-summary="true">
-    <span><strong>{stats.total}</strong> registros</span><span><strong>{stats.active}</strong> activos</span>
-    <span><strong>{stats.awaitingEvidence}</strong> sin respaldo</span><span><strong>{stats.voided}</strong> anulados</span>
+    <span><strong>{stats?.total??0}</strong> registros</span><span><strong>{stats?.active??0}</strong> activos</span>
+    <span><strong>{stats?.awaitingEvidence??0}</strong> sin respaldo</span><span><strong>{stats?.voided??0}</strong> anulados</span>
    </div>
    <form onSubmit={submit} className="am-form"><h4>Registrar un dato declarado</h4>
     <div className="am-fields">
