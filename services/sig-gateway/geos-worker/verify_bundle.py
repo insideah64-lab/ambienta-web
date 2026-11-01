@@ -17,7 +17,7 @@ import zipfile
 from clip import MAX_INPUT_BYTES, GeoReviewError, prepare
 from wfs_collect import (
     AcquisitionError, MAX_DEPTH, MAX_WFS_REQUESTS, MAX_ALL_RESPONSES_BYTES,
-    PAGE_LIMIT, canonical_json, feature_id, numeric_total, quarter, wfs_url
+    PAGE_LIMIT, canonical_json, feature_id, numeric_total, quarter, wfs_url, validate_request
 )
 
 MAX_ARCHIVE_BYTES = 65 * 1024 * 1024
@@ -76,6 +76,7 @@ def verify_bundle(path: Path) -> dict[str, Any]:
             broken("BBOX ausente del manifiesto.")
         if manifest.get("hashScope")!="assembled_geojson_not_raw_wfs_response":
             broken("Ámbito de hash incorrecto.")
+        validate_request(layer,bbox)
         pages=manifest.get("pages")
         if not isinstance(pages,list) or not 1<=len(pages)<=MAX_WFS_REQUESTS:
             broken("Inventario de peticiones WFS inválido.")
@@ -103,11 +104,13 @@ def verify_bundle(path: Path) -> dict[str, Any]:
             declared=numeric_total(data)
             if declared!=page.get("reportedCount") or len(items)!=page.get("returnedCount"):
                 broken("Contadores del manifiesto no coinciden con los originales.")
-            if page.get("completeTile") is not (declared==len(items)):
+            if page.get("completeTile") is not (declared<PAGE_LIMIT and declared==len(items)):
                 broken("Una ventana figura completa sin serlo.")
             if data.get("numberReturned") is not None and int(data["numberReturned"])!=len(items):
                 broken("numberReturned contradice la respuesta original.")
-            if page.get("sourceUrl")!=wfs_url(layer,page.get("bbox")):
+            if not isinstance(page.get("bbox"),list) or len(page["bbox"])!=4:
+                broken("Subventana BBOX inválida.")
+            if page.get("sourceUrl")!=wfs_url(layer,page["bbox"]):
                 broken("La URL original no cumple la lista blanca y BBOX declaradas.")
             rows.append((page,items))
             read_bytes+=len(raw)
@@ -127,7 +130,7 @@ def verify_bundle(path: Path) -> dict[str, Any]:
             if page.get("bbox")!=expected_bbox or page.get("depth")!=depth:
                 broken("La cobertura espacial fue alterada.")
             total=page["reportedCount"]
-            if total>PAGE_LIMIT:
+            if total>=PAGE_LIMIT:
                 if page["completeTile"] or depth>=MAX_DEPTH:
                     broken("Ventana WFS parcial sin subdivisión válida.")
                 for child in quarter(expected_bbox):
