@@ -34,3 +34,28 @@ export function prepareDiablillosPreview(storage,createdAt){
  catch(error){try{storage.removeItem(aoiStorage);}catch{}throw error;}
  return {status:'seeded',aoi:savedAoi,scenario:preview};
 }
+
+export function retractSeededDiablillosPreview(storage){
+ const studyKey=studyAreaStorageKey(true),aoiStorage=aoiKey(true);
+ const raw=storage.getItem(studyKey);
+ if(!raw)return {status:'no_auto_preview'};
+ let current;
+ try{current=JSON.parse(raw);}catch{return {status:'user_data_preserved'};}
+ if(current?.previewMarker!==DIABLILLOS_PREVIEW.marker||
+  current?.sourceHash!==DIABLILLOS_PREVIEW.syntheticSourceSha256||
+  current?.sourceKind!=='synthetic')return {status:'user_data_preserved'};
+ // Only the exact automatically generated marker can be retired.
+ const source=storage.getItem(GIS_KEY);
+ const aoiRaw=storage.getItem(aoiStorage);
+ let matchesAoi=false;
+ try{
+  const aoi=JSON.parse(aoiRaw);
+  matchesAoi=aoi?.center?.lat===DIABLILLOS_PREVIEW.lat&&
+   aoi?.center?.lon===DIABLILLOS_PREVIEW.lon&&
+   aoi?.radiusKm===DIABLILLOS_PREVIEW.radiusKm&&
+   aoi?.savedAt===current.createdAt;
+ }catch{}
+ storage.removeItem(studyKey);
+ if(!source&&matchesAoi)storage.removeItem(aoiStorage);
+ return {status:'auto_preview_retired',aoiRetired:!source&&matchesAoi};
+}

@@ -15,6 +15,17 @@ export function AoiWorkbench({onChange}:Props){
  const [active,setActive]=useState<PointAoi|null>(initial);
  const [error,setError]=useState('');
  useEffect(()=>{
+  const fromPerimeter=()=>{
+   const updated=readPointAoi(key) as PointAoi|null;
+   if(!updated)return;
+   setLat(String(updated.center.lat));setLon(String(updated.center.lon));setKm(String(updated.radiusKm));
+   setActive(updated);
+   onChange(updated);
+  };
+  window.addEventListener('ambienta:perimeter-aoi-updated',fromPerimeter);
+  return ()=>window.removeEventListener('ambienta:perimeter-aoi-updated',fromPerimeter);
+ },[onChange]);
+ useEffect(()=>{
   if(!lat.trim()||!lon.trim()||!km.trim()){
    setError('');if(active){localStorage.removeItem(key);setActive(null);onChange(null);}return;
   }

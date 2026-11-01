@@ -11,7 +11,8 @@ try{
  assert.equal(await page.locator('[data-page-role="gis-analysis"]').count(),0);
  assert.equal(await area.locator('[data-aoi-workbench="true"]').count(),1);
  assert.equal(await area.locator('[data-study-area-panel="true"]').count(),1);
- assert.equal(await area.locator('[data-study-map-preview="true"]').count(),1);
+ assert.equal(await area.locator('[data-study-map-preview="true"]').count(),0);
+ assert.equal(await area.locator('[data-perimeter-draw-map="true"]').count(),1);
  assert.equal(await area.locator('[data-sig-gateway]').count(),0);
  assert.equal(await area.getByLabel('Importar GeoJSON').count(),0);
  assert.equal(await area.locator('[data-spatial-links="overview"]').count(),1);
@@ -19,9 +20,8 @@ try{
  await page.getByRole('textbox',{name:'Longitud de consulta'}).fill('-67.20');
  await page.getByRole('textbox',{name:'Distancia de consulta'}).fill('5');
  await area.locator('[data-aoi-active="true"]').waitFor();
- await area.getByRole('button',{name:'Crear polígono sintético y 4 áreas'}).click();
+ await area.getByRole('button',{name:'Cargar solo ejemplo de geometría de ensayo (4 franjas)'}).click();
  await area.locator('[data-study-areas-ready="true"]').waitFor();
- await area.locator('[data-map-study-zones="4"]').waitFor();
  const original=await page.evaluate(()=>localStorage.getItem('ambienta-study-areas-diablillos-v1'));
  assert(original);
  const areas=JSON.parse(original).summary;
@@ -49,12 +49,11 @@ try{
  await page.getByRole('link',{name:'Área de estudio',exact:true}).click();
  await area.waitFor();
  await area.locator('[data-study-areas-ready="true"]').waitFor();
- assert.equal(await area.locator('[data-map-study-zones="4"]').count(),1);
+ assert.equal(await area.locator('[data-perimeter-draw-map="true"]').count(),1);
  assert.equal(await area.locator('[data-sig-gateway]').count(),0);
  await page.getByRole('textbox',{name:'Distancia de consulta'}).fill('7');
  await area.locator('[data-aoi-active="true"]').waitFor();
  await area.locator('[data-study-areas-ready="true"]').waitFor({state:'detached'});
- await area.locator('[data-map-study-zones="4"]').waitFor({state:'detached'});
  await page.getByRole('link',{name:'Mapas y SIG',exact:true}).click();
  await gis.waitFor();
  assert.equal(await gis.locator('[data-map-study-zones="4"]').count(),0,

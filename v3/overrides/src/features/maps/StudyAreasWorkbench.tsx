@@ -7,6 +7,8 @@ import {syntheticStudyPolygon,createStudyScenario,studyAreaStorageKey,
 // @ts-ignore: canonical browser validation for source polygons
 import {validateGeoJson} from './geojson-validate.mjs';
 import {IS_DIABLILLOS_CASE} from '../../lib/demo';
+// @ts-ignore: validate independent operator perimeter
+import {readPerimeter,perimeterKey} from './perimeter-source.mjs';
 import './study-areas.css';
 
 type Scenario={
@@ -19,9 +21,15 @@ type Scenario={
 };
 type Candidate={geojson:{type:'FeatureCollection';features:unknown[]};sha256:string;label:string};
 const KEY=studyAreaStorageKey(IS_DIABLILLOS_CASE);
+const PERIMETER_KEY=perimeterKey(IS_DIABLILLOS_CASE);
 const GIS_KEY=IS_DIABLILLOS_CASE?'ambienta-gis-diablillos-working-v3':'ambienta-gis-demo-working-v3';
 
 function sourceLayer():Candidate|null{
+ try{
+  const own=readPerimeter(localStorage,PERIMETER_KEY);
+  if(own)return {geojson:own.geojson as Candidate['geojson'],
+   sha256:own.sourceSha256,label:own.sourceName};
+ }catch{}
  try{
   const raw=localStorage.getItem(GIS_KEY);
   if(!raw||raw.length>1400000)return null;
@@ -42,6 +50,7 @@ function download(part:'zones'|'parent',scenario:Scenario){
  setTimeout(()=>URL.revokeObjectURL(url),500);
 }
 export function StudyAreasWorkbench({aoi}:{aoi:PointAoi|null}){
+ const own=readPerimeter(localStorage,PERIMETER_KEY);
  const [revision,setRevision]=useState(0);
  const [scenario,setScenario]=useState<Scenario|null>(null);
  const [imported,setImported]=useState<Candidate|null>(null);
@@ -66,8 +75,9 @@ export function StudyAreasWorkbench({aoi}:{aoi:PointAoi|null}){
   // A previous scenario is retained in storage for audit, but never displayed against another AOI.
  },[aoi?.bbox?.join(','),revision]);
  const valid=useMemo(()=>scenario&&aoi&&scenarioMatchesAoi(scenario,aoi.bbox)&&
+  (!own||scenario.sourceHash===own.sourceSha256)&&
   (scenario.sourceKind==='synthetic'||scenario.sourceHash===imported?.sha256)?scenario:null,
-  [scenario,aoi,imported]);
+  [scenario,aoi,imported,own?.sourceSha256]);
  async function assign(kind:'synthetic'|'imported'){
   if(!aoi){setError('Definí primero una ventana de consulta en Área de estudio.');return;}
   if(busy)return;
@@ -103,19 +113,24 @@ export function StudyAreasWorkbench({aoi}:{aoi:PointAoi|null}){
    aria-label="Delimitación y subáreas del polígono de estudio">
    <div className="geo-study-heading">
     <div><small className="geo-study-kicker">ÁREA DE ESTUDIO · DEFINICIÓN DEL TERRITORIO</small>
-     <strong>Perímetro y subáreas del caso de ensayo</strong></div>
+     <strong>Zonificación opcional sobre un perímetro definido</strong></div>
     <span className="geo-study-warning">SIMULADO · NO OFICIAL</span>
    </div>
-   <p>El territorio de ensayo se define aquí. Podés crear un polígono irregular con hueco o adoptar explícitamente una única geometría importada desde el laboratorio SIG. La ventana BBOX no se convierte en perímetro.</p>
+   <p>La delimitación se realiza primero en el editor de arriba. Este paso es opcional:
+ las cuatro franjas A–D son una demostración de recorte, <strong>no una zonificación técnica</strong>.
+ Podés mantener tu perímetro original sin dividirlo.</p>
    <div className="geo-study-buttons">
-    <button type="button" disabled={!aoi||busy} onClick={()=>assign('synthetic')}>
-     Crear polígono sintético y 4 áreas</button>
+    {!own&&<button type="button" disabled={!aoi||busy} onClick={()=>assign('synthetic')}>
+     Cargar solo ejemplo de geometría de ensayo (4 franjas)</button>}
     <button type="button" disabled={!aoi||!imported||busy} onClick={()=>assign('imported')}>
-     Asignar 4 áreas a un polígono importado</button>
+     Simular 4 franjas sobre {own?'mi perímetro':'polígono importado'} (opcional)</button>
     <Link className="v2-study-navlink" to="/mapas">Abrir Mapas y SIG para importar geometrías</Link>
    </div>
    {imported&&<small data-study-import-ready="true">Disponible desde SIG: {imported.label}. La procedencia declarada no acredita carácter oficial.</small>}
-   {!aoi&&<p role="status">Primero completá las coordenadas y la distancia de consulta.</p>}
+   {!aoi&&<p role="status">Para ejecutar una simulación de zonificación, definí primero una ventana de consulta.
+    El perímetro original puede guardarse y visualizarse sin esa ventana.</p>}
+   {own&&!valid&&<p data-perimeter-unzoned="true" role="status"><strong>Tu perímetro está guardado y se muestra sin división automática.</strong>
+    La zonificación es opcional. El contorno conserva todos sus vértices, huecos y concavidades.</p>}
    {IS_DIABLILLOS_CASE&&valid?.sourceKind==='synthetic'&&<p role="status" data-diablillos-demo-polygon="true" className="v2-panel-note">
     <strong>Polígono de demostración Diablillos — NO OFICIAL.</strong> Se muestra el ensayo centrado en
     latitud −24,70°, longitud −67,20° y ventana nominal de 5 km, con perímetro irregular,

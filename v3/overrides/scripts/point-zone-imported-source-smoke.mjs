@@ -21,7 +21,7 @@ try{
   name:'perimetro-qa.geojson',mimeType:'application/geo+json',buffer:Buffer.from(polygon)});
  await page.locator('[data-geojson-loaded=true]').waitFor();
  await page.getByRole('link',{name:'Área de estudio',exact:true}).click();
- await page.getByRole('button',{name:'Asignar 4 áreas a un polígono importado'}).click();
+ await page.getByRole('button',{name:'Simular 4 franjas sobre polígono importado (opcional)'}).click();
  await page.locator('[data-study-areas-ready=true]').waitFor();
  const study=await page.evaluate(()=>JSON.parse(localStorage.getItem('ambienta-study-areas-diablillos-v1')));
  assert.equal(study.sourceHash,polySha);
