@@ -25,7 +25,7 @@ try{
   assert.equal(await view.locator('.geo-user-perimeter-badge').count(),0);
   assert.equal(await view.locator('[data-map-study-zones="4"]').count(),0);
   await page.screenshot({path:screenshots+'/v354-sig-'+viewport.name+'.png',fullPage:true,animations:'disabled'});
-  await page.goto(base+'/');
+  await page.goto(base+'/expediente');
   await page.locator('.geo-compact [data-user-perimeter-visible=true]').waitFor();
   const small=page.locator('.geo-compact');
   const previewBox=await small.locator('.geo-map').boundingBox();
