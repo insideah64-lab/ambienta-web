@@ -30,6 +30,8 @@ import {AoiWorkbench,type PointAoi} from './features/georef/AoiWorkbench';
 import {aoiKey,readPointAoi} from './features/maps/aoi-model.mjs';
 // @ts-ignore: pure browser-local non-destructive synthetic Diablillos preview initializer
 import {retractSeededDiablillosPreview} from './features/maps/diablillos-preview.mjs';
+// @ts-ignore: opt-in source-backed QA fixture, never overwrites a real contour
+import {seedDiablillosQaReference} from './features/maps/diablillos-reference-qa.mjs';
 import {PerimeterWorkbench} from './features/maps/PerimeterWorkbench';
 import { EvidenceIntegrityLab } from './features/evidence/EvidenceIntegrityLab';
 
@@ -262,6 +264,12 @@ export default function App() {
     if(IS_DIABLILLOS_CASE){
       // Retire only the automatically injected V3.5.1 example; never touch user-created boundaries.
       try{retractSeededDiablillosPreview(window.localStorage);}catch{/* keep local data unchanged */}
+      // Explicit URL opt-in: never seed the Diablillos shape for normal project visits.
+      // A previous user perimeter is never overwritten even in QA mode.
+      if(new URLSearchParams(window.location.search).get('perimetro')==='referencia-qa'){
+       try{seedDiablillosQaReference(window.localStorage,new Date().toISOString());}
+       catch{/* keep local originals unchanged if storage or geometry fails */}
+      }
     }
     return readDemoState();
   });

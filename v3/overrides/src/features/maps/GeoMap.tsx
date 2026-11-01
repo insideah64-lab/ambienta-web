@@ -40,7 +40,7 @@ type WorkingLayer={
  |{category:'georef-centroids';sourceUrl:string;retrievedAt:string;license:'CC BY 4.0';verification:'api_centroids_not_boundaries'}
  |{category:'idesa-wfs';sourceUrl:string;retrievedAt:string;typeName:string;verification:'official_wfs_query_not_project_boundary';hashScope:'raw_upstream_wfs_response'};
 };
-const PUNA_CENTER:[number,number]=[-67.2,-24.7];
+const PUNA_CENTER:[number,number]=[-66.833333,-25.3];
 const SALTA_CENTER:[number,number]=[-65.45,-24.82];
 const SIG_GATEWAY_URL=(import.meta.env.VITE_SIG_GATEWAY_URL||SIG_API_BASE).trim();
 const SIG_GATEWAY_TOKEN=(import.meta.env.VITE_SIG_GATEWAY_TOKEN||SIG_API_ANON).trim();
@@ -211,8 +211,10 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
      const derived=initialAoi&&initialLayer?clipGeoJsonToBbox(initialLayer.geojson,initialAoi.bbox):null;
      mountWorking(map,derived&&initialLayer?{...initialLayer,geojson:derived.geojson as WorkingLayer['geojson']}:initialLayer,!compact&&!initialAoi);
      drawAdministrativeBoundary(map,readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
-     drawAoi(map,initialAoi);
      const own=readPerimeter(localStorage,PERIMETER_KEY);
+     // Query BBOX is not the study perimeter; never paint the green rectangle
+     // on top of an already declared user or QA polygon during initial map load.
+     drawAoi(map,own?null:initialAoi);
      const originalScenario=restoreStudyScenario(STUDY_KEY,initialAoi?.bbox,
       own?.sourceSha256||initialLayer?.sha256||null) as StudyAreaRecord|null;
      drawStudyAreas(map,own&&originalScenario?.sourceHash!==own.sourceSha256?null:originalScenario);
@@ -468,8 +470,12 @@ export function GeoMap({compact=false,province,focus,boundary,aoi}:Props){
     data-map-engine="maplibre" data-georef={layer?'unverified-local-layer':'regional-only'}>
    <div className="geo-map" ref={element} role="region" aria-label={'Mapa cartográfico interactivo de '+province}/>
    <div className="geo-mode"><span className="geo-live-dot"/> Base real · {basemap==='osm'?'OpenStreetMap':IGN_MAPS[basemap].label}</div>
-   {perimeter&&<div className="geo-user-perimeter-badge" data-user-perimeter-visible="true">
-    Perímetro de usuario · fuente no verificada · {perimeter.sourceName}
+   {perimeter&&<div className="geo-user-perimeter-badge"
+    data-user-perimeter-visible="true"
+    data-perimeter-qa={perimeter.qaMarker==='ambienta-diablillos-reference-QA-v1'?'true':'false'}>
+    {perimeter.qaMarker==='ambienta-diablillos-reference-QA-v1'
+     ?'DIABLILLOS · PERÍMETRO ILUSTRATIVO QA · NO OFICIAL'
+     :'Perímetro declarado · fuente no certificada'} · {perimeter.sourceName}
    </div>}
    {!compact&&<div className="geo-basemap" role="group" aria-label="Elegir mapa base">
      <button type="button" aria-pressed={basemap==='osm'} onClick={()=>selectBase('osm')}>OSM</button>

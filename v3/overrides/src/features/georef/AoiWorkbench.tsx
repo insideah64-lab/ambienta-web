@@ -54,8 +54,8 @@ export function AoiWorkbench({onChange}:Props){
   <header><strong>Recorte automático por coordenadas</strong>
    <p>Ingresá coordenadas y distancia: se calcula una ventana y se recortan las capas GeoJSON locales disponibles.</p></header>
   <div className="v2-aoi-fields">
-   <label>Latitud (°)<input aria-label="Latitud de consulta" value={lat} onChange={e=>setLat(e.target.value)} placeholder="-24.7000" inputMode="decimal"/></label>
-   <label>Longitud (°)<input aria-label="Longitud de consulta" value={lon} onChange={e=>setLon(e.target.value)} placeholder="-67.2000" inputMode="decimal"/></label>
+   <label>Latitud (°)<input aria-label="Latitud de consulta" value={lat} onChange={e=>setLat(e.target.value)} placeholder={IS_DIABLILLOS_CASE?"-25.3000":"-24.7000"} inputMode="decimal"/></label>
+   <label>Longitud (°)<input aria-label="Longitud de consulta" value={lon} onChange={e=>setLon(e.target.value)} placeholder={IS_DIABLILLOS_CASE?"-66.8333":"-67.2000"} inputMode="decimal"/></label>
    <label>Distancia nominal (km)<input aria-label="Distancia de consulta" value={km} onChange={e=>setKm(e.target.value)} inputMode="decimal"/></label>
   </div>
   {error&&<p role="alert" className="v2-aoi-error">{error}</p>}
