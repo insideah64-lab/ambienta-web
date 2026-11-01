@@ -12,6 +12,11 @@ assert(cachi&&cachi.centroide);
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 try{
  const page=await browser.newPage({viewport:{width:1440,height:900},acceptDownloads:true});
+ // The real official API response was checked above. Reuse those exact bytes for
+ // deterministic browser UI QA; live CORS/provider availability is an independent gate.
+ await page.route(/https:\/\/apis\.datos\.gob\.ar\/georef\/api\/v2\.1\/departamentos\?/,route=>
+  route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(body),
+   headers:{'access-control-allow-origin':'*'}}));
  const errors=[];
  page.on('pageerror',e=>errors.push(String(e)));
  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/area');
