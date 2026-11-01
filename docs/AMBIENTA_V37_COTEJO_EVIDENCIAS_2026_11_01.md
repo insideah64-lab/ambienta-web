@@ -30,3 +30,8 @@ Completar la fase de integridad documental sin modificar el expediente de domini
 
 ## Próximo trabajo
 Crear un modelo nativo para registros de medición con unidades, resultados y límites de detección sin extrapolar desde las inspecciones; vinculación documentada en expediente real con identidad individual y custodia segura; validación de CRS, error espacial, permisos y licencias.
+
+
+## Resultado CI comprobado
+**[GitHub Actions #41334359155](https://github.com/insideah64-lab/ambienta-web/actions/runs/41334359155) — SUCCESS**, código `ed4baa2bc81aa7b7e2b485dcbfce44ba5903657c`. Compilaciones V1/V2 y V3, pruebas nativas, comprobación de hashes preservados, navegador Chromium (incluyendo `documentary-evidence-smoke.mjs`) y artefacto QA exitosos. Los commits posteriores a ese SHA solamente actualizan documentación.
+**Release gate:** mantener PR #11 como borrador y página pública en V3.5 hasta aprobación de integración V3.6 y V3.7.
