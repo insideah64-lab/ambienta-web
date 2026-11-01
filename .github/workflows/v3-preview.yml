@@ -58,6 +58,7 @@ jobs:
           node apps/web-v3/scripts/desktop-readability-smoke.mjs
           node apps/web-v3/scripts/work-priorities-smoke.mjs
           node apps/web-v3/scripts/compact-work-smoke.mjs
+          node apps/web-v3/scripts/kpi-documentary-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
           node apps/web-v3/scripts/area-gis-separation-smoke.mjs
           node apps/web-v3/scripts/point-zone-analysis-smoke.mjs
@@ -95,6 +96,14 @@ jobs:
         with:
           name: ambienta-v357-tarjetas-compactas
           path: qa/ambienta-v357-compact-work/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Guardar capturas de KPIs documentales V3.5.8
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-v358-kpi-desktop
+          path: qa/ambienta-v358-kpi/
           if-no-files-found: warn
           retention-days: 30
       - name: Keep QA build (not a deployment)
