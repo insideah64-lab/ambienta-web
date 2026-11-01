@@ -261,7 +261,7 @@ export default function App() {
   const [data,setData]=useState<DemoState>(()=>{
     // Only the Diablillos DEMO and only in an empty local workspace:
     // the example geometry is never a verified project boundary.
-    if(IS_DIABLILLOS_CASE){
+    if(IS_DIABLILLOS_CASE&&new URLSearchParams(window.location.search).get('poligono')==='ensayo'){
       try{prepareDiablillosPreview(window.localStorage,new Date().toISOString());}
       catch{/* Local storage may be blocked; the application remains usable. */}
     }
