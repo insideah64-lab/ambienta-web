@@ -32,3 +32,9 @@ No fusionar hasta que CI, Chromium y revisión del comportamiento móvil pasen. 
 Checkpoint inicial: `backup/ambienta-v36-gis-review-checkpoint-2026-11-01`.
 Rama de trabajo: `feature/ambienta-v36-revision-documental-2026-11-01`.
 PR: https://github.com/insideah64-lab/ambienta-web/pull/10
+
+
+## Resultado del CI de la integración
+La ejecución [GitHub Actions #41281328251](https://github.com/insideah64-lab/ambienta-web/actions/runs/41281328251) finalizó **SUCCESS** sobre el commit funcional `df2d0092533e04368edf69417409f1e464e2d15f`. Pasaron construcción inmutable V1/V2, construcción V3, pruebas nativas, comprobación de hashes y recorrido Chromium de todos los flujos, incluido `documentary-review-smoke.mjs`. Las modificaciones posteriores son exclusivamente documentales.
+
+**Decisión de publicación:** PR #10 permanece en borrador; no desplegar V3.6 automáticamente ni sustituir V3.5 mientras falte aprobación de integración.
