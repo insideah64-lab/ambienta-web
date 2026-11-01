@@ -7,6 +7,8 @@ import {polygonFromVertices,parseKmlPolygon,validatePerimeterGeoJson,buildPerime
 // @ts-ignore: independent query window model
 import {aoiKey,readPointAoi} from './aoi-model.mjs';
 import {PerimeterDrawMap} from './PerimeterDrawMap';
+// @ts-ignore: opt-in regional QA polygon; never official or imported source
+import {seedDiablillosQaReference,DIABLILLOS_REFERENCE_2025} from './diablillos-reference-qa.mjs';
 import './perimeter-editor.css';
 type Props={aoi:PointAoi|null};
 type Candidate={geojson:any;rawText:string|null;sourceName:string;sourceType:'drawn'|'geojson'|'kml'};
@@ -92,6 +94,20 @@ export function PerimeterWorkbench({aoi}:Props){
    setNotice('Ventana de consulta ajustada a la extensión del perímetro. El contorno original no se modificó.');
   }catch(cause){setError(cause instanceof Error?cause.message:'No se pudo definir la ventana.');}
  }
+ function loadQaReference(){
+  if(saved||localStorage.getItem(KEY)!==null){
+   setError('Ya hay un perímetro guardado. Se conserva sin sobrescribirlo.');
+   return;
+  }
+  try{
+   const result=seedDiablillosQaReference(localStorage,new Date().toISOString());
+   if(result.status!=='seeded_illustrative_qa')throw Error('Existe otro perímetro. No se reemplazó.');
+   setSaved(result.record);setError('');setCandidate(null);setVertices([]);setDrawing(false);
+   setNotice('Referencia cartográfica ficticia de Diablillos cargada solo para QA. NO es un límite catastral.');
+   window.dispatchEvent(new Event('ambienta:perimeter-aoi-updated'));
+   window.dispatchEvent(new Event('ambienta:spatial-updated'));
+  }catch(cause){setError(cause instanceof Error?cause.message:'No se pudo cargar la referencia QA.');}
+ }
  const bounds=candidate?validatePerimeterGeoJson(candidate.geojson).bounds:saved?.bounds;
  return <section className="geo-perimeter-editor" data-perimeter-editor="true">
   <header className="geo-perimeter-head"><div>
@@ -100,6 +116,21 @@ export function PerimeterWorkbench({aoi}:Props){
    <p>Importá un límite respaldado o dibujá uno siguiendo el relieve y las instalaciones visibles.
     La geometría no se convierte en «oficial» hasta que se documente su procedencia.</p>
   </div><span>FUENTE DECLARADA · NO CERTIFICADA</span></header>
+  {IS_DIABLILLOS_CASE&&<div className="geo-perimeter-qa" data-diablillos-qa-callout="true">
+   <strong>Diablillos · referencia para probar el SIG</strong>
+   <p>El informe técnico de AbraSilver (2025) documenta el centro aproximado de la propiedad
+    (25°18′ S, 66°50′ O) y 11.403 ha. <b>El contorno de 15 vértices es totalmente ilustrativo,
+    generado para este ensayo: no representa concesiones, impactos ni el perímetro real.</b></p>
+   <div className="geo-perimeter-qa-actions">
+    <button type="button" disabled={!!saved||busy} onClick={loadQaReference}>
+     Cargar perímetro ilustrativo Diablillos (QA)</button>
+    <a href={DIABLILLOS_REFERENCE_2025.reportUrl} target="_blank" rel="noreferrer">
+     Consultar informe técnico (2025)</a>
+   </div>
+   {saved?.qaMarker===DIABLILLOS_REFERENCE_2025.marker&&<p role="status" data-diablillos-qa-active="true">
+    REFERENCIA SINTÉTICA EN USO · NO OFICIAL · sustituí esta geometría con un perímetro real verificado
+    cuando dispongas del archivo catastral o de estudio.</p>}
+  </div>}
   <div className="geo-perimeter-toolbar">
    <button type="button" aria-pressed={drawing} onClick={()=>{setDrawing(x=>!x);setCandidate(null);setError('');}}>
     {drawing?'Salir del modo dibujo':'Dibujar perímetro en el mapa'}</button>
