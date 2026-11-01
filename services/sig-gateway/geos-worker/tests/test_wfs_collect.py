@@ -251,5 +251,53 @@ class WfsTilesTest(unittest.TestCase):
         self.assertFalse(target.exists())
 
 
+    def test_exactly_max_features_is_ambiguous_and_subdivided(self):
+        fake=FakeWfs(features=fixture_features()[:20])
+        result,source=wf.acquire("municipios",BBOX,open_fn=fake)
+        self.assertEqual(len(source["features"]),20)
+        self.assertEqual(len(result.pages),5)
+        self.assertEqual(result.root_count,20)
+        self.assertEqual(len([p for p in result.pages if p.depth==0]),1)
+        self.assertEqual(result.pages[0].total,20)
+
+    def test_masked_overflow_count_at_page_limit_is_caught_by_tiling(self):
+        # A broken provider falsely says total=20 even when 26 match root.
+        def hidden_overflow(payload,call):
+            if call==1:
+                payload["totalFeatures"]=20
+            return payload
+        fake=FakeWfs(mutate=hidden_overflow)
+        with self.assertRaises(wf.AcquisitionError) as context:
+            wf.acquire("municipios",BBOX,open_fn=fake)
+        self.assertEqual(context.exception.code,"ROOT_COUNT_MISMATCH")
+
+    def test_conflicting_wfs_totals_are_rejected(self):
+        def contradict(payload,call):
+            payload["numberMatched"]=payload["totalFeatures"]+1
+            return payload
+        with self.assertRaises(wf.AcquisitionError) as context:
+            wf.acquire("municipios",BBOX,open_fn=FakeWfs(mutate=contradict))
+        self.assertEqual(context.exception.code,"COUNT_CONFLICT")
+
+    def test_provider_json_with_html_content_type_is_rejected(self):
+        fake=FakeWfs()
+        def html_type(url,timeout):
+            response=fake(url,timeout)
+            response.headers={"Content-Type":"text/html"}
+            return response
+        with self.assertRaises(wf.AcquisitionError) as context:
+            wf.acquire("municipios",BBOX,open_fn=html_type)
+        self.assertEqual(context.exception.code,"INVALID_PROVIDER_FORMAT")
+
+    def test_expired_total_job_budget_stops_before_any_new_request(self):
+        fake=FakeWfs()
+        job=wf.Acquisition("municipios",BBOX,0)
+        job.started-=wf.MAX_JOB_SECONDS+1
+        with self.assertRaises(wf.AcquisitionError) as context:
+            job.visit(BBOX,0,fake,8)
+        self.assertEqual(context.exception.code,"TIME_BUDGET")
+        self.assertEqual(len(fake.calls),0)
+
+
 if __name__=="__main__":
     unittest.main()
