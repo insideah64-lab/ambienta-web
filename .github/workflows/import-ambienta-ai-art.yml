@@ -1,0 +1,80 @@
+name: One-time AMBIENTA artwork import
+on:
+  push:
+    branches: ['feature/ambienta-ai-raster-art-2026-11-02']
+    paths: ['.github/workflows/import-ambienta-ai-art.yml']
+permissions:
+  contents: write
+jobs:
+  import-art:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install raster optimizer
+        run: python -m pip install --disable-pip-version-check Pillow==11.3.0
+      - name: Fetch generated art and turn it into permanent, optimized V3 assets
+        env:
+          AMBIENTA_PHOTO_URL: "https://dnznrvs05pmza.cloudfront.net/gemini/gemini-3.1-flash-image/images/8ddc8fd1-2267-464e-9ba9-e8c26c667764/0908f587-026f-485b-878b-f308415c6ecf/Single_ultra_wide_panoramic_landscape_image_asset_ONLY__NO_T.png?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiOWNjMmU3MDc5ODkzYjQyYSIsImJ1Y2tldCI6InJ1bndheS10YXNrLWFydGlmYWN0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTc5Mzc1MzIyM30.m4dTLhJKft0mduIDEOROcQry7sBWwgjmIpOLqnFoIiY"
+          AMBIENTA_SPRITE_URL: "https://dnznrvs05pmza.cloudfront.net/gemini/gemini-3.1-flash-image/images/53e3c5a2-8bf9-4bed-99ba-e41bb21298a1/2e25ae83-3498-46e8-b668-8bcbd51e0267/Create_a_precise_PRODUCTION_UI_ASSET_SPRITE_SHEET_for_an_ele.png?_jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJrZXlIYXNoIjoiNTA2ZWQ1ZGMyMzUwODlhMSIsImJ1Y2tldCI6InJ1bndheS10YXNrLWFydGlmYWN0cyIsInN0YWdlIjoicHJvZCIsImV4cCI6MTc5Mzc5NjE4OH0.zSlKeVh7xcvEvkdloH3QX9ALoNhkl2BDM9z72NE5L54"
+        run: |
+          python - <<'PY'
+          import os, io, json, hashlib, urllib.request
+          from PIL import Image, ImageOps
+          from pathlib import Path
+          folder=Path('v3/overrides/src/assets/ai')
+          folder.mkdir(parents=True, exist_ok=True)
+          def load(name):
+              url=os.environ[name]
+              req=urllib.request.Request(url,headers={'User-Agent':'AMBIENTA-asset-import/1.0'})
+              with urllib.request.urlopen(req,timeout=70) as response:
+                  raw=response.read()
+              assert 30000<len(raw)<15000000, (name,len(raw))
+              return Image.open(io.BytesIO(raw)).convert('RGB')
+          photo=load('AMBIENTA_PHOTO_URL')
+          assert photo.width/photo.height>1.8,(photo.width,photo.height)
+          photo=ImageOps.fit(photo,(2304,990),method=Image.Resampling.LANCZOS,centering=(.53,.5))
+          photo.save(folder/'hero-puna.webp','WEBP',quality=85,method=6)
+          sheet=load('AMBIENTA_SPRITE_URL')
+          assert sheet.width>=1024 and sheet.height>=1024,(sheet.width,sheet.height)
+          sheet=ImageOps.fit(sheet,(2048,2048),method=Image.Resampling.LANCZOS)
+          sheet.save(folder/'icon-sheet.webp','WEBP',quality=89,method=6)
+          names=[
+            'dashboard','folder','territory','impacts',
+            'pga','monitoring','audits','evidence',
+            'gis','reports','satellite','legal',
+            'library','history','cloud','brand']
+          paths={}
+          for index,name in enumerate(names):
+              x=index%4;y=index//4
+              icon=sheet.crop((x*512+16,y*512+16,(x+1)*512-16,(y+1)*512-16))
+              icon.thumbnail((288,288),Image.Resampling.LANCZOS)
+              fp=folder/('icon-'+name+'.webp')
+              icon.save(fp,'WEBP',quality=87,method=6)
+              paths[name]={'file':fp.name,'sha256':hashlib.sha256(fp.read_bytes()).hexdigest()}
+          meta={'style':'generated_pictorial','provenance':'Runway, generated for AMBIENTA; illustrative, not environmental evidence','background':'Puna-inspired illustration, not verified project photograph','photo':{'file':'hero-puna.webp','width':photo.width,'height':photo.height},'icons':paths}
+          (folder/'manifest.json').write_text(json.dumps(meta,indent=2,ensure_ascii=False)+'\n',encoding='utf-8')
+          print(json.dumps({'photo_size':(photo.width,photo.height),'sprite_size':(sheet.width,sheet.height),'icons':len(names),'total_bytes':sum(f.stat().st_size for f in folder.iterdir())}))
+          PY
+      - name: Commit the optimized assets to the feature branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add v3/overrides/src/assets/ai
+          git diff --cached --quiet || {
+            git commit -m "assets(v3): import generated Puna landscape and 16 raster illustrated icons"
+            git push origin "HEAD:feature/ambienta-ai-raster-art-2026-11-02"
+          }
+      - name: Keep visual source preview for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-generated-art-preview
+          path: v3/overrides/src/assets/ai/
+          if-no-files-found: warn
+          retention-days: 14
