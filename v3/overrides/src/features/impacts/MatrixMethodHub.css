@@ -1,0 +1,82 @@
+/* Independent method selection and form calculations in the AMBIENTA desktop workbench. */
+.ref-shell .amb-method-hub{min-width:0}
+.ref-shell .amb-method-catalog{
+ padding:22px 24px;margin-top:16px;border:1px solid #417885;border-radius:17px;
+ background:linear-gradient(138deg,#092e3a,#103b41 54%,#172c3f);
+ box-shadow:0 12px 30px #001d2566;color:#edfcf9
+}
+.ref-shell .amb-method-heading h3{font-size:23px;letter-spacing:-.02em;margin:5px 0 8px}
+.ref-shell .amb-method-heading p:not(.amb-matrix-overline){max-width:880px;color:#c1dce3;font-size:13px;line-height:1.6;margin:0 0 16px}
+.ref-shell .amb-method-cardgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.ref-shell .amb-method-card{
+ display:flex;flex-direction:column;justify-content:space-between;min-width:0;
+ border:1px solid #426878;border-radius:12px;padding:15px;
+ background:linear-gradient(150deg,#122f3c,#142a3b);box-shadow:inset 0 1px #d0ffff10;
+}
+.ref-shell .amb-method-card.is-active{
+ border-color:#8ce5c6;box-shadow:0 0 0 1px #3db99a55,inset 0 1px #e3fff722;
+ background:linear-gradient(160deg,#18534d,#153b4a)
+}
+.ref-shell .amb-method-card.is-planned{opacity:.84;background:linear-gradient(145deg,#203241,#192837)}
+.ref-shell .amb-method-card small{font-size:10px;letter-spacing:.04em;text-transform:uppercase;color:#9bd9d0;font-weight:750}
+.ref-shell .amb-method-card strong{display:block;font-size:16px;margin-top:5px;color:#f2fffa}
+.ref-shell .amb-method-card p{font-size:12px;line-height:1.5;color:#bdcfd8;margin:11px 0 10px}
+.ref-shell .amb-method-source{display:block;font-size:11px;color:#a0cbd7;margin-bottom:14px}
+.ref-shell .amb-method-cardbottom{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:9px}
+.ref-shell .amb-method-cardbottom>span{font-size:11px;color:#b8dece}
+.ref-shell .amb-method-cardbottom button{
+ color:#f7fff6;background:#246f66;border:1px solid #79d3bb;border-radius:8px;
+ font-weight:800;font-size:12px;padding:8px 10px;min-height:36px;white-space:nowrap
+}
+.ref-shell .amb-method-cardbottom button:hover{background:#338575}
+.ref-shell .amb-method-cardbottom button[aria-pressed=true]{background:#1b4b45;color:#d6fff0}
+.ref-shell .amb-method-cardbottom .amb-method-prerequisite{color:#d1c4a1;font-weight:700}
+.ref-shell .amb-method-purpose{
+ margin-top:14px;padding:16px 20px;border:1px solid #4a6671;border-radius:11px;
+ color:#c1d5df;background:#102834
+}
+.ref-shell .amb-method-purpose h4{font-size:14px;color:#eefcf6;margin:0 0 7px}
+.ref-shell .amb-method-purpose p{font-size:12px;line-height:1.65;margin:0}
+.ref-shell .amb-method-purpose strong{color:#f1e2b6}
+.ref-shell .amb-method-eval-head{display:flex;justify-content:space-between;align-items:flex-start;gap:15px;flex-wrap:wrap}
+.ref-shell .amb-method-eval-head h3{font-size:22px;line-height:1.2;margin:0 0 5px}
+.ref-shell .amb-method-eval-head p{font-size:13px;color:#b6d7db;margin:0 0 8px}
+.ref-shell .amb-method-eval-head code{
+ display:inline-block;max-width:100%;overflow-wrap:anywhere;
+ font-size:13px;color:#f3e3a6;background:#061e28;padding:7px 10px;border-radius:6px
+}
+.ref-shell .amb-method-disclaimer{font-size:12px;line-height:1.6;color:#c9dce2;padding:13px 15px;margin:15px 0;
+ background:#1642508f;border-left:3px solid #d6bc7a}
+.ref-shell .amb-method-disclaimer a{color:#a6eadd;text-decoration:underline}
+.ref-shell .amb-method-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:13px 0 16px}
+.ref-shell .amb-method-stats>div{background:#0a2a35;border:1px solid #3a6972;border-radius:9px;padding:13px}
+.ref-shell .amb-method-stats strong{display:block;color:#dcfff2;font-size:21px}
+.ref-shell .amb-method-stats small{font-size:11px;color:#bbd0dd}
+.ref-shell .amb-method-tools{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:11px;flex-wrap:wrap}
+.ref-shell .amb-method-tools span{font-size:11px;color:#bdd0d8}
+.ref-shell .amb-method-tools button{background:#1b5060;color:#e8ffff;border:1px solid #4d9494;border-radius:8px;padding:8px 10px;font-size:12px}
+.ref-shell .amb-method-inspector{background:#092b38;border:1px solid #416a78;border-radius:11px;padding:18px;margin-top:16px;max-width:100%}
+.ref-shell .amb-method-selected{display:flex;justify-content:space-between;align-items:start;gap:10px}
+.ref-shell .amb-method-selected small{font-size:10px;color:#9bd9d0;font-weight:800}
+.ref-shell .amb-method-selected h4{margin:5px 0;font-size:17px}
+.ref-shell .amb-method-selected p{font-size:12px;color:#aec8d5;margin:0}
+.ref-shell .amb-method-selected button{border:0;border-radius:6px;background:#285564;color:#f3fffa;padding:6px}
+.ref-shell .amb-method-inspector label{font-size:12px;color:#d5e4e7;font-weight:700;display:block;margin:13px 0}
+.ref-shell .amb-method-inspector select,.ref-shell .amb-method-inspector input,.ref-shell .amb-method-inspector textarea{
+ display:block;max-width:100%;width:100%;margin-top:5px;
+ border:1px solid #54858e;background:#0f3844;border-radius:8px;color:#ecfff8;
+ padding:9px 10px;font-size:12px;font-family:inherit
+}
+.ref-shell .amb-method-criteria{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:2px 13px}
+.ref-shell .amb-method-score{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0;
+ border:1px solid #4e8582;border-radius:9px;background:#133c42;padding:13px 15px}
+.ref-shell .amb-method-score span{color:#d0e4e7;font-size:13px}
+.ref-shell .amb-method-score strong{font-size:26px;color:#f2d893}
+.ref-shell .amb-method-score small{display:block;flex-basis:100%;font-size:11px;color:#b6d1d5}
+@media(max-width:1550px){.ref-shell .amb-method-cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1150px){.ref-shell .amb-method-criteria{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:710px){
+ .ref-shell .amb-method-cardgrid,.ref-shell .amb-method-criteria{grid-template-columns:1fr}
+ .ref-shell .amb-method-catalog{padding:16px}
+ .ref-shell .amb-method-stats{grid-template-columns:1fr}
+}
