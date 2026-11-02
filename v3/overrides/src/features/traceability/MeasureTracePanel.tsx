@@ -35,6 +35,14 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
    setExportStatus('No se pudo generar el archivo: '+(error instanceof Error?error.message:String(error)));
   }
  };
+ if(data.measures.filter(m=>m.id===measureId).length>1)
+  return <section className="ref-trace-panel" data-trace-ambiguous="true" role="alert">
+   <h3>Identificador de medida duplicado: {measureId}</h3>
+   <p>Hay varias medidas con el mismo ID. No se seleccionó un registro arbitrario,
+    no se calcularon sus relaciones y no se habilitó la exportación del grafo.</p>
+   <p>Revisá la identidad y procedencia del expediente original. No implica incumplimiento ambiental.</p>
+   <button type="button" className="v2-action-button" onClick={onClear}>Volver al listado</button>
+  </section>;
  if(!trace)return <section className="ref-trace-panel" data-trace-missing="true" role="status">
    <h3>Medida no encontrada</h3>
    <p>El identificador no existe en el expediente local. No se creó ningún vínculo nuevo.</p>

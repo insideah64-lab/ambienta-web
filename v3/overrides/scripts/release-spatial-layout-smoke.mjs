@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
 import {chromium} from 'playwright';
-// V3.6.5: geometry assertions test whether two independent desktop controls overlap.
+// V3.6.6: geometry assertions test whether two independent desktop controls overlap.
 // Inputs intentionally overlay their own color swatches; those are NOT counted as collisions.
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const path='qa/ambienta-v365-desktop';
@@ -24,8 +24,8 @@ try{
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/pga?medida=MED-DIAB-002');
   const badge=page.locator('[data-app-release]');
   await badge.waitFor();
-  assert.equal(await badge.getAttribute('data-app-release'),'3.6.5');
-  assert.match(await badge.innerText(),/WEB 3[.]6[.]5/);
+  assert.equal(await badge.getAttribute('data-app-release'),'3.6.6');
+  assert.match(await badge.innerText(),/WEB 3[.]6[.]6/);
   await page.locator('[data-measure-trace="MED-DIAB-002"]').waitFor();
   const spatial=page.locator('[data-spatial-links="measure"]');
   await spatial.waitFor();
@@ -58,7 +58,7 @@ try{
   assert.equal(afterDomain,original,'La vista SIG no debe mutar el expediente');
   await badge.screenshot({path:path+'/release-'+width+'.png',animations:'disabled'});
   await spatial.screenshot({path:path+'/spatial-'+width+'.png',animations:'disabled'});
-  console.log(JSON.stringify({width,layout,release:'3.6.5',result:'PASS'}));
+  console.log(JSON.stringify({width,layout,release:'3.6.6',result:'PASS'}));
   await context.close();
  }
 }finally{await browser.close()}

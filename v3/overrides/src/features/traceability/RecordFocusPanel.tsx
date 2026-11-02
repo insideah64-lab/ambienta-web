@@ -13,6 +13,16 @@ type Props={data:DemoState;kind:Kind;id:string;onClose:()=>void};
 
 export function RecordFocusPanel({data,kind,id,onClose}:Props){
  const detail=resolveRecordFocus(data,kind,id);
+ if(detail?.ambiguous)return <section className="ref-record-focus"
+  data-record-ambiguous={kind} role="alert" aria-labelledby="ref-ambiguous-heading">
+   <h3 id="ref-ambiguous-heading">Identificador duplicado · {id}</h3>
+   <p>Se encontraron {detail.occurrences} registros con el mismo identificador
+    en la categoría {TITLES[kind].toLowerCase()}. No se eligió ninguno ni se siguieron vínculos:
+    una URL por ID no distingue los registros originales.</p>
+   <p>Revisá la identidad y procedencia en el expediente de origen.
+    Esto no constituye hallazgo ambiental ni verificación documental.</p>
+   <button type="button" className="ref-record-dismiss" onClick={onClose}>Volver al listado</button>
+  </section>;
  if(!detail)return <section className="ref-record-focus" data-record-missing={kind} role="status">
    <h3>Registro no encontrado: {id}</h3>
    <p>No existe un registro de este tipo con ese identificador en el expediente actual.
