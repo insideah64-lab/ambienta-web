@@ -27,8 +27,8 @@ export function buildPreliminaryTechnicalReview(state){
  const project=state?.project??{};
  const audit=auditDocumentLinks(state);
  const impactRows=impacts.map(impact=>{
-  const linked=measures.filter(m=>unique(measures,m.id)&&
-   Array.isArray(m.impactIds)&&m.impactIds.includes(impact.id));
+  const linked=unique(impacts,impact.id)?measures.filter(m=>unique(measures,m.id)&&
+   Array.isArray(m.impactIds)&&m.impactIds.includes(impact.id)):[];
   return {id:impact.id,name:impact.name,factor:impact.factor,phase:impact.phase,
    sign:impact.sign,measures:linked.map(m=>m.id),
    referenceStatus:unique(impacts,impact.id)?'Registrado':'ID duplicado — revisar'};
