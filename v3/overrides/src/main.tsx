@@ -6,6 +6,8 @@ import App from './App';
 import './styles.css';
 // V3-only theme is loaded AFTER all V2 base CSS, avoiding cascade overwrite.
 import './desktop-palette-slate-blue.css';
+// Candidate daylight theme, loaded last. Keep unpublished until visual approval.
+import './desktop-sunlit-preview.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('No se encontró el contenedor de AMBIENTA V2');
