@@ -5,6 +5,7 @@ import { statusText, IS_DIABLILLOS_CASE } from '../../lib/demo';
 import {GeoMap} from '../maps/GeoMap';
 import type {AmbientaIconName} from '../iconography/AmbientaIcon';
 import {ArtworkIcon} from '../iconography/ArtworkIcon';
+import './commitment-pictograms.css';
 
 // @ts-ignore: V3-only pure workflow summary, not an environmental risk model
 import {summarizeWork} from './work-priorities.mjs';
@@ -66,6 +67,19 @@ function MapPanel({province}:{province:string}) {
     <p className="ref-panel-foot">Cartografía base OpenStreetMap. Un contorno de ensayo puede ser ilustrativo y no acredita límites oficiales ni observaciones de campo.</p>
   </section>;
 }
+type CommitmentArt = 'hydric'|'effluent'|'waste'|'participation';
+/* Use the measure identity and its actual subject, not the broad program:
+ * four commitments can belong to related environmental programs but require
+ * individually recognizable pictograms. Unrecognized measures keep the
+ * existing domain-specific artwork, never a misleading guessed illustration. */
+function commitmentArt(id:string,title:string):CommitmentArt|null {
+  const name=title.toLocaleLowerCase('es');
+  if(id==='MED-DIAB-001'||/monitoreo h[ií]drico/.test(name))return 'hydric';
+  if(id==='MED-DIAB-002'||/documentaci[oó]n de efluentes/.test(name))return 'effluent';
+  if(id==='MED-DIAB-003'||/residuos y suelos/.test(name))return 'waste';
+  if(id==='MED-DIAB-004'||/participaci[oó]n y acceso a informaci[oó]n/.test(name))return 'participation';
+  return null;
+}
 function Commitments({data}:{data:DemoState}) {
   const iconFor=(programId:string):AmbientaIconName=>{
     if(programId.includes('AGU'))return 'water';
@@ -76,15 +90,22 @@ function Commitments({data}:{data:DemoState}) {
   return <section className="ref-panel ref-commitments">
     <div className="ref-panel-head"><h2><ArtworkIcon kind="pga" size={20}/> Seguimiento de compromisos</h2>
       <Link to="/pga">Ver todos <ArrowRight size={14}/></Link></div>
-    <div className="ref-commitment-list">{data.measures.slice(0,5).map(m=>
-      <Link key={m.id} className="ref-commitment" to={'/pga?medida='+encodeURIComponent(m.id)}>
-        <span className="ref-commitment-icon"><ArtworkIcon kind={iconFor(m.programId)} size={24}/></span>
+    <div className="ref-commitment-list">{data.measures.slice(0,5).map(m=>{
+      const art=commitmentArt(m.id,m.title);
+      return <Link key={m.id} className="ref-commitment" to={'/pga?medida='+encodeURIComponent(m.id)}>
+        <span className={'ref-commitment-icon'+(art?' ref-commitment-icon--illustrated':'')}>
+          {art
+            ? <span className={'ref-commitment-art ref-commitment-art--'+art}
+                data-commitment-art={art} aria-hidden="true"/>
+            : <ArtworkIcon kind={iconFor(m.programId)} size={24}/>}
+        </span>
         <span className="ref-commitment-info">
           <span className="ref-commitment-title"><strong>{m.title}</strong>
             <span className={'ref-stage-tag ref-stage-'+m.status}>{statusText(m.status)}</span></span>
           <small>{m.id} · {m.owner}</small>
         </span>
-      </Link>)}</div>
+      </Link>;
+    })}</div>
     <p className="ref-panel-foot">Estados del expediente, sin estimación de avance físico ni de cumplimiento ambiental. {data.measures.filter(m=>m.status==='verificada').length} de {data.measures.length} medidas figuran como verificadas documentalmente.</p>
   </section>;
 }
