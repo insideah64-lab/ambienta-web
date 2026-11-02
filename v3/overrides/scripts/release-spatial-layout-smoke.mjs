@@ -11,7 +11,17 @@ try{
   const context=await browser.newContext({viewport:{width,height},deviceScaleFactor:1});
   const page=await context.newPage();
   const errors=[]; page.on('pageerror',err=>errors.push(String(err)));
-  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos&perimetro=referencia-qa#/pga?medida=MED-DIAB-002');
+  // A perimeter alone is not a zone scenario. Follow the existing
+  // V3.3 contract: explicitly create the four QA zones in this fresh browser.
+  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/area');
+  await page.getByRole('textbox',{name:'Latitud de consulta'}).fill('-24.70');
+  await page.getByRole('textbox',{name:'Longitud de consulta'}).fill('-67.20');
+  await page.getByRole('textbox',{name:'Distancia de consulta'}).fill('5');
+  await page.locator('[data-aoi-active=true]').waitFor();
+  await page.getByRole('button',{name:'Cargar solo ejemplo de geometría de ensayo (4 franjas)'}).click();
+  await page.locator('[data-study-areas-ready=true]').waitFor();
+  const original=await page.evaluate(()=>localStorage.getItem('ambienta-v2-diablillos-2026-demo'));
+  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/pga?medida=MED-DIAB-002');
   const badge=page.locator('[data-app-release]');
   await badge.waitFor();
   assert.equal(await badge.getAttribute('data-app-release'),'3.6.5');
@@ -44,6 +54,8 @@ try{
   assert.deepEqual(layout.failures,[]);
   assert(layout.overflow<=6,'No se admite desbordamiento horizontal en escritorio');
   assert.deepEqual(errors,[]);
+  const afterDomain=await page.evaluate(()=>localStorage.getItem('ambienta-v2-diablillos-2026-demo'));
+  assert.equal(afterDomain,original,'La vista SIG no debe mutar el expediente');
   await badge.screenshot({path:path+'/release-'+width+'.png',animations:'disabled'});
   await spatial.screenshot({path:path+'/spatial-'+width+'.png',animations:'disabled'});
   console.log(JSON.stringify({width,layout,release:'3.6.5',result:'PASS'}));
