@@ -1,6 +1,7 @@
 import {Link} from 'react-router-dom';
 import {useState} from 'react';
-import {ArrowRight, ClipboardList, FileText, ShieldCheck} from 'lucide-react';
+import {ArrowRight} from 'lucide-react';
+import {ArtworkIcon} from '../iconography/ArtworkIcon';
 import type {DemoState} from '../../lib/demo';
 import {statusText} from '../../lib/demo';
 import {GraphImportPanel} from './GraphImportPanel';
@@ -64,7 +65,7 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
     </div>
    </div>
    <p className="ref-trace-disclaimer" role="note">
-    <ShieldCheck size={18} aria-hidden="true"/>
+    <ArtworkIcon kind="folder" size={23}/>
     Solo referencias del expediente de demostración; los vínculos se siguen por ID.
     Una revisión documental, evidencia validada o inspección conforme no certifica
     cumplimiento ambiental ni autentica archivos.
@@ -92,7 +93,7 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
    </div>}
    <div className="ref-trace-grid">
     <section data-trace-group="inspections">
-     <h4><ClipboardList size={17} aria-hidden="true"/> Inspecciones <Link to="/monitoreo">Monitoreo <ArrowRight size={15}/></Link></h4>
+     <h4><ArtworkIcon kind="inspections" size={24}/> Inspecciones <Link to="/monitoreo">Monitoreo <ArrowRight size={15}/></Link></h4>
      {inspections.length?inspections.map((i:DemoState['inspections'][number])=>
       <div className="ref-trace-record" key={i.id}>
        <strong>{i.id}</strong><span>{i.date} · {i.result}</span>
@@ -102,7 +103,7 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
       </div>):<p className="ref-trace-empty">Sin inspecciones vinculadas por ID.</p>}
     </section>
     <section data-trace-group="evidence">
-     <h4><FileText size={17} aria-hidden="true"/> Evidencias <Link to="/evidencias">Evidencias <ArrowRight size={15}/></Link></h4>
+     <h4><ArtworkIcon kind="evidence" size={24}/> Evidencias <Link to="/evidencias">Evidencias <ArrowRight size={15}/></Link></h4>
      {evidence.length?evidence.map(({record:e,via}:{record:DemoState['evidence'][number];via:string})=>
       <div className="ref-trace-record" key={e.id}>
        <strong>{e.id} · {e.label}</strong><span>Estado documental: {e.status}</span>
@@ -112,7 +113,7 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
       </div>):<p className="ref-trace-empty">Sin evidencias vinculadas por ID.</p>}
     </section>
     <section data-trace-group="findings">
-     <h4><ShieldCheck size={17} aria-hidden="true"/> Hallazgos <Link to="/auditorias">Auditorías <ArrowRight size={15}/></Link></h4>
+     <h4><ArtworkIcon kind="audits" size={24}/> Hallazgos <Link to="/auditorias">Auditorías <ArrowRight size={15}/></Link></h4>
      {findings.length?findings.map((f:DemoState['findings'][number])=>
       <div className="ref-trace-record" key={f.id}>
        <strong>{f.id} · {f.title}</strong><span>Estado: {f.status}</span>
@@ -121,7 +122,7 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
       </div>):<p className="ref-trace-empty">Sin hallazgos asociados mediante inspecciones.</p>}
     </section>
     <section data-trace-group="actions">
-     <h4><ClipboardList size={17} aria-hidden="true"/> Acciones correctivas <Link to="/auditorias">Auditorías <ArrowRight size={15}/></Link></h4>
+     <h4><ArtworkIcon kind="measures" size={24}/> Acciones correctivas <Link to="/auditorias">Auditorías <ArrowRight size={15}/></Link></h4>
      {actions.length?actions.map((a:DemoState['correctiveActions'][number])=>
       <div className="ref-trace-record" key={a.id}>
        <strong>{a.id} · {a.action}</strong><span>Estado: {a.status} · Vence: {a.due}</span>
