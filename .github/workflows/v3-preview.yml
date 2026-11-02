@@ -70,6 +70,7 @@ jobs:
           node apps/web-v3/scripts/desktop-palette-smoke.mjs
           node apps/web-v3/scripts/ambienta-iconography-smoke.mjs
           node apps/web-v3/scripts/icon-coverage-smoke.mjs
+          node apps/web-v3/scripts/impact-matrix-builder-smoke.mjs
           node apps/web-v3/scripts/document-identity-negative-smoke.mjs
           node apps/web-v3/scripts/release-spatial-layout-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
@@ -215,6 +216,14 @@ jobs:
           path: qa/ambienta-original-icons/
           retention-days: 30
           if-no-files-found: warn
+      - name: Capturas del constructor de matrices ambientales
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-impact-matrix-builder
+          path: qa/ambienta-matrix-builder/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Capturas de cobertura iconográfica de las 15 secciones
         if: always()
         uses: actions/upload-artifact@v4
