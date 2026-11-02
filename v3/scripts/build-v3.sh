@@ -7,6 +7,13 @@ cd "$ROOT"
 mkdir -p apps/web-v3
 rsync -a --delete --exclude=node_modules --exclude=dist apps/web/ apps/web-v3/
 cp -a v3/overrides/. apps/web-v3/
+# Existing repository landscape photos are copied ONLY into the V3 staging
+# assets. They are scenic decorations, not project maps or field evidence.
+test -s assets/hero-mountain.jpg
+test -s assets/forest-mountains.jpg
+mkdir -p apps/web-v3/src/assets
+cp assets/hero-mountain.jpg apps/web-v3/src/assets/reference-hero-mountain.jpg
+cp assets/forest-mountains.jpg apps/web-v3/src/assets/reference-forest-mountains.jpg
 (
   cd apps/web-v3
   npm ci --no-fund --no-audit
