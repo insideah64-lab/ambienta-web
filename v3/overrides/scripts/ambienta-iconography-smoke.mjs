@@ -86,8 +86,8 @@ try{
   });
   assert.deepEqual(commitments.kinds,['hydric','effluent','waste','participation'],
     'Each Diablillos commitment must use its own visual subject, not a repeated leaf');
-  assert(commitments.backgrounds.every(x=>x.includes('commitment-pictograms')),
-    'Approved artwork must load as local V3 WebP sprite');
+  assert(commitments.backgrounds.every(x=>x.includes('commitment-pictograms')||x.includes('data:image/webp')),
+    'Approved WebP artwork must load either as bundled V3 asset or Vite-inlined data URI');
   assert.deepEqual(commitments.image,{width:256,height:64},
     'Four-image sprite must decode at 256 by 64 pixels');
   assert(snapshot.reducedMotionDuration.split(',').every(x=>parseFloat(x)===0),'Reduced motion must disable animation');
