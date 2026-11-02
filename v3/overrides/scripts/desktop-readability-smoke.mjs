@@ -55,7 +55,7 @@ try{
     documentWidth:document.documentElement.scrollWidth,
     viewport:window.innerWidth};
   });
-  assert.equal(layout.columns,width>1420?3:2,'Reference dashboard should use 3 columns only on sufficiently wide desktops');
+  assert.equal(layout.columns,width>1520?3:2,'Reference dashboard should use 3 columns only on sufficiently wide desktops');
   assert(layout.documentWidth<=width+6,'Unexpected horizontal scroll '+JSON.stringify(layout));
   const map=await page.locator('.ref-map-panel .geo-map').boundingBox();
   assert(map&&map.width>=390,'Map is too narrow to read');
