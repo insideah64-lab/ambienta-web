@@ -1,0 +1,231 @@
+/* AMBIENTA • Desktop visual refresh 2026-11-02
+   Cool midnight/slate design language. Green is reserved for success and
+   environmental semantics. Never restyle GeoJSON, GIS zone data swatches,
+   layer styles, map features, alert severity, or verification status meanings.
+   This is a V3 view-only theme and does not touch V1/V2 or user files. */
+@media(min-width:1100px){
+ .ref-shell{
+  --amb-bg:#0b1425;--amb-sidebar:#0d182b;--amb-surface:#17273b;
+  --amb-surface-raised:#1c3047;--amb-surface-soft:#142439;
+  --amb-line:#35506d;--amb-ink:#f0f6ff;--amb-muted:#b8cce1;
+  --amb-blue:#79beff;--amb-cyan:#8be2ed;--amb-violet:#c0aaff;
+  --amb-positive:#90e3b3;--amb-amber:#f4c684;
+  background:var(--amb-bg);color:var(--amb-ink);
+ }
+ .ref-shell.v2-app{background:var(--amb-bg)}
+ .ref-shell .v2-main{
+  background:radial-gradient(ellipse at 90% -8%,#28406c7a,transparent 43%),
+   linear-gradient(165deg,#0e1a2f 0%,#0c1729 55%,#0b1424);
+ }
+ .ref-shell .v2-main:before{background:linear-gradient(90deg,#091427b0,#141e3605 66%)}
+ .ref-shell .v2-scenic{opacity:.34}
+ .ref-shell .v2-sidebar{
+  background:linear-gradient(174deg,#0c172c 0%,#10213a 58%,#0a172b 100%);
+  border-right:1px solid #476383a6;
+  box-shadow:7px 0 30px #040b1940;
+ }
+ .ref-shell .v2-brand strong{color:#f3f7ff}
+ .ref-shell .v2-brand small,.ref-shell .v2-sidebar-title{color:#bdcee7}
+ .ref-shell .v2-logo{color:#90c8ff}
+ .ref-shell .v2-nav-item{color:#cbd9ea;border-color:transparent}
+ .ref-shell .v2-nav-item svg{color:#8caaca}
+ .ref-shell .v2-nav-item:hover{background:#213b5a;color:#f6faff}
+ .ref-shell .v2-nav-item.is-active{
+  background:linear-gradient(97deg,#315a93,#213e69);
+  border-color:#6aa5ef80;box-shadow:inset 3px 0 #97d6ff,0 5px 14px #05102145;
+  color:#fff;
+ }
+ .ref-shell .v2-nav-item.is-active svg{color:#bcdeff}
+ .ref-shell .v2-sidebar-separator{background:#455f7f9a}
+ .ref-shell .v2-sidebar-base{
+  background:linear-gradient(145deg,#1c304b,#15263e);
+  border-color:#4a6585;box-shadow:inset 0 1px #ffffff12;
+ }
+ .ref-shell .v2-sidebar-base strong{color:#f3f8ff}
+ .ref-shell .v2-sidebar-base small{color:#c5d2e5}
+ .ref-shell .v2-sidebar-base a{color:#9bd3ff}
+ .ref-shell .ref-demo-icon{background:#8ebee8;color:#12263b}
+ .ref-shell .v2-topbar{
+  background:#14253bd9;border-color:#425d7b;
+  box-shadow:inset 0 -1px #ffffff06;
+ }
+ .ref-shell .v2-breadcrumb,.ref-shell .v2-location{color:#d9e5f3}
+ .ref-shell .v2-breadcrumb span{color:#809ebd}
+ .ref-shell .v2-breadcrumb strong{color:#9dcaff}
+ .ref-shell .v2-location,.ref-shell .ref-user-chip{
+  background:#21334a;border-color:#486889;
+ }
+ .ref-shell .v2-location svg{color:#8cc8fa}
+ .ref-shell .ref-user-chip>span{background:#86b4f4;color:#152844}
+ .ref-shell .ref-theme-button{background:#21354f;border-color:#466787;color:#ecf4ff}
+ .ref-shell .v2-kicker,.ref-shell .ref-section-heading span{color:#88c9fd}
+ .ref-shell .v2-page-intro h1{color:#f7faff}
+ .ref-shell .v2-page-intro p:not(.v2-kicker){color:#c3d2e3}
+ .ref-shell .v2-panel,.ref-shell .ref-panel{
+  background:linear-gradient(155deg,#1a2c42 0%,#15253a 100%);
+  border-color:#3b5676;box-shadow:0 8px 24px #0610232b,inset 0 1px #ffffff0a;
+ }
+ .ref-shell .v2-panel-title h2,.ref-shell .ref-panel-head h2{color:#f3f8ff}
+ .ref-shell .ref-panel-head{border-color:#35506c}
+ .ref-shell .ref-panel-head a,.ref-shell .v2-small-link,
+ .ref-shell .ref-location-copy a,.ref-shell .v2-project-footer>a{
+  color:#a6d6ff;
+ }
+ .ref-shell .ref-panel-head a:hover{color:#d0ebff}
+ .ref-shell .v2-caption,.ref-shell .v2-project-code,
+ .ref-shell .v2-panel-note,.ref-shell .ref-panel-foot{color:#bfcfe1;border-color:#3c526d}
+ .ref-shell .v2-info,.ref-shell .v2-inline-notice{
+  background:#21354b;border-color:#44627f;color:#dbe8f6
+ }
+ .ref-shell .v2-info svg,.ref-shell .v2-inline-notice svg{color:#9bd2ff}
+ .ref-shell .v2-info strong,.ref-shell .v2-inline-notice strong{color:#f4f9ff}
+ .ref-shell .v2-info small{color:#bed0e1}
+ .ref-shell .v2-project-footer{border-color:#3f5875;color:#c2d1e3}
+ .ref-shell .v2-project-footer svg{color:#9fcaff}
+ .ref-shell .v2-table th{color:#a6cbea;border-color:#3d5874;background:#1c3047}
+ .ref-shell .v2-table td{color:#d2ddeb;border-color:#39516d}
+ .ref-shell .v2-table td strong{color:#f5f9ff}
+ .ref-shell .v2-table td small{color:#aebfd3}
+ .ref-shell .v2-table tr:hover td{background:#29435a8c}
+ .ref-shell .v2-empty{background:#172a40;border-color:#536e8d;color:#d5e2ef}
+ .ref-shell .v2-empty a{color:#a4d6ff}
+ .ref-shell .v2-search,.ref-shell .v2-select-label select,
+ .ref-shell .v2-input,.ref-shell .v2-textarea{
+  background:#13253a;border-color:#587392;color:#f2f8ff
+ }
+ .ref-shell .v2-search input{color:#f1f7ff}
+ .ref-shell .v2-search input::placeholder{color:#adc2d6}
+ .ref-shell .v2-select-label{color:#cbd9ea}
+ .ref-shell :is(button,a,input,select,textarea):focus-visible{
+  outline-color:#9bd7ff;outline-offset:3px
+ }
+ .ref-shell .v2-primary,.ref-shell .v2-export,.ref-shell .v2-action-button,
+ .ref-shell .v2-secondary,.ref-shell .ref-trace-export{
+  background:#315c96;border-color:#669ce0;color:#fff;
+  box-shadow:0 5px 13px #050e216b;
+ }
+ .ref-shell .v2-primary:hover,.ref-shell .v2-export:hover,
+ .ref-shell .v2-action-button:hover,.ref-shell .v2-secondary:hover,
+ .ref-shell .ref-trace-export:hover{background:#3d72b5;color:#fff}
+ .ref-shell .v2-badge{background:#2b3e56;border-color:#4c6787;color:#e5effd}
+ /* Preserve semantic warning, verified, error and positive status colors. */
+ .ref-shell .v2-badge-amber{background:#5b452c;color:#ffdaaa}
+ .ref-shell .v2-badge-mint{background:#1c5545;color:#b6efd0}
+ .ref-shell .v2-badge-blue{background:#234f73;color:#c4eaff}
+ .ref-shell .v2-warning,.ref-shell .v2-case-banner{background:#3e332a;border-color:#ab8354}
+ .ref-shell .v2-warning p,.ref-shell .v2-case-banner{color:#ffe3b5}
+ .ref-shell .v2-case-sources{background:#1a2b41;border-color:#526d88}
+ .ref-shell .v2-case-sources>strong,.ref-shell .v2-case-sources a{color:#9bd5ff}
+ .ref-shell .v2-case-sources p{color:#c9d8e6}
+ .ref-shell .ref-hero{
+  background-color:#1b2a46;border-color:#597395;
+  box-shadow:0 12px 30px #08122644;
+ }
+ .ref-shell .ref-hero:before{
+  background:linear-gradient(90deg,#0c1a2df0 0%,#1a2b49c7 42%,#1b2f5330 72%,#112441ad 100%)
+ }
+ .ref-shell .ref-hero-label{
+  background:#223e64;color:#d2e6ff;border-color:#8bb5e5
+ }
+ .ref-shell .ref-hero-tags span{background:#213953dc;border-color:#668bb2;color:#eaf4ff}
+ .ref-shell .ref-hero-location{
+  background:#192a42e8;border-color:#6d89ae;
+ }
+ .ref-shell .ref-province-art{color:#99c8ff;background:radial-gradient(ellipse at 45% 35%,#5e85c65a,transparent 75%)}
+ .ref-shell .ref-location-copy a{background:#294f83;border-color:#648ec0}
+ .ref-shell .ref-metric.v2-metric{
+  background:linear-gradient(135deg,#1a2e49,#17273d);border-color:#3d5d7c;
+ }
+ .ref-shell .ref-metric .v2-metric-icon{background:#2a4875;color:#a8d7ff}
+ .ref-shell .ref-metric.ref-accent-cyan .v2-metric-icon{background:#224c67;color:#a5edf4}
+ .ref-shell .ref-metric.ref-accent-blue .v2-metric-icon{background:#2c4c85;color:#c7e2ff}
+ .ref-shell .ref-metric.ref-accent-purple .v2-metric-icon{background:#454274;color:#e0d5ff}
+ .ref-shell .ref-metric.v2-metric p,.ref-shell .ref-metric.v2-metric .ref-metric-body>span{color:#c0d5e8}
+ .ref-shell .ref-metric-track{background:#314764}
+ .ref-shell .ref-metric-track i{background:linear-gradient(90deg,#499fdf,#84d0ff)}
+ .ref-shell .ref-metric.ref-accent-cyan .ref-metric-track i{background:linear-gradient(90deg,#4cbbd5,#9deaf2)}
+ .ref-shell .ref-metric.ref-accent-purple .ref-metric-track i{background:linear-gradient(90deg,#8e8ae6,#c3acff)}
+ .ref-shell .ref-attention{
+  background:linear-gradient(125deg,#203653,#172a42);border-color:#496886
+ }
+ .ref-shell .ref-attention-eyebrow{color:#9fceff}
+ .ref-shell .ref-attention-item{background:#1b334d;border-color:#4d688a}
+ .ref-shell .ref-attention-item.ref-attention-revision{background:#223d54;border-left-color:#6bbadc}
+ .ref-shell .ref-attention-item:hover,.ref-shell .ref-attention-item:focus-visible{
+  background:#294761;border-color:#90bfea
+ }
+ .ref-shell .ref-attention-revision .ref-attention-kind{color:#a8d8ff}
+ .ref-shell .ref-attention-summary>span{background:#233a55;border-color:#58718f}
+ .ref-shell .ref-section-heading p{color:#c5d5e6}
+ .ref-shell .ref-commitment:hover{background:#233c56}
+ .ref-shell .ref-commitment{border-color:#415977}
+ .ref-shell .ref-commitment-icon{background:#254564;border-color:#497399;color:#a9d7ff}
+ .ref-shell .ref-commitment:nth-child(2) .ref-commitment-icon{background:#20465f;color:#91e6ef}
+ .ref-shell .ref-commitment:nth-child(3) .ref-commitment-icon{background:#313f6a;color:#cdc0ff}
+ .ref-shell .ref-activity-icon{background:#2a4768;color:#b8d9ff}
+ .ref-shell .ref-indicator{background:#20354d;border-color:#415f7d}
+ .ref-shell .ref-indicator-icon{background:#284979;color:#b7d9ff}
+ .ref-shell .ref-indicator-dashes{color:#9cbed7}
+ .ref-shell .ref-schedule-months{background:#233853;border-color:#4a6582}
+ .ref-shell .ref-schedule-months>span{border-color:#4a6686}
+ .ref-shell .ref-schedule-row{border-color:#3b526b}
+ .ref-shell .ref-schedule-lane{
+  background:repeating-linear-gradient(90deg,transparent 0 calc(33.333% - 1px),#59728b67 calc(33.333% - 1px) 33.333%),
+   linear-gradient(#223b52b0,#1c31485e)
+ }
+ /* Visual containers around SIG; never recolor geographic symbols or zone fills. */
+ .ref-shell .geo-shell{background:#1b2d45;border-color:#4b6988}
+ .ref-shell .geo-mode{background:#182d45;border-color:#6597c6;color:#f2f7ff}
+ .ref-shell .geo-canvas-info{background:#182c45ed;border-color:#647f9f}
+ .ref-shell .geo-meta,.ref-shell .geo-layers,.ref-shell .geo-source{
+  background:#192b40;border-color:#395a78;color:#c5d9ec
+ }
+ .ref-shell .geo-meta button{background:#335c91;border-color:#6399cb;color:#f2f8ff}
+ .ref-shell .geo-layers strong{color:#bfd3e6}
+ .ref-shell .geo-layer-disabled{background:#31445d}
+ .ref-shell .geo-source a{color:#a6d9ff}
+ .ref-shell .geo-links-panel{
+  background:linear-gradient(147deg,#1b3049,#14273e);
+  border-color:#4b6b89;color:#f1f6ff
+ }
+ .ref-shell .geo-links-header small,.ref-shell .geo-links-record-title strong{color:#a3d6ff}
+ .ref-shell .geo-links-context,.ref-shell .geo-links-record,.ref-shell .geo-links-stats>div,
+ .ref-shell .geo-links-zone-card,.ref-shell .geo-links-checks{
+  background:#1d334d;border-color:#4a6685
+ }
+ .ref-shell .geo-links-record-title span,.ref-shell .geo-links-note,
+ .ref-shell .geo-links-panel>p,.ref-shell .geo-links-stats small{color:#c4d7e8}
+ .ref-shell .geo-links-toolbar button{background:#315f93;color:#fff;border-color:#6a9fc7}
+ .ref-shell .geo-links-toolbar button:hover:not(:disabled){background:#3976b2}
+ .ref-shell .geo-links-filter select{background:#172e48;border-color:#6183a7;color:#f4f8ff}
+ /* Checked zone control keeps its unique --zone-color from the SIG dataset. */
+ .ref-shell .geo-links-zone-controls input:not(:checked)+span{
+  background:#344760;border-color:#607c9c;color:#f0f7ff
+ }
+ .ref-shell .geo-links-zone-controls input:checked+span{
+  background:var(--zone-color);border-color:#fff
+ }
+ .ref-shell .ref-tech-report{
+  background:linear-gradient(140deg,#1d334f,#162a43);
+  border-color:#4c759e;color:#eff6ff
+ }
+ .ref-shell .ref-tech-head small{color:#a4cff9}
+ .ref-shell .ref-tech-head h3{color:#fff}
+ .ref-shell .ref-tech-head p,.ref-shell .ref-tech-readiness>p{color:#c7d9ed}
+ .ref-shell .ref-tech-head button{
+  background:#315f9c;border-color:#80aff4;color:#fff
+ }
+ .ref-shell .ref-tech-head button:hover{background:#4179bb}
+ .ref-shell .ref-tech-facts>div,.ref-shell .ref-tech-readiness-grid>div{
+  background:#233c5a;border-color:#536e91
+ }
+ .ref-shell .ref-tech-readiness{border-color:#587496}
+ .ref-shell .ref-tech-facts small,.ref-shell .ref-tech-readiness-grid small,
+ .ref-shell .ref-tech-nav{color:#d0dfef}
+ .ref-shell .ref-tech-readiness h4,.ref-shell .ref-tech-facts strong{color:#f4f9ff}
+ .ref-shell .ref-tech-warning{background:#35364a;border-left-color:#e9b86c;color:#ffeacc}
+ .ref-shell .ref-tech-message{background:#253e60;color:#ecf6ff}
+ .ref-shell .ref-tech-nav a{color:#a9d7ff}
+ .ref-shell .v2-footer{color:#adc4df;border-color:#3f5d7c}
+ .ref-shell .v2-footer svg{color:#8cbdf3}
+}
