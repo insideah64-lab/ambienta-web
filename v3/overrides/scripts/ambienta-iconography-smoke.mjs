@@ -14,6 +14,25 @@ try{
   const errors=[];page.on('pageerror',err=>errors.push(String(err)));
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/');
   await page.locator('.v2-sidebar .v2-logo [data-ambienta-icon="brand"]').waitFor();
+  await page.locator('.v2-sidebar nav .amb-art-loaded').first().waitFor();
+  const raster=await page.evaluate(()=>{
+    const nav=[...document.querySelectorAll('.v2-sidebar nav .v2-nav-item')];
+    const icons=nav.map(n=>n.querySelector('.amb-art-icon'));
+    const photo=getComputedStyle(document.querySelector('.ref-hero')).backgroundImage;
+    return {
+      ready:icons.filter(x=>x?.classList.contains('amb-art-loaded')).length,
+      kinds:icons.map(x=>x?.getAttribute('data-ambienta-artwork')),
+      imageWidths:icons.map(x=>x?.querySelector('img')?.naturalWidth),
+      imageSources:icons.map(x=>x?.querySelector('img')?.currentSrc),
+      background:photo,
+      heroBytes:performance.getEntriesByType('resource').filter(e=>e.name.includes('hero-puna')).length,
+    };
+  });
+  assert.equal(raster.ready,15,'All 15 navigation art images must load');
+  assert.equal(new Set(raster.imageSources).size,15,'All 15 modules need different generated image files');
+  assert(raster.imageWidths.every(x=>x>0),'Actual WebP pixel data required, not just SVG placeholders');
+  assert(raster.background.includes('hero-puna'),'Generated photo must replace prior vector background');
+  assert(!raster.background.includes('ambienta-landscape.svg'),'Old scenic SVG must not be active');
   const original=await page.evaluate(()=>JSON.stringify({...localStorage}));
   const snapshot=await page.evaluate(()=>{
     const all=[...document.querySelectorAll('.v2-sidebar nav .v2-nav-item')];
