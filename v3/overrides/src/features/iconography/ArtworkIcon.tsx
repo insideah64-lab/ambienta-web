@@ -16,6 +16,18 @@ import artLegal from '../../assets/ai/icon-legal.webp';
 import artLibrary from '../../assets/ai/icon-library.webp';
 import artHistory from '../../assets/ai/icon-history.webp';
 import artCloud from '../../assets/ai/icon-cloud.webp';
+import artVegetation from '../../assets/ai/icon-vegetation.webp';
+import artWater from '../../assets/ai/icon-water.webp';
+import artAir from '../../assets/ai/icon-air.webp';
+import artNoise from '../../assets/ai/icon-noise.webp';
+import artMeasures from '../../assets/ai/icon-measures.webp';
+import artInspections from '../../assets/ai/icon-inspections.webp';
+import artBiodiversity from '../../assets/ai/icon-biodiversity.webp';
+import artCalendar from '../../assets/ai/icon-calendar.webp';
+import artNotice from '../../assets/ai/icon-notice.webp';
+import artReview from '../../assets/ai/icon-review.webp';
+import artExport from '../../assets/ai/icon-export.webp';
+import artIndustry from '../../assets/ai/icon-industry.webp';
 
 /**
  * Actual generated raster artwork, bundled by Vite and hosted locally by
@@ -28,7 +40,10 @@ const art:Partial<Record<AmbientaIconName,string>>={
  monitoring:artMonitoring,audits:artAudits,evidence:artEvidence,
  gis:artGis,reports:artReports,satellite:artSatellite,
  legal:artLegal,library:artLibrary,history:artHistory,cloud:artCloud,
- measures:artImpacts,inspections:artMonitoring
+ vegetation:artVegetation,water:artWater,air:artAir,noise:artNoise,
+ measures:artMeasures,inspections:artInspections,biodiversity:artBiodiversity,
+ calendar:artCalendar,notice:artNotice,review:artReview,export:artExport,
+ industry:artIndustry
 };
 export function ArtworkIcon({kind,size=27,className=''}:{
  kind:AmbientaIconName;size?:number;className?:string
