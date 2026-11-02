@@ -65,6 +65,7 @@ jobs:
           node apps/web-v3/scripts/document-graph-export-smoke.mjs
           node apps/web-v3/scripts/document-graph-import-smoke.mjs
           node apps/web-v3/scripts/document-link-audit-smoke.mjs
+          node apps/web-v3/scripts/document-identity-negative-smoke.mjs
           node apps/web-v3/scripts/release-spatial-layout-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
           node apps/web-v3/scripts/area-gis-separation-smoke.mjs
@@ -167,6 +168,14 @@ jobs:
         with:
           name: ambienta-v365-desktop-sig-capturas
           path: qa/ambienta-v365-desktop/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Capturas de casos negativos de identidad documental V3.6.6
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-v366-document-identity-desktop
+          path: qa/ambienta-v366-document-identity/
           retention-days: 30
           if-no-files-found: warn
       - name: Keep QA build (not a deployment)
