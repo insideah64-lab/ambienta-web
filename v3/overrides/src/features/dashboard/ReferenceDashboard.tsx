@@ -43,7 +43,7 @@ function Hero({data}:{data:DemoState}) {
         <span><HeroSymbol kind="phase" size={24}/> {p.phase}</span>
       </div>
       <div className="ref-hero-tags">
-        <span className="ref-hero-tag ref-hero-tag--verified"><HeroSymbol kind="verified" size={23}/>{p.status}</span>
+        <span className="ref-hero-tag ref-hero-tag--document"><HeroSymbol kind="document" size={23}/>{p.status}</span>
         <span className="ref-hero-tag ref-hero-tag--mountain"><HeroSymbol kind="mountain" size={23}/>Área no informada</span>
         <span className="ref-hero-tag ref-hero-tag--calendar"><HeroSymbol kind="calendar" size={23}/>Inicio no declarado</span>
         <span className="ref-hero-tag ref-hero-tag--industry"><HeroSymbol kind="industry" size={23}/>{p.proponent}</span>
