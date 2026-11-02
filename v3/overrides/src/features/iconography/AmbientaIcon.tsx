@@ -11,7 +11,7 @@ export type AmbientaIconName =
  | 'reports' | 'satellite' | 'legal' | 'library' | 'history'
  | 'cloud' | 'vegetation' | 'water' | 'air' | 'noise'
  | 'measures' | 'inspections' | 'biodiversity'
- | 'calendar' | 'notice' | 'review' | 'export';
+ | 'calendar' | 'notice' | 'review' | 'export' | 'industry';
 
 type Props = Omit<SVGProps<SVGSVGElement>,'name'> & {
   kind:AmbientaIconName;
@@ -144,6 +144,10 @@ function Glyph({kind}:{kind:AmbientaIconName}) {
    <path d="M12 3.3v11M8.2 10.8 12 14.6l3.8-3.8"/>
    <path d="M5 16.5v3.2c0 .8.5 1.3 1.3 1.3h11.4c.8 0 1.3-.5 1.3-1.3v-3.2"/>
    <path d="M6.2 4.1h11.6"/>
+  </>;
+  case 'industry': return <>
+   <path d="M3 20.4V10.9l5.1 3.8 5.1-3.8v9.5zM13.2 20.4V6.9h6v13.5zM5.6 17.9h1.5M10.8 17.9h1.1M16 16h.9"/>
+   <path d="M2.5 20.4h18.8M15.4 6.9V3.7h1.8v3.2"/>
   </>;
   case 'biodiversity': return <>
    <path d="M12 21v-9.5M12 11.5C5.7 12 5 7.7 5.3 4.5c4.5.5 6.6 2.5 6.7 7M12 13.5c.5-6 3.2-8.7 7-9-0 5.5-1.7 9.3-7 9"/>

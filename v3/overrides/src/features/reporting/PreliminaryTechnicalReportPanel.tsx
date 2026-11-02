@@ -1,7 +1,7 @@
 import {useMemo,useState} from 'react';
 import './preliminary-technical-report.css';
 import {Link} from 'react-router-dom';
-import {ArrowDownToLine,FileCheck2,AlertCircle,ClipboardList} from 'lucide-react';
+import {ArtworkIcon} from '../iconography/ArtworkIcon';
 import type {DemoState} from '../../lib/demo';
 // @ts-ignore: pure read-only report logic shared with Node regression suite
 import {preparePreliminaryTechnicalDownload,buildPreliminaryTechnicalReview} from './preliminary-technical-report.mjs';
@@ -32,14 +32,14 @@ export function PreliminaryTechnicalReportPanel({data}:Props){
      hallazgos y acciones correctivas. Presenta los vacíos que impiden
      utilizar la documentación como un Estudio de Impacto Ambiental terminado.</p></div>
    <button type="button" onClick={download} data-export-technical-report="html">
-    <ArrowDownToLine size={16} aria-hidden="true"/> Descargar informe HTML imprimible
+    <ArtworkIcon kind="export" size={24}/> Descargar informe HTML imprimible
    </button>
   </div>
   <div className="ref-tech-facts">
-   <div><FileCheck2 size={20} aria-hidden="true"/><strong>{model.counts.impacts}</strong><small>Impactos declarados</small></div>
-   <div><ClipboardList size={20} aria-hidden="true"/><strong>{model.counts.measures}</strong><small>Medidas relacionadas</small></div>
-   <div><AlertCircle size={20} aria-hidden="true"/><strong data-report-missing={unaccredited}>{unaccredited}</strong><small>Componentes sin acreditación</small></div>
-   <div><AlertCircle size={20} aria-hidden="true"/><strong>{model.counts.documentaryWarnings}</strong><small>Observaciones de vínculos</small></div>
+   <div><ArtworkIcon kind="impacts" size={24}/><strong>{model.counts.impacts}</strong><small>Impactos declarados</small></div>
+   <div><ArtworkIcon kind="measures" size={24}/><strong>{model.counts.measures}</strong><small>Medidas relacionadas</small></div>
+   <div><ArtworkIcon kind="notice" size={24}/><strong data-report-missing={unaccredited}>{unaccredited}</strong><small>Componentes sin acreditación</small></div>
+   <div><ArtworkIcon kind="notice" size={24}/><strong>{model.counts.documentaryWarnings}</strong><small>Observaciones de vínculos</small></div>
   </div>
   <div className="ref-tech-readiness">
    <h4>Matriz de información para un futuro EsIA</h4>

@@ -1,5 +1,6 @@
 import {Link} from 'react-router-dom';
-import {ArrowRight, ShieldCheck, X} from 'lucide-react';
+import {ArrowRight, X} from 'lucide-react';
+import {ArtworkIcon} from '../iconography/ArtworkIcon';
 import type {DemoState} from '../../lib/demo';
 // @ts-ignore: V3-only pure JS selector with validated record types.
 import {resolveRecordFocus} from './record-focus.mjs';
@@ -39,7 +40,7 @@ export function RecordFocusPanel({data,kind,id,onClose}:Props){
       <X size={15} aria-hidden="true"/> Cerrar ficha
     </button>
    </div>
-   <div className="ref-record-notice" role="note"><ShieldCheck size={18} aria-hidden="true"/>
+   <div className="ref-record-notice" role="note"><ArtworkIcon kind="notice" size={23}/>
     Datos declarados en el expediente de demostración. Los vínculos se siguen
     únicamente por identificadores. Esta ficha no certifica cumplimiento,
     autenticidad documental ni inspecciones de campo.

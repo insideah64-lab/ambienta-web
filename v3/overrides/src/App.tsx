@@ -1,11 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, NavLink, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
-import {
-  Activity, ArrowDownToLine, CheckCircle2, Clock3,
-  ExternalLink, FileText, FolderOpen, Leaf,
-  MapPin, Menu, Moon, Search, ShieldCheck, Sun, X, Layers3
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import {CheckCircle2, ExternalLink, Menu, Moon, Search, Sun, X} from 'lucide-react';
 import {
   demoExport, demoSummary, readDemoState, statusText
 } from './lib/demo';
@@ -41,7 +36,7 @@ import {RecordFocusPanel} from './features/traceability/RecordFocusPanel';
 import {AMBIENTA_WEB_VERSION,AMBIENTA_WEB_RELEASE_LABEL} from './release-info.mjs';
 import {DocumentLinkAuditPanel} from './features/traceability/DocumentLinkAuditPanel';
 import {PreliminaryTechnicalReportPanel} from './features/reporting/PreliminaryTechnicalReportPanel';
-import {AmbientaIcon, type AmbientaIconName} from './features/iconography/AmbientaIcon';
+import type {AmbientaIconName} from './features/iconography/AmbientaIcon';
 import {ArtworkIcon} from './features/iconography/ArtworkIcon';
 
 
@@ -75,33 +70,33 @@ function measureTone(status: string): 'neutral'|'mint'|'amber'|'blue' {
   return status==='verificada'?'blue':status==='en_ejecucion'?'mint':status==='en_revision'?'amber':'neutral';
 }
 function Panel({kicker, title, children, action, icon}: {kicker:string;title:string;children:React.ReactNode;action?:React.ReactNode;icon?:AmbientaIconName}) {
-  return <section className="v2-panel"><header className="v2-panel-title"><div><p className="v2-kicker">{kicker}</p><h2>{icon&&<AmbientaIcon kind={icon} size={20}/>} {title}</h2></div>{action}</header>{children}</section>;
+  return <section className="v2-panel"><header className="v2-panel-title"><div><p className="v2-kicker">{kicker}</p><h2>{icon&&<ArtworkIcon kind={icon} size={25}/>} {title}</h2></div>{action}</header>{children}</section>;
 }
 function MapPreview({province,focus,boundary,aoi}:{province:string;focus?:TerritoryFocus|null;boundary?:BoundaryOverlay|null;aoi?:PointAoi|null}) {
  return <GeoMap compact province={province} focus={focus} boundary={boundary} aoi={aoi}/>;
 }
-function Info({label,value,icon:Icon}:{label:string;value:string;icon:LucideIcon}) {
-  return <div className="v2-info"><Icon size={18}/><div><small>{label}</small><strong>{value}</strong></div></div>;
+function Info({label,value,icon}:{label:string;value:string;icon:AmbientaIconName}) {
+  return <div className="v2-info"><ArtworkIcon kind={icon} size={26}/><div><small>{label}</small><strong>{value}</strong></div></div>;
 }
 function Expediente({data}: {data:DemoState}) {
   const p=data.project;
   return <div className="v2-detail-grid">
-    <Panel kicker="FICHA DEL PROYECTO" title={p.name}>
+    <Panel kicker="FICHA DEL PROYECTO" icon="folder" title={p.name}>
       <div className="v2-project-code">{p.id} · {p.province}</div>
       <GeorefSavedSummary/>
       <div className="v2-project-fields">
-        <Info icon={ShieldCheck} label="Estado" value={p.status}/>
-        <Info icon={Clock3} label="Fase" value={p.phase}/>
-        <Info icon={FolderOpen} label="Proponente" value={p.proponent}/>
-        <Info icon={Leaf} label="Actividad" value={p.kind}/>
-        <Info icon={ShieldCheck} label="Responsable" value={p.technicalLead}/>
+        <Info icon="folder" label="Estado" value={p.status}/>
+        <Info icon="calendar" label="Fase" value={p.phase}/>
+        <Info icon="industry" label="Proponente" value={p.proponent}/>
+        <Info icon="impacts" label="Actividad" value={p.kind}/>
+        <Info icon="folder" label="Responsable" value={p.technicalLead}/>
       </div>
       {IS_DIABLILLOS_CASE ? <div className="v2-case-sources"><strong>CONTEXTO DOCUMENTAL PÚBLICO · SIN AUDITORÍA OFICIAL</strong>
         <p>Referencia administrativa según informe: <b>0090302-188367/2024-0</b>. DIA informada: Resolución 048/2026 SM. Fuentes citadas, no equivalentes a evidencias de cumplimiento.</p>
         <ul>{DIABLILLOS_SOURCES.map((src:{id:string;label:string;url:string})=><li key={src.id}><a href={src.url} target="_blank" rel="noreferrer">{src.id} · {src.label} <ExternalLink size={13}/></a></li>)}</ul>
         <p>Las medidas, inspecciones, revisiones, hallazgos y acciones en este expediente son <b>simulaciones del laboratorio</b>. No se realizaron visitas de campo.</p></div> : <p className="v2-panel-note">Expediente ficticio. La edición completa sigue disponible en la aplicación V1 durante la migración.</p>}
     </Panel>
-    <Panel kicker="MAPA BASE REAL · GEOMETRÍA DEL PROYECTO PENDIENTE" title="Ubicación y geometría">
+    <Panel kicker="MAPA BASE REAL · GEOMETRÍA DEL PROYECTO PENDIENTE" icon="territory" title="Ubicación y geometría">
       <MapPreview province={p.province}/>
       <p className="v2-panel-note">Mapa base OpenStreetMap a nivel regional. El área exacta del proyecto y sus límites no están verificados ni representados.</p>
     </Panel>
@@ -112,29 +107,29 @@ function AreaEstudio({data}:{data:DemoState}) {
  const [,setBoundary]=useState<BoundaryOverlay|null>(()=>readAdminBoundary(adminBoundaryKey(IS_DIABLILLOS_CASE)));
  const [aoi,setAoi]=useState<PointAoi|null>(()=>readPointAoi(aoiKey(IS_DIABLILLOS_CASE)) as PointAoi|null);
  return <div className="v2-area-stack" data-page-role="territory-definition">
-   <Panel kicker="ÁREA DE ESTUDIO · DEFINICIÓN" title="Territorio, perímetro y superficies">
+   <Panel kicker="ÁREA DE ESTUDIO · DEFINICIÓN" icon="territory" title="Territorio, perímetro y superficies">
     <div className="v2-project-fields">
-     <Info icon={MapPin} label="Provincia" value={data.project.province}/>
-     <Info icon={FolderOpen} label="Expediente" value={data.project.id}/>
+     <Info icon="territory" label="Provincia" value={data.project.province}/>
+     <Info icon="folder" label="Expediente" value={data.project.id}/>
     </div>
     <p className="v2-panel-note">En este módulo se declara la ventana de referencia, se caracteriza el territorio y se delimita un polígono de estudio con sus subáreas. Las consultas de capas WFS/WMS, el recorte y la importación GeoJSON se realizan exclusivamente en <Link to="/mapas">laboratorio cartográfico</Link>.</p>
    </Panel>
-   <Panel kicker="PASO 1 · PERÍMETRO DEL ESTUDIO" title="Importar o dibujar el contorno">
+   <Panel kicker="PASO 1 · PERÍMETRO DEL ESTUDIO" icon="gis" title="Importar o dibujar el contorno">
     <PerimeterWorkbench aoi={aoi}/>
    </Panel>
    <AoiWorkbench onChange={setAoi}/>
    <GeorefTerritory onFocus={setTerritoryFocus} onBoundary={setBoundary}/>
-   <Panel kicker="PASO 3 · ZONIFICACIÓN OPCIONAL" title="Subáreas experimentales, solo a pedido">
+   <Panel kicker="PASO 3 · ZONIFICACIÓN OPCIONAL" icon="gis" title="Subáreas experimentales, solo a pedido">
     <StudyAreasWorkbench aoi={aoi}/>
    </Panel>
-   <Panel kicker="VÍNCULOS AMBIENTALES · QA" title="Relación documental con las subáreas">
+   <Panel kicker="VÍNCULOS AMBIENTALES · QA" icon="monitoring" title="Relación documental con las subáreas">
     <SpatialLinksPanel data={data} mode="overview"/>
    </Panel>
  </div>;
 }
 function MapasSIG({data}:{data:DemoState}){
  return <div className="v2-area-stack" data-page-role="gis-analysis">
-  <Panel kicker="MAPAS Y SIG · ANÁLISIS" title="Laboratorio cartográfico y geoprocesamiento">
+  <Panel kicker="MAPAS Y SIG · ANÁLISIS" icon="gis" title="Laboratorio cartográfico y geoprocesamiento">
    <p className="v2-panel-note">Este módulo concentra las bases cartográficas, consulta de datos IDESA/Georef, capas WMS, importación GeoJSON, recortes topológicos, revisión y exportación. La ventana AOI y el polígono de ensayo proceden de <Link to="/area">la definición territorial</Link> y no se redefinen aquí.</p>
    <GeoMap province={data.project.province}/>
    <PointZoneAnalysis/>
@@ -143,7 +138,7 @@ function MapasSIG({data}:{data:DemoState}){
  </div>;
 }
 function Impactos({data}:{data:DemoState}) {
-  return <Panel kicker="MATRIZ DE IMPACTOS" title="Impactos ambientales registrados">
+  return <Panel kicker="MATRIZ DE IMPACTOS" icon="impacts" title="Impactos ambientales registrados">
     <div className="v2-table-scroll"><table className="v2-table"><thead><tr>
       <th>Impacto</th><th>Factor</th><th>Etapa</th><th>Signo</th><th>Medidas relacionadas</th>
     </tr></thead><tbody>{data.impacts.map(impact=><tr key={impact.id}>
@@ -160,7 +155,7 @@ function Evidencias({data,onAction,onApply}:{data:DemoState;onAction:(kind:DemoA
   const selected=params.get('evidencia');
   const clear=()=>setParams(prev=>{const next=new URLSearchParams(prev);next.delete('evidencia');return next});
   return <Panel kicker="EVIDENCIAS DEL PGA" icon="evidence" title="Registro documental"
-    action={<button className="v2-action-button" onClick={()=>onAction('evidence')}>+ Registrar evidencia</button>}>
+    action={<button className="v2-action-button" onClick={()=>onAction('evidence')}><ArtworkIcon kind="evidence" size={24}/> Registrar evidencia</button>}>
     <div className="v2-evidence-overview"><strong>{data.evidence.length} referencias de demostración</strong>
       <span>{data.evidence.filter(e=>e.status==='pendiente').length} pendientes de revisión</span></div>
     {selected&&<RecordFocusPanel data={data} kind="evidence" id={selected} onClose={clear}/>}
@@ -179,13 +174,13 @@ function Reportes({data,onExport}:{data:DemoState;onExport:()=>void}) {
   const k=demoSummary(data);
   return <Panel kicker="INFORMES TÉCNICOS" icon="reports" title="Revisión integral del expediente">
     <p className="v2-caption">{data.project.name} · {data.project.id} · {data.project.province}</p>
-    <div className="v2-project-fields"><Info label="Programas" icon={Layers3} value={String(k.programs)}/>
-      <Info label="Medidas" icon={Leaf} value={String(k.measures)}/>
-      <Info label="Inspecciones" icon={Activity} value={String(data.inspections.length)}/>
-      <Info label="Evidencias" icon={FileText} value={String(data.evidence.length)}/></div>
+    <div className="v2-project-fields"><Info label="Programas" icon="pga" value={String(k.programs)}/>
+      <Info label="Medidas" icon="measures" value={String(k.measures)}/>
+      <Info label="Inspecciones" icon="inspections" value={String(data.inspections.length)}/>
+      <Info label="Evidencias" icon="evidence" value={String(data.evidence.length)}/></div>
     <p className="v2-panel-note">El archivo JSON conserva referencias, eventos y datos ficticios; no es un informe de cumplimiento ni un certificado ambiental.</p>
     <button className="v2-action-button" style={{marginTop:16}} onClick={onExport}>
-      <ArrowDownToLine size={16}/> Exportar JSON de la demostración</button>
+      <ArtworkIcon kind="export" size={23}/> Exportar JSON de la demostración</button>
     <PreliminaryTechnicalReportPanel data={data}/>
     <SpatialLinksPanel data={data} mode="report"/>
   </Panel>;
@@ -196,7 +191,7 @@ function ToolSection({kind}:{kind:'mita'|'normativa'|'biblioteca'}) {
     normativa:['Normativa','La biblioteca normativa requiere fuentes jurisdiccionales y versiones verificadas. No se emiten conclusiones legales automáticamente.'],
     biblioteca:['Biblioteca','El gestor de documentos se incorporará después de validar acceso privado y trazabilidad de archivos en Supabase.']
   }[kind];
-  return <Panel kicker="HERRAMIENTAS AMBIENTALES" title={spec[0]}>
+  return <Panel kicker="HERRAMIENTAS AMBIENTALES" icon={kind==='mita'?'satellite':kind==='normativa'?'legal':'library'} title={spec[0]}>
     <p className="v2-caption">{spec[1]}</p>
     {kind==='mita'&&<a className="v2-small-link" href={CLOUD_URL}>Consultar aplicación V1 <ExternalLink size={14}/></a>}
   </Panel>;
@@ -220,10 +215,10 @@ function PGA({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind,meas
   ),[data,term,program]);
   return <Panel kicker="PLAN DE GESTIÓN AMBIENTAL" icon="pga" title="Medidas y compromisos"
     action={<div className="v2-action-group">
-      <button type="button" className="v2-action-button" onClick={()=>onAction('measure')}><AmbientaIcon kind="measures" size={17}/> Nueva medida</button>
-      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('status')}><AmbientaIcon kind="calendar" size={17}/> Cambiar estado</button>
-      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('evidence')}><AmbientaIcon kind="evidence" size={17}/> Registrar evidencia</button>
-      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('review')}><AmbientaIcon kind="review" size={17}/> Revisar evidencia</button>
+      <button type="button" className="v2-action-button" onClick={()=>onAction('measure')}><ArtworkIcon kind="measures" size={17}/> Nueva medida</button>
+      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('status')}><ArtworkIcon kind="calendar" size={17}/> Cambiar estado</button>
+      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('evidence')}><ArtworkIcon kind="evidence" size={17}/> Registrar evidencia</button>
+      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('review')}><ArtworkIcon kind="review" size={17}/> Revisar evidencia</button>
     </div>}>
     <div className="v2-controls">
       <label className="v2-search"><Search size={17}/><input aria-label="Buscar medida" value={term} onChange={e=>setTerm(e.target.value)} placeholder="Buscar medida o responsable…"/></label>
@@ -254,7 +249,7 @@ function Monitoreo({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKin
   const selected=params.get('inspeccion');
   const clear=()=>setParams(prev=>{const next=new URLSearchParams(prev);next.delete('inspeccion');return next});
   return <Panel kicker="MONITOREO AMBIENTAL" icon="monitoring" title="Inspecciones programadas"
-    action={<button type="button" className="v2-action-button" onClick={()=>onAction('inspection')}>+ Nueva inspección</button>}>
+    action={<button type="button" className="v2-action-button" onClick={()=>onAction('inspection')}><ArtworkIcon kind="inspections" size={24}/> Nueva inspección</button>}>
     {selected&&<RecordFocusPanel data={data} kind="inspection" id={selected} onClose={clear}/>}
     <div className="v2-table-scroll"><table className="v2-table"><thead><tr><th>Inspección</th><th>Fecha</th><th>Medida asociada</th><th>Responsable</th><th>Resultado</th><th>Consulta</th></tr></thead>
       <tbody>{data.inspections.map(i=><tr key={i.id}><td><strong>{i.id}</strong><small>{i.note}</small></td><td>{i.date}</td>
@@ -276,11 +271,11 @@ function Auditorias({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKi
         onClose={clear}/>
     </div>}
     <Panel kicker="AUDITORÍAS" icon="audits" title="Hallazgos abiertos"
-      action={<div className="v2-action-group"><button type="button" className="v2-action-button" onClick={()=>onAction('finding')}>+ Nuevo hallazgo</button>
-      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('corrective')}>Acción correctiva</button></div>}>
+      action={<div className="v2-action-group"><button type="button" className="v2-action-button" onClick={()=>onAction('finding')}><ArtworkIcon kind="audits" size={24}/> Nuevo hallazgo</button>
+      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('corrective')}><ArtworkIcon kind="measures" size={24}/> Acción correctiva</button></div>}>
       <div className="v2-large-stat">{data.findings.filter(f=>f.status==='abierto').length}</div>
       <p className="v2-caption">Hallazgos abiertos en los datos actuales del ejemplo.</p>
-      <div className="v2-inline-notice"><AmbientaIcon kind="notice" size={19}/><span>Los hallazgos y su seguimiento son registros de demostración y no constituyen un dictamen de cumplimiento ambiental.</span></div>
+      <div className="v2-inline-notice"><ArtworkIcon kind="notice" size={19}/><span>Los hallazgos y su seguimiento son registros de demostración y no constituyen un dictamen de cumplimiento ambiental.</span></div>
     </Panel>
     <Panel kicker="REGISTRO" icon="history" title="Historial de hallazgos">
       {data.findings.length?data.findings.map(f=><div className="v2-audit-item" key={f.id}><span>{f.title}<small>{f.id} · {f.severity} · Inspección {f.inspectionId}</small></span><Badge tone="amber">{f.status}</Badge>
@@ -295,7 +290,7 @@ function Auditorias({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKi
 }
 function Historial({data}: {data:DemoState}) {
   return <Panel kicker="TRAZABILIDAD" icon="history" title="Registro de actividades"><div className="v2-history">
-    {data.audit.slice().reverse().map(e=><div className="v2-activity" key={e.id}><span className="v2-activity-icon"><AmbientaIcon kind="history" size={18}/></span>
+    {data.audit.slice().reverse().map(e=><div className="v2-activity" key={e.id}><span className="v2-activity-icon"><ArtworkIcon kind="history" size={24}/></span>
       <div><strong>{e.actor}</strong><p>{e.details}</p><small>{new Date(e.at).toLocaleString('es-AR',{dateStyle:'medium',timeStyle:'short'})}</small></div>
     </div>)}</div></Panel>;
 }
@@ -372,16 +367,16 @@ export default function App() {
         <div className="v2-top-actions">
           <button className="ref-theme-button" type="button" aria-label={bright?'Activar tema oscuro':'Activar iluminación suave'} onClick={()=>setBright(v=>!v)}>
             {bright?<Moon size={18}/>:<Sun size={18}/>}</button>
-          {!isPrivate&&<span className="v2-location"><MapPin size={15}/> {data.project.province} · AR</span>}
+          {!isPrivate&&<span className="v2-location"><ArtworkIcon kind="territory" size={23}/> {data.project.province} · AR</span>}
           <div className="ref-user-chip"><span>DE</span><strong>{isPrivate?'Acceso privado':'Demo Usuario'}</strong></div>
-          {!isOverview&&!isPrivate&&<button className="v2-export" onClick={()=>exportDemo(data)}><AmbientaIcon kind="export" size={17}/> <span>Exportar JSON</span></button>}
+          {!isOverview&&!isPrivate&&<button className="v2-export" onClick={()=>exportDemo(data)}><ArtworkIcon kind="export" size={23}/> <span>Exportar JSON</span></button>}
         </div>
       </header>
       <div className="v2-content">
-        {IS_DIABLILLOS_CASE&&!isPrivate&&<div className="v2-case-banner" role="note"><AmbientaIcon kind="notice" size={17}/> CASO DIABLILLOS · AUDITORÍA DOCUMENTAL DEMO · RESULTADOS SIMULADOS · SIN VISITA DE CAMPO</div>}
+        {IS_DIABLILLOS_CASE&&!isPrivate&&<div className="v2-case-banner" role="note"><ArtworkIcon kind="notice" size={17}/> CASO DIABLILLOS · AUDITORÍA DOCUMENTAL DEMO · RESULTADOS SIMULADOS · SIN VISITA DE CAMPO</div>}
         {!isOverview&&<div className="v2-page-intro"><div><p className="v2-kicker">PLATAFORMA AMBIENTAL ARGENTINA · VERSIÓN WEB {AMBIENTA_WEB_VERSION} · EXPERIMENTAL</p>
           <h1>{active.label}</h1><p>{active.description}</p></div></div>}
-        {!isPrivate&&!isOverview&&<div className="v2-warning"><span className="amb-warning-glyph"><AmbientaIcon kind="notice" size={20}/></span><p><strong>Ambiente de demostración.</strong> {IS_DIABLILLOS_CASE ? "Diablillos es un caso documental basado en fuentes públicas; medidas, inspecciones, evidencias y hallazgos son SIMULADOS. No se realizó auditoría de campo ni se certifica cumplimiento." : "Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental."}</p></div>}
+        {!isPrivate&&!isOverview&&<div className="v2-warning"><span className="amb-warning-glyph"><ArtworkIcon kind="notice" size={20}/></span><p><strong>Ambiente de demostración.</strong> {IS_DIABLILLOS_CASE ? "Diablillos es un caso documental basado en fuentes públicas; medidas, inspecciones, evidencias y hallazgos son SIMULADOS. No se realizó auditoría de campo ni se certifica cumplimiento." : "Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental."}</p></div>}
         {notice&&<div className="v2-success" role="status"><CheckCircle2 size={17}/><span>{notice}</span>
           <button type="button" onClick={()=>setNotice('')} aria-label="Cerrar confirmación"><X size={16}/></button></div>}
         <Routes>

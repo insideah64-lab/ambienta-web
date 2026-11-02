@@ -66,3 +66,23 @@
    transition:none!important;transform:none!important
  }
 }
+
+
+/* Consistent visual rhythm for raster pictograms outside the homepage. */
+.ref-shell .v2-panel-title h2 .amb-art-icon,
+.ref-shell .ref-panel-head h2 .amb-art-icon{vertical-align:middle;border-radius:7px}
+.ref-shell .v2-info .amb-art-icon{flex-shrink:0;border:1px solid #47736b42}
+.ref-shell .v2-action-button .amb-art-icon,
+.ref-shell .v2-export .amb-art-icon,
+.ref-shell .ref-about button .amb-art-icon{display:inline-grid;vertical-align:middle;margin-right:6px}
+.ref-shell .v2-action-button .amb-art-icon{border-radius:6px}
+.ref-shell .v2-inline-notice .amb-art-icon,
+.ref-shell .v2-warning .amb-art-icon,
+.ref-shell .v2-case-banner .amb-art-icon{flex-shrink:0;vertical-align:middle;margin-right:7px}
+.ref-shell .ref-trace-grid h4 .amb-art-icon,
+.ref-shell .ref-record-notice .amb-art-icon,
+.ref-shell .ref-trace-disclaimer .amb-art-icon{vertical-align:middle;margin-right:6px}
+.ref-shell .v2-cloud-mark .amb-art-icon,
+.ref-shell .v2-georef-heading .amb-art-icon{vertical-align:middle;flex-shrink:0}
+.ref-shell .ref-hero-tags .amb-art-icon{flex:none}
+.ref-shell .ref-indicator-icon .amb-art-icon{border-radius:9px}
