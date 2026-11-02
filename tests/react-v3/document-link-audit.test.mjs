@@ -52,3 +52,19 @@ test('incomplete inputs remain pure and only report document reference issues',(
  assert(audit.issues.some(i=>i.kind==='measure'&&i.code==='missing_reference'));
  assert.equal(JSON.stringify(x),before);
 });
+
+test('duplicated evidence source never deep-links to the first arbitrary duplicate',()=>{
+ const s=fixture();
+ s.evidence.push({...s.evidence[3],reference:'SIMULADO://otro'});
+ s.evidence[3].inspectionId='INSP-MISSING';
+ const issues=auditDocumentLinks(s).issues.filter(x=>x.id==='EVID-D-004');
+ assert(issues.some(x=>x.code==='duplicate_id'));
+ assert(issues.some(x=>x.code==='missing_target'));
+ assert(issues.every(x=>x.url===null));
+});
+test('unique source with a missing target keeps a safe link to its own record',()=>{
+ const s=fixture();s.findings[0].inspectionId='INSP-NO';
+ const issues=auditDocumentLinks(s).issues.filter(x=>x.id==='HALL-D-001');
+ assert.equal(issues.length,1);
+ assert.equal(issues[0].url,'/auditorias?hallazgo=HALL-D-001');
+});
