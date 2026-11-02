@@ -60,6 +60,13 @@ function readMatrix(projectId:string,projectName:string):Matrix{
  }catch{ /* blocked storage falls back to a volatile blank matrix */ }
  return initial(projectId,projectName);
 }
+/** Read-only catalog shared by distinct scoring engines. Preserves V1 draft keys. */
+export function readMatrixAxes(projectId:string,projectName:string):{
+ actions:Action[];factors:Factor[]
+}{
+ const doc=readMatrix(projectId,projectName);
+ return {actions:doc.actions,factors:doc.factors};
+}
 function download(filename:string,mime:string,content:string){
  const blob=new Blob([content],{type:mime});const url=URL.createObjectURL(blob);
  const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove();
