@@ -55,6 +55,7 @@ try{
 
   await page.getByRole('link',{name:'Plan de Gestión',exact:true}).first().click();
   await page.waitForURL(/#\/pga/);
+  await page.locator('.v2-sidebar a.is-active [data-ambienta-icon="pga"]').waitFor();
   assert.equal(await page.locator('.v2-sidebar a.is-active [data-ambienta-icon="pga"]').count(),1);
   assert.equal(await page.evaluate(()=>JSON.stringify({...localStorage})),original,
     'Navigation/icon changes must not mutate expediente');
