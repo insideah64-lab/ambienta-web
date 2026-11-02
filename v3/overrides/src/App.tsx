@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, NavLink, Route, Routes, useLocation, useSearchParams } from 'react-router-dom';
 import {
-  Activity, ArrowDownToLine, BookOpen, CheckCircle2, Clock3,
-  Cloud, ExternalLink, FileText, FolderOpen, Globe2, History, LayoutDashboard,
-  Leaf, Map, MapPin, Menu, Moon, Satellite, Search, ShieldCheck, Sun, X, Layers3
+  Activity, ArrowDownToLine, CheckCircle2, Clock3,
+  ExternalLink, FileText, FolderOpen, History, Leaf,
+  MapPin, Menu, Moon, Search, ShieldCheck, Sun, X, Layers3
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import {
