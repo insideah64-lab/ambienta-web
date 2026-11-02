@@ -78,6 +78,11 @@ try{
   assert.equal((await panel.locator('[data-conesa-absolute]').innerText()).trim(),'28');
   assert.equal((await panel.locator('[data-conesa-signed]').innerText()).trim(),'-28');
   assert.equal((await panel.locator('[data-conesa-category]').innerText()).trim(),'Moderado');
+  await panel.getByRole('combobox',{name:'Naturaleza Conesa revisado'}).selectOption('1');
+  assert.equal((await panel.locator('[data-conesa-signed]').innerText()).trim(),'28');
+  assert.equal((await panel.locator('[data-conesa-category]').innerText()).trim(),'Beneficioso',
+   'Positive impact must not inherit the negative severity label');
+  await panel.getByRole('combobox',{name:'Naturaleza Conesa revisado'}).selectOption('-1');
   await panel.getByRole('combobox',{name:'Conesa RV'}).selectOption('2');
   assert.equal((await panel.locator('[data-conesa-absolute]').innerText()).trim(),'29',
    'Changing RV updates a computed row, unlike the hardcoded Excel results');
