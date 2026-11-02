@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {ArrowDownToLine,RotateCcw,X} from 'lucide-react';
+import {ArrowDownToLine,X} from 'lucide-react';
 import {ImpactMatrixBuilder,readMatrixAxes} from './ImpactMatrixBuilder';
 import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type MethodId,type ScoredMethodId} from './MatrixMethodData';
 import './MatrixMethodHub.css';
