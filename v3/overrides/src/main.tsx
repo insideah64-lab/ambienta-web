@@ -8,6 +8,8 @@ import './styles.css';
 import './desktop-palette-slate-blue.css';
 // Reference-inspired dashboard is loaded LAST in V3 only.
 import './desktop-reference-dashboard.css';
+// Icon accents deliberately come after established V3 visual theme.
+import './features/iconography/ambienta-icons.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('No se encontró el contenedor de AMBIENTA V2');
