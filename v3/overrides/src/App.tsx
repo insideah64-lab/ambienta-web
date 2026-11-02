@@ -41,26 +41,28 @@ import {RecordFocusPanel} from './features/traceability/RecordFocusPanel';
 import {AMBIENTA_WEB_VERSION,AMBIENTA_WEB_RELEASE_LABEL} from './release-info.mjs';
 import {DocumentLinkAuditPanel} from './features/traceability/DocumentLinkAuditPanel';
 import {PreliminaryTechnicalReportPanel} from './features/reporting/PreliminaryTechnicalReportPanel';
+import {AmbientaIcon, type AmbientaIconName} from './features/iconography/AmbientaIcon';
+import './features/iconography/ambienta-icons.css';
 
-type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
+type Navigation = { path: string; label: string; icon: AmbientaIconName; description: string };
 const NAV_PRIMARY: Navigation[] = [
-  {path:'/',label:'Resumen',icon:LayoutDashboard,description:'Resumen visual del expediente y sus compromisos.'},
-  {path:'/expediente',label:'Expediente',icon:FolderOpen,description:'Alcance, responsables y fases del proyecto.'},
-  {path:'/area',label:'Área de estudio',icon:Globe2,description:'Definir ventana, territorio, perímetro, superficies y subáreas del proyecto.'},
-  {path:'/impactos',label:'Impactos',icon:Leaf,description:'Impactos ambientales vinculados al proyecto.'},
-  {path:'/pga',label:'Plan de Gestión',icon:Layers3,description:'Programas, medidas, indicadores y trazabilidad ambiental.'},
-  {path:'/monitoreo',label:'Monitoreo',icon:Activity,description:'Inspecciones, resultados y seguimiento en campo.'},
-  {path:'/auditorias',label:'Auditorías',icon:ShieldCheck,description:'Hallazgos, controles y acciones correctivas.'},
-  {path:'/evidencias',label:'Evidencias',icon:FileText,description:'Referencias documentales, huellas SHA-256 y revisiones en demostración.'},
-  {path:'/mapas',label:'Mapas y SIG',icon:Map,description:'Analizar capas WFS/WMS, importar GeoJSON, recortar y exportar cartografía.'},
-  {path:'/reportes',label:'Reportes',icon:FolderOpen,description:'Informe técnico preliminar, matriz de información faltante y exportación del expediente.'}
+  {path:'/',label:'Resumen',icon:'dashboard',description:'Resumen visual del expediente y sus compromisos.'},
+  {path:'/expediente',label:'Expediente',icon:'folder',description:'Alcance, responsables y fases del proyecto.'},
+  {path:'/area',label:'Área de estudio',icon:'territory',description:'Definir ventana, territorio, perímetro, superficies y subáreas del proyecto.'},
+  {path:'/impactos',label:'Impactos',icon:'impacts',description:'Impactos ambientales vinculados al proyecto.'},
+  {path:'/pga',label:'Plan de Gestión',icon:'pga',description:'Programas, medidas, indicadores y trazabilidad ambiental.'},
+  {path:'/monitoreo',label:'Monitoreo',icon:'monitoring',description:'Inspecciones, resultados y seguimiento en campo.'},
+  {path:'/auditorias',label:'Auditorías',icon:'audits',description:'Hallazgos, controles y acciones correctivas.'},
+  {path:'/evidencias',label:'Evidencias',icon:'evidence',description:'Referencias documentales, huellas SHA-256 y revisiones en demostración.'},
+  {path:'/mapas',label:'Mapas y SIG',icon:'gis',description:'Analizar capas WFS/WMS, importar GeoJSON, recortar y exportar cartografía.'},
+  {path:'/reportes',label:'Reportes',icon:'reports',description:'Informe técnico preliminar, matriz de información faltante y exportación del expediente.'}
 ];
 const NAV_TOOLS: Navigation[] = [
-  {path:'/mita',label:'MITA satelital',icon:Satellite,description:'Información sobre integración del motor satelital MITA.'},
-  {path:'/normativa',label:'Normativa',icon:BookOpen,description:'Referencias de gestión normativa pendientes de incorporación.'},
-  {path:'/biblioteca',label:'Biblioteca',icon:FolderOpen,description:'Biblioteca documental pendiente de conexión.'},
-  {path:'/historial',label:'Historial',icon:History,description:'Registro local de actividades de demostración.'},
-  {path:'/nube',label:'Espacio privado',icon:Cloud,description:'Acceso autenticado de solo lectura a expedientes de Supabase.'}
+  {path:'/mita',label:'MITA satelital',icon:'satellite',description:'Información sobre integración del motor satelital MITA.'},
+  {path:'/normativa',label:'Normativa',icon:'legal',description:'Referencias de gestión normativa pendientes de incorporación.'},
+  {path:'/biblioteca',label:'Biblioteca',icon:'library',description:'Biblioteca documental pendiente de conexión.'},
+  {path:'/historial',label:'Historial',icon:'history',description:'Registro local de actividades de demostración.'},
+  {path:'/nube',label:'Espacio privado',icon:'cloud',description:'Acceso autenticado de solo lectura a expedientes de Supabase.'}
 ];
 const NAV=[...NAV_PRIMARY,...NAV_TOOLS];
 const CLOUD_URL='https://insideah64-lab.github.io/ambienta-web/cloud.html';
@@ -341,20 +343,20 @@ export default function App() {
   useEffect(()=>setSidebarOpen(false),[location.pathname]);
   return <div className={"v2-app ref-shell"+(bright?" ref-bright":"")+(IS_DIABLILLOS_CASE?" audit-diablillos":"")}>
     <aside className={'v2-sidebar '+(sidebarOpen?'sidebar-open':'')} aria-label="Navegación de AMBIENTA">
-      <div className="v2-brand"><span className="v2-logo"><Leaf size={30}/></span><div><strong>AMBIENTA</strong><small>PLATAFORMA AMBIENTAL</small></div>
+      <div className="v2-brand"><span className="v2-logo"><AmbientaIcon kind="brand" size={30}/></span><div><strong>AMBIENTA</strong><small>PLATAFORMA AMBIENTAL</small></div>
         <button className="v2-close" aria-label="Cerrar navegación" onClick={()=>setSidebarOpen(false)}><X size={20}/></button>
       </div>
       <div className="v2-sidebar-title">ESPACIO DE TRABAJO</div>
-      <nav className="v2-nav" aria-label="Secciones">{NAV_PRIMARY.map(({path,label,icon:Icon})=>
+      <nav className="v2-nav" aria-label="Secciones">{NAV_PRIMARY.map(({path,label,icon})=>
         <NavLink key={path} to={path} end={path==='/'} className={({isActive})=>'v2-nav-item '+(isActive?'is-active':'')}>
-          <Icon size={19} strokeWidth={1.8}/><span>{label}</span></NavLink>)}</nav>
+          <AmbientaIcon kind={icon} size={20}/><span>{label}</span></NavLink>)}</nav>
       <div className="v2-sidebar-separator"/>
       <div className="v2-sidebar-title ref-tools-label">HERRAMIENTAS</div>
-      <nav className="v2-nav ref-tool-nav" aria-label="Herramientas">{NAV_TOOLS.map(({path,label,icon:Icon})=>
+      <nav className="v2-nav ref-tool-nav" aria-label="Herramientas">{NAV_TOOLS.map(({path,label,icon})=>
         <NavLink key={path} to={path} className={({isActive})=>'v2-nav-item '+(isActive?'is-active':'')}>
-          <Icon size={19} strokeWidth={1.8}/><span>{label}</span></NavLink>)}</nav>
+          <AmbientaIcon kind={icon} size={20}/><span>{label}</span></NavLink>)}</nav>
       <div className="v2-sidebar-base">
-        <span className="ref-demo-icon"><Leaf size={22}/></span>
+        <span className="ref-demo-icon"><AmbientaIcon kind="brand" size={22}/></span>
         <div><strong>Entorno de demostración</strong><small>{data.project.province} · Argentina</small>
         <Link to="/nube">Cambiar proyecto</Link></div>
       </div>
