@@ -26,7 +26,7 @@ try{
   const note=page.locator('[data-record-ambiguous=evidence]');
   await note.waitFor();
   assert.match(await note.innerText(),/Identificador duplicado/);
-  assert.match(await note.innerText(),/no se siguieron vínculos/i);
+  assert.match(await note.innerText(),/ni se siguieron vínculos/i);
   assert.equal(await page.locator('[data-record-focus="EVID-D-004"]').count(),0);
   await note.screenshot({path:out+'/duplicate-evidence-'+width+'.png',
    animations:'disabled'});
