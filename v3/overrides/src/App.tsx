@@ -37,6 +37,8 @@ import {PerimeterWorkbench} from './features/maps/PerimeterWorkbench';
 import { EvidenceIntegrityLab } from './features/evidence/EvidenceIntegrityLab';
 import {MeasureTracePanel} from './features/traceability/MeasureTracePanel';
 import {RecordFocusPanel} from './features/traceability/RecordFocusPanel';
+// @ts-ignore: small pure V3-only release label
+import {AMBIENTA_WEB_VERSION,AMBIENTA_WEB_RELEASE_LABEL} from './release-info.mjs';
 import {DocumentLinkAuditPanel} from './features/traceability/DocumentLinkAuditPanel';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
@@ -372,7 +374,7 @@ export default function App() {
       </header>
       <div className="v2-content">
         {IS_DIABLILLOS_CASE&&!isPrivate&&<div className="v2-case-banner" role="note"><ShieldCheck size={17}/> CASO DIABLILLOS · AUDITORÍA DOCUMENTAL DEMO · RESULTADOS SIMULADOS · SIN VISITA DE CAMPO</div>}
-        {!isOverview&&<div className="v2-page-intro"><div><p className="v2-kicker">PLATAFORMA AMBIENTAL ARGENTINA · V3 SIG TOPOLOGICO · EXPERIMENTAL</p>
+        {!isOverview&&<div className="v2-page-intro"><div><p className="v2-kicker">PLATAFORMA AMBIENTAL ARGENTINA · VERSIÓN WEB {AMBIENTA_WEB_VERSION} · EXPERIMENTAL</p>
           <h1>{active.label}</h1><p>{active.description}</p></div></div>}
         {!isPrivate&&!isOverview&&<div className="v2-warning"><span>!</span><p><strong>Ambiente de demostración.</strong> {IS_DIABLILLOS_CASE ? "Diablillos es un caso documental basado en fuentes públicas; medidas, inspecciones, evidencias y hallazgos son SIMULADOS. No se realizó auditoría de campo ni se certifica cumplimiento." : "Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental."}</p></div>}
         {notice&&<div className="v2-success" role="status"><CheckCircle2 size={17}/><span>{notice}</span>
@@ -395,7 +397,7 @@ export default function App() {
           <Route path="/nube" element={<CloudWorkspace/>}/>
           <Route path="*" element={<div className="v2-empty"><p>Sección no encontrada.</p><Link to="/">Volver al resumen</Link></div>}/>
         </Routes>
-        <footer className="v2-footer"><span><CheckCircle2 size={15}/> Sin aprobación normativa automática</span><span>AMBIENTA V3 SIG · React + TypeScript · Laboratorio topológico</span></footer>
+        <footer className="v2-footer"><span><CheckCircle2 size={15}/> Sin aprobación normativa automática</span><span data-app-release={AMBIENTA_WEB_VERSION}>{AMBIENTA_WEB_RELEASE_LABEL} · React + TypeScript · Laboratorio SIG</span></footer>
       </div>
     </main>
     {action&&<DemoActionDialog kind={action.kind} state={data} initialMeasureId={action.measureId}
