@@ -54,10 +54,9 @@ try{
   assert.equal(await page.locator('.ref-map-panel h2 [data-ambienta-icon="territory"]').count(),1);
   assert.equal(await page.locator('.ref-schedule h2 [data-ambienta-icon="calendar"]').count(),1);
   assert.equal(await page.locator('.ref-activities h2 [data-ambienta-icon="history"]').count(),1);
-  assert.equal(await page.locator('.ref-attention-eyebrow [data-ambienta-icon="notice"]').count(),1);
   assert.equal(await page.locator('.ref-indicators h2 [data-ambienta-icon="monitoring"]').count(),1);
   assert.equal(await page.locator('.ref-activity-icon [data-ambienta-icon]').count()>=1,true);
-  assert.equal(await page.locator('.ref-attention-item .ref-attention-kind [data-ambienta-icon]').count()>=1,true);
+  assert.equal(await page.locator('.v2-case-banner [data-ambienta-icon="notice"]').count(),1);
     await page.screenshot({path:output+'/dashboard-'+width+'.png',animations:'disabled'});
 
   await page.getByRole('link',{name:'Plan de Gestión',exact:true}).first().click();
