@@ -1,0 +1,96 @@
+name: YouTube Chromium access diagnostic (read-only research)
+on:
+  push:
+    branches: ['experiment/youtube-chromium-access-2026-11-02']
+    paths:
+      - '.github/workflows/yt-browser-access-check.yml'
+permissions:
+  contents: read
+jobs:
+  inspect-youtube:
+    runs-on: ubuntu-latest
+    timeout-minutes: 14
+    steps:
+      - name: Install fresh Playwright Chromium in temporary research directory
+        run: |
+          mkdir -p /tmp/ambienta-youtube-probe
+          cd /tmp/ambienta-youtube-probe
+          npm install playwright@1.56.1 --no-save --ignore-scripts --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Open public YouTube pages and inspect availability without credentials
+        run: |
+          mkdir -p youtube-probe-results
+          cat >/tmp/ambienta-youtube-probe/probe.cjs <<'NODE'
+          const {chromium}=require('playwright');
+          const fs=require('node:fs');
+          const path=require('node:path');
+          const output=path.join(process.env.GITHUB_WORKSPACE,'youtube-probe-results');
+          const probes=[
+            {id:'leopold-tutorial',url:'https://www.youtube.com/watch?v=dLEzvDH0deg'},
+            {id:'conesa-search',url:'https://www.youtube.com/results?search_query=matriz+Conesa+impacto+ambiental+paso+a+paso'}
+          ];
+          (async()=>{
+            const browser=await chromium.launch({headless:true,args:['--no-sandbox','--disable-dev-shm-usage']});
+            const results=[];
+            for(const test of probes){
+              const page=await browser.newPage({viewport:{width:1366,height:768},locale:'es-AR'});
+              const errors=[];let response=null;
+              page.on('requestfailed',r=>{
+                if(r.url().includes('youtube')&&errors.length<12)errors.push({url:r.url().slice(0,160),failure:r.failure()});
+              });
+              try{
+                const resp=await page.goto(test.url,{waitUntil:'domcontentloaded',timeout:28000});
+                response=resp?.status()??null;
+                await page.waitForTimeout(4500);
+                const initial=await page.evaluate(()=>{
+                  const player=window.ytInitialPlayerResponse||{};
+                  const vd=player.videoDetails||{};
+                  const tracks=player.captions?.playerCaptionsTracklistRenderer?.captionTracks||[];
+                  const heading=document.querySelector('h1')?.innerText||'';
+                  const body=(document.body?.innerText||'').slice(0,2800);
+                  const links=[...document.querySelectorAll('a[href*="/watch?v="]')].slice(0,8)
+                     .map(a=>({title:(a.innerText||a.getAttribute('title')||'').slice(0,130),url:a.href}));
+                  return {title:document.title,heading,bodySample:body,playerTitle:vd.title||null,
+                    playerStatus:player.playabilityStatus?.status||null,
+                    captionTracks:tracks.map(t=>({languageCode:t.languageCode,name:t.name?.simpleText||'',kind:t.kind||''})),
+                    searchLinks:links,videoElement:!!document.querySelector('video')};
+                });
+                let transcript={attempted:false,opened:false,segments:[]};
+                if(test.id==='leopold-tutorial'){
+                  transcript.attempted=true;
+                  const button=page.locator('ytd-video-description-transcript-section-renderer button, button[aria-label*="transcrip" i], button[aria-label*="transcript" i]').first();
+                  try{
+                    if(await button.count()&&await button.isVisible()){
+                      await button.click({timeout:4000});
+                      await page.waitForTimeout(1800);
+                      transcript.opened=await page.locator('ytd-transcript-segment-renderer').count()>0;
+                      transcript.segments=(await page.locator('ytd-transcript-segment-renderer').allInnerTexts()).slice(0,12);
+                    }
+                  }catch(error){transcript.error=String(error).slice(0,300);}
+                }
+                await page.screenshot({path:path.join(output,test.id+'.png'),fullPage:false,timeout:8000}).catch(()=>{});
+                results.push({id:test.id,url:test.url,response,finalUrl:page.url(),initial,transcript,errors});
+              }catch(e){
+                results.push({id:test.id,url:test.url,response,error:String(e),errors});
+              }finally{await page.close();}
+            }
+            await browser.close();
+            fs.writeFileSync(path.join(output,'probe-results.json'),JSON.stringify({timestamp:new Date().toISOString(),runner:'GitHub Actions ubuntu-latest Playwright Chromium 1.56.1',results},null,2));
+            for(const r of results){
+              console.log('YT_PROBE_RESULT '+JSON.stringify({id:r.id,status:r.response,error:r.error||null,
+                pageTitle:r.initial?.title||null,videoTitle:r.initial?.playerTitle||null,
+                playerStatus:r.initial?.playerStatus||null,captionTracks:r.initial?.captionTracks?.length||0,
+                transcriptSegments:r.transcript?.segments?.length||0,searchLinks:r.initial?.searchLinks?.length||0,
+                errors:r.errors?.slice(0,3)}));
+            }
+          })().catch(e=>{console.error(e);process.exitCode=1;});
+          NODE
+          node /tmp/ambienta-youtube-probe/probe.cjs
+      - name: Store Chromium research evidence, regardless of access result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-youtube-chromium-access-evidence
+          path: youtube-probe-results/
+          if-no-files-found: warn
+          retention-days: 7
