@@ -102,7 +102,7 @@ function WorkAttention({data}:{data:DemoState}){
   <div className="ref-attention-top">
    <div><p className="ref-attention-eyebrow">GESTIÓN DOCUMENTAL · ESTADOS DEL EXPEDIENTE</p>
     <h2 id="ref-work-title">Alertas y pendientes</h2>
-    <p>Revisiones y seguimientos documentales, no incumplimientos ambientales confirmados.</p>
+    <p>Estados de trabajo: <strong>no alertas ambientales ni incumplimientos comprobados.</strong></p>
    </div>
    <div className="ref-attention-summary" aria-label="Pendientes por tipo" data-work-summary="true">
     <span><strong data-work-follow-up="true">{work.followUp}</strong><small>seguimientos</small></span>
