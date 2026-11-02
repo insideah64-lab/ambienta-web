@@ -12,6 +12,8 @@ type Props={
 const hasScore=(x:LeopoldSlice)=>x.evaluated>0;
 const value=(x:LeopoldSlice)=>hasScore(x)?String(x.signedSum):'—';
 const escaped=(x:unknown)=>{
+ // Only user-authored strings are formula-injection risks: preserve computed negative numbers.
+ if(typeof x==='number'&&Number.isFinite(x))return '"'+String(x)+'"';
  const raw=String(x??'');
  const safe=/^\s*[=+\-@\t\r]/.test(raw)?"'"+raw:raw;
  return '"'+safe.replaceAll('"','""')+'"';
