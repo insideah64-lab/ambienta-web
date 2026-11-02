@@ -12,6 +12,8 @@ import './desktop-reference-dashboard.css';
 import './features/iconography/ambienta-icons.css';
 // Illustrated hero identity comes after the reference theme and plain icon styling.
 import './features/iconography/illustrated-hero.css';
+// Generated WebP art is V3-only, served from the compiled app, never an external CDN.
+import './features/iconography/raster-art.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('No se encontró el contenedor de AMBIENTA V2');

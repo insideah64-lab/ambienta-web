@@ -14,6 +14,25 @@ try{
   const errors=[];page.on('pageerror',err=>errors.push(String(err)));
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/');
   await page.locator('.v2-sidebar .v2-logo [data-ambienta-icon="brand"]').waitFor();
+  await page.locator('.v2-sidebar nav .amb-art-loaded').first().waitFor();
+  const raster=await page.evaluate(()=>{
+    const nav=[...document.querySelectorAll('.v2-sidebar nav .v2-nav-item')];
+    const icons=nav.map(n=>n.querySelector('.amb-art-icon'));
+    const photo=getComputedStyle(document.querySelector('.ref-hero')).backgroundImage;
+    return {
+      ready:icons.filter(x=>x?.classList.contains('amb-art-loaded')).length,
+      kinds:icons.map(x=>x?.getAttribute('data-ambienta-artwork')),
+      imageWidths:icons.map(x=>x?.querySelector('img')?.naturalWidth),
+      imageSources:icons.map(x=>x?.querySelector('img')?.currentSrc),
+      background:photo,
+      heroBytes:performance.getEntriesByType('resource').filter(e=>e.name.includes('hero-puna')).length,
+    };
+  });
+  assert.equal(raster.ready,15,'All 15 navigation art images must load');
+  assert.equal(new Set(raster.imageSources).size,15,'All 15 modules need different generated image files');
+  assert(raster.imageWidths.every(x=>x>0),'Actual WebP pixel data required, not just SVG placeholders');
+  assert(raster.background.includes('hero-puna'),'Generated photo must replace prior vector background');
+  assert(!raster.background.includes('ambienta-landscape.svg'),'Old scenic SVG must not be active');
   const original=await page.evaluate(()=>JSON.stringify({...localStorage}));
   const snapshot=await page.evaluate(()=>{
     const all=[...document.querySelectorAll('.v2-sidebar nav .v2-nav-item')];
@@ -52,21 +71,31 @@ try{
   assert(snapshot.overflow<=6,'Horizontal overflow '+snapshot.overflow);
   assert.deepEqual(errors,[],'No JS errors on dashboard');
   const hero=await page.locator('[data-hero-illustrated=true]').evaluate(el=>{
-    const icons=[...el.querySelectorAll('svg[data-ambienta-illustration]')];
+    const vectors=[...el.querySelectorAll('svg[data-ambienta-illustration]')];
+    const artworks=[...el.querySelectorAll('[data-ambienta-artwork]')];
     const tags=[...el.querySelectorAll('.ref-hero-tag')];
-    const shape=icons.map(svg=>svg.getAttribute('data-ambienta-illustration'));
+    const allKinds=[
+      ...vectors.map(svg=>'vector:'+svg.getAttribute('data-ambienta-illustration')),
+      ...artworks.map(span=>'raster:'+span.getAttribute('data-ambienta-artwork'))
+    ];
+    const imageSources=artworks.map(span=>span.querySelector('img')?.currentSrc);
     return {
-      icons:icons.length,distinctKinds:[...new Set(shape)],svgShapes:[...new Set(icons.map(x=>x.innerHTML))].length,
-      decorative:icons.every(svg=>svg.getAttribute('aria-hidden')==='true'),
+      icons:vectors.length+artworks.length,distinctKinds:[...new Set(allKinds)],
+      svgShapes:[...new Set(vectors.map(x=>x.innerHTML))].length,
+      uniquePhotos:[...new Set(imageSources)].length,
+      decodedRaster:artworks.every(span=>span.classList.contains('amb-art-loaded')&&span.querySelector('img')?.naturalWidth>0),
+      decorative:vectors.every(svg=>svg.getAttribute('aria-hidden')==='true')&&
+        artworks.every(span=>span.getAttribute('aria-hidden')==='true'),
       tags:tags.length,colors:[...new Set(tags.map(t=>getComputedStyle(t).backgroundImage))].length,
       header:el.querySelector('h1')?.textContent,
       coordinates:el.textContent.includes('Coordenadas no declaradas'),
       width:el.getBoundingClientRect().width,overflow:el.scrollWidth-el.clientWidth
     };
   });
-  assert(hero.distinctKinds.length>=8,'Hero must have >=8 different illustrated motifs');
+  assert(hero.distinctKinds.length>=8,'Hero must have >=8 distinctly illustrated motifs, SVG and WebP combined');
   assert(hero.icons>=10,'Hero pictograms should appear in heading, metadata, badges and location');
-  assert(hero.svgShapes>=8,'Hero art must have distinct SVG drawings, not a reused glyph');
+  assert(hero.uniquePhotos>=7,'Hero must actually decode >=7 distinct generated illustration assets');
+  assert.equal(hero.decodedRaster,true,'No missing or broken generated artwork in the hero');
   assert.equal(hero.decorative,true,'Illustrations must be hidden from assistive technology');
   assert.equal(hero.tags,4,'Four live project labels retained');
   assert(hero.colors>=4,'Tags need distinct color palettes, not all green');

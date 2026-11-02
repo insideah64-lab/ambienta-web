@@ -6,6 +6,7 @@ import type { DemoState, Summary } from '../../lib/demo';
 import { statusText, IS_DIABLILLOS_CASE } from '../../lib/demo';
 import {GeoMap} from '../maps/GeoMap';
 import {AmbientaIcon, type AmbientaIconName} from '../iconography/AmbientaIcon';
+import {ArtworkIcon} from '../iconography/ArtworkIcon';
 import {HeroSymbol} from '../iconography/HeroSymbol';
 // @ts-ignore: V3-only pure workflow summary, not an environmental risk model
 import {summarizeWork} from './work-priorities.mjs';
@@ -17,7 +18,7 @@ function Metric({icon,label,value,subtitle,accent,to}:{
 }) {
   return <Link to={to} className={'v2-metric ref-metric ref-accent-'+accent}
    aria-label={label+': '+value+'. '+subtitle+'. Abrir módulo'}>
-    <span className="v2-metric-icon" aria-hidden="true"><AmbientaIcon kind={icon} size={25}/></span>
+    <span className="v2-metric-icon" aria-hidden="true"><ArtworkIcon kind={icon} size={32}/></span>
     <span className="ref-metric-body">
       <span className="ref-metric-top"><span className="ref-metric-label">{label}</span><strong>{value}</strong></span>
       <span className="ref-metric-subtitle">{subtitle}</span>
@@ -30,27 +31,27 @@ function Hero({data}:{data:DemoState}) {
   return <section className="ref-hero ref-hero-illustrated" data-hero-illustrated="true">
     <div className="ref-hero-copy">
       <span className="ref-hero-label">
-        <HeroSymbol kind="case" size={21}/>
+        <ArtworkIcon kind="folder" size={23}/>
         {IS_DIABLILLOS_CASE ? 'CASO DOCUMENTAL · PRUEBA SIMULADA' : 'PROYECTO DE EJEMPLO'}
       </span>
       <div className="ref-hero-heading">
-        <span className="ref-hero-crest" aria-hidden="true"><HeroSymbol kind="crest" size={62}/></span>
+        <span className="ref-hero-crest" aria-hidden="true"><ArtworkIcon kind="brand" size={61}/></span>
         <h1>{p.name}</h1>
       </div>
       <div className="ref-hero-meta">
-        <span><HeroSymbol kind="document" size={24}/> Código: {p.id}</span>
-        <span><HeroSymbol kind="location" size={24}/> Provincia de {p.province}</span>
-        <span><HeroSymbol kind="phase" size={24}/> {p.phase}</span>
+        <span><ArtworkIcon kind="evidence" size={24}/> Código: {p.id}</span>
+        <span><ArtworkIcon kind="territory" size={24}/> Provincia de {p.province}</span>
+        <span><ArtworkIcon kind="reports" size={24}/> {p.phase}</span>
       </div>
       <div className="ref-hero-tags">
         <span className="ref-hero-tag ref-hero-tag--document"><HeroSymbol kind="document" size={23}/>{p.status}</span>
-        <span className="ref-hero-tag ref-hero-tag--mountain"><HeroSymbol kind="mountain" size={23}/>Área no informada</span>
-        <span className="ref-hero-tag ref-hero-tag--calendar"><HeroSymbol kind="calendar" size={23}/>Inicio no declarado</span>
+        <span className="ref-hero-tag ref-hero-tag--mountain"><ArtworkIcon kind="gis" size={25}/>Área no informada</span>
+        <span className="ref-hero-tag ref-hero-tag--calendar"><ArtworkIcon kind="history" size={25}/>Inicio no declarado</span>
         <span className="ref-hero-tag ref-hero-tag--industry"><HeroSymbol kind="industry" size={23}/>{p.proponent}</span>
       </div>
     </div>
     <div className="ref-hero-location">
-      <div className="ref-province-art" aria-hidden="true"><HeroSymbol kind="location" size={66}/></div>
+      <div className="ref-province-art" aria-hidden="true"><ArtworkIcon kind="territory" size={64}/></div>
       <div className="ref-location-copy">
         <small>UBICACIÓN</small><strong>{p.province} · Argentina</strong>
         <span>Coordenadas no declaradas</span>

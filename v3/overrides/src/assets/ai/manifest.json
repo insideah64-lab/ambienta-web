@@ -1,0 +1,76 @@
+{
+  "style": "generated_pictorial",
+  "provenance": "Runway, generated for AMBIENTA; illustrative, not environmental evidence",
+  "background": "Puna-inspired illustration, not verified project photograph",
+  "photo": {
+    "file": "hero-puna.webp",
+    "width": 2304,
+    "height": 990
+  },
+  "icons": {
+    "dashboard": {
+      "file": "icon-dashboard.webp",
+      "sha256": "1791225ea5c9d9708a96425c3928b6383fbc7d3c8a90b96244479ffc2ce6dc77"
+    },
+    "folder": {
+      "file": "icon-folder.webp",
+      "sha256": "aa5a186ec834dfcc1020bb6c284bd2d9112da55217bf91cecd6f7bb63f32e140"
+    },
+    "territory": {
+      "file": "icon-territory.webp",
+      "sha256": "e1227e32116e1afcc8f1a21a1ad9d012f94a499435d8bf1a06aa4aff28afedfa"
+    },
+    "impacts": {
+      "file": "icon-impacts.webp",
+      "sha256": "72d2f77436337827b2896c0e8394b18a472c78e5c2c73d991f7a42dabac5a49b"
+    },
+    "pga": {
+      "file": "icon-pga.webp",
+      "sha256": "d0002f28bdbc7250d86585600abf3d511d5d84d02433becbdee3ade888846036"
+    },
+    "monitoring": {
+      "file": "icon-monitoring.webp",
+      "sha256": "6ecf40c9e1088c4c00849235afb7eb928de83c37c436df98b17546cac293f8b6"
+    },
+    "audits": {
+      "file": "icon-audits.webp",
+      "sha256": "f9c5f0599a59e774c8aef135116be548167133ad4631d88c4539d9d127009e1e"
+    },
+    "evidence": {
+      "file": "icon-evidence.webp",
+      "sha256": "6d6db8c56d09342fe8089f43c3259a264ba6b7eeaa7141366a6f6d305acedf9a"
+    },
+    "gis": {
+      "file": "icon-gis.webp",
+      "sha256": "6c9490733e2ca85493f9325e5a46a51b1686035d733ee4db784043286fb5bd3f"
+    },
+    "reports": {
+      "file": "icon-reports.webp",
+      "sha256": "ae263f4ca9697d55811344a8efc8e47e6845370e7ae6d9877ef36bf3bd1a855c"
+    },
+    "satellite": {
+      "file": "icon-satellite.webp",
+      "sha256": "871bf9b49d5beaab6980cf53a146cbf13757a2e4df2778e5c2b8b550f5c60945"
+    },
+    "legal": {
+      "file": "icon-legal.webp",
+      "sha256": "9e1dbfb237e82e2b7d8e9a29c8b7ca6b8a345d15f0e1367aaa1dedb0bd731e84"
+    },
+    "library": {
+      "file": "icon-library.webp",
+      "sha256": "3a6c2b0b4b44a96ef2ac0222be0e90026e11e329349998657d8b6ff0ff43e1ec"
+    },
+    "history": {
+      "file": "icon-history.webp",
+      "sha256": "8556bb8f59103677c42ac9b6f21c40092219ce28deb04eeb45c163685c44fce9"
+    },
+    "cloud": {
+      "file": "icon-cloud.webp",
+      "sha256": "ad031549280c4fc57d2bfb7bf4067f0f008a960373474e443014f786a3cae359"
+    },
+    "brand": {
+      "file": "icon-brand.webp",
+      "sha256": "0c6e36780e5de4f8dc36a9a0207fa242bac905882fab8092928dc9a7bacbf8f6"
+    }
+  }
+}
