@@ -12,7 +12,7 @@ export type ConesaNature=-1|1|null;
 export type ConesaCriteria=Record<string,number>;
 export type ConesaEntry={sign:ConesaNature;criteria:ConesaCriteria;reason:string;evidence:string};
 export type ConesaCategory='Irrelevante'|'Moderado'|'Severo'|'Crítico';
-export type ConesaResult={absolute:number;signed:number;category:ConesaCategory};
+export type ConesaResult={absolute:number;signed:number;category:ConesaCategory|'Beneficioso'};
 export type ConesaDefinition={id:string;label:string;options:readonly [number,string][]};
 export const CONESA_FIELDS:readonly ConesaDefinition[]=[
  {id:'IN',label:'Intensidad',options:[[1,'Baja'],[2,'Media'],[4,'Alta'],[8,'Muy alta'],[12,'Total']]},
@@ -53,7 +53,7 @@ export function calculateConesa(item:ConesaEntry|undefined):ConesaResult|null{
  if(!item||conesaProblems(item).length)return null;
  const v=item.criteria;
  const absolute=3*v.IN+2*(v.EX+v.EX_CR)+(v.MO+v.MO_CR)+v.PE+v.RV+v.SI+v.AC+v.EF+v.PR+v.MC;
- return {absolute,signed:absolute*(item.sign as -1|1),category:conesaCategory(absolute)!};
+ return {absolute,signed:absolute*(item.sign as -1|1),category:item.sign===1?'Beneficioso':conesaCategory(absolute)!};
 }
 export function validatedConesaEntry(item:unknown):item is ConesaEntry{
  if(!item||typeof item!=='object')return false;
