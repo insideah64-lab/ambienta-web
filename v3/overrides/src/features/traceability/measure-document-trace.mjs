@@ -61,7 +61,7 @@ export function measureDocumentTrace(state,measureId){
    warn('ambiguous_evidence',e.id,'Evidencia con ID duplicado; vínculo excluido.');
    continue;
   }
-  if(e.inspectionId&&!unique(nI,e.inspectionId)){
+  if(e.inspectionId&&(nI.get(e.inspectionId)??0)>1){
    warn('ambiguous_inspection',e.id,
     'inspectionId de evidencia no es inequívoco; revisar referencia.');
    // A valid direct measureId remains a direct relationship, never indirect.
@@ -74,7 +74,7 @@ export function measureDocumentTrace(state,measureId){
     'Evidencia con medida e inspección de medidas diferentes; vínculo no incorporado.');
    continue;
   }
-  if(direct&&e.inspectionId&&!inspectionRef&&unique(nI,e.inspectionId)){
+  if(direct&&e.inspectionId&&!inspectionRef&&(nI.get(e.inspectionId)??0)===0){
    warn('unresolved_inspection',e.id,
     'La evidencia referencia una inspección inexistente; revisar procedencia.');
   }
