@@ -40,6 +40,7 @@ import {RecordFocusPanel} from './features/traceability/RecordFocusPanel';
 // @ts-ignore: small pure V3-only release label
 import {AMBIENTA_WEB_VERSION,AMBIENTA_WEB_RELEASE_LABEL} from './release-info.mjs';
 import {DocumentLinkAuditPanel} from './features/traceability/DocumentLinkAuditPanel';
+import {PreliminaryTechnicalReportPanel} from './features/reporting/PreliminaryTechnicalReportPanel';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
 const NAV_PRIMARY: Navigation[] = [
@@ -52,7 +53,7 @@ const NAV_PRIMARY: Navigation[] = [
   {path:'/auditorias',label:'Auditorías',icon:ShieldCheck,description:'Hallazgos, controles y acciones correctivas.'},
   {path:'/evidencias',label:'Evidencias',icon:FileText,description:'Referencias documentales, huellas SHA-256 y revisiones en demostración.'},
   {path:'/mapas',label:'Mapas y SIG',icon:Map,description:'Analizar capas WFS/WMS, importar GeoJSON, recortar y exportar cartografía.'},
-  {path:'/reportes',label:'Reportes',icon:FolderOpen,description:'Resumen exportable del expediente de demostración.'}
+  {path:'/reportes',label:'Reportes',icon:FolderOpen,description:'Informe técnico preliminar, matriz de información faltante y exportación del expediente.'}
 ];
 const NAV_TOOLS: Navigation[] = [
   {path:'/mita',label:'MITA satelital',icon:Satellite,description:'Información sobre integración del motor satelital MITA.'},
@@ -173,7 +174,7 @@ function Evidencias({data,onAction,onApply}:{data:DemoState;onAction:(kind:DemoA
 }
 function Reportes({data,onExport}:{data:DemoState;onExport:()=>void}) {
   const k=demoSummary(data);
-  return <Panel kicker="REPORTES" title="Resumen exportable">
+  return <Panel kicker="INFORMES TÉCNICOS" title="Revisión integral del expediente">
     <p className="v2-caption">{data.project.name} · {data.project.id} · {data.project.province}</p>
     <div className="v2-project-fields"><Info label="Programas" icon={Layers3} value={String(k.programs)}/>
       <Info label="Medidas" icon={Leaf} value={String(k.measures)}/>
@@ -182,6 +183,7 @@ function Reportes({data,onExport}:{data:DemoState;onExport:()=>void}) {
     <p className="v2-panel-note">El archivo JSON conserva referencias, eventos y datos ficticios; no es un informe de cumplimiento ni un certificado ambiental.</p>
     <button className="v2-action-button" style={{marginTop:16}} onClick={onExport}>
       <ArrowDownToLine size={16}/> Exportar JSON de la demostración</button>
+    <PreliminaryTechnicalReportPanel data={data}/>
     <SpatialLinksPanel data={data} mode="report"/>
   </Panel>;
 }

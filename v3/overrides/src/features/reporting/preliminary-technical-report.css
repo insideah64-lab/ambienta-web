@@ -1,0 +1,39 @@
+/* Desktop-only technical report review; never affects SIG originals. */
+@media(min-width:1100px){
+ .ref-shell .ref-tech-report{margin:22px 0;border:1px solid #3d7973;background:#153a40;
+  border-radius:12px;padding:22px 24px;color:#e6f7ef}
+ .ref-shell .ref-tech-head{display:flex;justify-content:space-between;gap:28px;align-items:center}
+ .ref-shell .ref-tech-head>div{flex:1;min-width:0}
+ .ref-shell .ref-tech-head small{color:#afddd1;font-size:12px;letter-spacing:.07em;font-weight:700}
+ .ref-shell .ref-tech-head h3{font-size:22px!important;color:#f3fffa;margin:7px 0 8px}
+ .ref-shell .ref-tech-head p{font-size:14px!important;line-height:1.6;color:#d0e9e0;margin:0}
+ .ref-shell .ref-tech-head button{display:flex;align-items:center;justify-content:center;gap:9px;
+  border:1px solid #95cfb6;background:#277e68;border-radius:8px;color:#fff;
+  padding:13px 15px;font-size:14px!important;font-weight:700;max-width:310px;min-width:225px;cursor:pointer}
+ .ref-shell .ref-tech-head button:hover{background:#339c80}
+ .ref-shell .ref-tech-facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:18px 0}
+ .ref-shell .ref-tech-facts>div{border:1px solid #4d7976;background:#1f474a;border-radius:9px;
+  display:grid;grid-template-columns:26px auto;column-gap:7px;align-items:center;padding:14px}
+ .ref-shell .ref-tech-facts strong{font-size:24px!important;color:#f2fff9}
+ .ref-shell .ref-tech-facts small{grid-column:1/-1;font-size:12px!important;color:#c7e8df;margin-top:5px}
+ .ref-shell .ref-tech-readiness{border-top:1px solid #4a7e79;padding-top:15px}
+ .ref-shell .ref-tech-readiness h4{font-size:17px!important;color:#f0fff9;margin:0 0 4px}
+ .ref-shell .ref-tech-readiness>p{font-size:13px!important;color:#d5e8e0;margin:0 0 13px}
+ .ref-shell .ref-tech-readiness-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .ref-shell .ref-tech-readiness-grid>div{border:1px solid #557974;background:#20464b;border-radius:8px;
+  padding:12px 14px;min-width:0;display:grid;gap:5px}
+ .ref-shell .ref-tech-readiness-grid strong{font-size:14px!important;color:#fff}
+ .ref-shell .ref-tech-readiness-grid span{font-size:12px!important;font-weight:700;color:#ffd7a8}
+ .ref-shell .ref-tech-readiness-grid small{font-size:12px!important;line-height:1.5;color:#d3e5de}
+ .ref-shell .ref-tech-readiness-grid [data-report-readiness="Registro DEMO disponible"] span{color:#b9ebcf}
+ .ref-shell .ref-tech-warning{margin:16px 0 8px;background:#253d3d;border-left:4px solid #ebc389;
+  border-radius:6px;padding:11px 13px;color:#e7eee7;font-size:13px!important;line-height:1.6}
+ .ref-shell .ref-tech-message{font-size:13px!important;background:#254f45;padding:10px 12px;
+  border-radius:6px;margin:15px 0;color:#ebf9ee}
+ .ref-shell .ref-tech-nav{font-size:13px!important;color:#cce7da;line-height:1.6;margin-top:8px}
+ .ref-shell .ref-tech-nav a{color:#c5f5df;text-decoration:underline;margin:0 2px}
+}
+@media(min-width:1100px) and (max-width:1400px){
+ .ref-shell .ref-tech-head{align-items:flex-start;flex-wrap:wrap;gap:15px}
+ .ref-shell .ref-tech-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

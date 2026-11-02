@@ -25,7 +25,7 @@ try{
  assert.deepEqual(stored.records.impact['IMP-D-AGU'].zoneIds,['B']);
  assert.equal(Object.keys(stored.records.evidence).length,6);
  // Walk modules and show exactly the same metadata tied to zone IDs.
- await page.getByRole('link',{name:'Impactos',exact:true}).click();
+ await page.locator('aside[aria-label="Navegación de AMBIENTA"]').getByRole('link',{name:'Impactos',exact:true}).click();
  const impacts=page.locator('[data-spatial-links=impact]');
  await impacts.waitFor();
  assert.equal(await impacts.locator('[data-spatial-record]').count(),4);
@@ -78,7 +78,7 @@ try{
  // The domain state remains untouched when only local geographic tags change.
  const originalAfter=await page.evaluate(()=>localStorage.getItem('ambienta-v2-diablillos-2026-demo'));
  assert.equal(originalAfter,original);
- await page.getByRole('link',{name:'Área de estudio',exact:true}).click();
+ await page.locator('aside[aria-label="Navegación de AMBIENTA"]').getByRole('link',{name:'Área de estudio',exact:true}).click();
  await page.getByRole('textbox',{name:'Distancia de consulta'}).fill('8');
  await page.locator('[data-aoi-active=true]').waitFor();
  const previous=page.locator('[data-spatial-links=overview]');
