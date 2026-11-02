@@ -99,7 +99,7 @@ function WorkAttention({data}:{data:DemoState}){
  const work=summarizeWork(data);
  return <section className="ref-attention" data-work-attention="true" aria-labelledby="ref-work-title">
   <div className="ref-attention-top">
-   <div><p className="ref-attention-eyebrow"><AmbientaIcon kind="notice" size={16}/> GESTIÓN DOCUMENTAL · ESTADOS DEL EXPEDIENTE</p>
+   <div><p className="ref-attention-eyebrow">GESTIÓN DOCUMENTAL · ESTADOS DEL EXPEDIENTE</p>
     <h2 id="ref-work-title">Alertas y pendientes</h2>
     <p>Estados de trabajo: <strong>no alertas ambientales ni incumplimientos comprobados.</strong></p>
    </div>
@@ -115,7 +115,7 @@ function WorkAttention({data}:{data:DemoState}){
      <Link to={item.path} key={item.key} className={'ref-attention-item ref-attention-'+item.category}
       data-attention-key={item.key}>
       <span className="ref-attention-item-top">
-       <span className="ref-attention-kind"><AmbientaIcon kind={item.category==='seguimiento'?'calendar':'review'} size={15}/> {item.category==='seguimiento'?'Seguimiento':'Revisión'}</span>
+       <span className="ref-attention-kind">{item.category==='seguimiento'?'Seguimiento':'Revisión'}</span>
        <span className="ref-attention-count">{item.count} {item.count===1?'registro':'registros'}</span>
       </span>
       <strong>{item.label}</strong>
