@@ -12,7 +12,7 @@ try{
   page.on('pageerror',err=>errors.push(String(err)));
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
   await page.locator('[data-matrix-method-catalog="v1"]').waitFor();
-  assert.equal(await page.locator('[data-catalog-method]').count(),4,'Four distinct methods in catalogue');
+  assert.equal(await page.locator('[data-catalog-method]').count(),5,'Five method variants, including distinct simplified Conesa review');
   assert.equal(await page.locator('[data-catalog-method="battelle"] button').count(),0,
    'Battelle must not be presented as executable without measurement transformation curves');
   assert.equal(await page.locator('[data-impact-matrix="v1"]').count(),1,
