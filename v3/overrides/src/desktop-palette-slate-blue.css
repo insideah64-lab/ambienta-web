@@ -557,3 +557,17 @@
  .ref-shell [data-page-role="territory-definition"] .geo-study-buttons button:hover:not(:disabled),
  .ref-shell .v2-study-navlink:hover{background:#5f7f87}
 }
+
+/* Status badges are semantically stronger than the neutral generic chip.
+   Specificity intentionally overrides generic .ref-shell .v2-badge. */
+@media(min-width:1100px){
+ .ref-shell .v2-badge.v2-badge-mint{
+  background:#315949;border-color:#649b80;color:#d1f6dd
+ }
+ .ref-shell .v2-badge.v2-badge-amber{
+  background:#665039;border-color:#bf955e;color:#ffdfad
+ }
+ .ref-shell .v2-badge.v2-badge-blue{
+  background:#395a70;border-color:#7ba8ca;color:#e0f2ff
+ }
+}
