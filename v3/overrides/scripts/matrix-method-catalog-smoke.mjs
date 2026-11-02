@@ -17,7 +17,7 @@ try{
    'Battelle must not be presented as executable without measurement transformation curves');
   assert.equal(await page.locator('[data-impact-matrix="v1"]').count(),1,
    'Existing identification and Leopold workbench remains accessible and compatible');
-  assert.equal(await page.locator('[data-matrix-method-catalog] button[aria-pressed="true"]').count(),1);
+  assert.equal(await page.locator('[data-matrix-method-catalog] .amb-method-cardbottom button[aria-pressed="true"]').count(),1, 'Exactly one methodology card selected');
   const before=await page.evaluate(()=>Object.keys(localStorage)
    .filter(k=>k.startsWith('ambienta-scored-matrix-v1:')));
   assert.equal(before.length,0,'Opening catalog does not generate new scored-matrix records');
