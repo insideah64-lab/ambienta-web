@@ -1,0 +1,33 @@
+.ref-shell .amb-leopold-analysis{margin:17px 0 0;padding:19px;background:linear-gradient(155deg,#102d39,#142e40);
+ border:1px solid #4b8190;border-radius:12px;color:#ebfaf8}
+.ref-shell .amb-leopold-analysis-head{display:flex;justify-content:space-between;align-items:start;gap:12px;flex-wrap:wrap}
+.ref-shell .amb-leopold-analysis-head h4{margin:2px 0 5px;font-size:18px;color:#f3fffb}
+.ref-shell .amb-leopold-analysis-head p:not(.amb-matrix-overline){font-size:12px;color:#b2d2da;line-height:1.6;margin:0;max-width:690px}
+.ref-shell .amb-leopold-analysis-head button{padding:10px 13px;background:#245b60;border:1px solid #80bea9;
+ color:#f1fff5;border-radius:8px;font-weight:700;white-space:nowrap;font-size:12px}
+.ref-shell .amb-leopold-overview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:17px 0 12px}
+.ref-shell .amb-leopold-overview span{display:block;background:#082a36;border:1px solid #355d70;border-radius:8px;padding:10px}
+.ref-shell .amb-leopold-overview strong{display:block;font-size:23px;color:#dafde9}
+.ref-shell .amb-leopold-overview small{display:block;font-size:11px;color:#afc9d3}
+.ref-shell .amb-leopold-caveat{border-left:3px solid #dfc27a;background:#3a373043;padding:10px 12px;font-size:12px;
+ color:#d6d5ca;line-height:1.55;margin:12px 0}
+.ref-shell .amb-leopold-analysis-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.ref-shell .amb-leopold-table-wrap{min-width:0}
+.ref-shell .amb-leopold-table-wrap h5{font-size:13px;margin:5px 0 9px;color:#d6faeb}
+.ref-shell .amb-leopold-table-scroll{overflow-x:auto;border:1px solid #3d6679;border-radius:8px;scrollbar-color:#4c7a86 #0a2835}
+.ref-shell .amb-leopold-table-scroll table{border-collapse:collapse;min-width:600px;width:100%;font-size:12px;color:#e2edf2}
+.ref-shell .amb-leopold-table-scroll th,.ref-shell .amb-leopold-table-scroll td{padding:9px 7px;border-bottom:1px solid #34596b;
+ text-align:center;font-variant-numeric:tabular-nums}
+.ref-shell .amb-leopold-table-scroll th:first-child{text-align:left;min-width:150px;max-width:230px;overflow-wrap:anywhere}
+.ref-shell .amb-leopold-table-scroll thead{background:#1c4e58;color:#d7ecea}
+.ref-shell .amb-leopold-table-scroll tbody tr:nth-child(even){background:#173c4855}
+.ref-shell .amb-leopold-table-scroll [data-leopold-sum]{font-weight:800;color:#f5ddb1}
+.ref-shell .amb-leopold-filter-note{font-size:11px;color:#e8d4a3;margin:12px 0 0}
+.ref-shell .amb-matrix-cell--diagonal{padding:0}
+.ref-shell .amb-leopold-diagonal{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;
+ min-height:62px;width:100%;height:100%;background:linear-gradient(to bottom right,
+ transparent calc(50% - .7px),#9db6bc calc(50% - .7px),#9db6bc calc(50% + .7px),transparent calc(50% + .7px))}
+.ref-shell .amb-leopold-diagonal span:first-child{grid-column:1;grid-row:1;text-align:center;align-self:center;font-size:15px}
+.ref-shell .amb-leopold-diagonal span:last-child{grid-column:2;grid-row:2;text-align:center;align-self:center;font-size:15px}
+@media(max-width:1500px){.ref-shell .amb-leopold-analysis-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.ref-shell .amb-leopold-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}
