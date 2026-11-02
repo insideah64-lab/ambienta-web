@@ -1,0 +1,277 @@
+/* AMBIENTA · Sunlit editorial desktop concept.
+   PREVIEW ONLY. This intentionally breaks the dark monochrome cycle:
+   dark ink navigation + daylight canvas + colored category surfaces.
+   Scoped to V3 desktop and NEVER changes cartographic data or status meaning. */
+@media(min-width:1100px){
+ .ref-shell{
+  --amb-bg:#f7f7f2;--amb-sidebar:#192533;--amb-surface:#ffffff;
+  --amb-surface-raised:#fffdfa;--amb-surface-soft:#edf3f3;
+  --amb-line:#d6dfe3;--amb-ink:#203040;--amb-muted:#596b77;
+  --amb-blue:#3278c0;--amb-cyan:#259a9a;--amb-violet:#8d66b1;
+  background:#f7f7f2;color:#24313d
+ }
+ .ref-shell.v2-app{background:#f7f7f2}
+ .ref-shell .v2-main{
+  color:#263844;
+  background:radial-gradient(ellipse at 90% -8%,#ffe9d7a8,transparent 40%),
+  radial-gradient(ellipse at 10% 30%,#ddf2e7ad,transparent 45%),
+  linear-gradient(165deg,#f9fbf8,#f5f7f6 52%,#f6f2f0)
+ }
+ .ref-shell .v2-main:before{background:linear-gradient(90deg,#d9ecec45,transparent 70%)}
+ .ref-shell .v2-scenic{opacity:.14;filter:saturate(.9)}
+ /* Keep a strong, characterful dark navigation rail */
+ .ref-shell .v2-sidebar{
+  background:linear-gradient(164deg,#1b2a38,#1b2837 59%,#223344);
+  border-right:1px solid #31495e;box-shadow:5px 0 25px #192d3630
+ }
+ .ref-shell .v2-brand strong{color:#fffef9}
+ .ref-shell .v2-brand small,.ref-shell .v2-sidebar-title{color:#c8d8e2}
+ .ref-shell .v2-logo{background:#b8eed1;color:#285947}
+ .ref-shell .v2-nav-item{color:#dce5ed}
+ .ref-shell .v2-nav-item svg{color:#c5d4df;flex-shrink:0}
+ .ref-shell .v2-nav-item:nth-child(4n + 1) svg{color:#7ee0be}
+ .ref-shell .v2-nav-item:nth-child(4n + 2) svg{color:#ffcc8c}
+ .ref-shell .v2-nav-item:nth-child(4n + 3) svg{color:#92c9ff}
+ .ref-shell .v2-nav-item:nth-child(4n) svg{color:#d7b2fb}
+ .ref-shell .v2-nav-item:hover{background:#36506a;color:#fff}
+ .ref-shell .v2-nav-item.is-active{
+  background:linear-gradient(98deg,#365b74,#31465d);
+  color:#fff;border-color:#7696a9;
+  box-shadow:inset 4px 0 #8fe5cc,0 6px 15px #09111e46
+ }
+ .ref-shell .v2-sidebar-base{background:#2a4150;border-color:#52707b}
+ .ref-shell .v2-sidebar-base small{color:#cededb}
+ .ref-shell .v2-sidebar-base strong{color:#fff}
+ .ref-shell .v2-sidebar-base a{color:#a7e4d1}
+ .ref-shell .v2-topbar{
+  background:#ffffffeb;border-bottom:1px solid #dae3e5;
+  box-shadow:0 3px 16px #172b3d0b
+ }
+ .ref-shell .v2-breadcrumb{color:#41566a}
+ .ref-shell .v2-breadcrumb span{color:#8393a0}
+ .ref-shell .v2-breadcrumb strong{color:#286578}
+ .ref-shell .v2-location,.ref-shell .ref-user-chip{
+  color:#314653;background:#eff6f5;border-color:#bfd5d7
+ }
+ .ref-shell .v2-location svg{color:#269884}
+ .ref-shell .ref-user-chip>span{color:#40322c;background:#f7cba7}
+ .ref-shell .ref-theme-button{background:#f1f6f5;border-color:#c1d4da;color:#27495e}
+ .ref-shell .v2-kicker{color:#c77639}
+ .ref-shell .v2-page-intro h1{color:#1a3442}
+ .ref-shell .v2-page-intro p:not(.v2-kicker){color:#607582}
+ .ref-shell .v2-content{color:#263b46}
+ .ref-shell .v2-panel,.ref-shell .ref-panel{
+  color:#2b414b;
+  background:linear-gradient(145deg,#ffffff,#fcfdfa);
+  border:1px solid #dae4e6;box-shadow:0 9px 28px #2e516014
+ }
+ .ref-shell .v2-panel-title h2,.ref-shell .ref-panel-head h2{color:#213a48}
+ .ref-shell .ref-panel-head{border-color:#e1e9e7}
+ .ref-shell .v2-panel-note,.ref-shell .v2-caption,.ref-shell .v2-project-code,
+ .ref-shell .ref-panel-foot{color:#607380;border-color:#dce6e8}
+ .ref-shell .ref-panel-head a,.ref-shell .v2-small-link,
+ .ref-shell .v2-project-footer>a{color:#277dae}
+ .ref-shell .v2-info,.ref-shell .v2-inline-notice{
+  background:#eef7f5;border-color:#c9e4d9;color:#375a58
+ }
+ .ref-shell .v2-info strong,.ref-shell .v2-inline-notice strong{color:#294b47}
+ .ref-shell .v2-info small{color:#577b79}
+ .ref-shell .v2-info svg,.ref-shell .v2-inline-notice svg{color:#268777}
+ .ref-shell .v2-project-footer{border-color:#d9e3e5;color:#506f7d}
+ .ref-shell .v2-project-footer svg{color:#3c9277}
+ .ref-shell .v2-search,.ref-shell .v2-select-label select,
+ .ref-shell .v2-input,.ref-shell .v2-textarea{
+  color:#243d49;background:#fff;border:1px solid #cad9e0
+ }
+ .ref-shell .v2-search input{color:#243d49}
+ .ref-shell .v2-search input::placeholder{color:#82929c}
+ .ref-shell .v2-select-label{color:#536c78}
+ .ref-shell :is(button,a,input,select,textarea):focus-visible{outline-color:#197bba}
+ .ref-shell .v2-table th{color:#4a6977;border-color:#dce5e5;background:#f0f6f6}
+ .ref-shell .v2-table td{color:#334651;border-color:#e0e8e9}
+ .ref-shell .v2-table td strong{color:#1e3440}
+ .ref-shell .v2-table td small{color:#617985}
+ .ref-shell .v2-table tr:hover td{background:#f1f9f7}
+ .ref-shell .v2-empty{background:#f4f8f5;border-color:#c8ded6;color:#56716e}
+ .ref-shell .v2-empty a{color:#227ba6}
+ /* Deliberate color coded actions and human-scale accents */
+ .ref-shell .v2-primary,.ref-shell .v2-export,.ref-shell .v2-action-button,
+ .ref-shell .ref-trace-export{
+  color:#fff;background:#327fc2;border-color:#2872a9;
+  box-shadow:0 5px 12px #206c9630
+ }
+ .ref-shell .v2-primary:hover,.ref-shell .v2-export:hover,
+ .ref-shell .v2-action-button:hover,.ref-shell .ref-trace-export:hover{
+  color:#fff;background:#2468a0
+ }
+ .ref-shell .v2-secondary,.ref-shell .v2-action-muted{
+  background:#fff;color:#345568;border-color:#b7ccd5;box-shadow:none
+ }
+ .ref-shell .v2-secondary:hover,.ref-shell .v2-action-muted:hover{background:#ebf4f8}
+ .ref-shell .ref-trace-open,.ref-shell .ref-trace-close,.ref-shell .ref-record-inline,
+ .ref-shell .ref-record-dismiss,.ref-shell .ref-trace-record-link{
+  background:#e9f3fa;border:1px solid #bed9e7;color:#28628c
+ }
+ .ref-shell .ref-trace-open[aria-pressed="true"]{background:#d5eafb;border-color:#75aed1}
+ .ref-shell .ref-trace-open:hover,.ref-shell .ref-record-inline:hover,
+ .ref-shell .ref-trace-close:hover{background:#d7ecfa}
+ .ref-shell .v2-badge{
+  background:#eff3f2;border-color:#d2dcde;color:#536675
+ }
+ .ref-shell .v2-badge.v2-badge-mint{
+  background:#def5e4;border-color:#7fcca0;color:#256947
+ }
+ .ref-shell .v2-badge.v2-badge-amber{
+  background:#fff0d7;border-color:#eac17f;color:#875614
+ }
+ .ref-shell .v2-badge.v2-badge-blue{
+  background:#e5f3ff;border-color:#98bfe5;color:#235e8e
+ }
+ .ref-shell .v2-warning,.ref-shell .v2-case-banner{
+  background:#fff3dc;border:1px solid #e0bb81;box-shadow:none
+ }
+ .ref-shell .v2-warning p,.ref-shell .v2-case-banner{color:#79521d}
+ .ref-shell .v2-warning strong{color:#704619}
+ .ref-shell .v2-case-sources{background:#f0f8f4;border-color:#c9ddd2}
+ .ref-shell .v2-case-sources>strong{color:#26705e}
+ .ref-shell .v2-case-sources p{color:#4f7169}
+ .ref-shell .v2-case-sources a{color:#1d789d}
+ /* Rich expressive hero: mineral reds, golden sunlight and teal.
+    Abstract gradient for Diablillos, never fake satellite imagery. */
+ .ref-shell .ref-hero,.ref-shell.audit-diablillos .ref-hero{
+  background-color:#41636a;
+  background-image:linear-gradient(100deg,#153e4ae8 0%,#176467bd 43%,#b763528c 74%,#ebad6c74 100%),
+   radial-gradient(ellipse at 82% 23%,#ffcf7890,transparent 44%),
+   linear-gradient(165deg,#1d6d70,#ed8d6f 63%,#eeb96b) !important;
+  border:1px solid #7cb7b2;
+  box-shadow:0 12px 28px #335c572b
+ }
+ .ref-shell .ref-hero:before,.ref-shell.audit-diablillos .ref-hero:before{
+  background:linear-gradient(90deg,#153d4cbf 0%,#18545fa1 38%,#8b60541c 74%,#4c536a38 100%)
+ }
+ .ref-shell .ref-hero:after{background:radial-gradient(ellipse at 80% 12%,#ffda9090,transparent 52%)}
+ .ref-shell .ref-hero-label{
+  color:#fff4d3;background:#624b5080;border-color:#ffe3a5
+ }
+ .ref-shell .ref-hero-tags span{color:#fff;background:#174d557e;border-color:#ffffff9c}
+ .ref-shell .ref-hero-location{
+  background:#fefcf5ea;border-color:#ffffffdd;box-shadow:0 6px 20px #1e536238
+ }
+ .ref-shell .ref-location-copy small,.ref-shell .ref-location-copy strong,
+ .ref-shell .ref-location-copy>span{color:#315260}
+ .ref-shell .ref-province-art{color:#2f927a;background:#d9f3e1}
+ .ref-shell .ref-location-copy a{background:#e5f1f8;color:#235b7e;border-color:#b5d5df}
+ /* KPI cards are different soft colors, not the same tinted gray */
+ .ref-shell .ref-metric.v2-metric{
+  background:linear-gradient(145deg,#f0fbf4,#e5f4e8);
+  border-color:#b6ddc4;box-shadow:0 7px 17px #226d5130
+ }
+ .ref-shell .ref-metric.v2-metric:nth-child(2){
+  background:linear-gradient(145deg,#ebf6ff,#e0eefc);border-color:#b6d8f0
+ }
+ .ref-shell .ref-metric.v2-metric:nth-child(3){
+  background:linear-gradient(145deg,#fff5e4,#ffe9d1);border-color:#f1d1a7
+ }
+ .ref-shell .ref-metric.v2-metric:nth-child(4){
+  background:linear-gradient(145deg,#f6f0ff,#eee6f7);border-color:#d8c7e7
+ }
+ .ref-shell .ref-metric.v2-metric p{color:#526d76}
+ .ref-shell .ref-metric.v2-metric strong{color:#203844}
+ .ref-shell .ref-metric.v2-metric .ref-metric-body>span{color:#54717c}
+ .ref-shell .ref-metric .v2-metric-icon{background:#d2eedb;color:#257e57}
+ .ref-shell .ref-metric:nth-child(2) .v2-metric-icon{background:#c7e5fb;color:#2167a6}
+ .ref-shell .ref-metric:nth-child(3) .v2-metric-icon{background:#ffe0b4;color:#a66b1c}
+ .ref-shell .ref-metric:nth-child(4) .v2-metric-icon{background:#e1d3f3;color:#8052a5}
+ .ref-shell .ref-metric-track{background:#d2e0e0}
+ .ref-shell .ref-metric-track i{background:#62b489}
+ .ref-shell .ref-metric:nth-child(2) .ref-metric-track i{background:#5eacd9}
+ .ref-shell .ref-metric:nth-child(3) .ref-metric-track i{background:#daa658}
+ .ref-shell .ref-metric:nth-child(4) .ref-metric-track i{background:#aa88c9}
+ /* Dashboard: sectional variety, but clear text, no confusing status semantics */
+ .ref-shell .ref-attention{
+  background:linear-gradient(135deg,#fffaf1,#fef2e9);
+  border-color:#ebd1af;color:#44505a
+ }
+ .ref-shell .ref-attention h2,.ref-shell .ref-attention strong{color:#334451}
+ .ref-shell .ref-attention-eyebrow{color:#aa6c30}
+ .ref-shell .ref-attention-item{
+  background:#fff;border-color:#e3ded3;color:#3c4c54
+ }
+ .ref-shell .ref-attention-item.ref-attention-revision{
+  background:#eaf7f0;border-left-color:#5aab84
+ }
+ .ref-shell .ref-attention-item:hover,.ref-shell .ref-attention-item:focus-visible{
+  background:#f5faf7;border-color:#a4ceb7
+ }
+ .ref-shell .ref-attention-revision .ref-attention-kind{color:#247b62}
+ .ref-shell .ref-attention-summary>span{background:#fff6ea;border-color:#eccb9a;color:#654c32}
+ .ref-shell .ref-attention-summary strong{color:#34505f}
+ .ref-shell .ref-section-heading p{color:#58717a}
+ .ref-shell .ref-section-heading span{color:#188977}
+ .ref-shell .ref-commitment{border-color:#dce7e7}
+ .ref-shell .ref-commitment:hover{background:#f0faf7}
+ .ref-shell .ref-commitment-icon{background:#e0f5e9;color:#248261}
+ .ref-shell .ref-commitment:nth-child(2) .ref-commitment-icon{background:#e3f3fd;color:#397eac}
+ .ref-shell .ref-commitment:nth-child(3) .ref-commitment-icon{background:#f2e5fd;color:#8d60ad}
+ .ref-shell .ref-activity-icon{background:#edf2ff;color:#647bc2}
+ .ref-shell .ref-indicator{background:#f6f9fa;border-color:#d9e5e7;color:#2d4c55}
+ .ref-shell .ref-indicator-icon{background:#e1f3ec;color:#318a64}
+ .ref-shell .ref-indicator-dashes{color:#719195}
+ .ref-shell .ref-schedule-months{background:#eff6f5;border-color:#d0e2e3}
+ .ref-shell .ref-schedule-months>span{border-color:#c5dce0;color:#4f7079}
+ .ref-shell .ref-schedule-row{border-color:#dce4e8}
+ .ref-shell .ref-schedule-lane{
+  background:repeating-linear-gradient(90deg,transparent 0 calc(33.333% - 1px),#cfe2e269 calc(33.333% - 1px) 33.333%),linear-gradient(#f5f9fa,#eef4f4)
+ }
+ /* Technical report and structured documentary cards stay legible on light canvas */
+ .ref-shell .ref-tech-report{
+  color:#254553;background:linear-gradient(140deg,#e8f8f4,#f2f7ff);
+  border-color:#b4d9d6
+ }
+ .ref-shell .ref-tech-head h3,.ref-shell .ref-tech-readiness h4{color:#25465d}
+ .ref-shell .ref-tech-head small{color:#258779}
+ .ref-shell .ref-tech-head p,.ref-shell .ref-tech-readiness>p{color:#537681}
+ .ref-shell .ref-tech-facts>div{background:#ffffffd9;border-color:#c8dddf}
+ .ref-shell .ref-tech-facts strong{color:#244456}
+ .ref-shell .ref-tech-facts small{color:#547681}
+ .ref-shell .ref-tech-readiness{border-color:#c6dddc}
+ .ref-shell .ref-tech-readiness-grid>div{background:#fff;border-color:#cbdedf;color:#24404f}
+ .ref-shell .ref-tech-readiness-grid strong{color:#254253}
+ .ref-shell .ref-tech-readiness-grid small{color:#58717e}
+ .ref-shell .ref-tech-warning{background:#fff0d5;border-left-color:#d8a15d;color:#73511f}
+ .ref-shell .ref-tech-message{background:#e1f5e8;color:#306449}
+ .ref-shell .ref-tech-nav{color:#496b78}
+ .ref-shell .ref-tech-nav a{color:#216d9f}
+ .ref-shell .ref-trace-choose,.ref-shell .ref-trace-panel,.ref-shell .ref-record-focus{
+  color:#334c58;background:#fff;border-color:#d1e2e6
+ }
+ .ref-shell .ref-trace-eyebrow,.ref-shell .ref-record-eyebrow{color:#188878}
+ .ref-shell .ref-trace-head h3,.ref-shell .ref-record-focus-header h3,
+ .ref-shell .ref-trace-grid h4,.ref-shell .ref-record-links h4{color:#264553}
+ .ref-shell .ref-trace-head small,.ref-shell .ref-trace-foot,
+ .ref-shell .ref-trace-empty,.ref-shell .ref-record-empty{color:#63808b}
+ .ref-shell .ref-trace-counts span,.ref-shell .ref-trace-grid>section,
+ .ref-shell .ref-record-fields>div,.ref-shell .ref-record-links-list a{
+  background:#f2f8fa;border-color:#d5e6e9;color:#365363
+ }
+ .ref-shell .ref-trace-grid h4 a{color:#2c7a9c}
+ .ref-shell .ref-trace-record{border-color:#d5e3e6}
+ .ref-shell .ref-trace-record strong,.ref-shell .ref-record-fields dd{color:#284452}
+ .ref-shell .ref-trace-record span,.ref-shell .ref-trace-record small,
+ .ref-shell .ref-record-fields dt{color:#64808b}
+ .ref-shell .ref-record-links-list a:hover{background:#e2f0f5}
+ .ref-shell .v2-footer{color:#617784;border-color:#cbdcdf}
+ .ref-shell .v2-footer svg{color:#389b7b}
+ /* GIS remains accurate: modify only external cards, never map layer/legend/zone swatches */
+ .ref-shell .geo-shell{border-color:#cbdde0;background:#f9fcfb}
+ .ref-shell .geo-links-panel{
+  background:linear-gradient(140deg,#193e4b,#266a70);
+  border-color:#589aa0;color:#f0fffa
+ }
+ .ref-shell .geo-links-header small,.ref-shell .geo-links-record-title strong{color:#b8f1e2}
+ .ref-shell .geo-links-context,.ref-shell .geo-links-record,.ref-shell .geo-links-stats>div,
+ .ref-shell .geo-links-zone-card,.ref-shell .geo-links-checks{
+  background:#214a56;border-color:#4f8890;color:#e9faf7
+ }
+ .ref-shell .geo-links-note,.ref-shell .geo-links-panel>p,.ref-shell .geo-links-stats small{color:#d8f1ed}
+}
