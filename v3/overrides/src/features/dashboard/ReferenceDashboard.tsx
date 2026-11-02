@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom';
 import {
-  ArrowDownToLine, ArrowRight, CalendarDays, ClipboardCheck,
-  MapPin
+  ArrowDownToLine, ArrowRight
 } from 'lucide-react';
 import type { DemoState, Summary } from '../../lib/demo';
 import { statusText, IS_DIABLILLOS_CASE } from '../../lib/demo';
 import {GeoMap} from '../maps/GeoMap';
 import {AmbientaIcon, type AmbientaIconName} from '../iconography/AmbientaIcon';
+import {HeroSymbol} from '../iconography/HeroSymbol';
 // @ts-ignore: V3-only pure workflow summary, not an environmental risk model
 import {summarizeWork} from './work-priorities.mjs';
 
@@ -27,25 +27,34 @@ function Metric({icon,label,value,subtitle,accent,to}:{
 }
 function Hero({data}:{data:DemoState}) {
   const p=data.project;
-  return <section className="ref-hero">
+  return <section className="ref-hero ref-hero-illustrated" data-hero-illustrated="true">
     <div className="ref-hero-copy">
-      <span className="ref-hero-label">{IS_DIABLILLOS_CASE ? "CASO DOCUMENTAL · PRUEBA SIMULADA" : "PROYECTO DE EJEMPLO"}</span>
-      <h1>{p.name}</h1>
+      <span className="ref-hero-label">
+        <HeroSymbol kind="case" size={21}/>
+        {IS_DIABLILLOS_CASE ? 'CASO DOCUMENTAL · PRUEBA SIMULADA' : 'PROYECTO DE EJEMPLO'}
+      </span>
+      <div className="ref-hero-heading">
+        <span className="ref-hero-crest" aria-hidden="true"><HeroSymbol kind="crest" size={62}/></span>
+        <h1>{p.name}</h1>
+      </div>
       <div className="ref-hero-meta">
-        <span><ClipboardCheck size={16}/> Código: {p.id}</span>
-        <span><MapPin size={16}/> Provincia de {p.province}</span>
-        <span><CalendarDays size={16}/> {p.phase}</span>
+        <span><HeroSymbol kind="document" size={24}/> Código: {p.id}</span>
+        <span><HeroSymbol kind="location" size={24}/> Provincia de {p.province}</span>
+        <span><HeroSymbol kind="phase" size={24}/> {p.phase}</span>
       </div>
       <div className="ref-hero-tags">
-        <span>{p.status}</span><span>Área no informada</span>
-        <span>Inicio no declarado</span><span>{p.proponent}</span>
+        <span className="ref-hero-tag ref-hero-tag--verified"><HeroSymbol kind="verified" size={23}/>{p.status}</span>
+        <span className="ref-hero-tag ref-hero-tag--mountain"><HeroSymbol kind="mountain" size={23}/>Área no informada</span>
+        <span className="ref-hero-tag ref-hero-tag--calendar"><HeroSymbol kind="calendar" size={23}/>Inicio no declarado</span>
+        <span className="ref-hero-tag ref-hero-tag--industry"><HeroSymbol kind="industry" size={23}/>{p.proponent}</span>
       </div>
     </div>
     <div className="ref-hero-location">
-      <div className="ref-province-art" aria-hidden="true"><MapPin size={31}/></div>
-      <div className="ref-location-copy"><small>UBICACIÓN</small><strong>{p.province} · Argentina</strong>
+      <div className="ref-province-art" aria-hidden="true"><HeroSymbol kind="location" size={66}/></div>
+      <div className="ref-location-copy">
+        <small>UBICACIÓN</small><strong>{p.province} · Argentina</strong>
         <span>Coordenadas no declaradas</span>
-        <Link to="/area"><MapPin size={14}/> Ver ficha</Link>
+        <Link to="/area"><HeroSymbol kind="location" size={18}/> Ver ficha</Link>
       </div>
     </div>
   </section>;
