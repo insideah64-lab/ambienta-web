@@ -2,6 +2,8 @@ import {Link} from 'react-router-dom';
 import {ArrowRight, ClipboardList, FileText, ShieldCheck} from 'lucide-react';
 import type {DemoState} from '../../lib/demo';
 import {statusText} from '../../lib/demo';
+// @ts-ignore: V3 pure URL construction for explicit record IDs
+import {recordFocusUrl} from './record-focus.mjs';
 // @ts-ignore: versioned read-only, pure JS selector; no domain mutations
 import {measureDocumentTrace} from './measure-document-trace.mjs';
 
@@ -50,6 +52,7 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
        <strong>{i.id}</strong><span>{i.date} · {i.result}</span>
        <small>Por: {i.assignee}</small>
        <small>Relación: inspección.measureId → {measure.id}</small>
+       <Link className="ref-trace-record-link" to={recordFocusUrl("inspection",i.id)!}>Abrir ficha {i.id} <ArrowRight size={15}/></Link>
       </div>):<p className="ref-trace-empty">Sin inspecciones vinculadas por ID.</p>}
     </section>
     <section data-trace-group="evidence">
@@ -59,6 +62,7 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
        <strong>{e.id} · {e.label}</strong><span>Estado documental: {e.status}</span>
        <small>{via==='medida'?'Vínculo directo measureId':'Vínculo indirecto mediante inspectionId'}</small>
        <small>Referencia declarada: {e.reference}</small>
+       <Link className="ref-trace-record-link" to={recordFocusUrl("evidence",e.id)!}>Abrir ficha {e.id} <ArrowRight size={15}/></Link>
       </div>):<p className="ref-trace-empty">Sin evidencias vinculadas por ID.</p>}
     </section>
     <section data-trace-group="findings">
@@ -67,6 +71,7 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
       <div className="ref-trace-record" key={f.id}>
        <strong>{f.id} · {f.title}</strong><span>Estado: {f.status}</span>
        <small>Vía: {f.inspectionId} → {measure.id}</small>
+       <Link className="ref-trace-record-link" to={recordFocusUrl("finding",f.id)!}>Abrir ficha {f.id} <ArrowRight size={15}/></Link>
       </div>):<p className="ref-trace-empty">Sin hallazgos asociados mediante inspecciones.</p>}
     </section>
     <section data-trace-group="actions">
@@ -75,6 +80,7 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
       <div className="ref-trace-record" key={a.id}>
        <strong>{a.id} · {a.action}</strong><span>Estado: {a.status} · Vence: {a.due}</span>
        <small>Vía: {a.findingId} → inspección → medida</small>
+       <Link className="ref-trace-record-link" to={recordFocusUrl("action",a.id)!}>Abrir ficha {a.id} <ArrowRight size={15}/></Link>
       </div>):<p className="ref-trace-empty">Sin acciones correctivas enlazadas por hallazgo.</p>}
     </section>
    </div>
