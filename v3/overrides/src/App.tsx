@@ -38,6 +38,7 @@ import {DocumentLinkAuditPanel} from './features/traceability/DocumentLinkAuditP
 import {PreliminaryTechnicalReportPanel} from './features/reporting/PreliminaryTechnicalReportPanel';
 import type {AmbientaIconName} from './features/iconography/AmbientaIcon';
 import {ArtworkIcon} from './features/iconography/ArtworkIcon';
+import {ImpactMatrixBuilder} from './features/impacts/ImpactMatrixBuilder';
 
 
 type Navigation = { path: string; label: string; icon: AmbientaIconName; description: string };
@@ -147,6 +148,7 @@ function Impactos({data}:{data:DemoState}) {
       <td>{data.measures.filter(m=>m.impactIds.includes(impact.id)).length}</td>
     </tr>)}</tbody></table></div>
     <p className="v2-panel-note">No hay puntuaciones de significancia ambiental calculadas automáticamente.</p>
+    <ImpactMatrixBuilder projectId={data.project.id} projectName={data.project.name} registeredImpacts={data.impacts}/>
     <SpatialLinksPanel data={data} mode="impact"/>
   </Panel>;
 }
