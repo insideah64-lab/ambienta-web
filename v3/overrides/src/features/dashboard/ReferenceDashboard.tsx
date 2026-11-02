@@ -188,7 +188,7 @@ export function ReferenceDashboard({data,k,onExport}:Props) {
     <Hero data={data}/>
     <section className="ref-metric-section" aria-label="Registros del expediente">
      <div className="ref-metric-section-head"><h2>Registros del expediente</h2>
-      <p>Recuentos documentales · no expresan cumplimiento ambiental.</p></div>
+      <p>Recuentos documentales, no porcentajes de cumplimiento.</p></div>
      <div className="v2-metrics ref-metrics">
       <Metric icon={Leaf} label="PROGRAMAS DEL PGA" value={k.programs}
         subtitle={measuresInPrograms+' con medidas asociadas'} accent="green" to="/pga"/>
