@@ -197,12 +197,12 @@ jobs:
           path: qa/ambienta-integral-report/
           retention-days: 30
           if-no-files-found: warn
-      - name: Capturas de paleta equilibrada escritorio
+      - name: Capturas de AMBIENTA real según referencia visual
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ambienta-desktop-balanced-visual
-          path: qa/ambienta-desktop-balanced/
+          name: ambienta-reference-dashboard-visual
+          path: qa/ambienta-real-reference-design/
           retention-days: 30
           if-no-files-found: warn
       - name: Keep QA build (not a deployment)
