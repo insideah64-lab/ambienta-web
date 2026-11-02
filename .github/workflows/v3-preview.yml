@@ -63,6 +63,7 @@ jobs:
           node apps/web-v3/scripts/measure-trace-smoke.mjs
           node apps/web-v3/scripts/record-focus-smoke.mjs
           node apps/web-v3/scripts/document-graph-export-smoke.mjs
+          node apps/web-v3/scripts/document-graph-import-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
           node apps/web-v3/scripts/area-gis-separation-smoke.mjs
           node apps/web-v3/scripts/point-zone-analysis-smoke.mjs
@@ -140,6 +141,14 @@ jobs:
         with:
           name: ambienta-v362-grafo-capturas
           path: qa/ambienta-v362-export/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Capturas de verificación documental V3.6.3
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-v363-importacion-capturas
+          path: qa/ambienta-v363-import/
           if-no-files-found: warn
           retention-days: 30
       - name: Keep QA build (not a deployment)

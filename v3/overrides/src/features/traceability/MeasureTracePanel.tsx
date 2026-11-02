@@ -3,6 +3,7 @@ import {useState} from 'react';
 import {ArrowRight, ClipboardList, FileText, ShieldCheck} from 'lucide-react';
 import type {DemoState} from '../../lib/demo';
 import {statusText} from '../../lib/demo';
+import {GraphImportPanel} from './GraphImportPanel';
 // @ts-ignore: V3 pure URL construction for explicit record IDs
 import {recordFocusUrl} from './record-focus.mjs';
 // @ts-ignore: versioned read-only, pure JS selector; no domain mutations
@@ -69,6 +70,7 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
      <strong>{exportStatus}</strong>
      {exportHash&&<code data-export-graph-hash="true">{exportHash}</code>}
     </div>}
+   <GraphImportPanel key={measureId} data={data} measureId={measureId}/>
    <div className="ref-trace-counts" aria-label="Registros relacionados">
     <span><strong>{counts.inspections}</strong> inspecciones</span>
     <span><strong>{counts.evidence}</strong> evidencias</span>
