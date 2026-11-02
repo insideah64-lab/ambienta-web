@@ -47,6 +47,19 @@
   filter:drop-shadow(0 0 4px currentColor)
  }
 }
+.ref-shell .ref-panel-head h2, .ref-shell .v2-panel-title h2{display:flex;align-items:center;gap:9px}
+.ref-shell .ref-panel-head h2 .amb-icon, .ref-shell .v2-panel-title h2 .amb-icon{color:#93cfe7}
+.ref-shell .ref-map-panel h2 .amb-icon{color:#8ed9c7}
+.ref-shell .ref-commitments h2 .amb-icon{color:#8ee6b2}
+.ref-shell .ref-schedule h2 .amb-icon{color:#eac28b}
+.ref-shell .ref-activities h2 .amb-icon{color:#b2c6f7}
+.ref-shell .ref-indicators h2 .amb-icon{color:#d5b7fa}
+.ref-shell .ref-attention-eyebrow .amb-icon{vertical-align:-3px;margin-right:5px;color:#f0c58e}
+.ref-shell .ref-attention-kind .amb-icon{vertical-align:-3px;margin-right:4px}
+.ref-shell .v2-action-button .amb-icon{vertical-align:-3px;margin-right:5px}
+.ref-shell .v2-activity-icon .amb-icon{color:#a7d2f0}
+.ref-shell .v2-case-banner .amb-icon,.ref-shell .v2-inline-notice .amb-icon{flex-shrink:0;color:#e7bc83}
+.ref-shell .amb-warning-glyph{display:inline-flex;align-items:center;justify-content:center;color:#e8c38b}
 @media(prefers-reduced-motion:reduce){
  .amb-icon{transition:none!important;transform:none!important}
  .ref-shell :is(.v2-nav-item,.ref-metric,.ref-commitment):is(:hover,:focus-visible) .amb-icon{

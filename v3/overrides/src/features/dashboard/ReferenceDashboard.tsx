@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import {
   ArrowDownToLine, ArrowRight, CalendarDays, ClipboardCheck,
-  Clock3, History, MapPin
+  MapPin
 } from 'lucide-react';
 import type { DemoState, Summary } from '../../lib/demo';
 import { statusText, IS_DIABLILLOS_CASE } from '../../lib/demo';
@@ -52,7 +52,7 @@ function Hero({data}:{data:DemoState}) {
 }
 function MapPanel({province}:{province:string}) {
  return <section className="ref-panel ref-map-panel ref-map-live">
-    <div className="ref-panel-head"><h2>Mapa del área de estudio</h2>
+    <div className="ref-panel-head"><h2><AmbientaIcon kind="territory" size={20}/> Mapa del área de estudio</h2>
       <Link to="/mapas">Abrir SIG <ArrowRight size={14}/></Link></div>
     <GeoMap province={province} compact/>
     <p className="ref-panel-foot">Cartografía base OpenStreetMap. Un contorno de ensayo puede ser ilustrativo y no acredita límites oficiales ni observaciones de campo.</p>
@@ -66,7 +66,7 @@ function Commitments({data}:{data:DemoState}) {
     return 'vegetation';
   };
   return <section className="ref-panel ref-commitments">
-    <div className="ref-panel-head"><h2>Seguimiento de compromisos</h2>
+    <div className="ref-panel-head"><h2><AmbientaIcon kind="pga" size={20}/> Seguimiento de compromisos</h2>
       <Link to="/pga">Ver todos <ArrowRight size={14}/></Link></div>
     <div className="ref-commitment-list">{data.measures.slice(0,5).map(m=>
       <Link key={m.id} className="ref-commitment" to={'/pga?medida='+encodeURIComponent(m.id)}>
@@ -83,15 +83,15 @@ function Commitments({data}:{data:DemoState}) {
 function ActivityPanel({data}:{data:DemoState}) {
   const entries=[...data.audit].reverse().slice(0,3);
   return <section className="ref-panel ref-activities">
-    <div className="ref-panel-head"><h2>Últimas actividades</h2>
+    <div className="ref-panel-head"><h2><AmbientaIcon kind="history" size={20}/> Últimas actividades</h2>
       <Link to="/historial">Ver historial <ArrowRight size={14}/></Link></div>
     {entries.map(e=><div className="ref-activity" key={e.id}>
-      <span className="ref-activity-icon"><History size={20}/></span>
+      <span className="ref-activity-icon"><AmbientaIcon kind="history" size={20}/></span>
       <div><strong>{e.event==='seed'?'Expediente de demostración creado':e.event.replaceAll('.',' · ')}</strong>
         <small>{e.details}</small></div>
       <time>{new Date(e.at).toLocaleDateString('es-AR',{day:'2-digit',month:'short',year:'numeric'})}</time>
     </div>)}
-    {entries.length<2&&<div className="ref-activity"><span className="ref-activity-icon"><Clock3 size={20}/></span>
+    {entries.length<2&&<div className="ref-activity"><span className="ref-activity-icon"><AmbientaIcon kind="calendar" size={20}/></span>
       <div><strong>Sin más actividades registradas</strong><small>Los próximos cambios del PGA aparecerán aquí.</small></div></div>}
   </section>;
 }
@@ -136,7 +136,7 @@ function Schedule({data}:{data:DemoState}) {
   const duration=end.getTime()-start.getTime();
   const months=[0,1,2].map(offset=>new Date(Date.UTC(start.getUTCFullYear(),start.getUTCMonth()+offset,1)));
   return <section className="ref-panel ref-schedule">
-    <div className="ref-panel-head"><h2>Cronograma general</h2>
+    <div className="ref-panel-head"><h2><AmbientaIcon kind="calendar" size={20}/> Cronograma general</h2>
       <Link to="/pga">Ver medidas <ArrowRight size={14}/></Link></div>
     <div className="ref-schedule-intro">Vencimientos documentados · {start.getUTCFullYear()}</div>
     <div className="ref-schedule-months"><span>Medida</span>{months.map((d,i)=>
@@ -160,7 +160,7 @@ function Indicators() {
     {name:'Ruido ambiental',note:'Sin mediciones',icon:'noise',accent:'purple'}
   ];
   return <section className="ref-panel ref-indicators">
-    <div className="ref-panel-head"><h2>Indicadores ambientales</h2>
+    <div className="ref-panel-head"><h2><AmbientaIcon kind="monitoring" size={20}/> Indicadores ambientales</h2>
       <span className="ref-panel-muted">Datos por incorporar</span></div>
     <div className="ref-indicator-grid">{list.map(({name,note,icon,accent})=>
       <div className={'ref-indicator ref-indicator-'+accent} key={name}>
