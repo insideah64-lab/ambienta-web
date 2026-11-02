@@ -51,13 +51,25 @@ try{
   assert(snapshot.reducedMotionDuration.split(',').every(x=>parseFloat(x)===0),'Reduced motion must disable animation');
   assert(snapshot.overflow<=6,'Horizontal overflow '+snapshot.overflow);
   assert.deepEqual(errors,[],'No JS errors on dashboard');
-  await page.screenshot({path:output+'/dashboard-'+width+'.png',animations:'disabled'});
+  assert.equal(await page.locator('.ref-map-panel h2 [data-ambienta-icon="territory"]').count(),1);
+  assert.equal(await page.locator('.ref-schedule h2 [data-ambienta-icon="calendar"]').count(),1);
+  assert.equal(await page.locator('.ref-activities h2 [data-ambienta-icon="history"]').count(),1);
+  assert.equal(await page.locator('.ref-attention-eyebrow [data-ambienta-icon="notice"]').count(),1);
+  assert.equal(await page.locator('.ref-indicators h2 [data-ambienta-icon="monitoring"]').count(),1);
+  assert.equal(await page.locator('.ref-activity-icon [data-ambienta-icon]').count()>=1,true);
+  assert.equal(await page.locator('.ref-attention-item .ref-attention-kind [data-ambienta-icon]').count()>=1,true);
+    await page.screenshot({path:output+'/dashboard-'+width+'.png',animations:'disabled'});
 
   await page.getByRole('link',{name:'Plan de Gestión',exact:true}).first().click();
   await page.waitForURL(/#\/pga/);
   await page.locator('.v2-sidebar a.is-active [data-ambienta-icon="pga"]').waitFor();
   assert.equal(await page.locator('.v2-sidebar a.is-active [data-ambienta-icon="pga"]').count(),1);
-  assert.equal(await page.evaluate(()=>JSON.stringify({...localStorage})),original,
+  for(const kind of ['measures','calendar','evidence','review']){
+    assert.equal(await page.locator('.v2-action-group .v2-action-button [data-ambienta-icon="'+kind+'"]').count(),1,
+      'PGA action needs original icon '+kind);
+  }
+  assert.equal(await page.locator('.v2-panel-title h2 [data-ambienta-icon="pga"]').count(),1);
+    assert.equal(await page.evaluate(()=>JSON.stringify({...localStorage})),original,
     'Navigation/icon changes must not mutate expediente');
   await page.screenshot({path:output+'/pga-'+width+'.png',animations:'disabled'});
   assert.deepEqual(errors,[]);
