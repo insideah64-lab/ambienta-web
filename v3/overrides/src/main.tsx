@@ -10,6 +10,8 @@ import './desktop-palette-slate-blue.css';
 import './desktop-reference-dashboard.css';
 // Icon accents deliberately come after established V3 visual theme.
 import './features/iconography/ambienta-icons.css';
+// Illustrated hero identity comes after the reference theme and plain icon styling.
+import './features/iconography/illustrated-hero.css';
 
 const root = document.getElementById('root');
 if (!root) throw new Error('No se encontró el contenedor de AMBIENTA V2');
