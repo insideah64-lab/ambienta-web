@@ -44,7 +44,7 @@ try {
    assert(check.main.includes('rgb(10, 39, 48)'),'Petrol main background should render');
    assert(check.panelBackground.includes('rgb(16, 50, 60)'),'Panel color should render');
    if(name==='inicio'){
-    assert(check.heroImage.includes('ambienta-landscape'),'Hero must include scenic asset');
+    assert(check.heroImage.includes('url(') && (check.heroImage.includes('svg') || check.heroImage.includes('ambienta-landscape')),'Hero must include bundled scenic SVG (inlined or URL)');
     assert(new Set(check.kpis).size>=3,'KPI icons must use distinct environmental accent families');
     assert.equal(check.mapCount,1,'Actual geographical map must be retained');
     assert(check.areas?.includes('commitments'),'Commitment panel must remain');
