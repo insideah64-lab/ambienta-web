@@ -38,6 +38,12 @@ try{
      metricColors:[...document.querySelectorAll('.ref-metric .v2-metric-icon')]
       .map(x=>getComputedStyle(x).backgroundColor),
      kpiCardColors:[...document.querySelectorAll('.ref-metric.v2-metric')].map(e=>getComputedStyle(e).backgroundImage),
+     titleAttention:document.querySelector('.ref-attention-top p:not(.ref-attention-eyebrow)')?
+      getComputedStyle(document.querySelector('.ref-attention-top p:not(.ref-attention-eyebrow)')).color:null,
+     descriptionAttention:document.querySelector('.ref-attention-description')?
+      getComputedStyle(document.querySelector('.ref-attention-description')).color:null,
+     metricLabel:document.querySelector('.ref-metric-label')?
+      getComputedStyle(document.querySelector('.ref-metric-label')).color:null,
      statusMint:document.querySelector('.v2-badge-mint') ?
       getComputedStyle(document.querySelector('.v2-badge-mint')).backgroundColor : null,
      statusAmber:document.querySelector('.v2-badge-amber') ?
@@ -53,6 +59,9 @@ try{
    if(name==='inicio'){
     assert(new Set(appearance.metricColors).size>=3,'KPIs need distinct, semantic accent families');
     assert(new Set(appearance.kpiCardColors).size>=3,'KPI cards need 3+ distinct background palettes');
+    assert.equal(appearance.titleAttention,'rgb(66, 97, 111)','Top summary must remain readable on pale surface');
+    assert.equal(appearance.descriptionAttention,'rgb(80, 110, 119)','Attention descriptions must have dark contrasting text');
+    assert.equal(appearance.metricLabel,'rgb(66, 102, 113)','KPI labels must be dark on pastel background');
    }
    if(name==='pga'){
     assert.equal(appearance.statusMint,'rgb(222, 245, 228)','Execution status must remain green');
