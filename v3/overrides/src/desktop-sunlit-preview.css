@@ -275,3 +275,33 @@
  }
  .ref-shell .geo-links-note,.ref-shell .geo-links-panel>p,.ref-shell .geo-links-stats small{color:#d8f1ed}
 }
+/* Sunlit contrast audit: old dark-mode white captions must not disappear on
+   white/pastel cards. Every value below is editorial UI text, not GIS data. */
+@media(min-width:1100px){
+ .ref-shell .ref-attention-top h2{color:#233c49}
+ .ref-shell .ref-attention-top p:not(.ref-attention-eyebrow){
+  color:#42616f
+ }
+ .ref-shell .ref-attention-top p strong{color:#946027}
+ .ref-shell .ref-attention-summary strong{color:#284651}
+ .ref-shell .ref-attention-summary small{color:#546f7b}
+ .ref-shell .ref-attention-kind{color:#a3682d}
+ .ref-shell .ref-attention-revision .ref-attention-kind{color:#167d60}
+ .ref-shell .ref-attention-count{color:#526e77}
+ .ref-shell .ref-attention-item>strong{color:#213c4a}
+ .ref-shell .ref-attention-description{color:#506e77}
+ .ref-shell .ref-attention-bottom,.ref-shell .ref-attention-bottom small{color:#5b7580}
+ .ref-shell .ref-attention-bottom svg{color:#168b77}
+ .ref-shell .ref-metric-section-head h2,
+ .ref-shell .ref-section-heading h2{color:#24414f}
+ .ref-shell .ref-metric-section-head p{color:#617d84}
+ .ref-shell .ref-metric .ref-metric-label{color:#426671}
+ .ref-shell .ref-metric.v2-metric .ref-metric-top>strong{color:#1e414e}
+ .ref-shell .ref-metric .ref-metric-subtitle{color:#526f7b}
+ .ref-shell .ref-metric-link-arrow{color:#227e88}
+ .ref-shell .ref-commitment-title strong{color:#243c49}
+ .ref-shell .ref-commitment-info>small{color:#647b84}
+ .ref-shell .ref-indicator strong{color:#274553}
+ .ref-shell .ref-indicator small{color:#617c85}
+ .ref-shell .ref-dashboard-disclaimer{color:#647b82}
+}
