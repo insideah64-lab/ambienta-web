@@ -1,4 +1,5 @@
 import {Link} from 'react-router-dom';
+import {useState} from 'react';
 import {ArrowRight, ClipboardList, FileText, ShieldCheck} from 'lucide-react';
 import type {DemoState} from '../../lib/demo';
 import {statusText} from '../../lib/demo';
@@ -6,11 +7,33 @@ import {statusText} from '../../lib/demo';
 import {recordFocusUrl} from './record-focus.mjs';
 // @ts-ignore: versioned read-only, pure JS selector; no domain mutations
 import {measureDocumentTrace} from './measure-document-trace.mjs';
+// @ts-ignore: versioned pure browser-local graph serializer
+import {buildDocumentGraph,prepareDocumentGraphExport} from './document-graph-export.mjs';
 
 type Props={data:DemoState;measureId:string;onClear:()=>void};
 
 export function MeasureTracePanel({data,measureId,onClear}:Props){
+ const [exportStatus,setExportStatus]=useState('');
+ const [exportHash,setExportHash]=useState('');
  const trace=measureDocumentTrace(data,measureId);
+ const graph=buildDocumentGraph(data,measureId);
+ const downloadGraph=async()=>{
+  setExportStatus('Preparando archivo…');
+  setExportHash('');
+  try{
+   const file=await prepareDocumentGraphExport(data,measureId);
+   if(!file)throw new Error('Medida no encontrada');
+   const url=URL.createObjectURL(new Blob([file.json],{type:'application/json;charset=utf-8'}));
+   const a=document.createElement('a');
+   a.href=url;a.download=file.filename;
+   document.body.appendChild(a);a.click();a.remove();
+   setTimeout(()=>URL.revokeObjectURL(url),1000);
+   setExportHash(file.data.integrity.graph_sha256);
+   setExportStatus('Archivo preparado para descarga');
+  }catch(error){
+   setExportStatus('No se pudo generar el archivo: '+(error instanceof Error?error.message:String(error)));
+  }
+ };
  if(!trace)return <section className="ref-trace-panel" data-trace-missing="true" role="status">
    <h3>Medida no encontrada</h3>
    <p>El identificador no existe en el expediente local. No se creó ningún vínculo nuevo.</p>
@@ -25,7 +48,11 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
      <p>{measure.title}</p>
      <small>{program?.name??'Programa no localizado'} · Responsable: {measure.owner}</small>
     </div>
-    <button type="button" className="ref-trace-close" onClick={onClear}>Cerrar detalle</button>
+    <div className="ref-trace-actions">
+     <button type="button" className="ref-trace-export" onClick={downloadGraph}
+      data-export-graph={measureId}>Exportar vínculos (JSON)</button>
+     <button type="button" className="ref-trace-close" onClick={onClear}>Cerrar detalle</button>
+    </div>
    </div>
    <p className="ref-trace-disclaimer" role="note">
     <ShieldCheck size={18} aria-hidden="true"/>
@@ -33,6 +60,15 @@ export function MeasureTracePanel({data,measureId,onClear}:Props){
     Una revisión documental, evidencia validada o inspección conforme no certifica
     cumplimiento ambiental ni autentica archivos.
    </p>
+   <p className="ref-trace-export-note" data-export-graph-info="true">
+    Exporta {graph?.nodeCount??0} registros y {graph?.edgeCount??0} vínculos declarados.
+    Las advertencias y relaciones indirectas se distinguen en el JSON; no se adjuntan archivos de evidencia.
+    La huella SHA-256 identifica únicamente el extracto generado.
+   </p>
+   {exportStatus&&<div className="ref-trace-export-result" role="status" data-export-graph-status="true">
+     <strong>{exportStatus}</strong>
+     {exportHash&&<code data-export-graph-hash="true">{exportHash}</code>}
+    </div>}
    <div className="ref-trace-counts" aria-label="Registros relacionados">
     <span><strong>{counts.inspections}</strong> inspecciones</span>
     <span><strong>{counts.evidence}</strong> evidencias</span>
