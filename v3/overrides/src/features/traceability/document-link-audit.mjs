@@ -72,6 +72,12 @@ export function auditDocumentLinks(state){
  }
  for(const f of index.finding.rows)ref('finding',f,'inspectionId','inspection');
  for(const a of index.action.rows)ref('action',a,'findingId','finding');
+ // A visible link is unsafe if the source ID is also duplicated: the route
+ // would open whichever duplicate appears first, not an unambiguous record.
+ for(const item of issues){
+  const source=index[item.kind];
+  if(!source?.byId.has(item.id)||source.duplicates.has(item.id))item.url=null;
+ }
  issues.sort((a,b)=>a.kind.localeCompare(b.kind)||a.id.localeCompare(b.id)||
   a.code.localeCompare(b.code));
  return {checked,total:issues.length,issues,
