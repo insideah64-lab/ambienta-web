@@ -314,3 +314,24 @@
 @media(min-width:1100px) and (max-width:1420px){
  .ref-shell .v2-nav-item{font-size:15px}
 }
+
+/* The reference screenshot's lower-middle alerts: 2×2, not a long vertical
+   page-wide interruption. Keep all four real categories and accessible text. */
+@media(min-width:1100px){
+ .ref-shell .ref-attention{padding:11px 13px}
+ .ref-shell .ref-attention-top{margin-bottom:8px;gap:8px}
+ .ref-shell .ref-attention-top h2{font-size:22px}
+ .ref-shell .ref-attention-top p:not(.ref-attention-eyebrow){font-size:12px;line-height:1.4}
+ .ref-shell .ref-attention-summary strong{font-size:22px}
+ .ref-shell .ref-attention-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .ref-shell .ref-attention-item{
+  min-height:105px;max-height:138px;padding:8px 9px;
+  display:flex;flex-direction:column;justify-content:space-between;gap:4px
+ }
+ .ref-shell .ref-attention-item>strong{font-size:17px;line-height:1.23;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+ .ref-shell .ref-attention-description{font-size:14px;line-height:1.3;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+ .ref-shell .ref-attention-bottom{min-width:0}
+ .ref-shell .ref-attention-bottom svg{flex-shrink:0}
+}
