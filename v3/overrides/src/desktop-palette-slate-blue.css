@@ -229,3 +229,44 @@
  .ref-shell .v2-footer{color:#adc4df;border-color:#3f5d7c}
  .ref-shell .v2-footer svg{color:#8cbdf3}
 }
+
+/* Secondary, non-semantic action surfaces kept out of the old green palette. */
+@media(min-width:1100px){
+ .ref-shell .ref-trace-open,.ref-shell .ref-trace-close,
+ .ref-shell .ref-record-inline,.ref-shell .ref-record-dismiss,
+ .ref-shell .ref-trace-record-link{
+  background:#305b8c;border-color:#74a4da;color:#f4f9ff
+ }
+ .ref-shell .ref-trace-open[aria-pressed="true"]{
+  background:#466aa7;border-color:#b4cfff;color:#fff
+ }
+ .ref-shell .ref-trace-open:hover,.ref-shell .ref-trace-close:hover,
+ .ref-shell .ref-record-inline:hover,.ref-shell .ref-record-dismiss:hover,
+ .ref-shell .ref-trace-record-link:hover{background:#4177ad}
+ .ref-shell .ref-trace-choose,.ref-shell .ref-trace-panel,
+ .ref-shell .ref-record-focus{
+  background:linear-gradient(145deg,#1f344e,#172b42);
+  border-color:#4a6b90;color:#eaf5ff
+ }
+ .ref-shell .ref-trace-eyebrow,.ref-shell .ref-record-eyebrow{color:#9fd2ff}
+ .ref-shell .ref-trace-head h3,.ref-shell .ref-record-focus-header h3{color:#f4f8ff}
+ .ref-shell .ref-trace-head small,.ref-shell .ref-trace-foot,
+ .ref-shell .ref-trace-empty,.ref-shell .ref-record-empty{color:#c1d5e7}
+ .ref-shell .ref-trace-counts span,.ref-shell .ref-trace-grid>section,
+ .ref-shell .ref-record-fields>div,.ref-shell .ref-record-links-list a{
+  background:#243c57;border-color:#537296;color:#eff7ff
+ }
+ .ref-shell .ref-trace-grid h4,.ref-shell .ref-record-links h4{color:#f0f7ff}
+ .ref-shell .ref-trace-grid h4 a{color:#a9d5ff}
+ .ref-shell .ref-trace-record{border-color:#4c6888}
+ .ref-shell .ref-trace-record strong,.ref-shell .ref-record-fields dd{color:#f5f9ff}
+ .ref-shell .ref-trace-record span,.ref-shell .ref-trace-record small,
+ .ref-shell .ref-record-fields dt{color:#b9d3eb}
+ .ref-shell .ref-record-links-list a:hover{background:#2e5072}
+ .ref-shell [data-page-role="territory-definition"] .geo-study-buttons button,
+ .ref-shell .v2-study-navlink{
+  background:#315f94;border-color:#75a3d1;color:#f4f9ff
+ }
+ .ref-shell [data-page-role="territory-definition"] .geo-study-buttons button:hover:not(:disabled),
+ .ref-shell .v2-study-navlink:hover{background:#437ab4;color:#fff}
+}
