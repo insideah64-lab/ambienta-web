@@ -55,6 +55,7 @@ const NAV_PRIMARY: Navigation[] = [
   {path:'/reportes',label:'Reportes',icon:'reports',description:'Informe técnico preliminar, matriz de información faltante y exportación del expediente.'}
 ];
 const NAV_TOOLS: Navigation[] = [
+  {path:'/matrices',label:'Matrices ambientales',icon:'measures',description:'Crear, editar y exportar matrices ambientales por proyecto.'},
   {path:'/mita',label:'MITA satelital',icon:'satellite',description:'Información sobre integración del motor satelital MITA.'},
   {path:'/normativa',label:'Normativa',icon:'legal',description:'Referencias de gestión normativa pendientes de incorporación.'},
   {path:'/biblioteca',label:'Biblioteca',icon:'library',description:'Biblioteca documental pendiente de conexión.'},
@@ -139,7 +140,7 @@ function MapasSIG({data}:{data:DemoState}){
  </div>;
 }
 function Impactos({data}:{data:DemoState}) {
-  return <Panel kicker="MATRIZ DE IMPACTOS" icon="impacts" title="Impactos ambientales registrados">
+  return <Panel kicker="REGISTRO DE IMPACTOS" icon="impacts" title="Impactos ambientales registrados">
     <div className="v2-table-scroll"><table className="v2-table"><thead><tr>
       <th>Impacto</th><th>Factor</th><th>Etapa</th><th>Signo</th><th>Medidas relacionadas</th>
     </tr></thead><tbody>{data.impacts.map(impact=><tr key={impact.id}>
@@ -147,10 +148,18 @@ function Impactos({data}:{data:DemoState}) {
       <td>{impact.phase}</td><td>{impact.sign}</td>
       <td>{data.measures.filter(m=>m.impactIds.includes(impact.id)).length}</td>
     </tr>)}</tbody></table></div>
-    <p className="v2-panel-note">No hay puntuaciones de significancia ambiental calculadas automáticamente.</p>
-    <ImpactMatrixBuilder projectId={data.project.id} projectName={data.project.name} registeredImpacts={data.impacts}/>
+    <p className="v2-panel-note">Este registro no calcula automáticamente la significancia ambiental. Las matrices de identificación y valoración se elaboran por separado.</p>
+    <Link className="v2-small-link" to="/matrices" data-open-matrix-tool="true">Abrir el constructor de matrices en Herramientas →</Link>
     <SpatialLinksPanel data={data} mode="impact"/>
   </Panel>;
+}
+function Matrices({data}:{data:DemoState}) {
+  return <div className="v2-area-stack" data-page-role="environmental-matrices-tool">
+    <Panel kicker="HERRAMIENTAS · EVALUACIÓN AMBIENTAL" icon="measures" title="Constructor de matrices">
+      <p className="v2-panel-note">Espacio de trabajo independiente para elaborar matrices de identificación y valoración. Los impactos ya registrados se consultan en <Link to="/impactos">Impactos</Link>; las ediciones del constructor se guardan en un borrador local vinculado al identificador del expediente, sin modificar el registro original.</p>
+    </Panel>
+    <ImpactMatrixBuilder projectId={data.project.id} projectName={data.project.name} registeredImpacts={data.impacts}/>
+  </div>;
 }
 function Evidencias({data,onAction,onApply}:{data:DemoState;onAction:(kind:DemoActionKind)=>void;onApply:(operation:Transaction,message:string)=>void}) {
   const [params,setParams]=useSearchParams();
@@ -385,6 +394,7 @@ export default function App() {
           <Route path="/" element={<ReferenceDashboard data={data} k={k} onExport={()=>exportDemo(data)}/>}/>
           <Route path="/area" element={<AreaEstudio data={data}/>}/>
           <Route path="/impactos" element={<Impactos data={data}/>}/>
+          <Route path="/matrices" element={<Matrices data={data}/>}/>
           <Route path="/evidencias" element={<Evidencias data={data} onAction={openAction} onApply={applyTransaction}/>}/>
           <Route path="/mapas" element={<MapasSIG data={data}/>}/>
           <Route path="/reportes" element={<Reportes data={data} onExport={()=>exportDemo(data)}/>}/>
