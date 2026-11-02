@@ -281,7 +281,7 @@
  .ref-shell .geo-links-header small{color:#8ce9ca}
  .ref-shell .geo-links-note{color:#bed5d6}
 }
-@media (min-width:1100px) and (max-width:1420px){
+@media (min-width:1100px) and (max-width:1520px){
  .ref-shell.v2-app{grid-template-columns:212px minmax(0,1fr)}
  .ref-shell .v2-sidebar{padding-left:8px;padding-right:8px}
  .ref-shell .v2-nav-item{font-size:11px}
@@ -311,7 +311,7 @@
  .ref-shell .geo-mode{font-size:13px}
  .ref-shell .v2-page-intro p:not(.v2-kicker){font-size:16px}
 }
-@media(min-width:1100px) and (max-width:1420px){
+@media(min-width:1100px) and (max-width:1520px){
  .ref-shell .v2-nav-item{font-size:15px}
 }
 
