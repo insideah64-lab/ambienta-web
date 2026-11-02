@@ -12,6 +12,8 @@ try {
   await page.locator('.v2-table').first().waitFor();
   assert.equal(await page.locator('[data-impact-matrix]').count(),0,
     'Impactos must be a documentary register, not the editing workbench');
+  assert.equal(await page.getByText(/Este registro no calcula automáticamente la significancia ambiental/).count(),1,
+    'Project Impactos explicitly distinguishes its documentary record from valuation');
   assert.equal(await page.locator('.v2-sidebar nav[aria-label="Herramientas"] a[href="#/matrices"]').count(),1,
     'The matrix constructor belongs in the Tools navigation');
   await page.locator('[data-open-matrix-tool]').click();
@@ -23,7 +25,8 @@ try {
   assert.equal(await grid.locator('tbody tr').count(),7,'7 factors, no fake evaluations');
   assert.equal(await page.locator('.amb-matrix-kpis>span').nth(1).locator('strong').innerText(),'0');
   assert.equal(await page.locator('.amb-matrix-cell--negative,.amb-matrix-cell--positive').count(),0);
-  assert.equal(await page.getByText('No hay puntuaciones de significancia ambiental calculadas automáticamente.').count(),1);
+  assert.equal(await page.locator('[data-page-role="environmental-matrices-tool"]').count(),1,
+    'The evaluation workbench lives on its own tools page');
   await page.screenshot({path:output+'/matrix-empty-'+width+'.png',animations:'disabled'});
   await page.locator('.amb-matrix-cell').first().click();
   const nature=page.getByRole('combobox',{name:'Naturaleza de la interacción'});
