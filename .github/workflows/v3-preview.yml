@@ -68,6 +68,7 @@ jobs:
           node apps/web-v3/scripts/document-issue-export-smoke.mjs
           node apps/web-v3/scripts/preliminary-technical-report-smoke.mjs
           node apps/web-v3/scripts/desktop-palette-smoke.mjs
+          node apps/web-v3/scripts/ambienta-iconography-smoke.mjs
           node apps/web-v3/scripts/document-identity-negative-smoke.mjs
           node apps/web-v3/scripts/release-spatial-layout-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
@@ -203,6 +204,14 @@ jobs:
         with:
           name: ambienta-reference-dashboard-visual
           path: qa/ambienta-real-reference-design/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Capturas de iconografía original AMBIENTA V3
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-original-icons-desktop
+          path: qa/ambienta-original-icons/
           retention-days: 30
           if-no-files-found: warn
       - name: Keep QA build (not a deployment)

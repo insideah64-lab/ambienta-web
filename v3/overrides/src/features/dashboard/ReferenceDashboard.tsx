@@ -1,24 +1,23 @@
 import { Link } from 'react-router-dom';
 import {
-  ArrowDownToLine, ArrowRight, CalendarDays,
-  ClipboardCheck, Clock3, Cloud, Droplets, FileText,
-  History, Leaf, MapPin,
-  ShieldCheck, Sprout, Wind, Volume2
+  ArrowDownToLine, ArrowRight, CalendarDays, ClipboardCheck,
+  Clock3, History, MapPin
 } from 'lucide-react';
 import type { DemoState, Summary } from '../../lib/demo';
 import { statusText, IS_DIABLILLOS_CASE } from '../../lib/demo';
 import {GeoMap} from '../maps/GeoMap';
+import {AmbientaIcon, type AmbientaIconName} from '../iconography/AmbientaIcon';
 // @ts-ignore: V3-only pure workflow summary, not an environmental risk model
 import {summarizeWork} from './work-priorities.mjs';
 
 type Props = {data:DemoState;k:Summary;onExport:()=>void};
-function Metric({icon:Icon,label,value,subtitle,accent,to}:{
-  icon:typeof Leaf;label:string;value:number;subtitle:string;
+function Metric({icon,label,value,subtitle,accent,to}:{
+  icon:AmbientaIconName;label:string;value:number;subtitle:string;
   accent:'green'|'cyan'|'blue'|'purple';to:string
 }) {
   return <Link to={to} className={'v2-metric ref-metric ref-accent-'+accent}
    aria-label={label+': '+value+'. '+subtitle+'. Abrir módulo'}>
-    <span className="v2-metric-icon" aria-hidden="true"><Icon size={23} strokeWidth={2}/></span>
+    <span className="v2-metric-icon" aria-hidden="true"><AmbientaIcon kind={icon} size={25}/></span>
     <span className="ref-metric-body">
       <span className="ref-metric-top"><span className="ref-metric-label">{label}</span><strong>{value}</strong></span>
       <span className="ref-metric-subtitle">{subtitle}</span>
@@ -60,18 +59,18 @@ function MapPanel({province}:{province:string}) {
   </section>;
 }
 function Commitments({data}:{data:DemoState}) {
-  const iconFor=(programId:string)=>{
-    if(programId.includes('AGU'))return <Droplets size={22}/>;
-    if(programId.includes('BIO'))return <Sprout size={22}/>;
-    if(programId.includes('AIR'))return <Wind size={22}/>;
-    return <Leaf size={22}/>;
+  const iconFor=(programId:string):AmbientaIconName=>{
+    if(programId.includes('AGU'))return 'water';
+    if(programId.includes('BIO'))return 'biodiversity';
+    if(programId.includes('AIR'))return 'air';
+    return 'vegetation';
   };
   return <section className="ref-panel ref-commitments">
     <div className="ref-panel-head"><h2>Seguimiento de compromisos</h2>
       <Link to="/pga">Ver todos <ArrowRight size={14}/></Link></div>
     <div className="ref-commitment-list">{data.measures.slice(0,5).map(m=>
       <Link key={m.id} className="ref-commitment" to={'/pga?medida='+encodeURIComponent(m.id)}>
-        <span className="ref-commitment-icon">{iconFor(m.programId)}</span>
+        <span className="ref-commitment-icon"><AmbientaIcon kind={iconFor(m.programId)} size={24}/></span>
         <span className="ref-commitment-info">
           <span className="ref-commitment-title"><strong>{m.title}</strong>
             <span className={'ref-stage-tag ref-stage-'+m.status}>{statusText(m.status)}</span></span>
@@ -155,17 +154,17 @@ function Schedule({data}:{data:DemoState}) {
 }
 function Indicators() {
   const list=[
-    {name:'Cobertura vegetal',note:'Sin datos satelitales',icon:Leaf,accent:'green'},
-    {name:'Calidad del agua',note:'Sin mediciones',icon:Droplets,accent:'blue'},
-    {name:'Calidad del aire',note:'Sin mediciones',icon:Cloud,accent:'cyan'},
-    {name:'Ruido ambiental',note:'Sin mediciones',icon:Volume2,accent:'purple'}
+    {name:'Cobertura vegetal',note:'Sin datos satelitales',icon:'vegetation',accent:'green'},
+    {name:'Calidad del agua',note:'Sin mediciones',icon:'water',accent:'blue'},
+    {name:'Calidad del aire',note:'Sin mediciones',icon:'air',accent:'cyan'},
+    {name:'Ruido ambiental',note:'Sin mediciones',icon:'noise',accent:'purple'}
   ];
   return <section className="ref-panel ref-indicators">
     <div className="ref-panel-head"><h2>Indicadores ambientales</h2>
       <span className="ref-panel-muted">Datos por incorporar</span></div>
-    <div className="ref-indicator-grid">{list.map(({name,note,icon:Icon,accent})=>
+    <div className="ref-indicator-grid">{list.map(({name,note,icon,accent})=>
       <div className={'ref-indicator ref-indicator-'+accent} key={name}>
-        <span className="ref-indicator-icon"><Icon size={22}/></span>
+        <span className="ref-indicator-icon"><AmbientaIcon kind={icon as AmbientaIconName} size={24}/></span>
         <div><strong>{name}</strong><small>{note}</small></div>
         <span className="ref-indicator-dashes" aria-hidden="true">···</span>
       </div>)}</div>
@@ -190,13 +189,13 @@ export function ReferenceDashboard({data,k,onExport}:Props) {
      <div className="ref-metric-section-head"><h2>Registros del expediente</h2>
       <p>Recuentos documentales, no porcentajes de cumplimiento.</p></div>
      <div className="v2-metrics ref-metrics">
-      <Metric icon={Leaf} label="PROGRAMAS DEL PGA" value={k.programs}
+      <Metric icon="pga" label="PROGRAMAS DEL PGA" value={k.programs}
         subtitle={measuresInPrograms+' con medidas asociadas'} accent="green" to="/pga"/>
-      <Metric icon={ClipboardCheck} label="MEDIDAS AMBIENTALES" value={k.measures}
+      <Metric icon="measures" label="MEDIDAS AMBIENTALES" value={k.measures}
         subtitle={k.verified+' verificadas · '+data.measures.filter(m=>m.status==='en_ejecucion').length+' en ejecución'} accent="purple" to="/pga"/>
-      <Metric icon={ShieldCheck} label="INSPECCIONES" value={data.inspections.length}
+      <Metric icon="inspections" label="INSPECCIONES" value={data.inspections.length}
         subtitle={k.inspectionsPending+' pendientes · registros documentales'} accent="cyan" to="/monitoreo"/>
-      <Metric icon={FileText} label="EVIDENCIAS" value={data.evidence.length}
+      <Metric icon="evidence" label="EVIDENCIAS" value={data.evidence.length}
         subtitle={reviewedEvidence+' revisadas · '+k.evidencePending+' pendientes'} accent="blue" to="/evidencias"/>
      </div>
     </section>
