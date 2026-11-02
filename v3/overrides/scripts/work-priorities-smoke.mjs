@@ -31,7 +31,7 @@ try{
    /no alertas ambientales ni incumplimientos comprobados/);
   const columns=await page.locator('.ref-reference-grid').evaluate(el=>
    getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length);
-  assert.equal(columns,width>1420?3:2);
+  assert.equal(columns,width>1520?3:2);
   const scroll=await page.evaluate(()=>document.documentElement.scrollWidth);
   assert(scroll<=width+6,'Avoid horizontal scroll at desktop');
   await page.screenshot({path:root+'/desktop-'+width+'-prioridades.png',animations:'disabled',
