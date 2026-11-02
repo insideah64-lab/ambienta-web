@@ -36,6 +36,7 @@ import {seedDiablillosQaReference} from './features/maps/diablillos-reference-qa
 import {PerimeterWorkbench} from './features/maps/PerimeterWorkbench';
 import { EvidenceIntegrityLab } from './features/evidence/EvidenceIntegrityLab';
 import {MeasureTracePanel} from './features/traceability/MeasureTracePanel';
+import {RecordFocusPanel} from './features/traceability/RecordFocusPanel';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
 const NAV_PRIMARY: Navigation[] = [
@@ -148,13 +149,19 @@ function Impactos({data}:{data:DemoState}) {
   </Panel>;
 }
 function Evidencias({data,onAction,onApply}:{data:DemoState;onAction:(kind:DemoActionKind)=>void;onApply:(operation:Transaction,message:string)=>void}) {
+  const [params,setParams]=useSearchParams();
+  const selected=params.get('evidencia');
+  const clear=()=>setParams(prev=>{const next=new URLSearchParams(prev);next.delete('evidencia');return next});
   return <Panel kicker="EVIDENCIAS DEL PGA" title="Registro documental"
     action={<button className="v2-action-button" onClick={()=>onAction('evidence')}>+ Registrar evidencia</button>}>
     <div className="v2-evidence-overview"><strong>{data.evidence.length} referencias de demostración</strong>
       <span>{data.evidence.filter(e=>e.status==='pendiente').length} pendientes de revisión</span></div>
+    {selected&&<RecordFocusPanel data={data} kind="evidence" id={selected} onClose={clear}/>}
+
     {data.evidence.length?data.evidence.map(e=><div className="v2-evidence-row" key={e.id}>
       <div><strong>{e.label}</strong><small>{e.reference} · {e.author} · {e.measureId??e.inspectionId}</small></div>
       <Badge tone={e.status==='validada'?'blue':e.status==='rechazada'?'amber':'neutral'}>{e.status}</Badge>
+      <Link className="ref-record-inline" to={'/evidencias?evidencia='+encodeURIComponent(e.id)}>Ver ficha</Link>
     </div>):<p className="v2-empty">Todavía no se registraron evidencias documentales.</p>}
     <p className="v2-panel-note">La demo conserva referencias textuales, no el contenido ni la autenticidad de los archivos. Los documentos privados se gestionan por separado.</p>
     <EvidenceIntegrityLab data={data} onApply={onApply}/>
@@ -234,18 +241,31 @@ function PGA({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind,meas
   </Panel>;
 }
 function Monitoreo({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind)=>void}) {
+  const [params,setParams]=useSearchParams();
+  const selected=params.get('inspeccion');
+  const clear=()=>setParams(prev=>{const next=new URLSearchParams(prev);next.delete('inspeccion');return next});
   return <Panel kicker="MONITOREO AMBIENTAL" title="Inspecciones programadas"
     action={<button type="button" className="v2-action-button" onClick={()=>onAction('inspection')}>+ Nueva inspección</button>}>
-    <div className="v2-table-scroll"><table className="v2-table"><thead><tr><th>Inspección</th><th>Fecha</th><th>Medida asociada</th><th>Responsable</th><th>Resultado</th></tr></thead>
+    {selected&&<RecordFocusPanel data={data} kind="inspection" id={selected} onClose={clear}/>}
+    <div className="v2-table-scroll"><table className="v2-table"><thead><tr><th>Inspección</th><th>Fecha</th><th>Medida asociada</th><th>Responsable</th><th>Resultado</th><th>Consulta</th></tr></thead>
       <tbody>{data.inspections.map(i=><tr key={i.id}><td><strong>{i.id}</strong><small>{i.note}</small></td><td>{i.date}</td>
         <td>{data.measures.find(m=>m.id===i.measureId)?.title||'—'}</td><td>{i.assignee}</td>
-        <td><Badge tone={i.result==='pendiente'?'amber':'mint'}>{i.result}</Badge></td></tr>)}</tbody></table></div>
+        <td><Badge tone={i.result==='pendiente'?'amber':'mint'}>{i.result}</Badge></td>
+        <td><Link className="ref-record-inline" to={'/monitoreo?inspeccion='+encodeURIComponent(i.id)}>Ver ficha</Link></td></tr>)}</tbody></table></div>
     <p className="v2-panel-note">No existen mediciones de calidad del aire cargadas en esta demostración.</p>
     <SpatialLinksPanel data={data} mode="inspection"/>
   </Panel>;
 }
 function Auditorias({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind)=>void}) {
+  const [params,setParams]=useSearchParams();
+  const findingId=params.get('hallazgo'),actionId=params.get('accion');
+  const clear=()=>setParams(prev=>{const next=new URLSearchParams(prev);
+    next.delete('hallazgo');next.delete('accion');return next});
   return <div className="v2-detail-grid">
+    {(findingId||actionId)&&<div className="ref-record-focus-placement">
+      <RecordFocusPanel data={data} kind={findingId?'finding':'action'} id={(findingId||actionId)!}
+        onClose={clear}/>
+    </div>}
     <Panel kicker="AUDITORÍAS" title="Hallazgos abiertos"
       action={<div className="v2-action-group"><button type="button" className="v2-action-button" onClick={()=>onAction('finding')}>+ Nuevo hallazgo</button>
       <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('corrective')}>Acción correctiva</button></div>}>
@@ -254,9 +274,13 @@ function Auditorias({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKi
       <div className="v2-inline-notice"><ShieldCheck size={19}/><span>Los hallazgos y su seguimiento son registros de demostración y no constituyen un dictamen de cumplimiento ambiental.</span></div>
     </Panel>
     <Panel kicker="REGISTRO" title="Historial de hallazgos">
-      {data.findings.length?data.findings.map(f=><div className="v2-audit-item" key={f.id}><span>{f.title}<small>{f.id} · {f.severity} · Inspección {f.inspectionId}</small></span><Badge tone="amber">{f.status}</Badge></div>):<p className="v2-empty">No se registraron hallazgos en esta demostración.</p>}
+      {data.findings.length?data.findings.map(f=><div className="v2-audit-item" key={f.id}><span>{f.title}<small>{f.id} · {f.severity} · Inspección {f.inspectionId}</small></span><Badge tone="amber">{f.status}</Badge>
+      <Link className="ref-record-inline" to={'/auditorias?hallazgo='+encodeURIComponent(f.id)}>Ver ficha</Link>
+      </div>):<p className="v2-empty">No se registraron hallazgos en esta demostración.</p>}
       <div className="v2-evidence-overview"><strong>Acciones correctivas</strong><span>{data.correctiveActions.length} registros</span></div>
-      {data.correctiveActions.map(a=><div className="v2-evidence-row" key={a.id}><div><strong>{a.action}</strong><small>{a.findingId} · {a.owner} · {a.due}</small></div><Badge>{a.status}</Badge></div>)}
+      {data.correctiveActions.map(a=><div className="v2-evidence-row" key={a.id}><div><strong>{a.action}</strong><small>{a.findingId} · {a.owner} · {a.due}</small></div><Badge>{a.status}</Badge>
+        <Link className="ref-record-inline" to={'/auditorias?accion='+encodeURIComponent(a.id)}>Ver ficha</Link>
+      </div>)}
     </Panel>
   </div>;
 }
