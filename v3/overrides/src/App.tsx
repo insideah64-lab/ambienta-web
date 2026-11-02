@@ -42,7 +42,7 @@ import {AMBIENTA_WEB_VERSION,AMBIENTA_WEB_RELEASE_LABEL} from './release-info.mj
 import {DocumentLinkAuditPanel} from './features/traceability/DocumentLinkAuditPanel';
 import {PreliminaryTechnicalReportPanel} from './features/reporting/PreliminaryTechnicalReportPanel';
 import {AmbientaIcon, type AmbientaIconName} from './features/iconography/AmbientaIcon';
-import './features/iconography/ambienta-icons.css';
+
 
 type Navigation = { path: string; label: string; icon: AmbientaIconName; description: string };
 const NAV_PRIMARY: Navigation[] = [
