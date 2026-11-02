@@ -86,8 +86,14 @@ try{
   assert.equal(await panel.locator('select[aria-label="Conesa RV"] option[value="3"]').count(),0,
    'RV=3 stays prohibited by this declared variant');
   await panel.getByRole('combobox',{name:'Conesa EX_CR'}).selectOption('4');
+  assert.equal((await panel.locator('[data-conesa-absolute]').innerText()).trim(),'36',
+   'Critical extension adds +4 inside 2EX, yielding +8 on importance');
+  const evidence=panel.getByPlaceholder('Documento, página, evidencia y ubicación de interés crítico…');
+  await evidence.fill('');
   assert.equal((await panel.locator('[data-conesa-absolute]').innerText()).trim(),'Pendiente',
    'Critical extension without supporting evidence cannot be accepted');
+  await evidence.fill('matriz metodo CONESSA.xlsx · EJEMPLO');
+  assert.equal((await panel.locator('[data-conesa-absolute]').innerText()).trim(),'36');
   await panel.getByRole('combobox',{name:'Conesa EX_CR'}).selectOption('0');
   const [dl]=await Promise.all([page.waitForEvent('download'),panel.getByRole('button',{name:'CSV',exact:true}).click()]);
   const csv=await fs.readFile(await dl.path(),'utf8');
