@@ -25,7 +25,7 @@ try{
   const badge=page.locator('[data-app-release]');
   await badge.waitFor();
   assert.equal(await badge.getAttribute('data-app-release'),'3.6.6');
-  assert.match(await badge.innerText(),/WEB 3[.]6[.]5/);
+  assert.match(await badge.innerText(),/WEB 3[.]6[.]6/);
   await page.locator('[data-measure-trace="MED-DIAB-002"]').waitFor();
   const spatial=page.locator('[data-spatial-links="measure"]');
   await spatial.waitFor();
