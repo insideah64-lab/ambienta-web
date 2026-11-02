@@ -50,6 +50,7 @@ jobs:
         run: |
           python3 -m http.server 8787 --bind 127.0.0.1 --directory dist >/tmp/ambienta-v3-preview.log 2>&1 &
           for i in $(seq 1 15); do curl -fsS http://127.0.0.1:8787/v3/index.html >/dev/null && break || sleep 1; done
+          node apps/web-v3/scripts/leopold-workbook-parity-smoke.mjs
           node apps/web-v3/scripts/topology-smoke.mjs
           node apps/web-v3/scripts/study-areas-smoke.mjs
           node apps/web-v3/scripts/perimeter-editor-smoke.mjs
@@ -217,6 +218,14 @@ jobs:
           path: qa/ambienta-original-icons/
           retention-days: 30
           if-no-files-found: warn
+      - name: Capturas de paridad con la planilla didáctica de Leopold
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-leopold-excel-parity
+          path: qa/ambienta-leopold-parity/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Capturas catálogo de metodologías Conesa / RIAM
         if: always()
         uses: actions/upload-artifact@v4
