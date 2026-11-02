@@ -7,7 +7,8 @@
 }
 .ref-shell .amb-method-heading h3{font-size:23px;letter-spacing:-.02em;margin:5px 0 8px}
 .ref-shell .amb-method-heading p:not(.amb-matrix-overline){max-width:880px;color:#c1dce3;font-size:13px;line-height:1.6;margin:0 0 16px}
-.ref-shell .amb-method-cardgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+.ref-shell .amb-method-cardgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.ref-shell .amb-method-card:last-child{grid-column:span 2}
 .ref-shell .amb-method-card{
  display:flex;flex-direction:column;justify-content:space-between;min-width:0;
  border:1px solid #426878;border-radius:12px;padding:15px;
@@ -73,10 +74,11 @@
 .ref-shell .amb-method-score span{color:#d0e4e7;font-size:13px}
 .ref-shell .amb-method-score strong{font-size:26px;color:#f2d893}
 .ref-shell .amb-method-score small{display:block;flex-basis:100%;font-size:11px;color:#b6d1d5}
-@media(max-width:1550px){.ref-shell .amb-method-cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1250px){.ref-shell .amb-method-cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:1150px){.ref-shell .amb-method-criteria{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:710px){
  .ref-shell .amb-method-cardgrid,.ref-shell .amb-method-criteria{grid-template-columns:1fr}
+ .ref-shell .amb-method-card:last-child{grid-column:auto}
  .ref-shell .amb-method-catalog{padding:16px}
  .ref-shell .amb-method-stats{grid-template-columns:1fr}
 }
