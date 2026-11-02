@@ -1,71 +1,97 @@
 /**
- * AMBIENTA V3.6.0 — Pure, read-only document trace selector.
- * Links by explicit IDs only. Transitive paths are labelled, never inferred
- * from descriptions, dates or matching titles. A conflict is NOT a valid link.
- * No statuses imply legal/environmental compliance.
+ * AMBIENTA V3.6.6 — fail-closed, read-only graph projection for one measure.
+ * Links are explicit IDs only. Duplicate identifiers never resolve by array order.
+ * Documentary health is not environmental/legal compliance or authenticity.
  */
+const counts=rows=>{
+ const ids=new Map();
+ for(const row of rows)if(typeof row?.id==='string')
+  ids.set(row.id,(ids.get(row.id)??0)+1);
+ return ids;
+};
 export function measureDocumentTrace(state,measureId){
  const measures=state?.measures??[];
- const measure=measures.find(m=>m.id===measureId);
- if(!measure)return null;
+ const matched=measures.filter(m=>m?.id===measureId);
+ // A single-ID URL cannot distinguish two measures with the same identifier.
+ if(matched.length!==1)return null;
+ const measure=matched[0];
  const inspections=state?.inspections??[];
  const findings=state?.findings??[];
  const actions=state?.correctiveActions??[];
  const evidences=state?.evidence??[];
- const knownInspections=new Map(inspections.map(i=>[i.id,i]));
- const knownFindings=new Map(findings.map(f=>[f.id,f]));
- const linkedInspections=inspections.filter(i=>i.measureId===measureId);
- const inspectionIds=new Set(linkedInspections.map(i=>i.id));
- const linkedFindings=findings.filter(f=>inspectionIds.has(f.inspectionId));
- const findingIds=new Set(linkedFindings.map(f=>f.id));
- const linkedActions=actions.filter(a=>findingIds.has(a.findingId));
+ const programs=state?.programs??[];
+ const nI=counts(inspections),nF=counts(findings),nA=counts(actions),
+  nE=counts(evidences),nP=counts(programs);
  const warnings=[];
+ const warn=(kind,id,message)=>warnings.push({kind,id,message});
+ const unique=(numberMap,id)=>numberMap.get(id)===1;
+ const linkedInspections=inspections.filter(i=>{
+  if(i.measureId!==measureId)return false;
+  if(!unique(nI,i.id)){
+   warn('ambiguous_inspection',i.id,'Inspección con ID duplicado; vínculo excluido.');
+   return false;
+  }
+  return true;
+ });
+ const inspectionIds=new Set(linkedInspections.map(i=>i.id));
+ const knownInspections=new Map(inspections.filter(i=>unique(nI,i.id)).map(i=>[i.id,i]));
+ const linkedFindings=findings.filter(f=>{
+  if(!inspectionIds.has(f.inspectionId))return false;
+  if(!unique(nF,f.id)){
+   warn('ambiguous_finding',f.id,'Hallazgo con ID duplicado; vínculo excluido.');
+   return false;
+  }
+  return true;
+ });
+ const findingIds=new Set(linkedFindings.map(f=>f.id));
+ const linkedActions=actions.filter(a=>{
+  if(!findingIds.has(a.findingId))return false;
+  if(!unique(nA,a.id)){
+   warn('ambiguous_action',a.id,'Acción con ID duplicado; vínculo excluido.');
+   return false;
+  }
+  return true;
+ });
  const relatedEvidence=[];
  for(const e of evidences){
   const direct=e.measureId===measureId;
-  const inspectionRef=e.inspectionId?knownInspections.get(e.inspectionId):null;
   const viaInspection=Boolean(e.inspectionId&&inspectionIds.has(e.inspectionId));
-  const conflicting=Boolean(e.measureId&&inspectionRef&&inspectionRef.measureId!==e.measureId);
-  if((direct||viaInspection)&&conflicting){
-   warnings.push({kind:'conflicting_evidence',id:e.id,
-    message:'Evidencia con medida e inspección de medidas diferentes; vínculo no incorporado.'});
+  if(!direct&&!viaInspection)continue;
+  if(!unique(nE,e.id)){
+   warn('ambiguous_evidence',e.id,'Evidencia con ID duplicado; vínculo excluido.');
    continue;
   }
-  if(direct&&e.inspectionId&&!inspectionRef){
-   warnings.push({kind:'unresolved_inspection',id:e.id,
-    message:'La evidencia referencia una inspección inexistente; revisar procedencia.'});
+  if(e.inspectionId&&!unique(nI,e.inspectionId)){
+   warn('ambiguous_inspection',e.id,
+    'inspectionId de evidencia no es inequívoco; revisar referencia.');
+   // A valid direct measureId remains a direct relationship, never indirect.
+   if(!direct)continue;
+  }
+  const inspectionRef=e.inspectionId?knownInspections.get(e.inspectionId):null;
+  const conflicting=Boolean(e.measureId&&inspectionRef&&inspectionRef.measureId!==e.measureId);
+  if(conflicting){
+   warn('conflicting_evidence',e.id,
+    'Evidencia con medida e inspección de medidas diferentes; vínculo no incorporado.');
+   continue;
+  }
+  if(direct&&e.inspectionId&&!inspectionRef&&unique(nI,e.inspectionId)){
+   warn('unresolved_inspection',e.id,
+    'La evidencia referencia una inspección inexistente; revisar procedencia.');
   }
   if(direct||(!e.measureId&&viaInspection)){
    relatedEvidence.push({record:e,via:direct?'medida':'inspeccion'});
   }
-  // If the inspection points here but a different measure is declared, it is
-  // incompatible even if the other measure does not exist.
   if(viaInspection&&e.measureId&&e.measureId!==measureId&&!conflicting){
-   warnings.push({kind:'conflicting_evidence',id:e.id,
-    message:'Referencia indirecta incompatible con la medida declarada.'});
+   warn('conflicting_evidence',e.id,
+    'Referencia indirecta incompatible con la medida declarada.');
   }
  }
- for(const f of linkedFindings){
-  if(!knownInspections.has(f.inspectionId)){
-   warnings.push({kind:'unresolved_finding',id:f.id,
-    message:'Referencia de inspección faltante.'});
-  }
- }
- for(const a of linkedActions){
-  if(!knownFindings.has(a.findingId)){
-   warnings.push({kind:'unresolved_action',id:a.id,
-    message:'Referencia de hallazgo faltante.'});
-  }
- }
- return {
-  measure,
-  program:(state.programs??[]).find(p=>p.id===measure.programId)??null,
-  inspections:linkedInspections,
-  findings:linkedFindings,
-  actions:linkedActions,
-  evidence:relatedEvidence,
-  warnings,
-  counts:{inspections:linkedInspections.length,findings:linkedFindings.length,
-   actions:linkedActions.length,evidence:relatedEvidence.length}
- };
+ const availablePrograms=programs.filter(p=>p.id===measure.programId);
+ if(availablePrograms.length>1)warn('ambiguous_program',measure.programId,
+  'Programa de medida con ID duplicado; vínculo no incorporado.');
+ const program=availablePrograms.length===1?availablePrograms[0]:null;
+ const countsResult={inspections:linkedInspections.length,findings:linkedFindings.length,
+  actions:linkedActions.length,evidence:relatedEvidence.length};
+ return {measure,program,inspections:linkedInspections,findings:linkedFindings,
+  actions:linkedActions,evidence:relatedEvidence,warnings,counts:countsResult};
 }
