@@ -10,7 +10,8 @@ export type AmbientaIconName =
  | 'pga' | 'monitoring' | 'audits' | 'evidence' | 'gis'
  | 'reports' | 'satellite' | 'legal' | 'library' | 'history'
  | 'cloud' | 'vegetation' | 'water' | 'air' | 'noise'
- | 'measures' | 'inspections' | 'biodiversity';
+ | 'measures' | 'inspections' | 'biodiversity'
+ | 'calendar' | 'notice' | 'review' | 'export';
 
 type Props = Omit<SVGProps<SVGSVGElement>,'name'> & {
   kind:AmbientaIconName;
@@ -122,6 +123,27 @@ function Glyph({kind}:{kind:AmbientaIconName}) {
    <path d="M4 7.2h12.2v12.4H4zM7 4.5h6M7.2 11.8h5.4M7.2 15.3h4"/>
    <circle cx="17.7" cy="15.8" r="3.3"/>
    <path d="m20.1 18.2 2 2"/>
+  </>;
+  case 'calendar': return <>
+   <rect x="3.4" y="5.2" width="17.2" height="15.3" rx="2.1"/>
+   <path d="M7.6 3v4.4M16.4 3v4.4M3.5 9.3h17"/>
+   <path d="m8.2 14.6 2.3 2.2 5.3-5"/>
+  </>;
+  case 'notice': return <>
+   <path d="M12 3.3 21 19H3z"/>
+   <path d="M12 9v4.8M12 17.1h.01"/>
+   <circle cx="12" cy="17.1" r=".5" fill="currentColor" stroke="none"/>
+  </>;
+  case 'review': return <>
+   <path d="M5.4 3.8h8l3.6 3.6v6.4M13.4 3.8v3.8h3.5M8 10.6h5.6M8 14h3.3"/>
+   <path d="M6.5 3.8h-1a1 1 0 0 0-1 1V19a1 1 0 0 0 1 1h6.3"/>
+   <circle cx="16" cy="16.1" r="3.4"/>
+   <path d="m18.5 18.6 2.6 2.6"/>
+  </>;
+  case 'export': return <>
+   <path d="M12 3.3v11M8.2 10.8 12 14.6l3.8-3.8"/>
+   <path d="M5 16.5v3.2c0 .8.5 1.3 1.3 1.3h11.4c.8 0 1.3-.5 1.3-1.3v-3.2"/>
+   <path d="M6.2 4.1h11.6"/>
   </>;
   case 'biodiversity': return <>
    <path d="M12 21v-9.5M12 11.5C5.7 12 5 7.7 5.3 4.5c4.5.5 6.6 2.5 6.7 7M12 13.5c.5-6 3.2-8.7 7-9-0 5.5-1.7 9.3-7 9"/>
