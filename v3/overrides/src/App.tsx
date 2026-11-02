@@ -42,6 +42,7 @@ import {AMBIENTA_WEB_VERSION,AMBIENTA_WEB_RELEASE_LABEL} from './release-info.mj
 import {DocumentLinkAuditPanel} from './features/traceability/DocumentLinkAuditPanel';
 import {PreliminaryTechnicalReportPanel} from './features/reporting/PreliminaryTechnicalReportPanel';
 import {AmbientaIcon, type AmbientaIconName} from './features/iconography/AmbientaIcon';
+import {ArtworkIcon} from './features/iconography/ArtworkIcon';
 
 
 type Navigation = { path: string; label: string; icon: AmbientaIconName; description: string };
@@ -343,20 +344,20 @@ export default function App() {
   useEffect(()=>setSidebarOpen(false),[location.pathname]);
   return <div className={"v2-app ref-shell"+(bright?" ref-bright":"")+(IS_DIABLILLOS_CASE?" audit-diablillos":"")}>
     <aside className={'v2-sidebar '+(sidebarOpen?'sidebar-open':'')} aria-label="Navegación de AMBIENTA">
-      <div className="v2-brand"><span className="v2-logo"><AmbientaIcon kind="brand" size={30}/></span><div><strong>AMBIENTA</strong><small>PLATAFORMA AMBIENTAL</small></div>
+      <div className="v2-brand"><span className="v2-logo"><ArtworkIcon kind="brand" size={35}/></span><div><strong>AMBIENTA</strong><small>PLATAFORMA AMBIENTAL</small></div>
         <button className="v2-close" aria-label="Cerrar navegación" onClick={()=>setSidebarOpen(false)}><X size={20}/></button>
       </div>
       <div className="v2-sidebar-title">ESPACIO DE TRABAJO</div>
       <nav className="v2-nav" aria-label="Secciones">{NAV_PRIMARY.map(({path,label,icon})=>
         <NavLink key={path} to={path} end={path==='/'} className={({isActive})=>'v2-nav-item '+(isActive?'is-active':'')}>
-          <AmbientaIcon kind={icon} size={20}/><span>{label}</span></NavLink>)}</nav>
+          <ArtworkIcon kind={icon} size={29}/><span>{label}</span></NavLink>)}</nav>
       <div className="v2-sidebar-separator"/>
       <div className="v2-sidebar-title ref-tools-label">HERRAMIENTAS</div>
       <nav className="v2-nav ref-tool-nav" aria-label="Herramientas">{NAV_TOOLS.map(({path,label,icon})=>
         <NavLink key={path} to={path} className={({isActive})=>'v2-nav-item '+(isActive?'is-active':'')}>
-          <AmbientaIcon kind={icon} size={20}/><span>{label}</span></NavLink>)}</nav>
+          <ArtworkIcon kind={icon} size={29}/><span>{label}</span></NavLink>)}</nav>
       <div className="v2-sidebar-base">
-        <span className="ref-demo-icon"><AmbientaIcon kind="brand" size={22}/></span>
+        <span className="ref-demo-icon"><ArtworkIcon kind="brand" size={25}/></span>
         <div><strong>Entorno de demostración</strong><small>{data.project.province} · Argentina</small>
         <Link to="/nube">Cambiar proyecto</Link></div>
       </div>
