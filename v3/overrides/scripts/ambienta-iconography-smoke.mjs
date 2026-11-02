@@ -71,21 +71,31 @@ try{
   assert(snapshot.overflow<=6,'Horizontal overflow '+snapshot.overflow);
   assert.deepEqual(errors,[],'No JS errors on dashboard');
   const hero=await page.locator('[data-hero-illustrated=true]').evaluate(el=>{
-    const icons=[...el.querySelectorAll('svg[data-ambienta-illustration]')];
+    const vectors=[...el.querySelectorAll('svg[data-ambienta-illustration]')];
+    const artworks=[...el.querySelectorAll('[data-ambienta-artwork]')];
     const tags=[...el.querySelectorAll('.ref-hero-tag')];
-    const shape=icons.map(svg=>svg.getAttribute('data-ambienta-illustration'));
+    const allKinds=[
+      ...vectors.map(svg=>'vector:'+svg.getAttribute('data-ambienta-illustration')),
+      ...artworks.map(span=>'raster:'+span.getAttribute('data-ambienta-artwork'))
+    ];
+    const imageSources=artworks.map(span=>span.querySelector('img')?.currentSrc);
     return {
-      icons:icons.length,distinctKinds:[...new Set(shape)],svgShapes:[...new Set(icons.map(x=>x.innerHTML))].length,
-      decorative:icons.every(svg=>svg.getAttribute('aria-hidden')==='true'),
+      icons:vectors.length+artworks.length,distinctKinds:[...new Set(allKinds)],
+      svgShapes:[...new Set(vectors.map(x=>x.innerHTML))].length,
+      uniquePhotos:[...new Set(imageSources)].length,
+      decodedRaster:artworks.every(span=>span.classList.contains('amb-art-loaded')&&span.querySelector('img')?.naturalWidth>0),
+      decorative:vectors.every(svg=>svg.getAttribute('aria-hidden')==='true')&&
+        artworks.every(span=>span.getAttribute('aria-hidden')==='true'),
       tags:tags.length,colors:[...new Set(tags.map(t=>getComputedStyle(t).backgroundImage))].length,
       header:el.querySelector('h1')?.textContent,
       coordinates:el.textContent.includes('Coordenadas no declaradas'),
       width:el.getBoundingClientRect().width,overflow:el.scrollWidth-el.clientWidth
     };
   });
-  assert(hero.distinctKinds.length>=8,'Hero must have >=8 different illustrated motifs');
+  assert(hero.distinctKinds.length>=8,'Hero must have >=8 distinctly illustrated motifs, SVG and WebP combined');
   assert(hero.icons>=10,'Hero pictograms should appear in heading, metadata, badges and location');
-  assert(hero.svgShapes>=8,'Hero art must have distinct SVG drawings, not a reused glyph');
+  assert(hero.uniquePhotos>=7,'Hero must actually decode >=7 distinct generated illustration assets');
+  assert.equal(hero.decodedRaster,true,'No missing or broken generated artwork in the hero');
   assert.equal(hero.decorative,true,'Illustrations must be hidden from assistive technology');
   assert.equal(hero.tags,4,'Four live project labels retained');
   assert(hero.colors>=4,'Tags need distinct color palettes, not all green');
