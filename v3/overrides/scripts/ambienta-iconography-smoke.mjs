@@ -13,7 +13,7 @@ try{
   const page=await ctx.newPage();
   const errors=[];page.on('pageerror',err=>errors.push(String(err)));
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/');
-  await page.locator('.v2-sidebar [data-ambienta-icon="brand"]').waitFor();
+  await page.locator('.v2-sidebar .v2-logo [data-ambienta-icon="brand"]').waitFor();
   const original=await page.evaluate(()=>JSON.stringify({...localStorage}));
   const snapshot=await page.evaluate(()=>{
     const all=[...document.querySelectorAll('.v2-sidebar nav .v2-nav-item')];
