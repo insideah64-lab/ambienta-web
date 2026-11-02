@@ -193,7 +193,7 @@ export function ReferenceDashboard({data,k,onExport}:Props) {
       <Metric icon={Leaf} label="PROGRAMAS DEL PGA" value={k.programs}
         subtitle={measuresInPrograms+' con medidas asociadas'} accent="green" to="/pga"/>
       <Metric icon={ClipboardCheck} label="MEDIDAS AMBIENTALES" value={k.measures}
-        subtitle={k.verified+' verificadas documentalmente · '+data.measures.filter(m=>m.status==='en_ejecucion').length+' en ejecución'} accent="purple" to="/pga"/>
+        subtitle={k.verified+' verificadas · '+data.measures.filter(m=>m.status==='en_ejecucion').length+' en ejecución'} accent="purple" to="/pga"/>
       <Metric icon={ShieldCheck} label="INSPECCIONES" value={data.inspections.length}
         subtitle={k.inspectionsPending+' pendientes · registros documentales'} accent="cyan" to="/monitoreo"/>
       <Metric icon={FileText} label="EVIDENCIAS" value={data.evidence.length}
