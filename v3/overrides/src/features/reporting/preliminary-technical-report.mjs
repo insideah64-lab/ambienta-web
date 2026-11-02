@@ -164,8 +164,13 @@ export function renderPreliminaryTechnicalHtml(model){
  txt(p.name)+' · '+txt(p.id)+' · '+txt(p.province)+'</p><div class="warning">'+
  txt(model.disclaimer)+'</div><p>Documento de análisis del estado de información disponible. '+
  'No se calcularon impactos ni resultados de monitoreo; se transcriben relaciones y estados registrados.</p></header>';
+ const statisticLabels={
+  impacts:'Impactos',programs:'Programas',measures:'Medidas',
+  inspections:'Inspecciones',evidence:'Evidencias',findings:'Hallazgos',
+  correctiveActions:'Acciones correctivas',documentaryWarnings:'Referencias a revisar'
+ };
  const stats='<div class="two">'+Object.entries(counts).map(([key,v])=>
-  '<div class="stat"><b>'+txt(v)+'</b>'+txt(key)+'</div>').join('')+'</div>';
+  '<div class="stat"><b>'+txt(v)+'</b>'+txt(statisticLabels[key]??key)+'</div>').join('')+'</div>';
  const body=header+
  section('alcance','1. Alcance y procedencia',
   '<p>Fuente: '+txt(model.provenance.source)+'. Revisión '+txt(model.provenance.revision)+
