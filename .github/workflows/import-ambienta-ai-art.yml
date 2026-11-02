@@ -38,7 +38,10 @@ jobs:
               return Image.open(io.BytesIO(raw)).convert('RGB')
           photo=load('AMBIENTA_PHOTO_URL')
           assert photo.width/photo.height>1.8,(photo.width,photo.height)
-          photo=ImageOps.fit(photo,(2304,990),method=Image.Resampling.LANCZOS,centering=(.53,.5))
+          # The generator ignored the no-text instruction and embedded fake copy on the left.
+          # Crop it out permanently; real React headings stay live and selectable.
+          photo=photo.crop((int(photo.width*.33),0,photo.width,photo.height))
+          photo=ImageOps.fit(photo,(2304,990),method=Image.Resampling.LANCZOS,centering=(.5,.5))
           photo.save(folder/'hero-puna.webp','WEBP',quality=85,method=6)
           sheet=load('AMBIENTA_SPRITE_URL')
           assert sheet.width>=1024 and sheet.height>=1024,(sheet.width,sheet.height)
@@ -53,6 +56,10 @@ jobs:
           for index,name in enumerate(names):
               x=index%4;y=index//4
               icon=sheet.crop((x*512+16,y*512+16,(x+1)*512-16,(y+1)*512-16))
+              if name=='brand':
+                  # Remove unwanted text in AI-created mark; site name is HTML.
+                  icon=icon.crop((0,0,icon.width,int(icon.height*.76)))
+                  icon=ImageOps.pad(icon,(480,480),method=Image.Resampling.LANCZOS,color='#0b2731')
               icon.thumbnail((288,288),Image.Resampling.LANCZOS)
               fp=folder/('icon-'+name+'.webp')
               icon.save(fp,'WEBP',quality=87,method=6)
