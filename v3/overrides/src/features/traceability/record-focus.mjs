@@ -17,14 +17,28 @@ export function recordFocusUrl(kind,id){
 export function resolveRecordFocus(state,kind,id){
  const rule=SCOPES[kind];
  if(!rule||typeof id!=='string'||!id.trim())return null;
- const record=(state?.[rule.collection]??[]).find(r=>r.id===id);
- if(!record)return null;
+ const candidates=(state?.[rule.collection]??[]).filter(r=>r?.id===id);
+ if(candidates.length===0)return null;
+ // A URL containing only an ID cannot distinguish duplicate source records.
+ // Fail closed instead of silently displaying the first occurrence.
+ if(candidates.length>1)return {
+  kind,id,ambiguous:true,occurrences:candidates.length,record:null,
+  fields:[],relations:[],warnings:['Identificador duplicado: no es posible determinar una ficha única.']
+ };
+ const record=candidates[0];
  const warnings=[],relations=[];
  const target=(key,refId,label)=>{
   if(!refId)return null;
-  const row=(state?.[key]??[]).find(r=>r.id===refId);
-  if(!row){warnings.push(label+' '+refId+' no existe en el expediente.');return null}
-  return row;
+  const matches=(state?.[key]??[]).filter(r=>r?.id===refId);
+  if(matches.length===0){
+   warnings.push(label+' '+refId+' no existe en el expediente.');return null;
+  }
+  if(matches.length>1){
+   warnings.push(label+' '+refId+' tiene '+matches.length+
+    ' registros con el mismo ID: vínculo ambiguo no incorporado.');
+   return null;
+  }
+  return matches[0];
  };
  const add=(kind,id,label)=>{
   const url=kind==='measure'?'/pga?medida='+encodeURIComponent(id):recordFocusUrl(kind,id);
