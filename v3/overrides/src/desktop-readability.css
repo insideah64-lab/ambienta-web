@@ -679,3 +679,23 @@
 @media(min-width:1100px) and (max-width:1399px){
  .ref-shell .ref-audit-links-list>div{align-items:flex-start;flex-wrap:wrap}
 }
+
+/* AMBIENTA 3.6.7 — field-level documentary issue provenance, desktop only. */
+@media(min-width:1100px){
+ .ref-shell .ref-audit-export-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+  padding:0 18px 16px;min-width:0}
+ .ref-shell .ref-audit-export-bar button{font-size:13px!important;white-space:normal;
+  text-align:center;line-height:1.4;flex:none;max-width:100%}
+ .ref-shell .ref-audit-export-bar button:disabled{opacity:.7;cursor:wait}
+ .ref-shell .ref-audit-export-bar small{color:#d2e5dd;font-size:13px!important;
+  line-height:1.45;flex:1;min-width:235px}
+ .ref-shell .ref-audit-origin{display:block;font-size:12px!important;color:#b4dbd5;
+  overflow-wrap:anywhere;line-height:1.6;margin-top:5px}
+ .ref-shell .ref-audit-origin code{font-size:12px!important;color:#e5fff0;
+  overflow-wrap:anywhere;white-space:normal}
+ .ref-shell .ref-audit-export-result{margin:0 18px 16px;display:grid;gap:7px;
+  padding:11px 13px;background:#173f3b;border:1px solid #73baa1;border-radius:8px;min-width:0}
+ .ref-shell .ref-audit-export-result strong{font-size:13px!important;color:#f5fff9}
+ .ref-shell .ref-audit-export-result code{font-size:12px!important;color:#d5fbe3;
+  overflow-wrap:anywhere;white-space:normal}
+}
