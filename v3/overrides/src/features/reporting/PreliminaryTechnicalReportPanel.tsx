@@ -1,4 +1,5 @@
 import {useMemo,useState} from 'react';
+import './preliminary-technical-report.css';
 import {Link} from 'react-router-dom';
 import {ArrowDownToLine,FileCheck2,AlertCircle,ClipboardList} from 'lucide-react';
 import type {DemoState} from '../../lib/demo';
