@@ -20,7 +20,7 @@
  .ref-shell .v2-scenic{
   height:235px;opacity:.62;filter:saturate(1.15);
   background:linear-gradient(90deg,#04242ca5,#0526324a),
-    url('./assets/reference-hero-mountain.jpg') center 45%/cover no-repeat;
+    url('./assets/ambienta-landscape.svg') center 45%/cover no-repeat;
   mask-image:linear-gradient(#000 0%,transparent 100%);
  }
  .ref-shell .v2-main:before{
@@ -135,7 +135,7 @@
  .ref-shell .ref-reference-dashboard .ref-hero{
   min-height:187px;align-items:center;
   background-image:linear-gradient(90deg,#051e23d2,#09373978 56%,#07383b28),
-    url('./assets/reference-hero-mountain.jpg') !important;
+    url('./assets/ambienta-landscape.svg') !important;
   background-position:center,center 58%;background-size:cover;
   border:1px solid #4b877b;box-shadow:0 10px 24px #05171c5e;
   border-radius:11px;
@@ -267,7 +267,7 @@
  .ref-shell .ref-attention-item:hover{background:#1c4c53}
  .ref-shell .ref-about{display:flex;gap:10px;padding:9px}
  .ref-shell .ref-about-photo{
-  width:42%;background-image:url('./assets/reference-forest-mountains.jpg')!important;
+  width:42%;background-image:url('./assets/ambienta-landscape.svg')!important;
   background-position:center;background-size:cover;min-height:120px;border-radius:7px
  }
  .ref-shell .ref-about-text strong{color:#f5fff9}
