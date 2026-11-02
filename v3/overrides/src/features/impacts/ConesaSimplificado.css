@@ -1,0 +1,43 @@
+.ref-shell .amb-conesa-rev{--conesa-stroke:#486c7b}
+.ref-shell .amb-conesa-top{display:flex;justify-content:space-between;gap:18px;align-items:start;flex-wrap:wrap}
+.ref-shell .amb-conesa-top h3{font-size:24px;margin:0 0 8px;color:#f2fff8}
+.ref-shell .amb-conesa-top p:not(.amb-matrix-overline){font-size:13px;color:#c3dce3;max-width:770px;line-height:1.55;margin:0 0 10px}
+.ref-shell .amb-conesa-top code{display:block;font-size:12px;line-height:1.65;overflow-wrap:anywhere;background:#092631;border:1px solid #335c6c;color:#e7daad;padding:10px;border-radius:8px}
+.ref-shell .amb-conesa-disclaimer{font-size:12px;line-height:1.75;border-left:3px solid #efd083;color:#d6e3e6;
+ background:#283a3b86;border-radius:0 8px 8px 0;padding:10px 14px;margin:17px 0}
+.ref-shell .amb-conesa-disclaimer strong{color:#ffedb6}
+.ref-shell .amb-conesa-disclaimer a{color:#98e8d4;text-decoration:underline}
+.ref-shell .amb-conesa-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:15px}
+.ref-shell .amb-conesa-kpis span{background:#082a35;border:1px solid #386777;border-radius:8px;padding:13px}
+.ref-shell .amb-conesa-kpis strong{display:block;color:#dffff4;font-size:24px}
+.ref-shell .amb-conesa-kpis small{display:block;font-size:11px;color:#b5d2dc}
+.ref-shell .amb-conesa-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.ref-shell .amb-conesa-toolbar p{font-size:12px;color:#bbced5;line-height:1.5;margin:0}
+.ref-shell .amb-conesa-toolbar button{display:flex;gap:6px;align-items:center;background:#1a5362;border:1px solid #5b9196;color:#eafff8;padding:8px 11px;border-radius:8px;font-weight:700;font-size:12px}
+.ref-shell .amb-conesa-editor{background:#0a2c38;border:1px solid #4c7d88;border-radius:12px;padding:18px;margin-top:17px}
+.ref-shell .amb-conesa-editor header{display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:14px}
+.ref-shell .amb-conesa-editor header small{color:#91d9c7;font-size:10px;font-weight:800}
+.ref-shell .amb-conesa-editor header h4{margin:4px 0;font-size:19px;color:#f5fffc}
+.ref-shell .amb-conesa-editor header p{font-size:12px;color:#bbced5;margin:0}
+.ref-shell .amb-conesa-editor header button{border:1px solid #477886;background:#163f4a;color:#e5faf7;padding:6px;border-radius:7px}
+.ref-shell .amb-conesa-editor label{display:block;font-size:12px;color:#d6e7eb;font-weight:750;margin:12px 0}
+.ref-shell .amb-conesa-editor input,.ref-shell .amb-conesa-editor select,.ref-shell .amb-conesa-editor textarea{display:block;width:100%;max-width:100%;margin-top:6px;background:#103a48;color:#f1fffb;border:1px solid #4a7a8a;border-radius:8px;padding:9px 11px;font-family:inherit;font-size:12px}
+.ref-shell .amb-conesa-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:14px;row-gap:3px}
+.ref-shell .amb-conesa-result{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:19px 0}
+.ref-shell .amb-conesa-result span{border:1px solid #4a777e;background:#153f47;border-radius:9px;padding:12px;color:#cce2e2;font-size:12px}
+.ref-shell .amb-conesa-result strong{display:block;color:#ffdda3;font-size:23px;margin-top:6px}
+.ref-shell .amb-conesa-problems{border-left:3px solid #e9af5c;background:#49352599;padding:12px;color:#f5dbad;line-height:1.55;font-size:12px}
+.ref-shell .amb-conesa-review{border:1px solid #4f7886;border-radius:13px;margin-top:18px;padding:16px;background:#0b2c3a}
+.ref-shell .amb-conesa-review h4{font-size:17px;color:#f2fff9;margin:0 0 6px}
+.ref-shell .amb-conesa-review p{font-size:12px;color:#b7d3dc;line-height:1.5;margin:0 0 12px}
+.ref-shell .amb-conesa-review-scroll{overflow:auto;max-height:530px;border:1px solid #376473;border-radius:8px}
+.ref-shell .amb-conesa-review table{border-collapse:collapse;min-width:1430px;width:100%;font-size:11px;color:#ebf5f6}
+.ref-shell .amb-conesa-review th,.ref-shell .amb-conesa-review td{padding:10px 7px;border-bottom:1px solid #305563;text-align:center;font-variant-numeric:tabular-nums}
+.ref-shell .amb-conesa-review thead{position:sticky;top:0;background:#1a4e5d}
+.ref-shell .amb-conesa-review th:first-child{min-width:200px;max-width:240px;text-align:left}
+.ref-shell .amb-conesa-review th button{background:transparent;color:#dffff4;border:0;text-align:left;font-size:12px;font-weight:750}
+.ref-shell .amb-conesa-review th button small{display:block;font-weight:400;color:#afcdd6;margin-top:4px}
+.ref-shell .amb-conesa-review [data-review-category]{font-weight:750;color:#f1d5a0}
+.ref-shell .amb-conesa-review [data-review-diagnostics]{min-width:140px;max-width:220px;overflow-wrap:anywhere;color:#f1cba7;text-align:left}
+@media(max-width:1400px){.ref-shell .amb-conesa-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.ref-shell .amb-conesa-fields,.ref-shell .amb-conesa-result{grid-template-columns:1fr}}

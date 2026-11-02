@@ -1,6 +1,7 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ArrowDownToLine,X} from 'lucide-react';
 import {ImpactMatrixBuilder,readMatrixAxes} from './ImpactMatrixBuilder';
+import {ConesaSimplificado} from './ConesaSimplificado';
 import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type MethodId,type ScoredMethodId} from './MatrixMethodData';
 import './MatrixMethodHub.css';
 
@@ -204,15 +205,19 @@ function ScoredMatrix({projectId,projectName,method}:{
    {notice&&<p role="status" className="amb-matrix-notice">{notice}</p>}
   </section>;
 }
+type ActiveMethod=Exclude<MethodId,'battelle'>|'conesa-simplificado-tutorial-v1';
 const CARDS: Array<{
- id:MethodId;name:string;kind:string;detail:string;status:string;source:string;available:boolean
+ id:MethodId|'conesa-simplificado-tutorial-v1';name:string;kind:string;detail:string;status:string;source:string;available:boolean
 }> = [
  {id:'causa-leopold',name:'Identificación y Leopold',kind:'Identificación / valoración',
   detail:'Cruce de acciones y factores, naturaleza del impacto y magnitud/importancia independientes (1–10). Incluye una ponderación experimental separada.',
   status:'Disponible',source:'Leopold et al. · USGS (1971)',available:true},
- {id:'conesa-1997-2ex',name:'Conesa Fernández-Vítora',kind:'Importancia cualitativa',
+ {id:'conesa-1997-2ex',name:'Conesa · motor anterior',kind:'Importancia cualitativa · edición anterior',
   detail:'Diez atributos definidos, signo y fórmula versionada 3IN + 2EX. Nunca hereda cifras de Leopold.',
   status:'Disponible · fórmula identificada',source:'Conesa (variante 1997) / Vidal y Regaldo',available:true},
+ {id:'conesa-simplificado-tutorial-v1',name:'Conesa simplificado · revisión',kind:'Importancia · Excel contrastado',
+  detail:'Importancia absoluta y con signo; criticidad como +4 al valor base; rangos 25/50/75 y tabla de revisión. RV=3 queda marcado como fuera de escala.',
+  status:'Nuevo · variante experimental trazable',source:'Tutorial y Excel aportados / Conesa 2010 (aplicación)',available:true},
  {id:'riam-1998',name:'RIAM',kind:'Comparación de alternativas',
   detail:'Cinco atributos A1, A2, B1, B2 y B3, con valoración estructurada y resultado ES.',
   status:'Disponible · fórmula identificada',source:'Pastakia y Jensen (1998)',available:true},
@@ -221,7 +226,7 @@ const CARDS: Array<{
   status:'Preparación metodológica',source:'Dee et al. (1973)',available:false}
 ];
 export function MatrixMethodHub({projectId,projectName,registeredImpacts}:Props){
- const [active,setActive]=useState<Exclude<MethodId,'battelle'>>('causa-leopold');
+ const [active,setActive]=useState<ActiveMethod>('causa-leopold');
  return <div className="amb-method-hub" data-matrix-method-catalog="v1">
   <section className="amb-method-catalog" aria-label="Catálogo de métodos ambientales">
    <div className="amb-method-heading">
@@ -237,7 +242,7 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts}:Props)
     <div className="amb-method-cardbottom">
      <span>{card.status}</span>
      {card.available?<button type="button" aria-pressed={active===card.id}
-      onClick={()=>setActive(card.id as Exclude<MethodId,'battelle'>)}>
+      onClick={()=>setActive(card.id as ActiveMethod)}>
       {active===card.id?'Método seleccionado':'Abrir método'}</button>
       :<span className="amb-method-prerequisite">Requiere datos de base</span>}
     </div>
@@ -252,6 +257,8 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts}:Props)
   </section>
   {active==='causa-leopold'
    ?<ImpactMatrixBuilder projectId={projectId} projectName={projectName} registeredImpacts={registeredImpacts}/>
-   :<ScoredMatrix key={projectId+':'+active} projectId={projectId} projectName={projectName} method={active}/>}
+   :active==='conesa-simplificado-tutorial-v1'
+     ?<ConesaSimplificado key={projectId+':'+active} projectId={projectId} projectName={projectName}/>
+     :<ScoredMatrix key={projectId+':'+active} projectId={projectId} projectName={projectName} method={active}/>}
  </div>;
 }

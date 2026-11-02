@@ -72,6 +72,7 @@ jobs:
           node apps/web-v3/scripts/ambienta-iconography-smoke.mjs
           node apps/web-v3/scripts/icon-coverage-smoke.mjs
           node apps/web-v3/scripts/impact-matrix-builder-smoke.mjs
+          node apps/web-v3/scripts/conesa-simplificado-excel-parity-smoke.mjs
           node apps/web-v3/scripts/matrix-method-catalog-smoke.mjs
           node apps/web-v3/scripts/document-identity-negative-smoke.mjs
           node apps/web-v3/scripts/release-spatial-layout-smoke.mjs
@@ -224,6 +225,14 @@ jobs:
         with:
           name: ambienta-leopold-excel-parity
           path: qa/ambienta-leopold-parity/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Capturas de revisión Conesa simplificado y paridad Excel
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-conesa-simplificado-parity
+          path: qa/ambienta-conesa-simplificado/
           if-no-files-found: warn
           retention-days: 30
       - name: Capturas catálogo de metodologías Conesa / RIAM
