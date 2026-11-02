@@ -21,13 +21,25 @@ const magnitudes=[
  [4,5,5,7,3],[1,3,3,7,-2]
 ];
 const importance=[
- [2,1,2,1,2],[2,2,2,3,1],[2,2,2,1,1],[1,1,2,1,1],
+ [2,1,2,1,2],[2,2,2,3,1],[2,2,2,1,1],[2,2,2,1,1],
  [1,1,2,1,1],[2,1,1,3,1],[1,1,2,1,1],[1,3,1,1,1],
  [1,5,5,6,1],[1,2,2,6,1]
 ];
 const expectedByFactor=[-29,-52,-10,-6,-13,-20,-1,-17,99,53];
 const expectedByAction=[0,-42,8,60,-22];
 const source='Matriz-de-Leopold.xlsx · hoja B · ejercicio de túnel ≤500 m';
+/* Verify copied workbook fixture independently of the React application.
+ * A transcription error must not become an apparent engine defect. */
+assert.deepEqual(magnitudes.map((row,i)=>
+ row.reduce((total,m,j)=>total+m*importance[i][j],0)),expectedByFactor,
+ 'Numeric fixture rows must reproduce worksheet B before opening Chromium');
+assert.deepEqual(actionNames.map((_,j)=>
+ magnitudes.reduce((total,row,i)=>total+row[j]*importance[i][j],0)),expectedByAction,
+ 'Numeric fixture columns must reproduce worksheet B before opening Chromium');
+assert.equal(expectedByFactor.reduce((a,b)=>a+b,0),4);
+assert.equal(magnitudes.flat().filter(x=>x>0).length,18);
+assert.equal(magnitudes.flat().filter(x=>x<0).length,32);
+
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 const out='qa/ambienta-leopold-parity';
 await fs.mkdir(out,{recursive:true});
