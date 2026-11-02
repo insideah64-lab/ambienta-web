@@ -63,7 +63,7 @@ try {
    else assert.equal(current,initial,'Visual styling may not modify local DEMO data');
    await page.screenshot({path:folder+'/'+name+'-'+width+'.png',animations:'disabled'});
    console.log(JSON.stringify({width,route:path,result:'PASS',theme:'reference-dark-env',
-      overview3col:name==='inicio'&&width>1420,overflow:check.overflow,readOnly:true}));
+      overview3col:name==='inicio'&&width>1520,overflow:check.overflow,readOnly:true}));
   }
   await ctx.close();
  }
