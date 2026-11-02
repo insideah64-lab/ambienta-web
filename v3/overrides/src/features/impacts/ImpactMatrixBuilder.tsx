@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useState} from 'react';
+import {useEffect,useMemo,useRef,useState} from 'react';
 import {Link} from 'react-router-dom';
 import {ArrowDownToLine,ChevronDown,Plus,RotateCcw,UploadCloud,X} from 'lucide-react';
 import './ImpactMatrixBuilder.css';
@@ -93,18 +93,21 @@ function cellTone(c:Cell|undefined){return !c?'empty':c.sign===0?'none':c.sign>0
 
 export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Props){
  const [doc,setDoc]=useState<Matrix>(()=>readMatrix(projectId,projectName));
+ const modified=useRef(false);
  const [mode,setMode]=useState<Mode>('identificacion');
  const [selected,setSelected]=useState<string|null>(null);
  const [actionName,setActionName]=useState('');
  const [factorName,setFactorName]=useState('');
  const [notice,setNotice]=useState('');
  const [onlyEvaluated,setOnlyEvaluated]=useState(false);
- useEffect(()=>{setDoc(readMatrix(projectId,projectName));setSelected(null);},[projectId,projectName]);
+ useEffect(()=>{modified.current=false;setDoc(readMatrix(projectId,projectName));setSelected(null);},[projectId,projectName]);
  useEffect(()=>{
+  // Opening the read-only Impactos page must never create a draft or mutate local DEMO storage.
+  if(!modified.current)return;
   try{localStorage.setItem(STORE+projectId,JSON.stringify(doc));}
   catch{setNotice('No se pudo guardar automáticamente. Exportá el JSON para conservar tu trabajo.');}
  },[projectId,doc]);
- const update=(fn:(current:Matrix)=>Matrix)=>setDoc(prev=>({...fn(prev),updatedAt:new Date().toISOString()}));
+ const update=(fn:(current:Matrix)=>Matrix)=>{modified.current=true;setDoc(prev=>({...fn(prev),updatedAt:new Date().toISOString()}));};
  const chosen=useMemo(()=>{
   if(!selected)return null;
   const [fid,aid]=selected.split('::');
@@ -155,7 +158,7 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
   try{const payload:unknown=JSON.parse(await file.text());
    if(!validMatrix(payload,projectId))return setNotice('Formato no válido, o corresponde a otro expediente. No se importó.');
    if(!window.confirm('¿Reemplazar la matriz local de este expediente por la del archivo?'))return;
-   setDoc(payload);setSelected(null);setNotice('Matriz JSON importada y verificada.');
+   modified.current=true;setDoc(payload);setSelected(null);setNotice('Matriz JSON importada y verificada.');
   }catch{setNotice('No fue posible leer el archivo JSON.');}
  };
  const deleteAction=(id:string)=>{if(!window.confirm('¿Eliminar esta acción y sus interacciones?'))return;update(cur=>({
@@ -262,7 +265,7 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
     {mode==='ponderada'&&<p className="amb-matrix-index">Suma de magnitudes adversas ponderadas: <strong>{adverseScore.toFixed(2)}</strong> · índice exploratorio sin umbral legal</p>}
     <button type="button" className="amb-matrix-reset" onClick={()=>{
       if(window.confirm('¿Reemplazar por catálogo de ejemplo vacío de valoraciones? Se perderán los cambios locales no exportados.')){
-       setDoc(initial(projectId,projectName));setSelected(null);setNotice('Matriz reiniciada.');}
+       modified.current=true;setDoc(initial(projectId,projectName));setSelected(null);setNotice('Matriz reiniciada.');}
     }}><RotateCcw size={15}/> Reiniciar borrador</button>
    </div>
    <div className="amb-matrix-inspector" data-matrix-inspector>
