@@ -28,7 +28,7 @@ try{
   const a=page.locator('[data-attention-key=findings]');
   assert.match(await a.innerText(),/Hallazgos para seguimiento/);
   assert.match(await page.locator('[data-work-attention=true]').innerText(),
-   /no incumplimientos ambientales confirmados/);
+   /no alertas ambientales ni incumplimientos comprobados/);
   const columns=await page.locator('.ref-reference-grid').evaluate(el=>
    getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length);
   assert.equal(columns,width>1420?3:2);
