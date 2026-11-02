@@ -1,9 +1,6 @@
-import { Link } from 'react-router-dom';
 import {
-  ArrowDownToLine, ArrowRight, CalendarDays,
-  ClipboardCheck, Clock3, Cloud, Droplets, FileText,
-  History, Leaf, MapPin,
-  ShieldCheck, Sprout, Wind, Volume2
+  ArrowDownToLine, ArrowRight, CalendarDays, ClipboardCheck,
+  Clock3, History, MapPin
 } from 'lucide-react';
 import type { DemoState, Summary } from '../../lib/demo';
 import { statusText, IS_DIABLILLOS_CASE } from '../../lib/demo';
