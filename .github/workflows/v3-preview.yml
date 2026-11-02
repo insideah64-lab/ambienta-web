@@ -71,6 +71,7 @@ jobs:
           node apps/web-v3/scripts/ambienta-iconography-smoke.mjs
           node apps/web-v3/scripts/icon-coverage-smoke.mjs
           node apps/web-v3/scripts/impact-matrix-builder-smoke.mjs
+          node apps/web-v3/scripts/matrix-method-catalog-smoke.mjs
           node apps/web-v3/scripts/document-identity-negative-smoke.mjs
           node apps/web-v3/scripts/release-spatial-layout-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
@@ -216,6 +217,14 @@ jobs:
           path: qa/ambienta-original-icons/
           retention-days: 30
           if-no-files-found: warn
+      - name: Capturas catálogo de metodologías Conesa / RIAM
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-matrix-method-catalog
+          path: qa/ambienta-matrix-methods/
+          if-no-files-found: warn
+          retention-days: 30
       - name: Capturas del constructor de matrices ambientales
         if: always()
         uses: actions/upload-artifact@v4
