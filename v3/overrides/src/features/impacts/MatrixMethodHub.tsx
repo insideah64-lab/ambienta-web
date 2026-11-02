@@ -204,10 +204,9 @@ function ScoredMatrix({projectId,projectName,method}:{
    {notice&&<p role="status" className="amb-matrix-notice">{notice}</p>}
   </section>;
 }
-const CARDS:[
- {id:MethodId;name:string;kind:string;detail:string;status:string;source:string;available:boolean},
- ...{id:MethodId;name:string;kind:string;detail:string;status:string;source:string;available:boolean}[]
-]=[
+const CARDS: Array<{
+ id:MethodId;name:string;kind:string;detail:string;status:string;source:string;available:boolean
+}> = [
  {id:'causa-leopold',name:'Identificación y Leopold',kind:'Identificación / valoración',
   detail:'Cruce de acciones y factores, naturaleza del impacto y magnitud/importancia independientes (1–10). Incluye una ponderación experimental separada.',
   status:'Disponible',source:'Leopold et al. · USGS (1971)',available:true},
