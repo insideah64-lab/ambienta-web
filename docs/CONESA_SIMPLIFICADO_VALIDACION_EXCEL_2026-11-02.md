@@ -43,10 +43,11 @@ admitir 3, pero necesitaría una fuente, versión y QA independientes.
 - Resultado con signo: `signo * importancia_absoluta`.
 - Solo se devuelve un cálculo si se completaron todos los campos en sus escalas.
   Un recargo crítico requiere texto de fundamento y referencia evidencial.
-- Categorías **descriptivas de esta variante**: abs <25 irrelevante;
-  25≤abs<50 moderado; 50≤abs<75 severo; abs≥75 crítico.
-  La **naturaleza** se conserva por separado: no corresponde interpretar
-  un beneficio con gran importancia como contaminación crítica.
+- Categorías **descriptivas para impactos adversos de esta variante**:
+  abs <25 irrelevante; 25≤abs<50 moderado; 50≤abs<75 severo; abs≥75 crítico.
+  Para signo **positivo**, se muestra `Beneficioso` y se conserva su
+  importancia absoluta y firmada sin aplicarle categorías de severidad adversa.
+  La clasificación positiva más detallada requeriría otra fuente validada.
 - Cuadro de revisión por impacto: valores de criterios, resultados absoluto
   y firmado, categoría y errores/pendientes.
 - CSV y JSON incluyen el ID de variante y los valores críticos;
