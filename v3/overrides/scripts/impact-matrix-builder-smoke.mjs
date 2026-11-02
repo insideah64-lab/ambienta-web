@@ -9,13 +9,24 @@ try {
   const ctx=await browser.newContext({viewport:{width,height:900},acceptDownloads:true,reducedMotion:'reduce'});
   const page=await ctx.newPage();const errors=[];page.on('pageerror',err=>errors.push(String(err)));
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/impactos');
+  await page.locator('.v2-table').first().waitFor();
+  assert.equal(await page.locator('[data-impact-matrix]').count(),0,
+    'Impactos must be a documentary register, not the editing workbench');
+  assert.equal(await page.getByText(/Este registro no calcula automáticamente la significancia ambiental/).count(),1,
+    'Project Impactos explicitly distinguishes its documentary record from valuation');
+  assert.equal(await page.locator('.v2-sidebar nav[aria-label="Herramientas"] a[href="#/matrices"]').count(),1,
+    'The matrix constructor belongs in the Tools navigation');
+  await page.locator('[data-open-matrix-tool]').click();
+  assert.equal(new URL(page.url()).hash,'#/matrices');
   await page.locator('[data-impact-matrix="v1"]').waitFor();
+  assert.equal(await page.locator('[data-page-role="environmental-matrices-tool"]').count(),1);
   const grid=page.locator('.amb-matrix-grid');
   assert.equal(await grid.locator('thead th').count(),5,'4 action examples plus factor header');
   assert.equal(await grid.locator('tbody tr').count(),7,'7 factors, no fake evaluations');
   assert.equal(await page.locator('.amb-matrix-kpis>span').nth(1).locator('strong').innerText(),'0');
   assert.equal(await page.locator('.amb-matrix-cell--negative,.amb-matrix-cell--positive').count(),0);
-  assert.equal(await page.getByText('No hay puntuaciones de significancia ambiental calculadas automáticamente.').count(),1);
+  assert.equal(await page.locator('[data-page-role="environmental-matrices-tool"]').count(),1,
+    'The evaluation workbench lives on its own tools page');
   await page.screenshot({path:output+'/matrix-empty-'+width+'.png',animations:'disabled'});
   await page.locator('.amb-matrix-cell').first().click();
   const nature=page.getByRole('combobox',{name:'Naturaleza de la interacción'});

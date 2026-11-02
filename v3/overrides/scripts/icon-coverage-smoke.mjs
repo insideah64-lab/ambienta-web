@@ -5,7 +5,7 @@ import {chromium} from 'playwright';
 const root='http://127.0.0.1:8787/v3/index.html?caso=diablillos#';
 const routes=[
  ['resumen','/'],['expediente','/expediente'],['area','/area'],
- ['impactos','/impactos'],['pga','/pga'],['monitoreo','/monitoreo'],
+ ['impactos','/impactos'],['matrices','/matrices'],['pga','/pga'],['monitoreo','/monitoreo'],
  ['auditorias','/auditorias'],['evidencias','/evidencias'],
  ['sig','/mapas'],['reportes','/reportes'],['mita','/mita'],
  ['normativa','/normativa'],['biblioteca','/biblioteca'],
@@ -55,8 +55,8 @@ try {
       overflow:document.documentElement.scrollWidth-innerWidth
     };
    });
-   assert.equal(data.navCount,15,'All routes must retain 15 navigation destinations: '+name);
-   assert.equal(data.navUniqueImages,15,'All 15 sidebar artworks must be different: '+name);
+   assert.equal(data.navCount,16,'All routes must retain 16 navigation destinations: '+name);
+   assert.equal(data.navUniqueImages,16,'All 16 sidebar artworks must be different: '+name);
    assert.equal(data.loaded,data.total,'Missing or broken generated images on '+name);
    assert.equal(data.legacyDecorative.length,0,'Unexpected generic decorative icon on '+name+': '+data.legacyDecorative);
    assert(data.overflow<=6,'Horizontal overflow on '+name+'/'+width+': '+data.overflow);
