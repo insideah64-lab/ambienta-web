@@ -100,7 +100,7 @@ export function SpatialLinksPanel({data,mode}:Props){
  return <section className="geo-links-panel" data-spatial-links={mode}
    aria-label="Vinculación espacial experimental">
    <div className="geo-links-header">
-    <div><small>AMBIENTA · VINCULACIÓN SIG V3.3</small>
+    <div><small>MÓDULO VINCULACIÓN SIG · v3.3</small>
      <h3>{category?'Zonas para '+titles[category].toLowerCase():'Trazabilidad entre zonas y módulos'}</h3></div>
     <span>SIMULADO · NO OFICIAL</span>
    </div>
