@@ -28,8 +28,8 @@ try{
      desktopBackground:style('.v2-sidebar').backgroundImage,
      mainBackground:style('.v2-main').backgroundImage,
      accent:theme.getPropertyValue('--amb-blue').trim(),
-     panelBackground:style('.v2-panel').backgroundImage,
-     text:style('.v2-panel-title h2').color,
+     panelBackground:style('.v2-panel, .ref-panel').backgroundImage,
+     text:style('.v2-panel-title h2, .ref-panel-head h2').color,
      highlight:style('.v2-nav-item.is-active').backgroundImage,
      overflow:document.documentElement.scrollWidth-window.innerWidth,
      statusColors:[...document.querySelectorAll('.v2-badge-mint,.v2-badge-amber,.v2-badge-blue')]
@@ -37,10 +37,10 @@ try{
     };
    });
    assert.equal(appearance.accent,'#79beff');
-   assert.match(appearance.desktopBackground,/rgb\\(12, 23, 44\\)/);
-   assert.match(appearance.mainBackground,/rgb\\(14, 26, 47\\)/);
-   assert.match(appearance.panelBackground,/rgb\\(26, 44, 66\\)/);
-   assert.match(appearance.highlight,/rgb\\(49, 90, 147\\)/);
+   assert(appearance.desktopBackground.includes('rgb(12, 23, 44)'), 'appearance.desktopBackground must use the new palette');
+   assert(appearance.mainBackground.includes('rgb(14, 26, 47)'), 'appearance.mainBackground must use the new palette');
+   assert(appearance.panelBackground.includes('rgb(26, 44, 66)'), 'appearance.panelBackground must use the new palette');
+   assert(appearance.highlight.includes('rgb(49, 90, 147)'), 'appearance.highlight must use the new palette');
    assert.equal(appearance.text,'rgb(243, 248, 255)');
    assert(appearance.overflow<=6,'Horizontal overflow at '+width+' '+route);
    assert.equal(await baseline(),original,'Theme may not mutate DEMO data');
