@@ -270,3 +270,304 @@
  .ref-shell [data-page-role="territory-definition"] .geo-study-buttons button:hover:not(:disabled),
  .ref-shell .v2-study-navlink:hover{background:#437ab4;color:#fff}
 }
+
+
+/* AMBIENTA — editorial-balanced desktop palette (revision after visual review).
+   Neutral charcoal surfaces, warm typography, restrained blue CTAs and
+   intentional multicolor informational accents. This supersedes the earlier
+   monochromatic navy surfaces without changing data/semantic SIG colors.
+   Strongly scoped to the desktop V3 shell, leaving V1/V2 and maps untouched. */
+@media (min-width:1100px){
+ .ref-shell{
+  --amb-bg:#191b20;--amb-sidebar:#202329;--amb-surface:#292e35;
+  --amb-surface-raised:#30363c;--amb-surface-soft:#252a30;
+  --amb-line:#535e68;--amb-ink:#f5f3ef;--amb-muted:#c5c8cc;
+  --amb-blue:#8bbde9;--amb-cyan:#80d4d2;--amb-violet:#c3afe5;
+  --amb-positive:#9bcfb0;--amb-amber:#f0c585;
+  background:var(--amb-bg);color:var(--amb-ink);
+ }
+ .ref-shell.v2-app{background:#191b20}
+ .ref-shell .v2-main{
+  background:radial-gradient(ellipse at 88% -10%,#62564b26,transparent 44%),
+  linear-gradient(165deg,#202228,#1b1e23 58%,#181b20)
+ }
+ .ref-shell .v2-main:before{background:linear-gradient(90deg,#181b22ad,transparent 67%)}
+ .ref-shell .v2-scenic{opacity:.22;filter:saturate(.72)}
+ .ref-shell .v2-sidebar{
+  background:linear-gradient(174deg,#24262b 0%,#202327 58%,#1b1e23);
+  border-right:1px solid #51565c;box-shadow:8px 0 25px #07090d39
+ }
+ .ref-shell .v2-brand strong{color:#f4f2ed}
+ .ref-shell .v2-brand small,.ref-shell .v2-sidebar-title{color:#c6c4c0}
+ .ref-shell .v2-logo{color:#9ed5b9}
+ .ref-shell .v2-nav-item{color:#d5d6d8}
+ .ref-shell .v2-nav-item svg{color:#afb6bd}
+ .ref-shell .v2-nav-item:hover{background:#363d41;color:#fff}
+ .ref-shell .v2-nav-item.is-active{
+  background:linear-gradient(95deg,#444b52,#353d44);
+  border-color:#727e85;
+  box-shadow:inset 3px 0 #9cbdc9,0 4px 12px #0b0d1238;
+  color:#fff
+ }
+ .ref-shell .v2-nav-item.is-active svg{color:#b9d7dd}
+ .ref-shell .v2-sidebar-separator{background:#51585e}
+ .ref-shell .v2-sidebar-base{
+  background:linear-gradient(145deg,#33383c,#292f32);
+  border-color:#626a6f
+ }
+ .ref-shell .v2-sidebar-base strong{color:#f4f2ee}
+ .ref-shell .v2-sidebar-base small{color:#c7c9ca}
+ .ref-shell .v2-sidebar-base a{color:#b5ddcf}
+ .ref-shell .ref-demo-icon{color:#20362f;background:#a2cfb5}
+ .ref-shell .v2-topbar{
+  background:#2a2d32df;border-color:#51575c;
+  box-shadow:inset 0 -1px #ffffff0d
+ }
+ .ref-shell .v2-breadcrumb,.ref-shell .v2-location{color:#e5e5e2}
+ .ref-shell .v2-breadcrumb span{color:#a6aaa9}
+ .ref-shell .v2-breadcrumb strong{color:#e0caa9}
+ .ref-shell .v2-location,.ref-shell .ref-user-chip{
+  background:#333840;border-color:#626a73
+ }
+ .ref-shell .v2-location svg{color:#9ecfbd}
+ .ref-shell .ref-user-chip>span{background:#d7bca0;color:#35291f}
+ .ref-shell .ref-theme-button{background:#393d43;border-color:#646c72}
+ .ref-shell .v2-kicker{color:#e1c59e}
+ .ref-shell .ref-section-heading span{color:#aad6c9}
+ .ref-shell .v2-page-intro h1{color:#fbf9f4}
+ .ref-shell .v2-page-intro p:not(.v2-kicker){color:#cacdd0}
+ .ref-shell .v2-panel,.ref-shell .ref-panel{
+  background:linear-gradient(150deg,#30343b,#282d34);
+  border-color:#555d66;box-shadow:0 7px 20px #0d111a2b,inset 0 1px #ffffff0f
+ }
+ .ref-shell .v2-panel-title h2,.ref-shell .ref-panel-head h2{color:#f7f5f0}
+ .ref-shell .ref-panel-head{border-color:#505760}
+ .ref-shell .ref-panel-head a,.ref-shell .v2-small-link,
+ .ref-shell .v2-project-footer>a{color:#a9d5f5}
+ .ref-shell .ref-panel-head a:hover{color:#d7ebfa}
+ .ref-shell .v2-caption,.ref-shell .v2-project-code,.ref-shell .v2-panel-note,
+ .ref-shell .ref-panel-foot{color:#c5c8ca;border-color:#505860}
+ .ref-shell .v2-info,.ref-shell .v2-inline-notice{
+  background:#353b42;border-color:#5d646c;color:#e8e8e5
+ }
+ .ref-shell .v2-info svg,.ref-shell .v2-inline-notice svg{color:#a7d6cb}
+ .ref-shell .v2-info strong,.ref-shell .v2-inline-notice strong{color:#fffaf5}
+ .ref-shell .v2-info small{color:#c6cdd0}
+ .ref-shell .v2-project-footer{border-color:#555d64;color:#cdd0d1}
+ .ref-shell .v2-project-footer svg{color:#acd5bf}
+ .ref-shell .v2-table th{background:#363c43;border-color:#5b6369;color:#cfdae0}
+ .ref-shell .v2-table td{color:#e1e2e2;border-color:#515860}
+ .ref-shell .v2-table td strong{color:#faf8f4}
+ .ref-shell .v2-table td small{color:#bec4c8}
+ .ref-shell .v2-table tr:hover td{background:#42484e90}
+ .ref-shell .v2-empty{background:#333940;border-color:#626b72;color:#e2e4e1}
+ .ref-shell .v2-empty a{color:#a9d8f7}
+ .ref-shell .v2-search,.ref-shell .v2-select-label select,
+ .ref-shell .v2-input,.ref-shell .v2-textarea{
+  background:#262c33;border-color:#687079;color:#f7f6f3
+ }
+ .ref-shell .v2-search input{color:#fbf9f4}
+ .ref-shell .v2-search input::placeholder{color:#b5bec6}
+ .ref-shell .v2-select-label{color:#d8dadd}
+ .ref-shell :is(button,a,input,select,textarea):focus-visible{
+  outline-color:#b3d7ee
+ }
+ /* Blue denotes interactive calls to action, not the entire surface. */
+ .ref-shell .v2-primary,.ref-shell .v2-export,.ref-shell .v2-action-button,
+ .ref-shell .ref-trace-export,.ref-shell .ref-tech-head button{
+  background:#426e98;border-color:#82b0dc;color:#fff;
+  box-shadow:0 4px 11px #11151c45
+ }
+ .ref-shell .v2-primary:hover,.ref-shell .v2-export:hover,
+ .ref-shell .v2-action-button:hover,.ref-shell .ref-trace-export:hover,
+ .ref-shell .ref-tech-head button:hover{
+  background:#5384ae;color:#fff
+ }
+ .ref-shell .v2-secondary,.ref-shell .v2-action-muted{
+  background:#424850;border-color:#78828a;color:#f7f6f2;box-shadow:none
+ }
+ .ref-shell .v2-secondary:hover,.ref-shell .v2-action-muted:hover{background:#545d64}
+ .ref-shell .v2-badge{background:#454a4e;border-color:#677078;color:#f0eeea}
+ .ref-shell .v2-warning,.ref-shell .v2-case-banner{
+  background:#41382f;border-color:#b4946b
+ }
+ .ref-shell .v2-case-sources{background:#31353b;border-color:#646b72}
+ .ref-shell .v2-case-sources>strong{color:#dfc295}
+ .ref-shell .v2-case-sources a{color:#b7dff2}
+ .ref-shell .v2-case-sources p{color:#d4d4cf}
+ .ref-shell .ref-hero{
+  background-color:#353538;border-color:#73736c;
+  box-shadow:0 11px 25px #0f121a40
+ }
+ .ref-shell .ref-hero:before{
+  background:linear-gradient(90deg,#20252ce8 0%,#30312ec7 42%,#4241301a 72%,#20252aa6)
+ }
+ .ref-shell .ref-hero-label{
+  background:#3e3934d9;color:#f2daab;border-color:#c6ac7c
+ }
+ .ref-shell .ref-hero-tags span{
+  background:#393d3cc9;border-color:#87948b;color:#f2f1ed
+ }
+ .ref-shell .ref-hero-location{
+  background:#30353bdc;border-color:#8f9696
+ }
+ .ref-shell .ref-province-art{
+  color:#bad4bd;background:radial-gradient(ellipse at 43% 40%,#667c5c59,transparent 75%)
+ }
+ .ref-shell .ref-location-copy a{
+  background:#454e55;border-color:#8898a1;color:#e2f5f0
+ }
+ .ref-shell .ref-metric.v2-metric{
+  background:linear-gradient(135deg,#353941,#2c3138);border-color:#5a636d
+ }
+ /* Independent accent families; the metrics no longer share one hue. */
+ .ref-shell .ref-metric .v2-metric-icon{
+  color:#acd6b6;background:#344e42;border-color:#62836f
+ }
+ .ref-shell .ref-metric.ref-accent-cyan .v2-metric-icon{
+  color:#a4e4db;background:#315458
+ }
+ .ref-shell .ref-metric.ref-accent-blue .v2-metric-icon{
+  color:#c2dcfa;background:#344d68
+ }
+ .ref-shell .ref-metric.ref-accent-purple .v2-metric-icon{
+  color:#e1d2fa;background:#4d4562
+ }
+ .ref-shell .ref-metric.v2-metric p,.ref-shell .ref-metric.v2-metric .ref-metric-body>span{
+  color:#d1d6d7
+ }
+ .ref-shell .ref-metric-track{background:#454d54}
+ .ref-shell .ref-metric-track i{background:linear-gradient(90deg,#75b595,#aad8b6)}
+ .ref-shell .ref-metric.ref-accent-cyan .ref-metric-track i{background:linear-gradient(90deg,#67bbc0,#a2e2d5)}
+ .ref-shell .ref-metric.ref-accent-blue .ref-metric-track i{background:linear-gradient(90deg,#729ec7,#aecfe9)}
+ .ref-shell .ref-metric.ref-accent-purple .ref-metric-track i{background:linear-gradient(90deg,#9a86bf,#c7b3e4)}
+ .ref-shell .ref-attention{
+  background:linear-gradient(125deg,#38383c,#303237);border-color:#65666c
+ }
+ .ref-shell .ref-attention-eyebrow{color:#e3c694}
+ .ref-shell .ref-attention-item{
+  background:#3a3e43;border-color:#616971
+ }
+ .ref-shell .ref-attention-item.ref-attention-revision{
+  background:#39443f;border-left-color:#9ac6a4
+ }
+ .ref-shell .ref-attention-item:hover,.ref-shell .ref-attention-item:focus-visible{
+  background:#474d50;border-color:#8f9d9b
+ }
+ .ref-shell .ref-attention-revision .ref-attention-kind{color:#bce1c4}
+ .ref-shell .ref-attention-summary>span{
+  background:#45484c;border-color:#6d7378
+ }
+ .ref-shell .ref-section-heading p{color:#c9ced0}
+ .ref-shell .ref-commitment:hover{background:#41474b}
+ .ref-shell .ref-commitment{border-color:#51585e}
+ .ref-shell .ref-commitment-icon{
+  background:#3a4d44;border-color:#608a73;color:#bce4c6
+ }
+ .ref-shell .ref-commitment:nth-child(2) .ref-commitment-icon{
+  background:#3b4d54;color:#b0e0e6
+ }
+ .ref-shell .ref-commitment:nth-child(3) .ref-commitment-icon{
+  background:#4a4359;color:#d5c3e5
+ }
+ .ref-shell .ref-activity-icon{background:#465043;color:#c6e3b0}
+ .ref-shell .ref-indicator{background:#393f45;border-color:#59646a}
+ .ref-shell .ref-indicator-icon{background:#39584c;color:#afd9c2}
+ .ref-shell .ref-indicator-dashes{color:#bcc4c4}
+ .ref-shell .ref-schedule-months{background:#3c4146;border-color:#62676c}
+ .ref-shell .ref-schedule-months>span{border-color:#666a6b}
+ .ref-shell .ref-schedule-row{border-color:#555c61}
+ .ref-shell .ref-schedule-lane{
+  background:repeating-linear-gradient(90deg,transparent 0 calc(33.333% - 1px),#7b7f8069 calc(33.333% - 1px) 33.333%),
+  linear-gradient(#373d42b0,#373b405e)
+ }
+ /* SIG data styling, zone swatches, status badges and warnings unchanged. */
+ .ref-shell .geo-shell{background:#2b3338;border-color:#5e6e71}
+ .ref-shell .geo-mode{background:#333b42;border-color:#8ba9a7;color:#f7faf8}
+ .ref-shell .geo-canvas-info{background:#2b353ce8;border-color:#869d9a}
+ .ref-shell .geo-meta,.ref-shell .geo-layers,.ref-shell .geo-source{
+  background:#292f35;border-color:#5e676e;color:#d5e2e0
+ }
+ .ref-shell .geo-meta button{background:#426f79;border-color:#88adb8}
+ .ref-shell .geo-layers strong{color:#d4d9dc}
+ .ref-shell .geo-layer-disabled{background:#434a50}
+ .ref-shell .geo-source a{color:#b4e0e7}
+ .ref-shell .geo-links-panel{
+  background:linear-gradient(147deg,#30353b,#292f35);border-color:#616d75
+ }
+ .ref-shell .geo-links-header small,.ref-shell .geo-links-record-title strong{color:#a9d9d4}
+ .ref-shell .geo-links-context,.ref-shell .geo-links-record,.ref-shell .geo-links-stats>div,
+ .ref-shell .geo-links-zone-card,.ref-shell .geo-links-checks{
+  background:#393f46;border-color:#636c74
+ }
+ .ref-shell .geo-links-record-title span,.ref-shell .geo-links-note,
+ .ref-shell .geo-links-panel>p,.ref-shell .geo-links-stats small{color:#d0d5d6}
+ .ref-shell .geo-links-toolbar button{background:#477592;border-color:#85aabb}
+ .ref-shell .geo-links-toolbar button:hover:not(:disabled){background:#5d8ba5}
+ .ref-shell .geo-links-filter select{background:#303941;border-color:#7b8a92}
+ .ref-shell .geo-links-zone-controls input:not(:checked)+span{
+  background:#484d51;border-color:#848b90
+ }
+ .ref-shell .ref-tech-report{
+  background:linear-gradient(140deg,#353940,#2c3137);border-color:#636d75
+ }
+ .ref-shell .ref-tech-head small{color:#b8d7d6}
+ .ref-shell .ref-tech-head p,.ref-shell .ref-tech-readiness>p{color:#d0d5d7}
+ .ref-shell .ref-tech-facts>div,.ref-shell .ref-tech-readiness-grid>div{
+  background:#3e4349;border-color:#697178
+ }
+ .ref-shell .ref-tech-readiness{border-color:#61696e}
+ .ref-shell .ref-tech-facts small,.ref-shell .ref-tech-readiness-grid small,
+ .ref-shell .ref-tech-nav{color:#d3d7d8}
+ .ref-shell .ref-tech-warning{background:#444039;border-left-color:#e5ba7f}
+ .ref-shell .ref-tech-message{background:#344948;color:#e9f5ed}
+ .ref-shell .ref-tech-nav a{color:#b6ddec}
+ .ref-shell .v2-footer{color:#c5c9c9;border-color:#545b60}
+ .ref-shell .v2-footer svg{color:#aacbb6}
+ /* Secondary record links are neutral; only actions remain blue. */
+ .ref-shell .ref-trace-open,.ref-shell .ref-trace-close,.ref-shell .ref-record-inline,
+ .ref-shell .ref-record-dismiss,.ref-shell .ref-trace-record-link{
+  background:#454b51;border-color:#7b8792;color:#f7f8f8
+ }
+ .ref-shell .ref-trace-open[aria-pressed="true"]{
+  background:#486f82;border-color:#9fc5d3
+ }
+ .ref-shell .ref-trace-open:hover,.ref-shell .ref-trace-close:hover,
+ .ref-shell .ref-record-inline:hover,.ref-shell .ref-record-dismiss:hover,
+ .ref-shell .ref-trace-record-link:hover{background:#57636c}
+ .ref-shell .ref-trace-choose,.ref-shell .ref-trace-panel,.ref-shell .ref-record-focus{
+  background:linear-gradient(145deg,#373c42,#2e343a);border-color:#606c74
+ }
+ .ref-shell .ref-trace-eyebrow,.ref-shell .ref-record-eyebrow{color:#b4d6cb}
+ .ref-shell .ref-trace-head small,.ref-shell .ref-trace-foot,.ref-shell .ref-trace-empty,
+ .ref-shell .ref-record-empty{color:#ced2d1}
+ .ref-shell .ref-trace-counts span,.ref-shell .ref-trace-grid>section,
+ .ref-shell .ref-record-fields>div,.ref-shell .ref-record-links-list a{
+  background:#3f454b;border-color:#6b7379
+ }
+ .ref-shell .ref-trace-grid h4 a{color:#a9d8eb}
+ .ref-shell .ref-trace-record{border-color:#636b6e}
+ .ref-shell .ref-trace-record span,.ref-shell .ref-trace-record small,
+ .ref-shell .ref-record-fields dt{color:#cbd1d4}
+ .ref-shell .ref-record-links-list a:hover{background:#525c62}
+ .ref-shell [data-page-role="territory-definition"] .geo-study-buttons button,
+ .ref-shell .v2-study-navlink{
+  background:#4b666f;border-color:#8babb0
+ }
+ .ref-shell [data-page-role="territory-definition"] .geo-study-buttons button:hover:not(:disabled),
+ .ref-shell .v2-study-navlink:hover{background:#5f7f87}
+}
+
+/* Status badges are semantically stronger than the neutral generic chip.
+   Specificity intentionally overrides generic .ref-shell .v2-badge. */
+@media(min-width:1100px){
+ .ref-shell .v2-badge.v2-badge-mint{
+  background:#315949;border-color:#649b80;color:#d1f6dd
+ }
+ .ref-shell .v2-badge.v2-badge-amber{
+  background:#665039;border-color:#bf955e;color:#ffdfad
+ }
+ .ref-shell .v2-badge.v2-badge-blue{
+  background:#395a70;border-color:#7ba8ca;color:#e0f2ff
+ }
+}
