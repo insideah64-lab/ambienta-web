@@ -51,6 +51,28 @@ try{
   assert(snapshot.reducedMotionDuration.split(',').every(x=>parseFloat(x)===0),'Reduced motion must disable animation');
   assert(snapshot.overflow<=6,'Horizontal overflow '+snapshot.overflow);
   assert.deepEqual(errors,[],'No JS errors on dashboard');
+  const hero=await page.locator('[data-hero-illustrated=true]').evaluate(el=>{
+    const icons=[...el.querySelectorAll('svg[data-ambienta-illustration]')];
+    const tags=[...el.querySelectorAll('.ref-hero-tag')];
+    const shape=icons.map(svg=>svg.getAttribute('data-ambienta-illustration'));
+    return {
+      icons:icons.length,distinctKinds:[...new Set(shape)],svgShapes:[...new Set(icons.map(x=>x.innerHTML))].length,
+      decorative:icons.every(svg=>svg.getAttribute('aria-hidden')==='true'),
+      tags:tags.length,colors:[...new Set(tags.map(t=>getComputedStyle(t).backgroundImage))].length,
+      header:el.querySelector('h1')?.textContent,
+      coordinates:el.textContent.includes('Coordenadas no declaradas'),
+      width:el.getBoundingClientRect().width,overflow:el.scrollWidth-el.clientWidth
+    };
+  });
+  assert(hero.distinctKinds.length>=8,'Hero must have >=8 different illustrated motifs');
+  assert(hero.icons>=10,'Hero pictograms should appear in heading, metadata, badges and location');
+  assert(hero.svgShapes>=8,'Hero art must have distinct SVG drawings, not a reused glyph');
+  assert.equal(hero.decorative,true,'Illustrations must be hidden from assistive technology');
+  assert.equal(hero.tags,4,'Four live project labels retained');
+  assert(hero.colors>=4,'Tags need distinct color palettes, not all green');
+  assert(hero.header?.includes('Diablillos'));
+  assert.equal(hero.coordinates,true,'No fake geolocation');
+  assert(hero.overflow<=6,'Hero must not overflow its box: '+JSON.stringify(hero));
   assert.equal(await page.locator('.ref-map-panel h2 [data-ambienta-icon="territory"]').count(),1);
   assert.equal(await page.locator('.ref-schedule h2 [data-ambienta-icon="calendar"]').count(),1);
   assert.equal(await page.locator('.ref-activities h2 [data-ambienta-icon="history"]').count(),1);
