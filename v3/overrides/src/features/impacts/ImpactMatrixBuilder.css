@@ -1,0 +1,107 @@
+/* AMBIENTA V3 — impact-assessment matrix workbench.
+   Matrix heat colors are interaction sign, never an assessment of compliance.
+   Isolated from GIS symbols, project data and V1/V2 styles. */
+.ref-shell .amb-matrix{--mm-bg:#092a35;--mm-stroke:#386875;--mm-text:#f0fbfc;
+ margin:22px 0 0;padding:22px;min-width:0;max-width:100%;
+ background:linear-gradient(155deg,#0d343e 0%,#0a2832 58%,#111f37 100%);
+ border:1px solid #538b8c;border-radius:18px;color:var(--mm-text);
+ box-shadow:0 14px 34px #0002
+}
+.ref-shell .amb-matrix *{box-sizing:border-box}
+.ref-shell .amb-matrix-top{display:flex;justify-content:space-between;gap:22px;align-items:start}
+.ref-shell .amb-matrix-overline{margin:0 0 7px;font-size:11px;letter-spacing:.11em;font-weight:800;color:#96e8cb}
+.ref-shell .amb-matrix-top h3{font-size:24px;line-height:1.2;letter-spacing:-.02em;margin:0 0 9px}
+.ref-shell .amb-matrix-top p:not(.amb-matrix-overline){margin:0;font-size:14px;line-height:1.55;color:#c2d9e0;max-width:780px}
+.ref-shell .amb-matrix button,.ref-shell .amb-matrix-file{font-family:inherit}
+.ref-shell .amb-matrix-exports{display:flex;gap:7px;flex-wrap:wrap;align-items:center;justify-content:flex-end;flex-shrink:0}
+.ref-shell .amb-matrix-exports button,.ref-shell .amb-matrix-file{display:inline-flex;gap:7px;align-items:center;justify-content:center;
+ background:#133e4d;border:1px solid #5c9a9c;color:#e5ffff;border-radius:9px;
+ min-height:39px;padding:7px 12px;font-weight:700;font-size:12px;cursor:pointer}
+.ref-shell .amb-matrix-exports button:hover,.ref-shell .amb-matrix-file:hover{background:#195361}
+.ref-shell .amb-matrix-file input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.ref-shell .amb-matrix-caution{background:#183b42;border-left:3px solid #ecc672;padding:11px 13px;margin:18px 0;
+ border-radius:0 8px 8px 0;color:#c9e1e6;font-size:13px;line-height:1.55}
+.ref-shell .amb-matrix-caution strong{color:#ffe7a0}
+.ref-shell .amb-matrix-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:13px 0 18px}
+.ref-shell .amb-matrix-kpis>span{padding:13px 10px;background:#092733ba;border:1px solid #3a6876;border-radius:10px}
+.ref-shell .amb-matrix-kpis strong{display:block;font-size:23px;line-height:1.2;color:#dcfff3}
+.ref-shell .amb-matrix-kpis small{font-size:11px;line-height:1.3;color:#b0cbd4}
+.ref-shell .amb-matrix-tools{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:15px 0 9px;flex-wrap:wrap}
+.ref-shell .amb-matrix-modes{display:flex;gap:5px;padding:4px;border-radius:10px;background:#06202b;border:1px solid #335c66}
+.ref-shell .amb-matrix-modes button{border:0;background:transparent;color:#b2d1dc;padding:8px 11px;border-radius:7px;font-size:13px;font-weight:750}
+.ref-shell .amb-matrix-modes button[aria-pressed=true]{background:#246b69;color:white;box-shadow:0 2px 8px #0004}
+.ref-shell .amb-matrix-filter{font-size:12px;color:#c7dde3;display:flex;gap:7px;align-items:center}
+.ref-shell .amb-matrix-filter input{accent-color:#67d9b0}
+.ref-shell .amb-matrix-legend{font-size:12px;color:#abc9d4;line-height:1.55;margin:0 0 10px}
+.ref-shell .amb-matrix-scroll{border:1px solid #4b7884;border-radius:11px;overflow:auto;max-width:100%;max-height:590px;background:#071f2b;scrollbar-color:#477788 #092e38}
+.ref-shell .amb-matrix-grid{border-collapse:separate;border-spacing:0;table-layout:fixed;width:max-content;min-width:100%;font-size:12px}
+.ref-shell .amb-matrix-grid th,.ref-shell .amb-matrix-grid td{border-right:1px solid #285563;border-bottom:1px solid #285563;padding:0;text-align:center}
+.ref-shell .amb-matrix-grid thead th{position:sticky;top:0;z-index:3;background:#184452;min-width:115px;width:115px;max-width:115px;
+ padding:12px 8px;vertical-align:bottom;color:#eaf7fc}
+.ref-shell .amb-matrix-grid thead th small{display:block;color:#a7d0d8;font-size:10px;margin-bottom:6px}
+.ref-shell .amb-matrix-grid thead th span{display:block;overflow-wrap:anywhere;line-height:1.35;font-weight:750}
+.ref-shell .amb-matrix-grid .amb-matrix-sticky{position:sticky;left:0;z-index:2;text-align:left;min-width:190px;width:190px;max-width:190px;
+ padding:11px 12px;background:#153a48;box-shadow:3px 0 6px #061a2080}
+.ref-shell .amb-matrix-grid thead .amb-matrix-sticky{z-index:4}
+.ref-shell .amb-matrix-grid tbody .amb-matrix-sticky strong{display:block;font-size:12px;color:#f0fafb;overflow-wrap:anywhere}
+.ref-shell .amb-matrix-grid tbody .amb-matrix-sticky small{display:block;font-size:10px;margin-top:4px;color:#9ebdc9}
+.ref-shell .amb-matrix-cell{display:block;width:100%;min-height:63px;min-width:115px;border:0;
+ font-size:12px;font-weight:800;padding:8px 5px;white-space:normal;cursor:pointer;transition:background .15s}
+.ref-shell .amb-matrix-cell--empty{background:#0c2e3a;color:#799eaa}
+.ref-shell .amb-matrix-cell--positive{background:#205848;color:#c2fddc}
+.ref-shell .amb-matrix-cell--negative{background:#603636;color:#ffdbd3}
+.ref-shell .amb-matrix-cell--none{background:#233d4d;color:#d2e7e9}
+.ref-shell .amb-matrix-cell:hover,.ref-shell .amb-matrix-cell.is-selected{outline:2px solid #f2d086;outline-offset:-2px;filter:brightness(1.18)}
+.ref-shell .amb-matrix-bottom{display:grid;grid-template-columns:minmax(280px,.95fr) minmax(300px,1.1fr);gap:14px;margin-top:17px}
+.ref-shell .amb-matrix-side,.ref-shell .amb-matrix-inspector{padding:18px;border:1px solid #3e7180;border-radius:12px;background:#092a36}
+.ref-shell .amb-matrix-side h4,.ref-shell .amb-matrix-inspector h4{font-size:17px;margin:0 0 7px;color:#ecfff6}
+.ref-shell .amb-matrix-side>p,.ref-shell .amb-matrix-placeholder p{font-size:12px;color:#bdd1d9;line-height:1.55;margin:4px 0 13px}
+.ref-shell .amb-matrix-entry{display:flex;gap:7px;margin:9px 0}
+.ref-shell .amb-matrix input:not([type=checkbox]):not([type=file]),
+.ref-shell .amb-matrix select,.ref-shell .amb-matrix textarea{
+ min-width:0;width:100%;padding:9px 10px;color:#e8fcff;background:#103846;
+ border:1px solid #4b7c87;border-radius:7px;font-size:12px}
+.ref-shell .amb-matrix input::placeholder,.ref-shell .amb-matrix textarea::placeholder{color:#99b8c2}
+.ref-shell .amb-matrix-entry button,.ref-shell .amb-matrix-secondary{display:inline-flex;gap:5px;align-items:center;justify-content:center;
+ background:#1c6470;border:1px solid #53a4a3;color:#effff8;border-radius:8px;
+ padding:8px 12px;font-weight:750;font-size:12px;white-space:nowrap}
+.ref-shell .amb-matrix-secondary{white-space:normal;margin:9px 0}
+.ref-shell .amb-matrix-catalog{border-top:1px solid #386b76;margin-top:12px;padding-top:10px;font-size:13px}
+.ref-shell .amb-matrix-catalog summary{cursor:pointer;display:flex;align-items:center;justify-content:space-between;font-weight:750;color:#bce7e7}
+.ref-shell .amb-matrix-catalog h5{margin:15px 0 9px;color:#d8fbf2;font-size:12px}
+.ref-shell .amb-matrix-editrow{display:flex;gap:4px;margin:5px 0}
+.ref-shell .amb-matrix-editrow select{flex:0 0 124px;width:124px}
+.ref-shell .amb-matrix-editrow input[type=number]{flex:0 0 68px;width:68px}
+.ref-shell .amb-matrix-editrow button{border:1px solid #4a6f7d;color:#c4e7ed;background:#173b49;border-radius:7px;padding:8px}
+.ref-shell .amb-matrix-reset{display:inline-flex;gap:6px;align-items:center;margin-top:16px;border:1px solid #726575;color:#debfc9;background:#332d3b;
+ padding:8px;border-radius:8px;font-size:12px}
+.ref-shell .amb-matrix-index{margin:10px 0!important;color:#f5db94!important}
+.ref-shell .amb-matrix-inspector-head{display:flex;justify-content:space-between;gap:10px;align-items:start;margin-bottom:14px}
+.ref-shell .amb-matrix-inspector-head small{font-size:10px;color:#a4ded0;font-weight:800;letter-spacing:.06em}
+.ref-shell .amb-matrix-inspector-head p{font-size:12px;color:#b2d0d8;margin:0}
+.ref-shell .amb-matrix-inspector-head button{border:0;background:#1d4955;color:#def9f4;border-radius:7px;padding:5px}
+.ref-shell .amb-matrix-inspector label{display:block;font-size:12px;font-weight:700;color:#d0e3ea;margin:12px 0}
+.ref-shell .amb-matrix-inspector label input,.ref-shell .amb-matrix-inspector label select,
+.ref-shell .amb-matrix-inspector label textarea{display:block;margin-top:6px}
+.ref-shell .amb-matrix-two{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+.ref-shell .amb-matrix-guidance{font-size:11px;color:#9fbdca;line-height:1.5}
+.ref-shell .amb-matrix-caution-inline{font-size:12px;color:#f5d28c;background:#4a3f2844;border-left:2px solid #e5b96a;padding:8px}
+.ref-shell .amb-matrix-notice{font-size:12px;color:#e0f2e9;margin-top:12px;background:#21535b;padding:10px;border-radius:7px}
+.ref-shell .amb-matrix-notice button{margin-left:12px;color:#f4e0aa;border:0;background:none;text-decoration:underline}
+.ref-shell .amb-matrix-footer{border-top:1px solid #396677;margin-top:20px;padding-top:12px;display:grid;gap:5px;
+ color:#a5c2cb;font-size:11px;line-height:1.5}
+.ref-shell .amb-matrix-footer a{text-decoration:underline;color:#b7efd9}
+@media(max-width:1450px){
+ .ref-shell .amb-matrix-bottom{grid-template-columns:1fr}
+ .ref-shell .amb-matrix-top{flex-wrap:wrap}
+ .ref-shell .amb-matrix-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:1150px){
+ .ref-shell .amb-matrix{padding:14px}
+ .ref-shell .amb-matrix-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ref-shell .amb-matrix-modes{max-width:100%;overflow-x:auto}
+ .ref-shell .amb-matrix-modes button{white-space:nowrap}
+}
+@media(prefers-reduced-motion:reduce){
+ .ref-shell .amb-matrix-cell{transition:none}
+}
