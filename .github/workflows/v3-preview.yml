@@ -67,6 +67,7 @@ jobs:
           node apps/web-v3/scripts/document-link-audit-smoke.mjs
           node apps/web-v3/scripts/document-issue-export-smoke.mjs
           node apps/web-v3/scripts/preliminary-technical-report-smoke.mjs
+          node apps/web-v3/scripts/desktop-palette-smoke.mjs
           node apps/web-v3/scripts/document-identity-negative-smoke.mjs
           node apps/web-v3/scripts/release-spatial-layout-smoke.mjs
           node apps/web-v3/scripts/spatial-links-smoke.mjs
@@ -194,6 +195,14 @@ jobs:
         with:
           name: ambienta-v370-informe-integrado-desktop
           path: qa/ambienta-integral-report/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Capturas de paleta azul pizarra escritorio
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-desktop-slate-blue-visual
+          path: qa/ambienta-desktop-slate-blue/
           retention-days: 30
           if-no-files-found: warn
       - name: Keep QA build (not a deployment)
