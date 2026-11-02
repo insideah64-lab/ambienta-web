@@ -1,0 +1,55 @@
+/* AMBIENTA V3 • Original SVG icon family
+   Only iconography and microinteractions. Do not recolor map/symbol data. */
+.amb-icon{
+ display:inline-block;
+ flex-shrink:0;
+ vertical-align:middle;
+ transform-origin:center;
+ transition:transform .18s ease,filter .18s ease,color .18s ease;
+}
+/* Navigation icon accents communicate function without coloring entire panels. */
+@media(min-width:1100px){
+ .ref-shell .v2-nav-item .amb-icon{color:#b7e9d8}
+ .ref-shell .v2-nav-item [data-ambienta-icon="dashboard"]{color:#8decb9}
+ .ref-shell .v2-nav-item [data-ambienta-icon="folder"]{color:#9acbdb}
+ .ref-shell .v2-nav-item [data-ambienta-icon="territory"]{color:#87dbdd}
+ .ref-shell .v2-nav-item [data-ambienta-icon="impacts"]{color:#b4e798}
+ .ref-shell .v2-nav-item [data-ambienta-icon="pga"]{color:#6fe1b4}
+ .ref-shell .v2-nav-item [data-ambienta-icon="monitoring"]{color:#9fd5f7}
+ .ref-shell .v2-nav-item [data-ambienta-icon="audits"]{color:#edc38e}
+ .ref-shell .v2-nav-item [data-ambienta-icon="evidence"]{color:#a1d0ff}
+ .ref-shell .v2-nav-item [data-ambienta-icon="gis"]{color:#a6d5ee}
+ .ref-shell .v2-nav-item [data-ambienta-icon="reports"]{color:#d3b8f9}
+ .ref-shell .v2-nav-item [data-ambienta-icon="satellite"]{color:#a3dfef}
+ .ref-shell .v2-nav-item [data-ambienta-icon="legal"]{color:#f1d19d}
+ .ref-shell .v2-nav-item [data-ambienta-icon="library"]{color:#b3ccec}
+ .ref-shell .v2-nav-item [data-ambienta-icon="history"]{color:#a1d9d7}
+ .ref-shell .v2-nav-item [data-ambienta-icon="cloud"]{color:#ccb8f0}
+ .ref-shell .v2-logo .amb-icon{color:#80efb3}
+ .ref-shell .ref-demo-icon .amb-icon{color:#0b4934}
+ .ref-shell .v2-nav-item:hover .amb-icon,
+ .ref-shell .v2-nav-item:focus-visible .amb-icon,
+ .ref-shell .v2-nav-item.is-active .amb-icon{
+  transform:translateY(-1px) scale(1.07);
+  filter:drop-shadow(0 0 4px #79eabd55)
+ }
+ .ref-shell .v2-nav-item.is-active .amb-icon{color:#e5fff4}
+ .ref-shell .ref-metric .amb-icon{
+  width:25px;height:25px;filter:drop-shadow(0 1px 2px #0002)
+ }
+ .ref-shell .ref-metric:hover .amb-icon,
+ .ref-shell .ref-metric:focus-visible .amb-icon{transform:translateY(-2px) scale(1.06)}
+ .ref-shell .ref-commitment .amb-icon,
+ .ref-shell .ref-indicator .amb-icon{width:24px;height:24px}
+ .ref-shell .ref-commitment:hover .amb-icon,
+ .ref-shell .ref-commitment:focus-visible .amb-icon{transform:rotate(-4deg) scale(1.06)}
+ .ref-shell .ref-indicator .amb-icon{
+  filter:drop-shadow(0 0 4px currentColor)
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .amb-icon{transition:none!important;transform:none!important}
+ .ref-shell :is(.v2-nav-item,.ref-metric,.ref-commitment):is(:hover,:focus-visible) .amb-icon{
+   transition:none!important;transform:none!important;
+ }
+}
