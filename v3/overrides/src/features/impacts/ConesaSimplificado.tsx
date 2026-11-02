@@ -102,7 +102,7 @@ export function ConesaSimplificado({projectId,projectName}:Props){
   <p className="amb-conesa-disclaimer" role="note">
    Esta ficha reproduce la escala explícita del tutorial compartido, contrastada con aplicaciones publicadas de Conesa.
    <strong> No es una homologación normativa para Salta.</strong> El caso didáctico con RV = 3 queda fuera de esta variante (RV: 1, 2, 4), y no se acepta sin revisión.
-   Las categorías se asignan por magnitud absoluta: menos de 25 irrelevante, de 25 a menos de 50 moderado, de 50 a menos de 75 severo, y 75 o más crítico.
+   Las categorías de severidad para impactos negativos se asignan por importancia absoluta: menos de 25 irrelevante, 25 a menos de 50 moderado, 50 a menos de 75 severo y 75 o más crítico. Los impactos positivos se identifican como beneficiosos, sin etiquetarlos como críticos.
    <a href="https://www.dremsm.gob.pe/archivos/rdr/rdr24/rdr35.pdf" target="_blank" rel="noreferrer"> Fuente de clasificación: autoridad ambiental, 2024</a>.
   </p>
   <div className="amb-conesa-kpis">
