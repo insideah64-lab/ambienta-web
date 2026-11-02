@@ -37,6 +37,7 @@ import {PerimeterWorkbench} from './features/maps/PerimeterWorkbench';
 import { EvidenceIntegrityLab } from './features/evidence/EvidenceIntegrityLab';
 import {MeasureTracePanel} from './features/traceability/MeasureTracePanel';
 import {RecordFocusPanel} from './features/traceability/RecordFocusPanel';
+import {DocumentLinkAuditPanel} from './features/traceability/DocumentLinkAuditPanel';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
 const NAV_PRIMARY: Navigation[] = [
@@ -232,6 +233,7 @@ function PGA({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind,meas
       </tr>)}</tbody></table></div>
     {!filtered.length&&<p className="v2-empty">No hay medidas que coincidan con los filtros.</p>}
     <p className="v2-panel-note">Medidas creadas localmente mediante el dominio original. Verificar requiere inspección conforme y evidencia revisada por otra persona. No equivale a aprobación ambiental.</p>
+    <DocumentLinkAuditPanel data={data}/>
     {selectedId?<MeasureTracePanel data={data} measureId={selectedId} onClear={()=>chooseMeasure(null)}/>
       :<div className="ref-trace-choose" data-trace-empty-selection="true">
         Seleccioná <strong>Ver trazabilidad</strong> en una medida para consultar solo sus inspecciones,
