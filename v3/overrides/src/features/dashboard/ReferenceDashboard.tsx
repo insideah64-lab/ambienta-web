@@ -53,7 +53,7 @@ function Hero({data}:{data:DemoState}) {
 }
 function MapPanel({province}:{province:string}) {
  return <section className="ref-panel ref-map-panel ref-map-live">
-    <div className="ref-panel-head"><h2>Mapa base regional</h2>
+    <div className="ref-panel-head"><h2>Mapa del área de estudio</h2>
       <Link to="/mapas">Abrir SIG <ArrowRight size={14}/></Link></div>
     <GeoMap province={province} compact/>
     <p className="ref-panel-foot">Cartografía base OpenStreetMap. Un contorno de ensayo puede ser ilustrativo y no acredita límites oficiales ni observaciones de campo.</p>
@@ -101,9 +101,8 @@ function WorkAttention({data}:{data:DemoState}){
  return <section className="ref-attention" data-work-attention="true" aria-labelledby="ref-work-title">
   <div className="ref-attention-top">
    <div><p className="ref-attention-eyebrow">GESTIÓN DOCUMENTAL · ESTADOS DEL EXPEDIENTE</p>
-    <h2 id="ref-work-title">Trabajo por atender</h2>
-    <p>Seguimientos y revisiones abiertos en el expediente de demostración.
-     Son estados de trabajo, <strong>no alertas ambientales ni incumplimientos comprobados.</strong></p>
+    <h2 id="ref-work-title">Alertas y pendientes</h2>
+    <p>Revisiones y seguimientos documentales, no incumplimientos ambientales confirmados.</p>
    </div>
    <div className="ref-attention-summary" aria-label="Pendientes por tipo" data-work-summary="true">
     <span><strong data-work-follow-up="true">{work.followUp}</strong><small>seguimientos</small></span>
@@ -185,42 +184,35 @@ function About({onExport}:{onExport:()=>void}) {
 export function ReferenceDashboard({data,k,onExport}:Props) {
   const measuresInPrograms=new Set(data.measures.map(m=>m.programId)).size;
   const reviewedEvidence=data.evidence.filter(e=>e.status!=='pendiente').length;
-  return <div className="ref-dashboard">
+  return <div className="ref-dashboard ref-reference-dashboard" data-reference-dashboard="true">
     <Hero data={data}/>
-    <WorkAttention data={data}/>
     <section className="ref-metric-section" aria-label="Registros del expediente">
      <div className="ref-metric-section-head"><h2>Registros del expediente</h2>
-      <p>Recuentos documentales, no porcentajes de cumplimiento.</p></div>
+      <p>Recuentos documentales · no expresan cumplimiento ambiental.</p></div>
      <div className="v2-metrics ref-metrics">
       <Metric icon={Leaf} label="PROGRAMAS DEL PGA" value={k.programs}
         subtitle={measuresInPrograms+' con medidas asociadas'} accent="green" to="/pga"/>
       <Metric icon={ClipboardCheck} label="MEDIDAS AMBIENTALES" value={k.measures}
-        subtitle={k.verified+' verificadas · '+data.measures.filter(m=>m.status==='en_ejecucion').length+' en ejecución'}
-        accent="green" to="/pga"/>
+        subtitle={k.verified+' verificadas documentalmente · '+data.measures.filter(m=>m.status==='en_ejecucion').length+' en ejecución'} accent="purple" to="/pga"/>
       <Metric icon={ShieldCheck} label="INSPECCIONES" value={data.inspections.length}
         subtitle={k.inspectionsPending+' pendientes · registros documentales'} accent="cyan" to="/monitoreo"/>
       <Metric icon={FileText} label="EVIDENCIAS" value={data.evidence.length}
         subtitle={reviewedEvidence+' revisadas · '+k.evidencePending+' pendientes'} accent="blue" to="/evidencias"/>
      </div>
     </section>
-    <div className="ref-section-heading">
-      <div><span>SEGUIMIENTO DEL EXPEDIENTE</span><h2>Operación y territorio</h2></div>
-      <p>Información de consulta. Las medidas del PGA son documentales y el perímetro QA no es oficial.</p>
-    </div>
-    <div className="ref-dashboard-columns">
-      <div className="ref-dashboard-column">
-        <MapPanel province={data.project.province}/>
-        <Commitments data={data}/>
+    <div className="ref-reference-grid" aria-label="Tablero ambiental del proyecto">
+      <MapPanel province={data.project.province}/>
+      <Commitments data={data}/>
+      <div className="ref-reference-aside">
+       <Schedule data={data}/>
+       <Indicators/>
       </div>
-      <div className="ref-dashboard-column">
-        <Schedule data={data}/>
-        <Indicators/>
-      </div>
-    </div>
-    <div className="ref-supporting-grid">
       <ActivityPanel data={data}/>
+      <WorkAttention data={data}/>
       <About onExport={onExport}/>
     </div>
-    <p className="ref-dashboard-disclaimer">{IS_DIABLILLOS_CASE?"AMBIENTA V2 · Caso documental Diablillos: todas las inspecciones, resultados y evidencias operativas son SIMULADOS.":"AMBIENTA V2 · Vista conceptual basada en el diseño de referencia · Datos de demostración separados de Supabase."}</p>
+    <p className="ref-dashboard-disclaimer">{IS_DIABLILLOS_CASE?
+      "Caso documental Diablillos · Datos operativos y controles simulados · Geometrías QA no oficiales.":
+      "Proyecto ficticio de demostración · Sin verificaciones de campo ni certificación de cumplimiento."}</p>
   </div>;
 }
