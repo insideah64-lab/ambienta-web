@@ -26,7 +26,7 @@ try{
   const errors=[];
   page.on('pageerror',err=>errors.push(String(err)));
   await page.goto(address+'#/');
-  await page.locator('.ref-dashboard-columns .ref-map-panel').waitFor();
+  await page.locator('.ref-reference-grid .ref-map-panel').waitFor();
   await page.locator('.geo-compact .geo-map canvas').waitFor();
   await page.screenshot({path:root+'/'+label+'-overview.png',fullPage:true,animations:'disabled'});
   const selectors={
@@ -48,14 +48,14 @@ try{
    assert(values[k].fontSize>=minimum, k+' too small '+values[k].fontSize+'px, target '+minimum+'px');
   }
   const layout=await page.evaluate(()=>{
-   const el=document.querySelector('.ref-dashboard-columns');
+   const el=document.querySelector('.ref-reference-grid');
    const cs=getComputedStyle(el),cols=cs.gridTemplateColumns.split(' ').filter(Boolean);
    return {columns:cols.length,
     bodyScrollWidth:document.body.scrollWidth,
     documentWidth:document.documentElement.scrollWidth,
     viewport:window.innerWidth};
   });
-  assert.equal(layout.columns,width>=1400?2:1,'Desktop dashboard must not squeeze into 3 narrow columns');
+  assert.equal(layout.columns,width>1520?3:2,'Reference dashboard should use 3 columns only on sufficiently wide desktops');
   assert(layout.documentWidth<=width+6,'Unexpected horizontal scroll '+JSON.stringify(layout));
   const map=await page.locator('.ref-map-panel .geo-map').boundingBox();
   assert(map&&map.width>=390,'Map is too narrow to read');

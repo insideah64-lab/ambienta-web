@@ -17,9 +17,9 @@ try{
   const metrics=await page.locator('.ref-metrics').boundingBox();
   const map=await page.locator('.ref-map-panel').boundingBox();
   assert(first&&work&&metrics&&map);
-  assert(work.y>=first.y+first.height-1,'Work summary must follow project identity');
-  assert(metrics.y>=work.y+work.height-1,'Metrics follow outstanding work');
-  assert(map.y>=metrics.y+metrics.height-1,'Territorial map is for consultation, below actionable work');
+  assert(metrics.y>=first.y+first.height-1,'Document counts follow project identity');
+  assert(map.y>=metrics.y+metrics.height-1,'Territorial map is below documentary counts');
+  assert(work.y>=metrics.y+metrics.height-1,'Documentary pending work remains visible in the lower mosaic');
   assert.equal(await page.locator('[data-work-follow-up=true]').innerText(),'2');
   assert.equal(await page.locator('[data-work-review=true]').innerText(),'4');
   assert.equal(await page.locator('[data-attention-key]').count(),4);
@@ -29,9 +29,9 @@ try{
   assert.match(await a.innerText(),/Hallazgos para seguimiento/);
   assert.match(await page.locator('[data-work-attention=true]').innerText(),
    /no alertas ambientales ni incumplimientos comprobados/);
-  const columns=await page.locator('.ref-dashboard-columns').evaluate(el=>
+  const columns=await page.locator('.ref-reference-grid').evaluate(el=>
    getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length);
-  assert.equal(columns,width>=1400?2:1);
+  assert.equal(columns,width>1520?3:2);
   const scroll=await page.evaluate(()=>document.documentElement.scrollWidth);
   assert(scroll<=width+6,'Avoid horizontal scroll at desktop');
   await page.screenshot({path:root+'/desktop-'+width+'-prioridades.png',animations:'disabled',
@@ -50,6 +50,6 @@ try{
  await page.goto(address);
  await page.locator('[data-attention-key=measures]').click();
  assert.equal(await page.locator('.v2-page-intro h1').innerText(),'Plan de Gestión');
- console.log(JSON.stringify({result:'PASS',desktopOnly:true,workFirst:true,summary:{followUp:2,review:4},
+ console.log(JSON.stringify({result:'PASS',desktopOnly:true,workIntegrated:true,summary:{followUp:2,review:4},
    realModuleLinks:true,noFalseEnvironmentalEmergency:true,noHorizontalOverflow:true,screenshots:3}));
 }finally{await browser.close();}

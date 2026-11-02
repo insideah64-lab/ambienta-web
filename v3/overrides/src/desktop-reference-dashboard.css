@@ -1,0 +1,363 @@
+/* AMBIENTA · reference-inspired, functional V3 DESKTOP design.
+ * Deep forest/petrol blue, varied green/cyan/amber/violet semantic accents,
+ * high-contrast modules and an atmospheric scenic header.
+ * These declarations style the UI only. They MUST NOT recolor Leaflet features,
+ * GeoJSON/KML geometries, mapped zones, or claim synthetic QA data are official.
+ */
+@media (min-width:1100px) {
+ .ref-shell{
+  --amb-bg:#061c23;--amb-sidebar:#051c20;--amb-surface:#0c2b32;
+  --amb-surface-raised:#13353e;--amb-line:#28515b;
+  --amb-ink:#effbf7;--amb-muted:#bbd7d6;
+  --amb-positive:#6be4a7;--amb-blue:#7fb9ee;
+  background:#071c24;color:#eff9f8;
+ }
+ .ref-shell.v2-app{background:#071c24;grid-template-columns:235px minmax(0,1fr)}
+ .ref-shell .v2-main{
+  background:radial-gradient(ellipse at 82% -8%,#377c6840,transparent 43%),
+   linear-gradient(165deg,#0a2730,#071e26 61%,#061a22);
+ }
+ .ref-shell .v2-scenic{
+  height:235px;opacity:.62;filter:saturate(1.15);
+  background:linear-gradient(90deg,#04242ca5,#0526324a),
+    url('./assets/ambienta-landscape.svg') center 45%/cover no-repeat;
+  mask-image:linear-gradient(#000 0%,transparent 100%);
+ }
+ .ref-shell .v2-main:before{
+  background:linear-gradient(90deg,#061c26c9,#08212d3d 58%,#061c269e)
+ }
+ .ref-shell .v2-content{max-width:2000px;padding:17px clamp(13px,1.15vw,26px) 20px}
+ .ref-shell .v2-sidebar{
+  background:linear-gradient(165deg,#06252a,#041c21 65%,#061a22);
+  border-right:1px solid #225057;
+  box-shadow:5px 0 24px #03131972;padding:20px 11px;
+ }
+ .ref-shell .v2-brand{margin:0 9px 26px;gap:11px}
+ .ref-shell .v2-brand strong{color:#fff;font-size:17px;letter-spacing:.07em}
+ .ref-shell .v2-brand small{color:#c0dad7}
+ .ref-shell .v2-logo{color:#75ecac;background:#134b40;border:1px solid #3b936c;
+  border-radius:10px;display:grid;place-items:center;width:39px;height:39px}
+ .ref-shell .v2-sidebar-title{color:#b4cdd2;margin-bottom:10px;font-size:10px}
+ .ref-shell .v2-nav{gap:3px}
+ .ref-shell .v2-nav-item{height:39px;border-radius:7px;font-size:12px;color:#e0eded;
+  font-weight:630;padding:0 12px;transition:background .2s}
+ .ref-shell .v2-nav-item svg{color:#81d7c4}
+ .ref-shell .v2-nav-item:hover{background:#174841;color:#fff;transform:none}
+ .ref-shell .v2-nav-item.is-active{
+  background:linear-gradient(90deg,#196950,#124b46);
+  border-color:#388a72;color:#fff;
+  box-shadow:inset 3px 0 #85f4b9,0 2px 9px #00191848;
+ }
+ .ref-shell .v2-nav-item.is-active svg{color:#d5ffe7}
+ .ref-shell .v2-sidebar-separator{margin:17px 7px 15px;background:#366266}
+ .ref-shell .ref-tool-nav .v2-nav-item{height:37px}
+ .ref-shell .v2-sidebar-base{background:#082e32df;border:1px solid #3a6970;
+  border-radius:9px;padding:12px 10px}
+ .ref-shell .v2-sidebar-base strong{color:#f2fff8;font-size:10px}
+ .ref-shell .v2-sidebar-base small{color:#c0dbd5}
+ .ref-shell .v2-sidebar-base a{color:#79f3bf}
+ .ref-shell .ref-demo-icon{background:#72dba4;color:#07352b}
+ .ref-shell .v2-sidebar-landscape{opacity:.38;filter:saturate(1.25)}
+ .ref-shell .v2-topbar{
+  min-height:49px;background:#082631cf;border:0;border-bottom:1px solid #4a777356;
+  backdrop-filter:blur(9px)
+ }
+ .ref-shell .v2-breadcrumb{color:#e0eded;letter-spacing:0}
+ .ref-shell .v2-breadcrumb strong{color:#8cf2aa}
+ .ref-shell .v2-location,.ref-shell .ref-user-chip,.ref-shell .ref-theme-button{
+  color:#e6fff8;background:#0b3236b8;border:1px solid #3b6569
+ }
+ .ref-shell .v2-location svg{color:#81eab0}
+ .ref-shell .ref-user-chip>span{color:#06332a;background:#81f0c0}
+ .ref-shell .ref-theme-button{color:#e8f9f7}
+ .ref-shell .v2-page-intro h1{color:#f2fdf7}
+ .ref-shell .v2-page-intro p:not(.v2-kicker){color:#bcd5d7}
+ .ref-shell .v2-kicker{color:#83dbb7}
+ .ref-shell .v2-panel,.ref-shell .ref-panel{
+  color:#e5f7f5;background:linear-gradient(155deg,#10323c,#0b2832);
+  border:1px solid #29525c;box-shadow:inset 0 1px #ffffff0b,0 5px 16px #04141b4a;
+  border-radius:9px;
+ }
+ .ref-shell .v2-panel-title h2,.ref-shell .ref-panel-head h2{color:#f0fcf7}
+ .ref-shell .ref-panel-head{border-bottom:1px solid #2b515b}
+ .ref-shell .ref-panel-head a,.ref-shell .v2-small-link{color:#6dedb8}
+ .ref-shell .ref-panel-head a:hover{color:#c4ffe3}
+ .ref-shell .v2-table th{background:#123842;color:#bce1e1;border-color:#285864}
+ .ref-shell .v2-table td{color:#e5f3ef;border-color:#24515c}
+ .ref-shell .v2-table td strong{color:#f8fffa}
+ .ref-shell .v2-table td small,.ref-shell .v2-caption,.ref-shell .v2-project-code,
+ .ref-shell .v2-panel-note,.ref-shell .ref-panel-foot{color:#aecad0}
+ .ref-shell .v2-table tr:hover td{background:#16434a}
+ .ref-shell .v2-info,.ref-shell .v2-inline-notice{
+  background:#13373f;color:#dbf5ec;border:1px solid #2a6261
+ }
+ .ref-shell .v2-info strong,.ref-shell .v2-inline-notice strong{color:#fff}
+ .ref-shell .v2-info small{color:#b4d2d1}
+ .ref-shell .v2-search,.ref-shell .v2-select-label select,
+ .ref-shell .v2-input,.ref-shell .v2-textarea{
+  color:#f0fff7;background:#0c2a34;border:1px solid #37636b
+ }
+ .ref-shell .v2-search input{color:#f0fff7}
+ .ref-shell .v2-search input::placeholder{color:#adc9cc}
+ .ref-shell .v2-select-label{color:#cbe1e0}
+ .ref-shell .v2-primary,.ref-shell .v2-export,.ref-shell .v2-action-button{
+  background:#177654;color:#effff8;border:1px solid #389b75
+ }
+ .ref-shell .v2-primary:hover,.ref-shell .v2-export:hover,
+ .ref-shell .v2-action-button:hover{background:#239467}
+ .ref-shell .v2-secondary,.ref-shell .v2-action-muted{
+  background:#16414c;border:1px solid #3e7279;color:#def5f5
+ }
+ .ref-shell .v2-secondary:hover,.ref-shell .v2-action-muted:hover{background:#205b62}
+ .ref-shell .ref-trace-open,.ref-shell .ref-trace-close,
+ .ref-shell .ref-record-inline,.ref-shell .ref-record-dismiss{
+  color:#d1f5f6;background:#164a54;border:1px solid #40858d
+ }
+ .ref-shell .v2-badge{background:#26444a;border:1px solid #4e7478;color:#edf9f3}
+ .ref-shell .v2-badge.v2-badge-mint{background:#126a50;border-color:#37a577;color:#d9ffeb}
+ .ref-shell .v2-badge.v2-badge-amber{background:#76562c;border-color:#d8a860;color:#fff0c9}
+ .ref-shell .v2-badge.v2-badge-blue{background:#215776;border-color:#5f9ab9;color:#e2f8ff}
+ .ref-shell .v2-warning,.ref-shell .v2-case-banner{
+  color:#f9e0af;background:#483626;border:1px solid #987344
+ }
+ .ref-shell .v2-warning p,.ref-shell .v2-case-banner{color:#f9e1b8}
+ .ref-shell .v2-case-banner{padding:8px 13px;margin-bottom:10px;font-size:10px}
+ .ref-shell .v2-case-sources{background:#15383f;border:1px solid #457178}
+ .ref-shell .v2-case-sources>strong,.ref-shell .v2-case-sources a{color:#8ceac6}
+ .ref-shell .v2-case-sources p{color:#c8dfde}
+ .ref-shell .v2-footer{color:#9ebdc2;border-color:#34545c}
+ .ref-shell .v2-footer svg{color:#78dea4}
+ .ref-shell :is(button,a,input,select,textarea):focus-visible{
+  outline:2px solid #9bf6ce;outline-offset:2px
+ }
+ /* Hero is scenic illustration only, not project satellite imagery. */
+ .ref-shell .ref-reference-dashboard{gap:11px}
+ .ref-shell .ref-reference-dashboard .ref-hero{
+  min-height:187px;align-items:center;
+  background-image:linear-gradient(90deg,#051e23d2,#09373978 56%,#07383b28),
+    url('./assets/ambienta-landscape.svg') !important;
+  background-position:center,center 58%;background-size:cover;
+  border:1px solid #4b877b;box-shadow:0 10px 24px #05171c5e;
+  border-radius:11px;
+ }
+ .ref-shell .ref-reference-dashboard .ref-hero:before{
+  background:linear-gradient(90deg,#072c32b4 0%,#123b428e 37%,#082f3560 75%,#05262bd1)
+ }
+ .ref-shell .ref-reference-dashboard .ref-hero:after{
+  background:radial-gradient(ellipse at 76% 15%,#e5b27965,transparent 44%)
+ }
+ .ref-shell .ref-hero-copy{padding:18px 22px}
+ .ref-shell .ref-hero h1{font-size:clamp(22px,2.05vw,31px);color:#fff}
+ .ref-shell .ref-hero-label{color:#c8fab0;background:#104133d1;border:1px solid #c0d96b;
+  border-radius:9px;padding:7px 12px}
+ .ref-shell .ref-hero-meta{color:#fff;font-size:11px}
+ .ref-shell .ref-hero-tags span{color:#eafff3;background:#0a443ebd;border-color:#79dcb0}
+ .ref-shell .ref-hero-location{
+  width:228px;min-height:132px;background:#072b31ce;
+  border:1px solid #75a998a6;backdrop-filter:blur(9px);border-radius:11px
+ }
+ .ref-shell .ref-location-copy strong{color:#fff}
+ .ref-shell .ref-location-copy small,.ref-shell .ref-location-copy>span{color:#bfd8d4}
+ .ref-shell .ref-location-copy a{background:#0d6a50;color:#fff;border:1px solid #53a782}
+ .ref-shell .ref-province-art{background:#174b43;color:#7be6a8}
+ /* Four prominent documentary counts, without fake physical progress bars. */
+ .ref-shell .ref-metric-section{margin:0}
+ .ref-shell .ref-metric-section-head{padding:0 2px 1px}
+ .ref-shell .ref-metric-section-head h2{color:#eafcf6;font-size:12px}
+ .ref-shell .ref-metric-section-head p{color:#a7c9c8;font-size:10px}
+ .ref-shell .ref-metrics.v2-metrics{grid-template-columns:repeat(4,minmax(0,1fr));gap:11px}
+ .ref-shell .ref-metric.v2-metric{
+  position:relative;min-height:104px;padding:14px;border-radius:9px;
+  border:1px solid #305a61;background:linear-gradient(145deg,#11343c,#0c2933);
+  box-shadow:0 3px 15px #041b2050;
+ }
+ .ref-shell .ref-metric.v2-metric:after{
+  content:'';position:absolute;bottom:0;left:0;width:100%;height:3px;
+  background:linear-gradient(90deg,#47c18f,#55daa566,transparent);border-radius:0 0 9px 9px
+ }
+ .ref-shell .ref-metric.ref-accent-purple:after{background:linear-gradient(90deg,#b29aeb,#c9b8f366,transparent)}
+ .ref-shell .ref-metric.ref-accent-cyan:after{background:linear-gradient(90deg,#59dddb,#a7f1ed66,transparent)}
+ .ref-shell .ref-metric.ref-accent-blue:after{background:linear-gradient(90deg,#71b9ee,#b1e0fd66,transparent)}
+ .ref-shell .ref-metric .v2-metric-icon{
+  height:46px;width:46px;color:#81edac;background:#174e3f;border:1px solid #2e7766
+ }
+ .ref-shell .ref-metric.ref-accent-purple .v2-metric-icon{color:#d6c2fc;background:#443967;border-color:#70639c}
+ .ref-shell .ref-metric.ref-accent-cyan .v2-metric-icon{color:#8be9e5;background:#16545d;border-color:#318892}
+ .ref-shell .ref-metric.ref-accent-blue .v2-metric-icon{color:#b1dfff;background:#234f71;border-color:#487ea6}
+ .ref-shell .ref-metric .ref-metric-label{color:#c5dada;font-size:10px}
+ .ref-shell .ref-metric .ref-metric-top strong{color:#fff;font-size:28px}
+ .ref-shell .ref-metric .ref-metric-subtitle{color:#c5dcdb}
+ .ref-shell .ref-metric-link-arrow{color:#7cceb1}
+ /* Three-column main analytics and supporting row, mirroring the reference hierarchy. */
+ .ref-shell .ref-reference-grid{
+  display:grid;gap:11px;min-width:0;
+  grid-template-columns:minmax(0,1.38fr) minmax(0,1.02fr) minmax(0,1.01fr);
+  grid-template-areas:"map commitments aside" "activities attention about";
+  align-items:stretch;
+ }
+ .ref-shell .ref-reference-grid > *{min-width:0}
+ .ref-shell .ref-reference-grid>.ref-map-panel{grid-area:map}
+ .ref-shell .ref-reference-grid>.ref-commitments{grid-area:commitments}
+ .ref-shell .ref-reference-aside{grid-area:aside;display:grid;gap:11px;align-content:stretch}
+ .ref-shell .ref-reference-aside>.ref-schedule{min-height:184px}
+ .ref-shell .ref-reference-aside>.ref-indicators{min-height:154px}
+ .ref-shell .ref-reference-grid>.ref-activities{grid-area:activities}
+ .ref-shell .ref-reference-grid>.ref-attention{grid-area:attention}
+ .ref-shell .ref-reference-grid>.ref-about{grid-area:about}
+ .ref-shell .ref-reference-grid>.ref-panel,.ref-shell .ref-reference-grid>.ref-attention{
+  min-height:0;align-self:stretch
+ }
+ .ref-shell .ref-map-panel{display:flex;flex-direction:column}
+ .ref-shell .ref-map-panel .geo-shell{flex:1;min-height:265px}
+ .ref-shell .ref-map-panel .ref-panel-foot{margin-top:auto}
+ .ref-shell .ref-panel-head{height:42px;padding:0 13px}
+ .ref-shell .ref-panel-head h2{font-size:13px}
+ .ref-shell .ref-panel-head a{color:#70f2bb;font-size:10px}
+ .ref-shell .ref-commitment-list{padding:0 13px}
+ .ref-shell .ref-commitment{min-height:65px;padding:8px 0;border-bottom:1px solid #2a5862}
+ .ref-shell .ref-commitment:hover{background:#18444a}
+ .ref-shell .ref-commitment-icon{background:#17483d;color:#8defb5;border:1px solid #387766}
+ .ref-shell .ref-commitment:nth-child(2) .ref-commitment-icon{color:#8bdcff;background:#19475c}
+ .ref-shell .ref-commitment:nth-child(3) .ref-commitment-icon{color:#d8c0fc;background:#403658}
+ .ref-shell .ref-commitment-title strong{color:#f2fffa;font-size:10px}
+ .ref-shell .ref-commitment-info>small{color:#bdd6d7;font-size:9px}
+ .ref-shell .ref-stage-tag{border-radius:25px}
+ .ref-shell .ref-panel-foot{color:#a9c9c7;border-color:#2b535c}
+ .ref-shell .ref-schedule-intro{color:#bcd6d6}
+ .ref-shell .ref-schedule-months{background:#143741;border-color:#2a5961}
+ .ref-shell .ref-schedule-months>span{color:#edf9f7;border-color:#38616b}
+ .ref-shell .ref-schedule-row{border-color:#2b4f59}
+ .ref-shell .ref-schedule-row>span{color:#e4f3ef}
+ .ref-shell .ref-schedule-lane{background:repeating-linear-gradient(90deg,transparent 0 calc(33.333% - 1px),#50717a55 calc(33.333% - 1px) 33.333%),linear-gradient(#13343c,#103039)}
+ .ref-shell .ref-schedule-note,.ref-shell .ref-panel-muted{color:#a3c6c9}
+ .ref-shell .ref-indicator{background:#153943;border:1px solid #285864}
+ .ref-shell .ref-indicator strong{color:#effaf6}
+ .ref-shell .ref-indicator small{color:#bed5d7}
+ .ref-shell .ref-indicator-icon{color:#9befb5;background:#194a3e}
+ .ref-shell .ref-indicator-blue .ref-indicator-icon{color:#a4ddff;background:#24587a}
+ .ref-shell .ref-indicator-cyan .ref-indicator-icon{color:#afedf2;background:#205766}
+ .ref-shell .ref-indicator-purple .ref-indicator-icon{color:#d8c5fb;background:#51436f}
+ /* Actual logged activities in lower left */
+ .ref-shell .ref-activity{padding:9px 12px;border-color:#28515a}
+ .ref-shell .ref-activity strong{color:#f4fff9}
+ .ref-shell .ref-activity small,.ref-shell .ref-activity time{color:#b6d2d2}
+ .ref-shell .ref-activity-icon{color:#90ecba;background:#155342}
+ /* Document warnings are not environmental violations. */
+ .ref-shell .ref-attention{
+  background:linear-gradient(150deg,#10333d,#0b2731);
+  border:1px solid #2d5963;border-radius:9px;padding:10px 12px;
+ }
+ .ref-shell .ref-attention-top{gap:7px;margin-bottom:9px}
+ .ref-shell .ref-attention-eyebrow{color:#74dfb4;font-size:9px}
+ .ref-shell .ref-attention-top h2{color:#f3fff9;font-size:13px}
+ .ref-shell .ref-attention-top p:not(.ref-attention-eyebrow){color:#b4d1d4;font-size:9px}
+ .ref-shell .ref-attention-top p strong{color:#f0d8a0}
+ .ref-shell .ref-attention-summary>span{background:#1a3b46;border-color:#3c636d}
+ .ref-shell .ref-attention-summary strong{color:#f5fff9}
+ .ref-shell .ref-attention-summary small{color:#b7d8d6}
+ .ref-shell .ref-attention-grid{display:grid;grid-template-columns:1fr;gap:6px}
+ .ref-shell .ref-attention-item{
+  background:#143941;border:1px solid #335b62;min-height:0;padding:8px 10px
+ }
+ .ref-shell .ref-attention-item.ref-attention-revision{background:#423629;border-left:3px solid #e4af65}
+ .ref-shell .ref-attention-item strong{color:#f2fff9}
+ .ref-shell .ref-attention-description,.ref-shell .ref-attention-count{color:#bdd8d7}
+ .ref-shell .ref-attention-revision .ref-attention-kind{color:#ffd28f}
+ .ref-shell .ref-attention-kind{color:#86efbd}
+ .ref-shell .ref-attention-item:hover{background:#1c4c53}
+ .ref-shell .ref-about{display:flex;gap:10px;padding:9px}
+ .ref-shell .ref-about-photo{
+  width:42%;background-image:url('./assets/ambienta-landscape.svg')!important;
+  background-position:center;background-size:cover;min-height:120px;border-radius:7px
+ }
+ .ref-shell .ref-about-text strong{color:#f5fff9}
+ .ref-shell .ref-about-text p{color:#c0d7d8}
+ .ref-shell .ref-about-text button{background:#116949;border-color:#358a65}
+ .ref-shell .ref-about-text button:hover{background:#248b60}
+ .ref-shell .ref-dashboard-disclaimer{color:#92b5bb;font-size:10px}
+ /* Only presentation around SIG: no recoloring geographical features. */
+ .ref-shell .geo-shell{background:#11333d;border-color:#335f66}
+ .ref-shell .geo-links-panel{background:#10343c;border-color:#38717a}
+ .ref-shell .geo-links-header small{color:#8ce9ca}
+ .ref-shell .geo-links-note{color:#bed5d6}
+}
+@media (min-width:1100px) and (max-width:1520px){
+ .ref-shell.v2-app{grid-template-columns:212px minmax(0,1fr)}
+ .ref-shell .v2-sidebar{padding-left:8px;padding-right:8px}
+ .ref-shell .v2-nav-item{font-size:11px}
+ .ref-shell .ref-reference-grid{
+  grid-template-columns:minmax(0,1.16fr) minmax(0,1fr);
+  grid-template-areas:"map commitments" "aside aside" "activities attention" "about about";
+ }
+ .ref-shell .ref-reference-aside{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ref-shell .ref-reference-grid>.ref-about{min-height:130px}
+}
+
+/* Preserve the approved readable desktop type scale despite a denser mosaic. */
+@media(min-width:1100px){
+ .ref-shell .v2-nav-item{font-size:15px;min-height:43px}
+ .ref-shell .ref-hero h1{font-size:clamp(32px,2.3vw,39px)}
+ .ref-shell .ref-metric .ref-metric-label{font-size:13px}
+ .ref-shell .ref-metric .ref-metric-top strong{font-size:29px}
+ .ref-shell .ref-metric .ref-metric-subtitle{font-size:13px;line-height:1.35}
+ .ref-shell .ref-metric.v2-metric{min-height:125px}
+ .ref-shell .ref-panel-head h2{font-size:18px}
+ .ref-shell .ref-panel-head{min-height:48px;height:auto;padding:10px 13px}
+ .ref-shell .ref-commitment-title strong{font-size:15px;line-height:1.3}
+ .ref-shell .ref-commitment-info>small{font-size:12px}
+ .ref-shell .ref-commitment{min-height:79px}
+ .ref-shell .ref-schedule-row>span{font-size:13px}
+ .ref-shell .geo-shell>.geo-canvas-info span{font-size:12px}
+ .ref-shell .geo-mode{font-size:13px}
+ .ref-shell .v2-page-intro p:not(.v2-kicker){font-size:16px}
+}
+@media(min-width:1100px) and (max-width:1520px){
+ .ref-shell .v2-nav-item{font-size:15px}
+}
+
+/* The reference screenshot's lower-middle alerts: 2×2, not a long vertical
+   page-wide interruption. Keep all four real categories and accessible text. */
+@media(min-width:1100px){
+ .ref-shell .ref-attention{padding:11px 13px}
+ .ref-shell .ref-attention-top{margin-bottom:8px;gap:8px}
+ .ref-shell .ref-attention-top h2{font-size:22px}
+ .ref-shell .ref-attention-top p:not(.ref-attention-eyebrow){font-size:12px;line-height:1.4}
+ .ref-shell .ref-attention-summary strong{font-size:22px}
+ .ref-shell .ref-attention-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+ .ref-shell .ref-attention-item{
+  min-height:105px;max-height:138px;padding:8px 9px;
+  display:flex;flex-direction:column;justify-content:space-between;gap:4px
+ }
+ .ref-shell .ref-attention-item>strong{font-size:17px;line-height:1.23;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+ .ref-shell .ref-attention-description{font-size:14px;line-height:1.3;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+ .ref-shell .ref-attention-bottom{min-width:0}
+ .ref-shell .ref-attention-bottom svg{flex-shrink:0}
+}
+
+/* Safeguard established QA for real record counts and categorical statuses. */
+@media(min-width:1100px){
+ .ref-shell .ref-metric.v2-metric{min-height:112px;max-height:120px;padding:10px 12px}
+ .ref-shell .ref-commitment-info>small{font-size:13px}
+ .ref-shell .ref-stage-tag{font-size:12px}
+}
+@media(min-width:1100px) and (max-width:1399px){
+ .ref-shell .ref-metrics.v2-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* Keep attention summary horizontal chips under the heading at ~400px panel
+   width, rather than squeezing its explanatory copy into a thin column. */
+@media(min-width:1100px){
+ .ref-shell .ref-reference-grid .ref-attention-top{
+  flex-direction:column;align-items:stretch;justify-content:flex-start;gap:5px
+ }
+ .ref-shell .ref-reference-grid .ref-attention-top>div:first-child{min-width:0}
+ .ref-shell .ref-reference-grid .ref-attention-top p:not(.ref-attention-eyebrow){
+  margin:4px 0 0;line-height:1.35
+ }
+ .ref-shell .ref-reference-grid .ref-attention-summary{
+  align-self:flex-start;display:flex;gap:7px;flex-wrap:nowrap
+ }
+ .ref-shell .ref-reference-grid .ref-attention-summary>span{min-height:0}
+}
