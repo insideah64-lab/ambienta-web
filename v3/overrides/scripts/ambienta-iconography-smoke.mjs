@@ -50,7 +50,7 @@ try{
       navLabels:all.every(link=>Boolean(link.textContent?.trim())),
       metricKinds:metrics.map(m=>m.querySelector('svg[data-ambienta-icon]')?.getAttribute('data-ambienta-icon')),
       indicatorKinds:indicators.map(m=>m.querySelector('svg[data-ambienta-icon]')?.getAttribute('data-ambienta-icon')),
-      commitmentIcons:commitments.filter(m=>m.querySelector('svg[data-ambienta-icon]')).length,
+      commitmentIcons:commitments.filter(m=>m.querySelector('svg[data-ambienta-icon], [data-commitment-art]')).length,
       reducedMotionDuration:first?getComputedStyle(first).transitionDuration:'',
       brand:document.querySelector('.v2-logo [data-ambienta-icon]')?.getAttribute('data-ambienta-icon'),
       overflow:document.documentElement.scrollWidth-innerWidth
@@ -66,7 +66,30 @@ try{
   assert.equal(snapshot.brand,'brand');
   assert.deepEqual(snapshot.metricKinds,['pga','measures','inspections','evidence']);
   assert.deepEqual(snapshot.indicatorKinds,['vegetation','water','air','noise']);
-  assert(snapshot.commitmentIcons>=2,'Live measure card glyphs required');
+  assert(snapshot.commitmentIcons>=4,'Every visible commitment requires an illustration');
+  const commitments=await page.evaluate(async ()=>{
+    const icons=[...document.querySelectorAll('.ref-commitment [data-commitment-art]')];
+    const kinds=icons.map(el=>el.getAttribute('data-commitment-art'));
+    const backgrounds=icons.map(el=>getComputedStyle(el).backgroundImage);
+    const first=backgrounds[0]||'';
+    const url=first.startsWith('url("')?first.slice(5,-2):'';
+    let image=null;
+    if(url){
+      const response=await fetch(url);
+      if(response.ok){
+        const bitmap=await createImageBitmap(await response.blob());
+        image={width:bitmap.width,height:bitmap.height};
+        bitmap.close();
+      }
+    }
+    return {kinds,backgrounds,image};
+  });
+  assert.deepEqual(commitments.kinds,['hydric','effluent','waste','participation'],
+    'Each Diablillos commitment must use its own visual subject, not a repeated leaf');
+  assert(commitments.backgrounds.every(x=>x.includes('commitment-pictograms')),
+    'Approved artwork must load as local V3 WebP sprite');
+  assert.deepEqual(commitments.image,{width:256,height:64},
+    'Four-image sprite must decode at 256 by 64 pixels');
   assert(snapshot.reducedMotionDuration.split(',').every(x=>parseFloat(x)===0),'Reduced motion must disable animation');
   assert(snapshot.overflow<=6,'Horizontal overflow '+snapshot.overflow);
   assert.deepEqual(errors,[],'No JS errors on dashboard');
