@@ -73,8 +73,8 @@ function Badge({ children, tone='neutral' }: {children: React.ReactNode; tone?: 
 function measureTone(status: string): 'neutral'|'mint'|'amber'|'blue' {
   return status==='verificada'?'blue':status==='en_ejecucion'?'mint':status==='en_revision'?'amber':'neutral';
 }
-function Panel({kicker, title, children, action}: {kicker:string;title:string;children:React.ReactNode;action?:React.ReactNode}) {
-  return <section className="v2-panel"><header className="v2-panel-title"><div><p className="v2-kicker">{kicker}</p><h2>{title}</h2></div>{action}</header>{children}</section>;
+function Panel({kicker, title, children, action, icon}: {kicker:string;title:string;children:React.ReactNode;action?:React.ReactNode;icon?:AmbientaIconName}) {
+  return <section className="v2-panel"><header className="v2-panel-title"><div><p className="v2-kicker">{kicker}</p><h2>{icon&&<AmbientaIcon kind={icon} size={20}/>} {title}</h2></div>{action}</header>{children}</section>;
 }
 function MapPreview({province,focus,boundary,aoi}:{province:string;focus?:TerritoryFocus|null;boundary?:BoundaryOverlay|null;aoi?:PointAoi|null}) {
  return <GeoMap compact province={province} focus={focus} boundary={boundary} aoi={aoi}/>;
@@ -158,7 +158,7 @@ function Evidencias({data,onAction,onApply}:{data:DemoState;onAction:(kind:DemoA
   const [params,setParams]=useSearchParams();
   const selected=params.get('evidencia');
   const clear=()=>setParams(prev=>{const next=new URLSearchParams(prev);next.delete('evidencia');return next});
-  return <Panel kicker="EVIDENCIAS DEL PGA" title="Registro documental"
+  return <Panel kicker="EVIDENCIAS DEL PGA" icon="evidence" title="Registro documental"
     action={<button className="v2-action-button" onClick={()=>onAction('evidence')}>+ Registrar evidencia</button>}>
     <div className="v2-evidence-overview"><strong>{data.evidence.length} referencias de demostración</strong>
       <span>{data.evidence.filter(e=>e.status==='pendiente').length} pendientes de revisión</span></div>
@@ -176,7 +176,7 @@ function Evidencias({data,onAction,onApply}:{data:DemoState;onAction:(kind:DemoA
 }
 function Reportes({data,onExport}:{data:DemoState;onExport:()=>void}) {
   const k=demoSummary(data);
-  return <Panel kicker="INFORMES TÉCNICOS" title="Revisión integral del expediente">
+  return <Panel kicker="INFORMES TÉCNICOS" icon="reports" title="Revisión integral del expediente">
     <p className="v2-caption">{data.project.name} · {data.project.id} · {data.project.province}</p>
     <div className="v2-project-fields"><Info label="Programas" icon={Layers3} value={String(k.programs)}/>
       <Info label="Medidas" icon={Leaf} value={String(k.measures)}/>
@@ -217,12 +217,12 @@ function PGA({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind,meas
     (program==='todos'||m.programId===program) &&
     (m.title+' '+m.id+' '+m.owner).toLocaleLowerCase('es').includes(term.toLocaleLowerCase('es'))
   ),[data,term,program]);
-  return <Panel kicker="PLAN DE GESTIÓN AMBIENTAL" title="Medidas y compromisos"
+  return <Panel kicker="PLAN DE GESTIÓN AMBIENTAL" icon="pga" title="Medidas y compromisos"
     action={<div className="v2-action-group">
-      <button type="button" className="v2-action-button" onClick={()=>onAction('measure')}>+ Nueva medida</button>
-      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('status')}>Cambiar estado</button>
-      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('evidence')}>Registrar evidencia</button>
-      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('review')}>Revisar evidencia</button>
+      <button type="button" className="v2-action-button" onClick={()=>onAction('measure')}><AmbientaIcon kind="measures" size={17}/> Nueva medida</button>
+      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('status')}><AmbientaIcon kind="calendar" size={17}/> Cambiar estado</button>
+      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('evidence')}><AmbientaIcon kind="evidence" size={17}/> Registrar evidencia</button>
+      <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('review')}><AmbientaIcon kind="review" size={17}/> Revisar evidencia</button>
     </div>}>
     <div className="v2-controls">
       <label className="v2-search"><Search size={17}/><input aria-label="Buscar medida" value={term} onChange={e=>setTerm(e.target.value)} placeholder="Buscar medida o responsable…"/></label>
@@ -252,7 +252,7 @@ function Monitoreo({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKin
   const [params,setParams]=useSearchParams();
   const selected=params.get('inspeccion');
   const clear=()=>setParams(prev=>{const next=new URLSearchParams(prev);next.delete('inspeccion');return next});
-  return <Panel kicker="MONITOREO AMBIENTAL" title="Inspecciones programadas"
+  return <Panel kicker="MONITOREO AMBIENTAL" icon="monitoring" title="Inspecciones programadas"
     action={<button type="button" className="v2-action-button" onClick={()=>onAction('inspection')}>+ Nueva inspección</button>}>
     {selected&&<RecordFocusPanel data={data} kind="inspection" id={selected} onClose={clear}/>}
     <div className="v2-table-scroll"><table className="v2-table"><thead><tr><th>Inspección</th><th>Fecha</th><th>Medida asociada</th><th>Responsable</th><th>Resultado</th><th>Consulta</th></tr></thead>
@@ -274,14 +274,14 @@ function Auditorias({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKi
       <RecordFocusPanel data={data} kind={findingId?'finding':'action'} id={(findingId||actionId)!}
         onClose={clear}/>
     </div>}
-    <Panel kicker="AUDITORÍAS" title="Hallazgos abiertos"
+    <Panel kicker="AUDITORÍAS" icon="audits" title="Hallazgos abiertos"
       action={<div className="v2-action-group"><button type="button" className="v2-action-button" onClick={()=>onAction('finding')}>+ Nuevo hallazgo</button>
       <button type="button" className="v2-action-button v2-action-muted" onClick={()=>onAction('corrective')}>Acción correctiva</button></div>}>
       <div className="v2-large-stat">{data.findings.filter(f=>f.status==='abierto').length}</div>
       <p className="v2-caption">Hallazgos abiertos en los datos actuales del ejemplo.</p>
-      <div className="v2-inline-notice"><ShieldCheck size={19}/><span>Los hallazgos y su seguimiento son registros de demostración y no constituyen un dictamen de cumplimiento ambiental.</span></div>
+      <div className="v2-inline-notice"><AmbientaIcon kind="notice" size={19}/><span>Los hallazgos y su seguimiento son registros de demostración y no constituyen un dictamen de cumplimiento ambiental.</span></div>
     </Panel>
-    <Panel kicker="REGISTRO" title="Historial de hallazgos">
+    <Panel kicker="REGISTRO" icon="history" title="Historial de hallazgos">
       {data.findings.length?data.findings.map(f=><div className="v2-audit-item" key={f.id}><span>{f.title}<small>{f.id} · {f.severity} · Inspección {f.inspectionId}</small></span><Badge tone="amber">{f.status}</Badge>
       <Link className="ref-record-inline" to={'/auditorias?hallazgo='+encodeURIComponent(f.id)}>Ver ficha</Link>
       </div>):<p className="v2-empty">No se registraron hallazgos en esta demostración.</p>}
@@ -293,8 +293,8 @@ function Auditorias({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKi
   </div>;
 }
 function Historial({data}: {data:DemoState}) {
-  return <Panel kicker="TRAZABILIDAD" title="Registro de actividades"><div className="v2-history">
-    {data.audit.slice().reverse().map(e=><div className="v2-activity" key={e.id}><span className="v2-activity-icon"><History size={18}/></span>
+  return <Panel kicker="TRAZABILIDAD" icon="history" title="Registro de actividades"><div className="v2-history">
+    {data.audit.slice().reverse().map(e=><div className="v2-activity" key={e.id}><span className="v2-activity-icon"><AmbientaIcon kind="history" size={18}/></span>
       <div><strong>{e.actor}</strong><p>{e.details}</p><small>{new Date(e.at).toLocaleString('es-AR',{dateStyle:'medium',timeStyle:'short'})}</small></div>
     </div>)}</div></Panel>;
 }
@@ -373,14 +373,14 @@ export default function App() {
             {bright?<Moon size={18}/>:<Sun size={18}/>}</button>
           {!isPrivate&&<span className="v2-location"><MapPin size={15}/> {data.project.province} · AR</span>}
           <div className="ref-user-chip"><span>DE</span><strong>{isPrivate?'Acceso privado':'Demo Usuario'}</strong></div>
-          {!isOverview&&!isPrivate&&<button className="v2-export" onClick={()=>exportDemo(data)}><ArrowDownToLine size={17}/> <span>Exportar JSON</span></button>}
+          {!isOverview&&!isPrivate&&<button className="v2-export" onClick={()=>exportDemo(data)}><AmbientaIcon kind="export" size={17}/> <span>Exportar JSON</span></button>}
         </div>
       </header>
       <div className="v2-content">
-        {IS_DIABLILLOS_CASE&&!isPrivate&&<div className="v2-case-banner" role="note"><ShieldCheck size={17}/> CASO DIABLILLOS · AUDITORÍA DOCUMENTAL DEMO · RESULTADOS SIMULADOS · SIN VISITA DE CAMPO</div>}
+        {IS_DIABLILLOS_CASE&&!isPrivate&&<div className="v2-case-banner" role="note"><AmbientaIcon kind="notice" size={17}/> CASO DIABLILLOS · AUDITORÍA DOCUMENTAL DEMO · RESULTADOS SIMULADOS · SIN VISITA DE CAMPO</div>}
         {!isOverview&&<div className="v2-page-intro"><div><p className="v2-kicker">PLATAFORMA AMBIENTAL ARGENTINA · VERSIÓN WEB {AMBIENTA_WEB_VERSION} · EXPERIMENTAL</p>
           <h1>{active.label}</h1><p>{active.description}</p></div></div>}
-        {!isPrivate&&!isOverview&&<div className="v2-warning"><span>!</span><p><strong>Ambiente de demostración.</strong> {IS_DIABLILLOS_CASE ? "Diablillos es un caso documental basado en fuentes públicas; medidas, inspecciones, evidencias y hallazgos son SIMULADOS. No se realizó auditoría de campo ni se certifica cumplimiento." : "Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental."}</p></div>}
+        {!isPrivate&&!isOverview&&<div className="v2-warning"><span className="amb-warning-glyph"><AmbientaIcon kind="notice" size={20}/></span><p><strong>Ambiente de demostración.</strong> {IS_DIABLILLOS_CASE ? "Diablillos es un caso documental basado en fuentes públicas; medidas, inspecciones, evidencias y hallazgos son SIMULADOS. No se realizó auditoría de campo ni se certifica cumplimiento." : "Todos los proyectos, medidas y cifras iniciales son ficticios. No constituyen evaluación, aprobación ni cumplimiento ambiental."}</p></div>}
         {notice&&<div className="v2-success" role="status"><CheckCircle2 size={17}/><span>{notice}</span>
           <button type="button" onClick={()=>setNotice('')} aria-label="Cerrar confirmación"><X size={16}/></button></div>}
         <Routes>
