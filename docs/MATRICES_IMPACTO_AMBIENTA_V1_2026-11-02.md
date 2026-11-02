@@ -1,7 +1,7 @@
 # AMBIENTA — Constructor de matrices de impacto V1 (02/11/2026)
 
 ## Integración
-Módulo React V3 **Impactos**, debajo de los impactos registrados.
+Módulo React V3 **Herramientas → Matrices ambientales**, como espacio independiente. El módulo **Impactos** conserva el registro documental y un enlace contextual hacia la herramienta.
 Sin cambios en V1/V2, expedientes transaccionales o simbología cartográfica.
 Borradores aislados por proyecto en localStorage; no hay escrituras en Supabase.
 
@@ -44,3 +44,10 @@ El trabajo local no constituye informe oficial, firma, custodia ni conformidad.
 Chromium 1366/1800: estado inicialmente sin evaluar, edición de signo,
 magnitud e importancia, autoguardado, exportaciones, acciones/factores
 añadidos, ancho responsive y no alterar expediente. CI preserva V1/V2.
+
+## Ajuste de arquitectura del 02/11/2026
+El constructor se trasladó al grupo de navegación **Herramientas**, ruta `/matrices`.
+La ruta `/impactos` conserva únicamente la consulta documental, sus vínculos
+espaciales y un enlace al taller. La clave local de almacenamiento se mantiene
+sin cambios: los borradores anteriores siguen siendo legibles bajo el mismo
+identificador de expediente. La navegación suma 16 destinos ilustrados distintos.
