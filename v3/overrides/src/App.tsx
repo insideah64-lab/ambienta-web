@@ -40,6 +40,8 @@ import {RecordFocusPanel} from './features/traceability/RecordFocusPanel';
 // @ts-ignore: small pure V3-only release label
 import {AMBIENTA_WEB_VERSION,AMBIENTA_WEB_RELEASE_LABEL} from './release-info.mjs';
 import {DocumentLinkAuditPanel} from './features/traceability/DocumentLinkAuditPanel';
+// V3 desktop-only visual layer, imported after component styles.
+import './desktop-palette-slate-blue.css';
 import {PreliminaryTechnicalReportPanel} from './features/reporting/PreliminaryTechnicalReportPanel';
 
 type Navigation = { path: string; label: string; icon: LucideIcon; description: string };
