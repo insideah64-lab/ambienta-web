@@ -335,3 +335,13 @@
  .ref-shell .ref-attention-bottom{min-width:0}
  .ref-shell .ref-attention-bottom svg{flex-shrink:0}
 }
+
+/* Safeguard established QA for real record counts and categorical statuses. */
+@media(min-width:1100px){
+ .ref-shell .ref-metric.v2-metric{min-height:112px;max-height:120px;padding:10px 12px}
+ .ref-shell .ref-commitment-info>small{font-size:13px}
+ .ref-shell .ref-stage-tag{font-size:12px}
+}
+@media(min-width:1100px) and (max-width:1399px){
+ .ref-shell .ref-metrics.v2-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
