@@ -54,7 +54,7 @@ export function GraphImportPanel({data,measureId}:Props){
       data-graph-import-input="true"/>
     </label>
    </div>
-   <p className="ref-import-caution">Máximo 1 MiB · Solo esquema `ambienta.document_trace.v1` ·
+   <p className="ref-import-caution">Máximo 1 MiB · Solo esquema <code>ambienta.document_trace.v1</code> ·
     No se guarda ni sincroniza el archivo. SHA-256 no prueba autenticidad ni cumplimiento.</p>
    {filename&&<p className="ref-import-filename">Archivo seleccionado: <strong>{filename}</strong></p>}
    {busy&&<p role="status">Comprobando estructura y huella…</p>}
