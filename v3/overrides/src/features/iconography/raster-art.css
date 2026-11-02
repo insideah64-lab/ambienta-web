@@ -1,0 +1,68 @@
+/* AMBIENTA V3 | local AI-generated WebP artwork, progressive SVG fallback.
+ * Photography is a Puna-inspired illustration, NOT a verified image of Diablillos.
+ * Raster files live inside V3's assets; GitHub Pages serves them with no AI API.
+ * Not applied to any SIG map, protected legend, boundary or environmental status.
+ */
+.ref-shell .amb-art-icon{
+ display:inline-grid;place-items:center;position:relative;overflow:hidden;flex:none;
+ vertical-align:middle;isolation:isolate;border-radius:8px;
+ background:linear-gradient(145deg,#0b2a32ab,#10363b66);
+}
+.ref-shell .amb-art-icon .amb-icon{grid-area:1/1;position:relative;z-index:1;transition:opacity .22s ease}
+.ref-shell .amb-art-icon img{
+ grid-area:1/1;position:absolute;inset:0;z-index:2;
+ display:block;width:100%;height:100%;object-fit:cover;
+ border-radius:inherit;opacity:0;transition:opacity .22s ease;
+}
+.ref-shell .amb-art-icon.amb-art-loaded img{opacity:1}
+.ref-shell .amb-art-icon.amb-art-loaded>.amb-icon{opacity:0}
+@media(min-width:1100px){
+ .ref-shell .ref-reference-dashboard .ref-hero-illustrated{
+  /* Keep dynamic React copy accessible and outside the generated photograph. */
+  background-image:linear-gradient(95deg,#061d23ec 0%,#082c33ce 33%,#0a35439a 56%,#0a263349 84%),
+    url('../../assets/ai/hero-puna.webp') !important;
+  background-size:cover,cover;background-position:center,center 52%;
+  border-color:#70b5a4;box-shadow:inset 0 1px #c9f8ed4d,0 16px 32px #03192072;
+ }
+ .ref-shell .ref-reference-dashboard .ref-hero-illustrated:before{
+  background:linear-gradient(90deg,#031f28a8 0%,transparent 59%,#04283273 100%);
+ }
+ .ref-shell .ref-reference-dashboard .ref-hero-illustrated:after{
+  background:linear-gradient(180deg,#0b344100 50%,#05262b75 100%)
+ }
+ .ref-shell .v2-nav-item .amb-art-icon{border-radius:9px;box-shadow:inset 0 1px #ffffff16}
+ .ref-shell .v2-nav-item:hover .amb-art-icon,
+ .ref-shell .v2-nav-item:focus-visible .amb-art-icon{
+  filter:drop-shadow(0 0 4px #95e4d340);
+  transform:translateY(-1px) scale(1.04)
+ }
+ .ref-shell .v2-nav-item.is-active .amb-art-icon{
+  background:linear-gradient(150deg,#17413b,#24594e);
+  box-shadow:0 1px 10px #04181a80,inset 0 1px #b9ffe83d
+ }
+ .ref-shell .v2-logo .amb-art-icon{border-radius:9px;background:#18493f}
+ .ref-shell .ref-demo-icon .amb-art-icon{border-radius:8px;background:#14644d}
+ .ref-shell .ref-hero-crest .amb-art-icon{
+  border-radius:15px;background:#0a343c9e;filter:drop-shadow(0 1px 3px #062e35)
+ }
+ .ref-shell .ref-hero-illustrated .ref-hero-meta .amb-art-icon{
+  width:25px!important;height:25px!important;border-radius:6px
+ }
+ .ref-shell .ref-hero-illustrated .ref-hero-label .amb-art-icon{
+  width:25px!important;height:25px!important;border-radius:6px
+ }
+ .ref-shell .ref-hero-illustrated .ref-hero-tags .amb-art-icon{
+  width:28px!important;height:28px!important;border-radius:7px
+ }
+ .ref-shell .ref-hero-illustrated .ref-province-art .amb-art-icon{
+  border-radius:11px;background:#0b4c52
+ }
+ .ref-shell .ref-metric .v2-metric-icon .amb-art-icon{
+  width:32px!important;height:32px!important;box-shadow:0 1px 7px #0003
+ }
+}
+@media(prefers-reduced-motion:reduce){
+ .ref-shell .amb-art-icon,.ref-shell .amb-art-icon img,.ref-shell .amb-art-icon .amb-icon{
+   transition:none!important;transform:none!important
+ }
+}
