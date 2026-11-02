@@ -345,3 +345,19 @@
 @media(min-width:1100px) and (max-width:1399px){
  .ref-shell .ref-metrics.v2-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+/* Keep attention summary horizontal chips under the heading at ~400px panel
+   width, rather than squeezing its explanatory copy into a thin column. */
+@media(min-width:1100px){
+ .ref-shell .ref-reference-grid .ref-attention-top{
+  flex-direction:column;align-items:stretch;justify-content:flex-start;gap:5px
+ }
+ .ref-shell .ref-reference-grid .ref-attention-top>div:first-child{min-width:0}
+ .ref-shell .ref-reference-grid .ref-attention-top p:not(.ref-attention-eyebrow){
+  margin:4px 0 0;line-height:1.35
+ }
+ .ref-shell .ref-reference-grid .ref-attention-summary{
+  align-self:flex-start;display:flex;gap:7px;flex-wrap:nowrap
+ }
+ .ref-shell .ref-reference-grid .ref-attention-summary>span{min-height:0}
+}
