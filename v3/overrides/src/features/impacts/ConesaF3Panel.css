@@ -32,3 +32,8 @@
 .ref-shell .amb-f3-error p{color:#f0dad4}
 .ref-shell .amb-f3 footer{margin-top:14px;font-size:11px;color:#b4cad2}
 @media(max-width:900px){.ref-shell .amb-f3-summary,.ref-shell .amb-f3-results{grid-template-columns:repeat(2,minmax(0,1fr))}.ref-shell .amb-f3-grid,.ref-shell .amb-f3-scenarios{grid-template-columns:minmax(0,1fr)}}
+
+.ref-shell .amb-f3 .amb-f3-type{margin:15px 0 8px;padding:13px 16px;background:#254856;border:1px solid #608793;border-radius:9px}
+.ref-shell .amb-f3 .amb-f3-type label{margin:0}
+.ref-shell .amb-f3 .amb-f3-type p{color:#d6e7e9;margin:7px 0 0;font-size:12px}
+.ref-shell .amb-f3 .amb-f3-type select:focus-visible{outline:3px solid #f6cf8b;outline-offset:3px}

@@ -5,6 +5,11 @@ import {
  f3Problems,evaluateF3Factor,type F3Doc,type F3FactorRecord,type ScenarioF3
 } from './ConesaF3Model';
 import type {F2Factor} from './ConesaF2Model';
+import {
+ F3B_STORAGE,blankF3BDoc,blankF3BCurve,validF3BDoc,
+ f3bProblems,evaluateF3BCurve,type F3BDoc,type F3BCurve
+} from './ConesaF3CurveModel';
+import {ConesaF3CurveEditor} from './ConesaF3CurveEditor';
 import {ConesaF3Comparison} from './ConesaF3Comparison';
 import './ConesaF3Panel.css';
 type Props={projectId:string;projectName:string;factors:F2Factor[]};
@@ -32,30 +37,72 @@ function csv(v:unknown){
  return '"'+safe.replaceAll('"','""')+'"';
 }
 function nullableNumber(value:string){return value.trim()===''?null:Number(value)}
+function readCurveDraft(projectId:string,projectName:string):{doc:F3BDoc;damaged:string|null}{
+ try{
+  const raw=localStorage.getItem(F3B_STORAGE+projectId);
+  if(raw!==null){
+   try{
+    const decoded:unknown=JSON.parse(raw);
+    if(validF3BDoc(decoded,projectId))return {doc:decoded,damaged:null};
+   }catch{/* Never overwrite a damaged original */}
+   return {doc:blankF3BDoc(projectId,projectName),damaged:raw};
+  }
+ }catch{/* Draft remains memory-only when storage unavailable */}
+ return {doc:blankF3BDoc(projectId,projectName),damaged:null};
+}
 export function ConesaF3Panel({projectId,projectName,factors}:Props){
  const [loaded]=useState(()=>readDraft(projectId,projectName));
+ const [curveLoaded]=useState(()=>readCurveDraft(projectId,projectName));
  const [doc,setDoc]=useState<F3Doc>(loaded.doc);
+ const [curveDoc,setCurveDoc]=useState<F3BDoc>(curveLoaded.doc);
  const [selected,setSelected]=useState<string>('');
  const [notice,setNotice]=useState('');
  const modified=useRef(false);
+ const curveModified=useRef(false);
  const blocked=loaded.damaged!==null;
+ const curveBlocked=curveLoaded.damaged!==null;
  const factor=factors.find(f=>f.id===selected);
  const current=factor?doc.records[factor.id]:undefined;
  const active=current||blankF3Factor();
- const problems=f3Problems(current);
- const quality=evaluateF3Factor(current);
- const rows=useMemo(()=>factors.map(f=>({
-  factor:f,
-  record:doc.records[f.id],
-  issues:f3Problems(doc.records[f.id]),
-  result:evaluateF3Factor(doc.records[f.id])
- })),[factors,doc]);
+ const curveRecord=factor?curveDoc.records[factor.id]:undefined;
+ const curveActive=!!curveRecord?.enabled;
+ const problems=curveActive?f3bProblems(current,curveRecord):f3Problems(current);
+ const quality=curveActive?evaluateF3BCurve(current,curveRecord):evaluateF3Factor(current);
+ const rows=useMemo(()=>factors.map(f=>{
+  const record=doc.records[f.id],curve=curveDoc.records[f.id],isCurve=!!curve?.enabled;
+  return {
+   factor:f,record,
+   mode:isCurve?'curva':'lineal',
+   methodDescription:isCurve?'F3b · interpolación por tramos':'F3a · lineal',
+   methodSource:isCurve?curve.source:(record?.transformation.source??''),
+   issues:isCurve?f3bProblems(record,curve):f3Problems(record),
+   result:isCurve?evaluateF3BCurve(record,curve):evaluateF3Factor(record)
+  };
+ }),[factors,doc,curveDoc]);
  const orphanIds=Object.keys(doc.records).filter(id=>!factors.some(f=>f.id===id));
  useEffect(()=>{
   if(!modified.current||blocked)return;
   try{localStorage.setItem(F3_STORAGE+projectId,JSON.stringify(doc))}
   catch{setNotice('No fue posible guardar F3 en este navegador. Exportá el archivo JSON para conservarlo.')}
  },[doc,blocked,projectId]);
+ useEffect(()=>{
+  if(!curveModified.current||curveBlocked)return;
+  try{localStorage.setItem(F3B_STORAGE+projectId,JSON.stringify(curveDoc))}
+  catch{setNotice('No se pudo guardar F3b. Exportá el JSON de curvas para conservarlo.')}
+ },[curveDoc,curveBlocked,projectId]);
+ const updateCurve=(next:F3BCurve)=>{
+  if(!factor||curveBlocked)return;
+  curveModified.current=true;
+  setCurveDoc(previous=>({...previous,updatedAt:new Date().toISOString(),
+   records:{...previous.records,[factor.id]:next}}));
+ };
+ const chooseCurve=(mode:'lineal'|'curva')=>{
+  if(!factor||curveBlocked)return;
+  const previous=curveDoc.records[factor.id];
+  if(mode==='lineal'&&!previous?.enabled)return;
+  updateCurve(previous?{...previous,enabled:mode==='curva'}:
+   {...blankF3BCurve(current||blankF3Factor()),enabled:mode==='curva'});
+ };
  const update=(changes:Partial<F3FactorRecord>)=>{
   if(!factor||blocked)return;
   modified.current=true;
@@ -80,18 +127,19 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
     r?.without.value??'',r?.without.date??'',r?.without.source??'',
     r?.withProject.value??'',r?.withProject.date??'',r?.withProject.source??'',
     q?.without??'',q?.withProject??'',q?.delta??'',q?.rawDelta??'',
-    r?JSON.stringify(r.transformation):'',r?.transformation.source??'',
-    r?.composition??'',row.issues.join(' | ')]);
+    row.mode==='curva'?JSON.stringify(curveDoc.records[row.factor.id]??''):
+     (r?JSON.stringify(r.transformation):''),
+    row.methodSource??'',r?.composition??'',row.issues.join(' | ')]);
   }
   return '\uFEFF'+lines.map(row=>row.map(csv).join(';')).join('\r\n');
  };
  return <section className="amb-f3" data-conesa-f3={F3_METHOD}>
   <header className="amb-f3-head">
    <div>
-    <p className="amb-matrix-overline"><BookOpen size={15}/> FASE F3a · VALORACIÓN CUANTITATIVA EXPERIMENTAL</p>
+    <p className="amb-matrix-overline"><BookOpen size={15}/> FASES F3a / F3b · VALORACIÓN CUANTITATIVA EXPERIMENTAL</p>
     <h3>Indicadores, escenarios y calidad ambiental</h3>
-    <p>Conesa 1997, pp. 107–116. Se comparan magnitudes y calidades por factor, SIN/CON proyecto.
-     No se infieren mediciones, funciones ni eficacia de medidas. F3a no calcula todavía Vj, IA total
+    <p>Conesa 1997, pp. 107–117 y Anejo 4. Se comparan magnitudes y calidades por factor, SIN/CON proyecto.
+     No se infieren mediciones, funciones ni eficacia de medidas. F3 no calcula todavía Vj, IA total
      ni demuestra equivalencia entre la importancia cualitativa y la calidad ambiental.</p>
    </div>
    <div className="amb-f3-actions">
@@ -100,11 +148,16 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
       interpretation:'Borrador sin validación profesional'},null,2))}>
      <ArrowDownToLine size={15}/> JSON F3a</button>
     <button type="button" onClick={()=>download('AMBIENTA-Conesa-F3a-'+projectId+'.csv','text/csv;charset=utf-8',exportCSV())}>
-     <ArrowDownToLine size={15}/> CSV F3a</button>
+     <ArrowDownToLine size={15}/> CSV F3a/F3b</button>
+    <button type="button" disabled={curveBlocked}
+     onClick={()=>download('AMBIENTA-Conesa-F3b-curvas-'+projectId+'.json','application/json',
+     JSON.stringify({...curveDoc,provenance:'Conesa 1997, cap. 5.3 y Anejo 4',
+      interpretation:'Curvas reconstruidas por el evaluador, no digitalización oficial'},null,2))}>
+     <ArrowDownToLine size={15}/> JSON Curvas F3b</button>
    </div>
   </header>
   <p className="amb-f3-notice" role="note">
-   F3a comienza con funciones <strong>lineales explícitas</strong>, definidas por límites y orientación
+   F3a trabaja con rectas explícitas; F3b admite curvas por nudos documentados, sin extrapolación. Las rectas se definen por límites y orientación
    aportados por el evaluador. Una recta no es una función atribuida automáticamente al libro.
    No extrapolamos, no sumamos unidades físicas distintas y no suponemos sinergia aditiva.
   </p>
@@ -113,6 +166,12 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
    <p>Conservamos el texto original. Descargalo para recuperarlo, sin sustituirlo por un documento vacío.</p>
    <button type="button" onClick={()=>download('AMBIENTA-Conesa-F3a-respaldo-'+projectId+'.txt',
     'text/plain;charset=utf-8',loaded.damaged!)}>Descargar original sin modificar</button>
+  </div>}
+  {curveBlocked&&<div role="alert" className="amb-f3-error" data-f3b-damaged>
+   <strong>El respaldo F3b no supera la validación; las curvas quedan bloqueadas.</strong>
+   <p>No se reescribe el archivo original. F3a permanece independiente y accesible.</p>
+   <button type="button" onClick={()=>download('AMBIENTA-F3b-original-'+projectId+'.txt',
+    'text/plain;charset=utf-8',curveLoaded.damaged!)}>Descargar original F3b sin modificar</button>
   </div>}
   <div className="amb-f3-summary">
    <span><strong>{factors.length}</strong><small>Factores disponibles</small></span>
@@ -128,7 +187,7 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
      return <button type="button" key={f.id} onClick={()=>setSelected(f.id)}
       aria-pressed={f.id===selected} data-f3-factor={f.id}>
       <span><strong>{f.name}</strong><small>{f.group}</small></span>
-      <span>{row.record?.indicator||'Sin indicador'}</span>
+      <span>{row.record?.indicator||'Sin indicador'}{row.mode==='curva'?' · Curva F3b':''}</span>
       <span>{row.result?('ΔCA '+row.result.delta.toFixed(4)):'Pendiente'}</span>
      </button>;
     })}
@@ -178,6 +237,20 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
      </fieldset>;
     })}
    </div>
+   <div className="amb-f3-type">
+    <label>Tipo de transformación de calidad ambiental
+     <select aria-label="F3 tipo de función" value={curveActive?'curva':'lineal'}
+      disabled={curveBlocked||blocked} onChange={e=>chooseCurve(e.target.value as 'lineal'|'curva')}>
+      <option value="lineal">F3a · recta documentada</option>
+      <option value="curva">F3b · curva por nudos documentados</option>
+     </select>
+    </label>
+    <p>Cambiar de función no borra ni transforma la anterior. La evaluación utiliza
+     exclusivamente el método seleccionado para este factor.</p>
+   </div>
+   {curveActive&&curveRecord?
+    <ConesaF3CurveEditor base={active} curve={curveRecord}
+     blocked={blocked||curveBlocked} onChange={updateCurve}/>:
    <fieldset className="amb-f3-transform">
     <legend>Función CA=f(M) · lineal documentada</legend>
     <div className="amb-f3-grid">
@@ -204,7 +277,7 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
      <textarea aria-label="F3 función alcance" rows={2} maxLength={2000} disabled={blocked}
       value={active.transformation.scope}
       onChange={e=>changeTransformation({scope:e.target.value})}/></label>
-   </fieldset>
+   </fieldset>}
    {quality?<div className="amb-f3-results" data-f3-results>
     <span>CA SIN<strong>{quality.without.toFixed(4)}</strong></span>
     <span>CA CON<strong>{quality.withProject.toFixed(4)}</strong></span>
@@ -224,6 +297,7 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
   {orphanIds.length>0&&<p className="amb-f3-error">Hay {orphanIds.length} registro(s) F3 sin factor activo.
    No se borran ni se cuentan en resultados; permanecen en JSON.</p>}
   {notice&&<p role="status" className="amb-f3-error">{notice}</p>}
-  <footer>F3a experimental · Capítulos 5.2–5.3.2 · No sustituye evaluación profesional ni certificación.</footer>
+  <footer>F3a/F3b experimental · Conesa 1997, §5.3, Anejo 4.
+   Curvas por interpolación declarada; no es una digitalización oficial ni reemplaza la revisión profesional.</footer>
  </section>;
 }
