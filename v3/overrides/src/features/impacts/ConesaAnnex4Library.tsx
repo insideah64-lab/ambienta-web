@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {
- ANNEX4_ATMOSPHERE,annex4Citation,searchAnnex4,
+ ANNEX4_ATMOSPHERE,searchAnnex4,
  type Annex4CatalogEntry
 } from './ConesaAnnex4Catalog';
 import './ConesaAnnex4Library.css';
