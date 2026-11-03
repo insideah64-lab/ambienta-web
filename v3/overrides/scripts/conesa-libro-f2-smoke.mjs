@@ -44,7 +44,7 @@ try{
   assert.equal((await summary.nth(3).locator('strong').innerText()).trim(),'1',
    'Explicit below-threshold treatment is counted, never automatically assigned');
   await editor.locator('input[type="checkbox"]').check();
-  assert.match(await editor.locator('[data-f2-problems]').innerText(),/bandera roja/i);
+  assert.match(await editor.locator('[data-f2-problems]').innerText(),/alerta roja/i);
   await editor.getByRole('textbox',{name:'Conesa F2 motivo bandera roja'}).fill('Lugar de daño potencial irreversible en circunstancias críticas');
   await editor.getByRole('textbox',{name:'Conesa F2 evidencia bandera roja'}).fill('Acta de prueba QA');
   await editor.getByRole('textbox',{name:'Conesa F2 alternativa'}).fill('Alternativa de ubicación sujeta a análisis');
