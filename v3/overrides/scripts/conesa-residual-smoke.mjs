@@ -72,6 +72,23 @@ try{
   assert.equal(await editor.locator('[data-pga-linked-detail]').count(),1);
   assert((await editor.getByRole('link',{name:'Abrir ficha y trazabilidad en PGA'}).getAttribute('href'))
    .includes('/pga?medida='+encodeURIComponent(sourceId)));
+  assert.equal((await row.locator('[data-residual-state]').innerText()).trim(),'Revisar',
+   'An existing PGA ID is not enough without a matching registered impact');
+  const linkedImpact=editor.getByRole('combobox',{name:'Impacto registrado vinculado'});
+  await linkedImpact.selectOption('IMP-D-EFL');
+  assert((await editor.locator('[data-chain-status]').innerText()).includes('incompatible'));
+  assert.equal((await editor.locator('[data-chain-monitoring]').innerText()).includes('Sin inspecciones'),true,
+   'An incompatible measure must not attribute its inspection to a different impact');
+  await linkedImpact.selectOption('IMP-D-AGU');
+  assert.equal((await row.locator('[data-residual-state]').innerText()).trim(),'Revisar',
+   'Even a valid ID match needs a documented environmental rationale');
+  await editor.getByRole('textbox',{name:'Fundamento de vínculo impacto medida'}).fill(
+   'Ejercicio QA: el evaluador vincula expresamente la interacción al impacto hídrico declarado.');
+  assert.equal((await editor.locator('[data-chain-status]').innerText()).trim(),
+   'Correspondencia por identificador: vinculado');
+  assert.equal((await editor.locator('[data-chain-inspection="INSP-DIAB-001"]').count()),1);
+  assert((await editor.locator('[data-chain-inspection="INSP-DIAB-001"] a').getAttribute('href'))
+   .includes('/monitoreo?inspeccion=INSP-DIAB-001'));
   assert.equal((await row.locator('[data-residual-state]').innerText()).trim(),'Completo');
   await page.screenshot({path:out+'/conesa-residual-'+width+'.png',animations:'disabled'});
   const [download]=await Promise.all([page.waitForEvent('download'),
@@ -81,6 +98,8 @@ try{
   assert(csv.includes('"conesa-simplificado-residual-v1"'));
   assert(csv.includes('"' + sourceId + '"')&&csv.includes('"vinculado"'),
    'CSV must preserve exact PGA measure ID and documented linkage status');
+  assert(csv.includes('"IMP-D-AGU"')&&csv.includes('"INSP-DIAB-001"'),
+   'CSV preserves explicitly linked impact and monitoring IDs');
   const original=await page.evaluate(projectId=>
    JSON.parse(localStorage.getItem('ambienta-conesa-simplificado-v1:'+projectId)).entries['demo-f4::demo-a1'],
    projectId);
@@ -90,6 +109,8 @@ try{
    projectId);
   assert.equal(residualBefore.residual.criteria.IN,1);
   assert.equal(residualBefore.measure.execution,'prevista');
+  assert.equal(residualBefore.impactId,'IMP-D-AGU');
+  assert(residualBefore.impactLinkReason.includes('Ejercicio QA'));
 
   // Changing the source scoring must invalidate a previously reviewed scenario.
   await page.evaluate(projectId=>{

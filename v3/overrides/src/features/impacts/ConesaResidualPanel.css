@@ -44,3 +44,13 @@
 .ref-shell .amb-residual-pga-link [data-pga-linked-detail] p{color:#c1d3db;font-size:12px;margin:7px 0;line-height:1.5}
 .ref-shell .amb-residual-pga-link [data-pga-linked-detail] a{color:#a2e1e7;font-size:12px;font-weight:700;text-decoration:underline}
 .ref-shell .amb-residual-overflow [data-residual-pga]{min-width:110px;font-size:11px}
+
+.ref-shell .amb-conesa-chain{border:1px solid #648d9b;background:#0f3443;padding:14px 16px;border-radius:9px;margin:13px 0}
+.ref-shell .amb-conesa-chain>strong{display:block;font-size:14px;color:#e8f9f5;margin:0 0 10px}
+.ref-shell .amb-conesa-chain p{font-size:12px;line-height:1.6;color:#c8dfe3;margin:8px 0}
+.ref-shell .amb-conesa-chain [data-chain-confirmed]{color:#d9edc5}
+.ref-shell .amb-conesa-chain [data-chain-monitoring]{font-size:12px;font-weight:700;color:#f3d8ad;margin:12px 0}
+.ref-shell .amb-conesa-chain ul{margin:8px 0 14px;padding-left:20px}
+.ref-shell .amb-conesa-chain li{font-size:12px;color:#d8e9ed;padding:4px 0}
+.ref-shell .amb-conesa-chain a{color:#acf1ef;text-decoration:underline}
+.ref-shell .amb-residual-overflow [data-residual-chain]{min-width:125px;font-size:11px}
