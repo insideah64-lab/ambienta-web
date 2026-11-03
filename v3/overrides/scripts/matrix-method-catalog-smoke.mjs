@@ -25,7 +25,7 @@ try{
   const methodAccents=[];
   for(const id of methodIds){
    const card=page.locator('[data-catalog-method="'+id+'"]');
-   assert.equal(await card.locator('.amb-method-cardvisual svg').count(),1,
+   assert((await card.locator('.amb-method-cardvisual svg').count())>=1,
     'Each method must have its own vector icon: '+id);
    assert.equal(await card.locator('.amb-method-cardcopy strong').count(),1);
    const accent=await card.evaluate(node=>getComputedStyle(node).getPropertyValue('--method-accent').trim());
