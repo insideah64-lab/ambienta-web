@@ -8,29 +8,38 @@ import { createEnvironmentalRepository } from '../../../../../web/cloud/reposito
 import {CloudEvidencePilot} from './CloudEvidencePilot';
 import {PrivateIntakeForm,type PrivateIntakeKind} from './PrivateIntakeForm';
 import {PrivateMeasureForm,type PrivateMeasureValues} from './PrivateMeasureForm';
+import {PrivateMonitoringForm,type PrivateInspectionValues,type PrivateEvidenceReferenceValues} from './PrivateMonitoringForm';
+// @ts-ignore: pure documentary projection, tested by Node
+import {privateMonitoringSummary,validatePrivateInspection,validatePrivateEvidenceReference} from './private-monitoring.mjs';
 // @ts-ignore: pure documentary projection, tested natively
 import {privateMeasureSummary} from './private-measure.mjs';
 import './private-workspace.css';
 import './cloud.css';
 
 type ProjectRow = { id:string; owner_id?:string; name:string; province:string; project_phase:string; status:string; created_at:string };
-type MeasureRow = {id:string;title?:string;program_id?:string;status?:string};
+type MeasureRow = {id:string;title?:string;project_id:string;program_id?:string;status?:string};
+type InspectionRow={id:string;project_id:string;measure_id:string;recorded_by?:string;
+ scheduled_for:string;result:string;note:string};
 type MeasureImpactLinkRow={measure_id:string;impact_id:string;project_id:string};
 type MeasureSummary={id:string;title:string;status:string;programLabel:string;
  impactLabels:string[];problems:string[]};
 type ImpactRow = {id:string;code?:string;title?:string;factor?:string;sign?:string;project_phase?:string};
 type ProgramRow = {id:string;code?:string;name?:string;category?:string};
-type EvidenceRow = {id:string;measure_id?:string;label?:string;storage_path?:string|null;original_file_name?:string|null;file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
+type EvidenceRow = {id:string;project_id?:string;measure_id?:string;inspection_id?:string|null;
+ label?:string;reference_label?:string;storage_path?:string|null;original_file_name?:string|null;
+ file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
 type ProjectDetail = { project:ProjectRow; environmental_impacts:ImpactRow[];
   management_programs:ProgramRow[]; management_measures:MeasureRow[];
   measure_impact_links:MeasureImpactLinkRow[];
-  monitoring_inspections:unknown[]; environmental_evidence:EvidenceRow[];
+  monitoring_inspections:InspectionRow[]; environmental_evidence:EvidenceRow[];
   audit_findings:unknown[]; corrective_actions:unknown[] };
 type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>Promise<ProjectDetail>;
   createProject:(values:Record<string,string>)=>Promise<ProjectRow>;
   createImpact:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
   createProgram:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
   createMeasure:(projectId:string,values:PrivateMeasureValues)=>Promise<string>;
+  createInspection:(projectId:string,measureId:string,values:Omit<PrivateInspectionValues,'measureId'>)=>Promise<InspectionRow>;
+  registerEvidence:(projectId:string,measureId:string,values:Omit<PrivateEvidenceReferenceValues,'measureId'>)=>Promise<EvidenceRow>;
   uploadEvidenceFile:(projectId:string,measureId:string,values:{label:string;file:File})=>Promise<unknown>;
   downloadEvidence:(row:EvidenceRow)=>Promise<{blob:Blob;name:string}> };
 function message(cause:unknown):string {
@@ -48,7 +57,7 @@ export function CloudWorkspace() {
   const [error,setError]=useState('');
   const [info,setInfo]=useState('');
   const [mode,setMode]=useState<'login'|'signup'>('login');
-  const [createMode,setCreateMode]=useState<PrivateIntakeKind|'measure'|null>(null);
+  const [createMode,setCreateMode]=useState<PrivateIntakeKind|'measure'|'inspection'|'reference'|null>(null);
 
   useEffect(()=>{
     if(!client)return;
@@ -71,6 +80,8 @@ export function CloudWorkspace() {
       ++generation;
       ++authEpoch.current;
       setUser(null);setProjects([]);setSelected(null);setCreateMode(null);
+      // A prior account's ID or success message must never remain after sign-out.
+      setInfo('');setError('');
       setBusy(false);
       if(!session){setLoading(false);return;}
       setLoading(true);
@@ -197,6 +208,49 @@ export function CloudWorkspace() {
    }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
    finally{if(epoch===authEpoch.current)setBusy(false);}
   }
+  async function savePrivateMonitoring(
+   kind:'inspection'|'reference',
+   values:PrivateInspectionValues|PrivateEvidenceReferenceValues
+  ){
+   if(!reader||!user||!selected||busy)return;
+   const epoch=authEpoch.current,projectId=selected.project.id;
+   // Recheck currently selected project: form options are not an auth boundary.
+   const scope={projectId,measures:selected.management_measures,
+    inspections:selected.monitoring_inspections};
+   let inspection:PrivateInspectionValues|undefined;
+   let reference:PrivateEvidenceReferenceValues|undefined;
+   try{
+    if(kind==='inspection')inspection=validatePrivateInspection(values,scope) as PrivateInspectionValues;
+    else reference=validatePrivateEvidenceReference(values,scope) as PrivateEvidenceReferenceValues;
+   }catch(cause){setError(message(cause));return;}
+   setBusy(true);setError('');setInfo('');
+   try{
+    if(inspection){
+     const {measureId,...entry}=inspection;
+     await reader.createInspection(projectId,measureId,entry);
+    }else if(reference){
+     const {measureId,...entry}=reference;
+     await reader.registerEvidence(projectId,measureId,entry);
+    }
+    if(epoch!==authEpoch.current)return;
+    setCreateMode(null);
+    setInfo(kind==='inspection'
+     ?'Inspección registrada como declaración del usuario; no acredita cumplimiento.'
+     :'Referencia documental creada en estado pendiente; no se adjuntó ningún archivo.');
+    try{
+     const fresh=await reader.loadProject(projectId);
+     if(epoch===authEpoch.current)setSelected(fresh);
+    }catch(cause){
+     if(epoch===authEpoch.current)setError('Registro guardado; la ficha no pudo actualizarse: '+message(cause));
+    }
+   }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
+   finally{if(epoch===authEpoch.current)setBusy(false);}
+  }
+  const monitoring=selected?privateMonitoringSummary(selected) as {
+   inspections:Array<{id:string;measureName:string;date:string;result:string;note:string;warnings:string[]}>;
+   references:Array<{id:string;measureName:string;inspectionId:string;label:string;
+    reference:string;status:string;warnings:string[]}>
+  }:null;
   return <div className="v2-cloud-workspace">
     <div className="v2-cloud-heading"><span className="v2-cloud-mark"><ArtworkIcon kind="cloud" size={29}/></span>
       <div><strong>Expedientes privados</strong><p>Conexión separada de los datos ficticios de la demostración.</p></div>
@@ -313,6 +367,64 @@ export function CloudWorkspace() {
           <p>Los enlaces provienen de <code>measure_impact_links</code>; no se deducen
            por coincidencias de nombres ni constituyen acreditación de cumplimiento.</p>
          </div>
+        </section>
+        <section className="amb-private-monitoring" data-private-monitoring>
+         <div className="amb-private-list-header">
+          <div><h3>Monitoreo del PGA y referencias documentales</h3>
+           <p>Registros del expediente autenticado, asociados por identificador a medidas ya existentes.</p></div>
+          <div className="amb-private-actions">
+           <button type="button" disabled={busy}
+            onClick={()=>{setCreateMode(createMode==='inspection'?null:'inspection');setError('');}}>
+            Nueva inspección</button>
+           <button type="button" disabled={busy}
+            onClick={()=>{setCreateMode(createMode==='reference'?null:'reference');setError('');}}>
+            Nueva referencia documental</button>
+          </div>
+         </div>
+         {(createMode==='inspection'||createMode==='reference')&&
+          <PrivateMonitoringForm
+           kind={createMode} projectId={selected.project.id}
+           busy={busy} measures={selected.management_measures}
+           inspections={selected.monitoring_inspections}
+           onSave={values=>savePrivateMonitoring(createMode,values)}
+           onCancel={()=>setCreateMode(null)}/>}
+         <div className="amb-private-monitoring-grid">
+          <div>
+           <h4>Inspecciones registradas · {monitoring?.inspections.length??0}</h4>
+           {!(monitoring?.inspections.length)&&<p>Todavía no hay inspecciones registradas.</p>}
+           {(monitoring?.inspections||[]).map(i=>
+            <article key={i.id} data-private-inspection={i.id}>
+             <strong>{i.measureName}</strong>
+             <small>Fecha declarada: {i.date} · ID: {i.id}</small>
+             <small>Resultado: {i.result==='pending'?'Pendiente':i.result==='conformant'
+              ?'Conforme, declarado por usuario':i.result==='observed'
+              ?'Con observaciones, declarado':i.result==='not_applicable'
+              ?'No aplica, declarado':'Estado no reconocido'}</small>
+             <p>{i.note}</p>
+             {i.warnings.length>0&&<p className="amb-private-measure-warning"
+              role="status">{i.warnings.join(' · ')}</p>}
+            </article>)}
+          </div>
+          <div>
+           <h4>Referencias sin archivo · {monitoring?.references.length??0}</h4>
+           {!(monitoring?.references.length)&&<p>Sin referencias documentales registradas.</p>}
+           {(monitoring?.references||[]).map(e=>
+            <article key={e.id} data-private-reference={e.id}>
+             <strong>{e.label}</strong>
+             <small>Medida: {e.measureName}</small>
+             <small>Inspección: {e.inspectionId||'Referencia directa a medida'}</small>
+             <p>Fuente declarada: {e.reference}</p>
+             <small>Estado: {e.status==='pending'?'Pendiente, no validada':e.status}</small>
+             {e.warnings.length>0&&<p className="amb-private-measure-warning"
+              role="status">{e.warnings.join(' · ')}</p>}
+            </article>)}
+          </div>
+         </div>
+         <p className="amb-private-monitoring-disclaimer">
+          Los estados y resultados son declaraciones cargadas por el usuario.
+          No verifican cumplimiento, mediciones de campo ni eficacia de las medidas.
+          La creación de archivos privados y la firma profesional permanecen bloqueadas.
+         </p>
         </section>
         <CloudEvidencePilot projectId={selected.project.id} measures={selected.management_measures}
           evidence={selected.environmental_evidence} reader={reader!} onUploaded={async()=>{

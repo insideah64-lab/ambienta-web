@@ -34,3 +34,15 @@
 .ref-shell .amb-private-draft-state{background:#574c3d;color:#ffe5ac;border:1px solid #ad9361;padding:5px 9px;border-radius:6px;font-size:11px;white-space:nowrap}
 .ref-shell .amb-private-measure-warning{font-size:12px;color:#ffdfbd;margin:8px 0;border-left:3px solid #e6b366;padding-left:8px}
 @media(max-width:800px){.ref-shell .amb-private-measure-register article{flex-wrap:wrap}}
+
+.ref-shell .amb-private-monitoring{margin:18px 0;padding:18px;border:1px solid #6a8093;border-radius:12px;background:#19394d;color:#dcecf2}
+.ref-shell .amb-private-monitoring-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:18px 0}
+.ref-shell .amb-private-monitoring-grid>div{border:1px solid #557789;border-radius:9px;background:#204658;min-width:0;padding:14px}
+.ref-shell .amb-private-monitoring-grid h4{margin:0 0 11px;font-size:15px;color:#f3f8f8}
+.ref-shell .amb-private-monitoring-grid>div>p{color:#ccdee5;font-size:12px}
+.ref-shell .amb-private-monitoring-grid article{padding:12px 0;border-top:1px solid #59788a;overflow-wrap:anywhere}
+.ref-shell .amb-private-monitoring-grid article strong{display:block;color:#f4f9f6;font-size:13px}
+.ref-shell .amb-private-monitoring-grid article small{display:block;color:#d6e3e8;font-size:11px;line-height:1.6}
+.ref-shell .amb-private-monitoring-grid article p{color:#e5eff1;font-size:12px;margin:9px 0;line-height:1.55}
+.ref-shell .amb-private-monitoring .amb-private-monitoring-disclaimer{background:#344753;border-left:3px solid #e4ba77;border-radius:3px;color:#edf0e8;line-height:1.65;font-size:12px;padding:10px 13px}
+@media(max-width:900px){.ref-shell .amb-private-monitoring-grid{grid-template-columns:1fr}}
