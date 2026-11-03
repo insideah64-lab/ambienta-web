@@ -72,7 +72,8 @@ export function ConesaF3CurveEditor({base,curve,blocked,onChange}:Props){
   </div>
   {curve.origin==='anejo4'&&
    <ConesaAnnex4Library indicator={base.indicator} unit={base.unit}
-    disabled={blocked} onUseReference={entry=>update({
+    disabled={blocked} hasNumericPoints={curve.points.some(p=>p.m!==null||p.ca!==null)}
+    onUseReference={entry=>update({
      source:annex4Citation(entry),bookPage:entry.printedPage
     })}/>}
   <label>Ámbito, condiciones y validez local de la función
