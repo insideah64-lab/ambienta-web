@@ -27,9 +27,9 @@ El libro está sujeto a derechos de autor. **No subir a GitHub el PDF, imágenes
 | Valoración cuantitativa y funciones de transformación | 113–120 (PDF 107–114) | Magnitudes heterogéneas → calidad ambiental comparable (CA 0–1); no confundir con suma de importancias |
 | Medidas correctoras y análisis del impacto final | 120–128 (PDF 114–122) | Comparar condiciones SIN / CON proyecto / CON medidas; eficacia documentada, no inventada |
 | Sistema de alerta, vigilancia e informe | 128–130 (PDF 121–123) | Banderas rojas, seguimiento de indicadores e impactos residuales medidos vs previstos, informe trazable |
-| Catálogos por tipo de proyecto | Anejo 2, 149–184 (PDF 143–178) | Plantillas sectoriales **optativas**, no valoraciones precargadas ni evidencia ficticia |
-| Factores e indicadores ambientales | Anejo 3, 185–252 (PDF 179–246) | Catálogo técnico de factores/indicadores, sujeto a contextualización local |
-| Funciones de transformación | Anejo 4, 253–300 (PDF 247–294) | Catálogo de modelos/curvas: habilitar solo cuando existan funciones documentadas y valores medidos |
+| Catálogos por tipo de proyecto | Anejo 2, 149–184 (PDF 142–176) | Plantillas sectoriales **optativas**, no valoraciones precargadas ni evidencia ficticia |
+| Factores e indicadores ambientales | Anejo 3, 185–252 (PDF 177–243) | Catálogo técnico de factores/indicadores, sujeto a contextualización local |
+| Funciones de transformación | Anejo 4, 253–300 (PDF 244–291) | Catálogo de modelos/curvas: habilitar solo cuando existan funciones documentadas y valores medidos |
 
 Los desplazamientos PDF/impreso son orientativos para ubicar apartados, y deben verificarse en cada tabla/figura antes de generar referencias automáticas.
 
