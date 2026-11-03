@@ -100,7 +100,7 @@ try{
   await evidence.fill('matriz metodo CONESSA.xlsx · EJEMPLO');
   assert.equal((await panel.locator('[data-conesa-absolute]').innerText()).trim(),'36');
   await panel.getByRole('combobox',{name:'Conesa EX_CR'}).selectOption('0');
-  const [dl]=await Promise.all([page.waitForEvent('download'),panel.getByRole('button',{name:'CSV',exact:true}).click()]);
+  const [dl]=await Promise.all([page.waitForEvent('download'),panel.locator('.amb-conesa-top').getByRole('button',{name:'CSV',exact:true}).click()]);
   const csv=await fs.readFile(await dl.path(),'utf8');
   assert(csv.includes('"28"')&&csv.includes('"-28"')&&csv.includes('"62"'));
   assert(csv.includes('"conesa-simplificado-tutorial-v1"'));
