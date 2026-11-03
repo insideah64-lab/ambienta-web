@@ -119,10 +119,10 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
    </div>
   </div>
   <p className="amb-conesa-disclaimer" role="note">
-   Esta ficha reproduce la escala explícita del tutorial compartido, contrastada con aplicaciones publicadas de Conesa.
+   Esta ficha utiliza una variante didáctica contrastada con el tutorial y el Excel. El ejemplar completo de Conesa Fernández-Vítora, 3.ª edición (1997, reimpresión de 2000), es ahora la referencia principal de su auditoría metodológica. La implementación completa del libro está pendiente.
    <strong> No es una homologación normativa para Salta.</strong> El caso didáctico con RV = 3 queda fuera de esta variante (RV: 1, 2, 4), y no se acepta sin revisión.
    Las categorías de severidad para impactos negativos se asignan por importancia absoluta: menos de 25 irrelevante, 25 a menos de 50 moderado, 50 a menos de 75 severo y 75 o más crítico. Los impactos positivos se identifican como beneficiosos, sin etiquetarlos como críticos.
-   <a href="https://www.dremsm.gob.pe/archivos/rdr/rdr24/rdr35.pdf" target="_blank" rel="noreferrer"> Fuente de clasificación: autoridad ambiental, 2024</a>.
+   <a href="https://www.dremsm.gob.pe/archivos/rdr/rdr24/rdr35.pdf" target="_blank" rel="noreferrer"> Fuente complementaria: aplicación ambiental, 2024</a>. La 4.ª edición de 2010 es posterior y requiere cotejo adicional antes de homologar cambios.
   </p>
   <div className="amb-conesa-kpis">
    <span><strong>{axes.actions.length} × {axes.factors.length}</strong><small>acciones × factores</small></span>
