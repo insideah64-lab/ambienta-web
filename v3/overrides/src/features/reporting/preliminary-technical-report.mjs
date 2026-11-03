@@ -160,6 +160,35 @@ export function renderPreliminaryTechnicalHtml(model){
   model.readiness.map(x=>[x.name,x.status,x.detail]));
  const issuesTable=table(['Colección','Registro','Campo','Referencia','Tipo','Aviso'],
   model.documentaryWarnings.map(x=>[x.origin,x.id,x.field,x.reference,x.code,x.message]));
+ const annex=model.conesaAnnex;
+ const hasAnnex=Boolean(annex&&(annex.rows.length||annex.issues.length));
+ const conesaTable=hasAnnex?table([
+  'Interacción','Factor / acción','Etapa','Vínculo catálogo',
+  'I inicial absoluta','I inicial con signo','Categoría inicial',
+  'Estado residual','I residual absoluta','I residual con signo','Categoría residual',
+  'Δ absoluta','Estado de revisión'
+ ],annex.rows.map(x=>[x.id,safe(x.factor)+' / '+safe(x.action),x.phase,x.catalogStatus,
+  x.initialAbsolute,x.initialSigned,x.initialCategory,
+  x.residualOutcome,x.residualAbsolute,x.residualSigned,x.residualCategory,
+  x.delta,x.reviewStatus])):'';
+ const conesaCriteriaTable=hasAnnex?table([
+  'Interacción','Criterios iniciales (incluidos recargos)','Criterios residuales',
+  'Fundamento inicial','Fuente inicial','Fundamento residual','Fuente residual'
+ ],annex.rows.map(x=>[x.id,x.initialCriteria,x.residualCriteria,x.initialReason,
+  x.initialEvidence,x.residualReason,x.residualEvidence])):'';
+ const conesaTraceTable=hasAnnex?table([
+  'Interacción','Impacto ID','Medida PGA ID','Estado de cadena','Inspecciones ID',
+  'Evidencias ID','Jerarquía','Medida y fuente','Referencia PGA',
+  'Responsable / indicador / frecuencia','Incertidumbre y evidencia',
+  'Ejecución declarada','Supuestos','Fundamento vínculo','Advertencias'
+ ],annex.rows.map(x=>[
+  x.id,x.impactId,x.measureId,x.chainStatus,join(x.inspectionIds),join(x.evidenceIds),
+  x.hierarchy,safe(x.measureDescription)+' / '+safe(x.measureReference),x.pgaReference,
+  safe(x.responsible)+' / '+safe(x.indicator)+' / '+safe(x.frequency),
+  safe(x.uncertainty)+' / '+safe(x.evidenceQuality),x.declaredExecution,
+  x.assumptions,x.impactLinkReason,join(x.warnings)
+ ])):'';
+ const conesaIssues=hasAnnex?table(['Avisos de lectura de borradores'],annex.issues.map(x=>[x])):'';
  const styles=`
   :root{color-scheme:light;font-family:Arial,Helvetica,sans-serif;color:#17252c}
   *{box-sizing:border-box} body{max-width:1120px;margin:0 auto;padding:38px 46px;background:#fff;font-size:13px;line-height:1.55}
@@ -180,7 +209,11 @@ export function renderPreliminaryTechnicalHtml(model){
  '<h1>Informe técnico de revisión del expediente</h1><p class="meta">'+
  txt(p.name)+' · '+txt(p.id)+' · '+txt(p.province)+'</p><div class="warning">'+
  txt(model.disclaimer)+'</div><p>Documento de análisis del estado de información disponible. '+
- 'No se calcularon impactos ni resultados de monitoreo; se transcriben relaciones y estados registrados.</p></header>';
+ (hasAnnex
+   ?'Las valoraciones Conesa anexas se recalcularon a partir de borradores del navegador. '+
+     'No son mediciones ambientales, revisiones profesionales ni resultados acreditados de monitoreo.'
+   :'No se calcularon impactos ni resultados de monitoreo; se transcriben relaciones y estados registrados.')
+  +'</p></header>';
  const statisticLabels={
   impacts:'Impactos',programs:'Programas',measures:'Medidas',
   inspections:'Inspecciones',evidence:'Evidencias',findings:'Hallazgos',
@@ -207,6 +240,21 @@ export function renderPreliminaryTechnicalHtml(model){
  'metodología de valoración de impactos, análisis de alternativas, planes y monitoreos respaldados '+
  'por evidencias originales, cartografía de procedencia acreditada y revisión normativa por jurisdicción. '+
  'El resultado debe ser revisado y firmado por profesionales habilitados según corresponda.</p>')+
+ (hasAnnex?section('conesa-anexo','11. Anexo Conesa simplificado: valoración inicial, residual y trazabilidad',
+  '<p><strong>Fuente:</strong> '+txt(annex.source?.initial)+'; '+
+  txt(annex.source?.residual)+'. Método inicial: '+txt(annex.methods?.initial)+
+  '; método residual: '+txt(annex.methods?.residual)+'. Fechas de actualización declaradas: '+
+  txt(annex.source?.initialUpdatedAt)+' / '+txt(annex.source?.residualUpdatedAt)+'.</p>'+
+  '<p class="warning">'+txt(annex.disclaimer)+
+  ' El estado «Completo documental» no significa una aprobación ni evidencia de eficacia. '+
+  'Los valores faltantes y los vínculos no resueltos permanecen pendientes.</p>'+
+  '<h3>11.1 Resultados de valoración</h3>'+conesaTable+
+  '<h3>11.2 Criterios, fundamentos y fuentes</h3>'+conesaCriteriaTable+
+  '<h3>11.3 Medidas, incertidumbre y monitoreo documental</h3>'+conesaTraceTable+
+  (annex.issues.length?'<h3>11.4 Incidencias en el almacenamiento local</h3>'+conesaIssues:'')+
+  '<p>Las diferencias entre puntuaciones ordinales no son porcentajes de mitigación. '+
+  'Un impacto evitado no se representa como importancia cero. '+
+  'La vinculación por ID no verifica la pertinencia ni eficacia de una medida.</p>'):'')+
  '<footer class="foot">AMBIENTA · Documento de trabajo generado desde un expediente local de demostración. '+
  'El archivo HTML puede imprimirse como PDF desde el navegador. Sin certificación ambiental, '+
  'sin validación de fuentes externas y sin contenido SIG original adjunto.</footer>';
