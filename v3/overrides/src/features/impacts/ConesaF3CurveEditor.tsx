@@ -3,6 +3,8 @@ import {
  blankF3BCurve,f3bPointProblems,f3bProblems,interpolateF3BCurve,
  type F3BCurve,type F3BCurvePoint
 } from './ConesaF3CurveModel';
+import {ConesaAnnex4Library} from './ConesaAnnex4Library';
+import {annex4Citation} from './ConesaAnnex4Catalog';
 import './ConesaF3CurveEditor.css';
 type Props={
  base:F3FactorRecord;curve:F3BCurve;
@@ -47,7 +49,7 @@ export function ConesaF3CurveEditor({base,curve,blocked,onChange}:Props){
    <label>Procedencia de la función
     <select aria-label="F3b procedencia" value={curve.origin} disabled={blocked}
      onChange={e=>update({origin:e.target.value as F3BCurve['origin']})}>
-     <option value="anejo4">Anejo 4 de Conesa · transcripción revisada</option>
+     <option value="anejo4">Anejo 4 de Conesa · referencia bibliográfica</option>
      <option value="estudio">Estudio científico o técnico externo</option>
      <option value="expertos">Panel de especialistas / Delphi</option>
     </select>
@@ -68,6 +70,11 @@ export function ConesaF3CurveEditor({base,curve,blocked,onChange}:Props){
      placeholder="Equipo técnico y persona responsable"/>
    </label>
   </div>
+  {curve.origin==='anejo4'&&
+   <ConesaAnnex4Library indicator={base.indicator} unit={base.unit}
+    disabled={blocked} onUseReference={entry=>update({
+     source:annex4Citation(entry),bookPage:entry.printedPage
+    })}/>}
   <label>Ámbito, condiciones y validez local de la función
    <textarea aria-label="F3b ámbito" rows={2} maxLength={2000}
     value={curve.scope} disabled={blocked}
