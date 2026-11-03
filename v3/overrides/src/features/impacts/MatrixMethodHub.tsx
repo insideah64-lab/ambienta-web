@@ -272,7 +272,32 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
   {active==='causa-leopold'
    ?<ImpactMatrixBuilder projectId={projectId} projectName={projectName} registeredImpacts={registeredImpacts}/>
    :active==='conesa-simplificado-tutorial-v1'
-     ?<ConesaSimplificado key={projectId+':'+active} projectId={projectId} projectName={projectName} pgaData={pgaData}/>
+     ?<>
+      <ConesaSimplificado key={projectId+':'+active} projectId={projectId} projectName={projectName} pgaData={pgaData}/>
+      {archive.present&&<section className="amb-conesa-archive" data-conesa-legacy-archive
+        aria-label="Archivo de valoraciones Conesa anteriores">
+       <div><small>ARCHIVO HISTÓRICO · NO ES OTRO MÉTODO PARA ELEGIR</small>
+        <h4>Valoraciones guardadas con la edición anterior</h4>
+        <p>{archive.valid
+         ?'Hay '+archive.count+' valoración(es) anteriores en este navegador. Se conservan sin convertir ni mezclar sus puntuaciones.'
+         :'El borrador de la edición anterior no supera la validación del formato. Se conserva intacto; descargá un respaldo para revisar su contenido.'}</p>
+       </div>
+       {archive.valid
+        ?<button type="button" aria-expanded={legacyOpen}
+          onClick={()=>setLegacyOpen(open=>!open)}>
+          {legacyOpen?'Ocultar archivo anterior':'Consultar y exportar valoraciones anteriores'}
+         </button>
+        :<button type="button" onClick={()=>{
+          try{
+           const raw=localStorage.getItem(keyFor(projectId,'conesa-1997-2ex'));
+           if(raw!==null)download('AMBIENTA-Conesa-anterior-respaldo-'+projectId+'.txt','text/plain;charset=utf-8',raw);
+          }catch{/* Keep source unchanged on storage failures. */}
+         }}>Descargar respaldo anterior sin modificar</button>}
+       {archive.valid&&legacyOpen&&
+        <ScoredMatrix key={projectId+':legacy-readonly'} projectId={projectId}
+         projectName={projectName} method="conesa-1997-2ex" readOnly/>}
+      </section>}
+     </>
      :<ScoredMatrix key={projectId+':'+active} projectId={projectId} projectName={projectName} method={active}/>}
  </div>;
 }
