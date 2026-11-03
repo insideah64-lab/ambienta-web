@@ -108,8 +108,13 @@ try{
   // Still independent of the 1997 engine and other saved methods.
   const allKeys=await page.evaluate(()=>Object.keys(localStorage));
   assert.equal(allKeys.filter(k=>k.startsWith('ambienta-conesa-simplificado-v1:')).length,1);
-  await page.locator('[data-catalog-method="conesa-1997-2ex"] button').click();
-  assert.equal(await page.locator('[data-method-assessment="conesa-1997-2ex"] [data-method-cell]').count(),28);
+  assert.equal(await page.locator('[data-catalog-method="conesa-1997-2ex"]').count(),0,
+   'Legacy Conesa must not appear as a second catalog card');
+  assert.equal(await page.locator('[data-conesa-legacy-archive]').count(),0,
+   'No archival section without an existing historical draft');
+  await page.locator('[data-catalog-method="riam-1998"] button').click();
+  await page.locator('[data-method-assessment="riam-1998"]').waitFor();
+  assert.equal(await page.locator('[data-method-assessment="riam-1998"] [data-method-cell]').count(),28);
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
   assert.equal(await panel.locator('[data-conesa-review-row]').count(),4);
   // Removing a factor or action from the shared catalog must not erase the valuation.
