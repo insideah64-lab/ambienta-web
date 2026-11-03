@@ -25,7 +25,18 @@ try{
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('curva');
   const library=editor.locator('[data-f3b-library]');
   await library.locator('summary').click();
-  assert.equal(await library.locator('[data-annex4-id]').count(),10);
+  assert.equal(await library.locator('[data-annex4-id]').count(),27);
+  assert.match(await library.locator('[data-annex4-coverage]').innerText(),/14[\s\S]*5[\s\S]*8/);
+  const sections=library.getByRole('combobox',{name:'Sección Anejo 4'});
+  await sections.selectOption('II. Suelo');
+  assert.equal(await library.locator('[data-annex4-id]').count(),5);
+  await library.locator('[data-annex4-id="soil-01-erosion-sedimentos"]').click();
+  assert.match(await library.locator('[data-f3b-library-detail]').innerText(),/m³\/ha\/año/);
+  await sections.selectOption('III. Agua');
+  assert.equal(await library.locator('[data-annex4-id]').count(),8);
+  await library.locator('[data-annex4-id="water-07-sustancias-toxicas"]').click();
+  assert.match(await library.locator('[data-annex4-nonlinear-warning]').innerText(),/interpolador F3b/);
+  await sections.selectOption('todas');
   await library.getByRole('textbox',{name:'Buscar fichas Anejo 4'}).fill('MONOXIDO');
   assert.equal(await library.locator('[data-annex4-id]').count(),2);
   await library.locator('[data-annex4-id="atm-01-co-diario"]').click();
@@ -52,6 +63,11 @@ try{
   assert(first.points.every(p=>p.m===null&&p.ca===null));
   assert.equal(first.assessor,'');
   assert.equal(first.evidence,'');
+  await library.getByRole('textbox',{name:'Buscar fichas Anejo 4'}).fill('ruido');
+  await library.locator('[data-annex4-id="atm-11-ruido-presion"]').click();
+  await editor.getByRole('spinbutton',{name:'F3b magnitud nudo 1'}).fill('5');
+  assert.equal(await library.getByRole('button',{name:'Cargar únicamente cita y página en F3b'}).isDisabled(),true,
+   'No debe atribuir nudos existentes a otra ficha sin revisión');
   const metrics=await library.evaluate(node=>({
    width:node.getBoundingClientRect().width,scrollWidth:node.scrollWidth
   }));
