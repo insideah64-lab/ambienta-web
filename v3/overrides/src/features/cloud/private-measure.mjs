@@ -47,11 +47,12 @@ export function validatePrivateMeasure(values,scope){
  };
 }
 /** No inferred links by factor/title. Invalid or cross-scope references are surfaced. */
-export function privateMeasureSummary(measures,links,impacts,programs){
+export function privateMeasureSummary(measures,links,impacts,programs,projectId){
+ if(!PRIVATE_UUID.test(projectId||''))throw new Error('Proyecto privado inválido');
  const impactNames=new Map((impacts||[]).map(i=>[i.id,i.code||i.title||i.id]));
  const programNames=new Map((programs||[]).map(p=>[p.id,p.code||p.name||p.id]));
- return (measures||[]).map(m=>{
-  const linked=(links||[]).filter(l=>l.measure_id===m.id);
+ return (measures||[]).filter(m=>!m.project_id||m.project_id===projectId).map(m=>{
+  const linked=(links||[]).filter(l=>l.project_id===projectId&&l.measure_id===m.id);
   const linkedIds=[...new Set(linked.map(l=>l.impact_id))];
   const problems=[];
   if(!programNames.has(m.program_id))problems.push('Programa PGA no resuelto');
