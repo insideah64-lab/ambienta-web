@@ -67,22 +67,39 @@ export function ConesaSimplificado({projectId,projectName}:Props){
   const action=axes.actions.find(a=>a.id===selected.slice(separator+2));
   return factor&&action?{factor,action,entry:doc.entries[selected]}:null;
  },[axes,selected,doc]);
- const reviews=useMemo(()=>axes.factors.flatMap(f=>axes.actions.flatMap(a=>{
-  const id=f.id+'::'+a.id,entry=doc.entries[id];if(!entry)return [];
-  return [{id,action:a.name,phase:a.phase,factor:f.name,entry,
-   computed:calculateConesa(entry),problems:conesaProblems(entry)}];
- })),[axes,doc]);
- const complete=reviews.filter(x=>x.computed!==null).length;
+ const reviews=useMemo(()=>{
+  const activeIds=new Set<string>();
+  const linked=axes.factors.flatMap(f=>axes.actions.flatMap(a=>{
+   const id=f.id+'::'+a.id;activeIds.add(id);
+   const entry=doc.entries[id];if(!entry)return [];
+   return [{id,action:a.name,phase:a.phase,factor:f.name,entry,
+    computed:calculateConesa(entry),problems:conesaProblems(entry),orphan:false}];
+  }));
+  // A change in the shared catalog must never silently hide saved evaluations.
+  // Preserve disconnected IDs in the audit table and CSV until reconciled.
+  const orphaned=Object.entries(doc.entries).filter(([id])=>!activeIds.has(id))
+   .map(([id,entry])=>{
+    const split=id.indexOf('::');
+    return {id,action:split>=0?id.slice(split+2):'(sin acción)',
+     phase:'Fuera del catálogo',factor:split>=0?id.slice(0,split):id,entry,
+     computed:calculateConesa(entry),
+     problems:['Acción o factor ausente del catálogo actual',...conesaProblems(entry)],orphan:true};
+   });
+  return [...linked,...orphaned];
+ },[axes,doc]);
+ const detached=reviews.filter(x=>x.orphan).length;
+ const complete=reviews.filter(x=>!x.orphan&&x.computed!==null).length;
  const incomplete=reviews.length-complete;
  const exportRows=()=>{
   const header=['Acción','Etapa','Factor','Naturaleza',...CONESA_FIELDS.map(f=>f.id),
-   'Importancia absoluta','Importancia con signo','Categoría','Observaciones de validación',
+   'Importancia absoluta','Importancia con signo','Categoría','Estado de vínculo','Observaciones de validación',
    'Fundamento','Evidencia','Método/versión'];
   const rows:(string|number|null)[][]=[header];
   for(const r of reviews)rows.push([
    r.action,r.phase,r.factor,r.entry.sign===-1?'Negativo':r.entry.sign===1?'Positivo':'Sin declarar',
    ...CONESA_FIELDS.map(f=>r.entry.criteria[f.id]??null),
    r.computed?.absolute??null,r.computed?.signed??null,r.computed?.category??'Pendiente',
+   r.orphan?'Desvinculado':'Vinculado',
    r.problems.join(' | '),r.entry.reason,r.entry.evidence,METHOD_ID
   ]);
   return '\uFEFF'+rows.map(row=>row.map(csvSafe).join(';')).join('\r\n');
@@ -109,6 +126,7 @@ export function ConesaSimplificado({projectId,projectName}:Props){
    <span><strong>{axes.actions.length} × {axes.factors.length}</strong><small>acciones × factores</small></span>
    <span><strong>{complete}</strong><small>interacciones completas</small></span>
    <span><strong>{incomplete}</strong><small>incompletas / por revisar</small></span>
+   <span><strong>{detached}</strong><small>registros desvinculados</small></span>
   </div>
   <div className="amb-conesa-toolbar">
    <p>El catálogo de factores y acciones proviene de la herramienta de identificación, no de puntuaciones de Leopold.</p>
@@ -175,19 +193,25 @@ export function ConesaSimplificado({projectId,projectName}:Props){
    </div>}
   </div>
   <div className="amb-conesa-review" data-conesa-review>
-   <div><h4>Tabla de revisión de las interacciones</h4><p>Auditoría transversal de criterios, resultados y anomalías; los impactos de ejemplo no se precargan en Diablillos.</p></div>
+   <div><h4>Tabla de revisión de las interacciones</h4><p>Auditoría transversal de criterios, resultados y anomalías; los impactos de ejemplo no se precargan en Diablillos.</p>
+    {detached>0&&<p className="amb-conesa-orphan-note" role="status">
+     {detached} valoración(es) conservada(s) cuyo factor o acción ya no figura en el catálogo.
+     Se mantienen visibles y exportables con sus ID originales; para volver a editarlas,
+     restaurá los identificadores del catálogo. No cuentan como evaluaciones completas.
+    </p>}</div>
    <div className="amb-conesa-review-scroll" role="region" tabIndex={0} aria-label="Tabla de revisión de resultados de Conesa">
     <table><thead><tr><th>Factor / acción</th><th>Nat.</th>{CONESA_FIELDS.map(f=><th key={f.id}>{f.id}</th>)}
-     <th>I abs.</th><th>I signo</th><th>Categoría</th><th>Validación</th></tr></thead>
-     <tbody>{reviews.length?reviews.map(r=><tr key={r.id} data-conesa-review-row={r.id}>
-      <th><button type="button" onClick={()=>setSelected(r.id)}>{r.factor}<small>{r.action}</small></button></th>
+     <th>I abs.</th><th>I signo</th><th>Categoría</th><th>Vínculo</th><th>Validación</th></tr></thead>
+     <tbody>{reviews.length?reviews.map(r=><tr key={r.id} data-conesa-review-row={r.id} data-conesa-orphan={r.orphan?'true':undefined}>
+      <th><button type="button" disabled={r.orphan} onClick={()=>setSelected(r.id)}>{r.factor}<small>{r.action}</small></button></th>
       <td>{r.entry.sign===-1?'−':r.entry.sign===1?'+':'?'}</td>
       {CONESA_FIELDS.map(f=><td key={f.id}>{r.entry.criteria[f.id]??'—'}</td>)}
       <td data-review-absolute>{r.computed?.absolute??'—'}</td>
       <td data-review-signed>{r.computed?.signed??'—'}</td>
       <td data-review-category>{r.computed?.category??'Pendiente'}</td>
+      <td data-review-link>{r.orphan?'Desvinculado':'Vinculado'}</td>
       <td data-review-diagnostics>{r.problems.length?r.problems.join('; '):'Cálculo completo'}</td>
-     </tr>):<tr><td colSpan={18}>Sin valoraciones todavía. Seleccioná una celda de la matriz para comenzar.</td></tr>}</tbody>
+     </tr>):<tr><td colSpan={19}>Sin valoraciones todavía. Seleccioná una celda de la matriz para comenzar.</td></tr>}</tbody>
     </table>
    </div>
   </div>
