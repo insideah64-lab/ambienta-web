@@ -6,16 +6,23 @@ import { getSupabaseClient } from '../../lib/supabase';
 // @ts-ignore: Reuse the V1 cloud repository; this legacy ESM module has no TS declarations.
 import { createEnvironmentalRepository } from '../../../../../web/cloud/repository.mjs';
 import {CloudEvidencePilot} from './CloudEvidencePilot';
+import {PrivateIntakeForm,type PrivateIntakeKind} from './PrivateIntakeForm';
+import './private-workspace.css';
 import './cloud.css';
 
 type ProjectRow = { id:string; owner_id?:string; name:string; province:string; project_phase:string; status:string; created_at:string };
 type MeasureRow = {id:string;title?:string};
+type ImpactRow = {id:string;code?:string;title?:string;factor?:string;sign?:string;project_phase?:string};
+type ProgramRow = {id:string;code?:string;name?:string;category?:string};
 type EvidenceRow = {id:string;measure_id?:string;label?:string;storage_path?:string|null;original_file_name?:string|null;file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
-type ProjectDetail = { project:ProjectRow; environmental_impacts:unknown[];
-  management_programs:unknown[]; management_measures:MeasureRow[];
+type ProjectDetail = { project:ProjectRow; environmental_impacts:ImpactRow[];
+  management_programs:ProgramRow[]; management_measures:MeasureRow[];
   monitoring_inspections:unknown[]; environmental_evidence:EvidenceRow[];
   audit_findings:unknown[]; corrective_actions:unknown[] };
 type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>Promise<ProjectDetail>;
+  createProject:(values:Record<string,string>)=>Promise<ProjectRow>;
+  createImpact:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
+  createProgram:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
   uploadEvidenceFile:(projectId:string,measureId:string,values:{label:string;file:File})=>Promise<unknown>;
   downloadEvidence:(row:EvidenceRow)=>Promise<{blob:Blob;name:string}> };
 function message(cause:unknown):string {
@@ -32,6 +39,7 @@ export function CloudWorkspace() {
   const [error,setError]=useState('');
   const [info,setInfo]=useState('');
   const [mode,setMode]=useState<'login'|'signup'>('login');
+  const [createMode,setCreateMode]=useState<PrivateIntakeKind|null>(null);
 
   useEffect(()=>{
     if(!client)return;
@@ -52,7 +60,7 @@ export function CloudWorkspace() {
     }
     const {data:subscription}=client.auth.onAuthStateChange((_event,session)=>{
       ++generation;
-      setUser(null);setProjects([]);setSelected(null);
+      setUser(null);setProjects([]);setSelected(null);setCreateMode(null);
       if(!session){setLoading(false);return;}
       setLoading(true);
       // Avoid calling other Supabase APIs synchronously inside the Auth callback.
@@ -75,7 +83,8 @@ export function CloudWorkspace() {
   async function submit(event:FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if(!client)return;
-    const values=new FormData(event.currentTarget);
+    const form=event.currentTarget;
+    const values=new FormData(form);
     const email=String(values.get('email')??'').trim();
     const password=String(values.get('password')??'');
     setBusy(true);setError('');setInfo('');
@@ -89,7 +98,7 @@ export function CloudWorkspace() {
         if(authError)throw authError;
         setInfo('Sesión iniciada. Consultando expedientes privados.');
       }
-      (event.currentTarget as HTMLFormElement).reset();
+      form.reset();
     } catch(cause){setError(message(cause));}
     finally {setBusy(false);}
   }
@@ -99,7 +108,7 @@ export function CloudWorkspace() {
     try {
       const {error:authError}=await client.auth.signOut();
       if(authError)throw authError;
-      setUser(null);setProjects([]);setSelected(null);
+      setUser(null);setProjects([]);setSelected(null);setCreateMode(null);
     } catch(cause){setError(message(cause));}
     finally{setBusy(false);}
   }
