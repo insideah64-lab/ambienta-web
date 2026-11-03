@@ -11,6 +11,10 @@ export const CONESA_REPORT_ANNEX_SCHEMA='ambienta.conesa-report-annex.v1' as con
 type InitialDocument={schema:'ambienta.conesa-simplificado.v1';projectId:string;
  projectName:string;updatedAt:string;entries:Record<string,ConesaEntry>};
 type ReadResult<T>={data:T|null;issue:string|null};
+type ChainProjection={
+ status:string;warnings:string[];
+ inspectionIds:string[];evidenceIds:string[];
+};
 function readDraft<T>(storage:Storage,key:string,isValid:(value:unknown)=>value is T,
  label:string):ReadResult<T>{
  try{
@@ -60,7 +64,7 @@ export function readConesaReportAnnex(state:DemoState,storage:Storage){
   const initial=original.data?.entries[id],record=residual.data?.entries[id];
   const initialResult=calculateConesa(initial),review=reviewResidual(initial,record);
   const chain=resolveConesaImpactChain(state,projectId,record?.impactId||'',
-    record?.measure.pgaMeasureId||'');
+    record?.measure.pgaMeasureId||'') as unknown as ChainProjection;
   const orphan=!factor||!action;
   const associationClaim=Boolean(record?.impactId||record?.measure.pgaMeasureId);
   const chainIssue=associationClaim&&chain.status!=='vinculado';
