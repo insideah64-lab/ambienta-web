@@ -15,6 +15,8 @@ try{
   const f3=page.locator('[data-conesa-f3]');await f3.waitFor();
   assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
   assert.equal(await f3.locator('[data-f3-factor]').count(),7);
+  assert.equal(await f3.locator('[data-f3-visual-empty]').count(),1,'Empty chart must not show fabricated values');
+  assert.equal(await f3.locator('[data-f3-chart-row]').count(),0);
   assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('ambienta-conesa-libro-1997-f3a:'))),[]);
   await f3.locator('[data-f3-factor]').first().click();
   const editor=f3.locator('[data-f3-editor]');
@@ -36,6 +38,19 @@ try{
   assert.match(await editor.locator('[data-f3-results]').innerText(),/0,?8|0\.8000/);
   const v=await editor.locator('[data-f3-results]').innerText();
   assert(v.includes('-0.3000')||v.includes('−0.3000'),v);
+  assert.equal(await f3.locator('[data-f3-visual-empty]').count(),0);
+  assert.equal(await f3.locator('[data-f3-chart-row]').count(),1);
+  await f3.locator('.amb-f3-quality-disclosure summary').click();
+  assert.equal(await f3.locator('.amb-f3-quality-disclosure tbody tr').count(),1);
+  const exact=await f3.locator('.amb-f3-quality-disclosure tbody').innerText();
+  assert(exact.includes('0.8000')&&exact.includes('0.5000')&&exact.includes('-0.3000'),exact);
+  const chartGeometry=await f3.locator('.amb-f3-quality').evaluate(el=>({
+   outer:el.getBoundingClientRect().width,
+   content:el.scrollWidth,
+   ticks:el.querySelectorAll('.amb-f3-quality-ticks span').length
+  }));
+  assert.equal(chartGeometry.ticks,5);
+  assert(chartGeometry.content<=chartGeometry.outer+3,'Comparison chart must not clip at desktop widths');
   await page.screenshot({path:out+'/conesa-f3a-'+width+'.png',animations:'disabled',fullPage:true});
   const key=await page.evaluate(()=>Object.keys(localStorage).find(k=>k.startsWith('ambienta-conesa-libro-1997-f3a:')));
   assert(key,'F3a independent storage expected');
@@ -51,6 +66,7 @@ try{
   await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
   await f3.locator('[data-f3-factor]').first().click();
   assert(await f3.locator('[data-f3-results]').count()===1,'F3 persists through reload');
+  assert.equal(await f3.locator('[data-f3-chart-row]').count(),1,'Chart derives from persisted F3 data');
   if(f1)assert.equal(await page.evaluate(k=>localStorage.getItem(k),f1),f1Data);
   await page.evaluate(k=>localStorage.setItem(k,'{corrupt-F3a-json'),key);
   await page.reload();
