@@ -473,9 +473,71 @@ export function CloudWorkspace() {
           La creación de archivos privados y la firma profesional permanecen bloqueadas.
          </p>
         </section>
+        <section className="amb-private-monitoring" data-private-audit>
+         <div className="amb-private-list-header">
+          <div><h3>Auditoría ambiental y acciones correctivas</h3>
+           <p>Seguimiento documental por inspección, hallazgo y acción.
+            No se certifica ejecución ni cierre profesional.</p></div>
+          <div className="amb-private-actions">
+           <button type="button" disabled={busy} onClick={()=>{
+            setCreateMode(createMode==='finding'?null:'finding');setError('');
+           }}>Nuevo hallazgo</button>
+           <button type="button" disabled={busy} onClick={()=>{
+            setCreateMode(createMode==='action'?null:'action');setError('');
+           }}>Nueva acción correctiva</button>
+          </div>
+         </div>
+         {(createMode==='finding'||createMode==='action')&&
+          <PrivateAuditForm kind={createMode}
+           projectId={selected.project.id}
+           inspections={selected.monitoring_inspections}
+           findings={selected.audit_findings}
+           busy={busy} onSave={values=>savePrivateAudit(createMode,values)}
+           onCancel={()=>setCreateMode(null)}/>}
+         <div className="amb-private-monitoring-grid">
+          <div>
+           <h4>Hallazgos abiertos · {auditing?.findings.length??0}</h4>
+           {!(auditing?.findings.length)&&<p>Aún no hay hallazgos registrados.</p>}
+           {(auditing?.findings||[]).map(f=>
+            <article key={f.id} data-private-finding={f.id}>
+             <strong>{f.title}</strong>
+             <small>Inspección: {f.inspectionId} · Fecha declarada: {f.inspectionDate}</small>
+             <small>Severidad: {f.severity==='observation'?'Observación':
+              f.severity==='minor'?'Menor':f.severity==='major'?'Mayor':'Sin clasificar'}
+              {' · '}Estado: {f.status==='open'?'Abierto':f.status==='investigating'?'En investigación':f.status}</small>
+             <p>{f.description}</p>
+             {f.warnings.length>0&&<p role="status" className="amb-private-measure-warning">
+              {f.warnings.join(' · ')}</p>}
+            </article>)}
+          </div>
+          <div>
+           <h4>Acciones correctivas · {auditing?.actions.length??0}</h4>
+           {!(auditing?.actions.length)&&<p>Aún no hay acciones correctivas registradas.</p>}
+           {(auditing?.actions||[]).map(a=>
+            <article key={a.id} data-private-corrective-action={a.id}>
+             <strong>{a.action}</strong>
+             <small>Hallazgo: {a.linkedTitle}</small>
+             <small>Responsable declarado: {a.owner}</small>
+             <small>Fecha objetivo: {a.dueDate||'No declarada'}</small>
+             <small>Estado: {a.status==='open'?'Abierta':a.status==='in_progress'?
+              'En progreso (declarado)':a.status}</small>
+             {a.warnings.length>0&&<p role="status" className="amb-private-measure-warning">
+              {a.warnings.join(' · ')}</p>}
+            </article>)}
+          </div>
+         </div>
+         <p className="amb-private-monitoring-disclaimer">Los registros son declaraciones
+          del titular del expediente. Un hallazgo o acción abierta no implica
+          incumplimiento verificado ni corrección ejecutada. La revisión
+          independiente, las aprobaciones y la firma siguen desactivadas.</p>
+        </section>
         <CloudEvidencePilot projectId={selected.project.id} measures={selected.management_measures}
           evidence={selected.environmental_evidence} reader={reader!} onUploaded={async()=>{
-           if(user&&reader){const latest=await reader.loadProject(selected.project.id);setSelected(latest);}
+           if(user&&reader){
+            const epoch=authEpoch.current,projectId=selected.project.id;
+            const latest=await reader.loadProject(projectId);
+            if(epoch===authEpoch.current)setSelected(latest);
+           }
           }}/>
         <p className="v2-cloud-readonly">Los vínculos entre impactos, medidas, monitoreo y matrices profesionales
          aún no están conectados al expediente real. El rol de revisor independiente y
