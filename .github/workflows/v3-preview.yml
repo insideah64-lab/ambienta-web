@@ -75,6 +75,7 @@ jobs:
           node apps/web-v3/scripts/icon-coverage-smoke.mjs
           node apps/web-v3/scripts/impact-matrix-builder-smoke.mjs
           node apps/web-v3/scripts/conesa-simplificado-excel-parity-smoke.mjs
+          node apps/web-v3/scripts/conesa-libro-1997-smoke.mjs
           node apps/web-v3/scripts/conesa-residual-smoke.mjs
           node apps/web-v3/scripts/matrix-method-catalog-smoke.mjs
           node apps/web-v3/scripts/document-identity-negative-smoke.mjs
@@ -252,6 +253,14 @@ jobs:
         with:
           name: ambienta-conesa-simplificado-parity
           path: qa/ambienta-conesa-simplificado/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Capturas del motor Conesa 1997 libro F1
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-conesa-libro-f1
+          path: qa/ambienta-conesa-libro-f1/
           if-no-files-found: warn
           retention-days: 30
       - name: Capturas del escenario residual y seguimiento de incertidumbre

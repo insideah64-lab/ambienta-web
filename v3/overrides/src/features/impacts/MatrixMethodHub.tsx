@@ -3,6 +3,7 @@ import {ArrowDownToLine,X,Grid3X3,Target,Scale,Activity,ArrowUpRight,Check} from
 import {ImpactMatrixBuilder,readMatrixAxes} from './ImpactMatrixBuilder';
 import type {DemoState} from '../../lib/demo';
 import {ConesaSimplificado} from './ConesaSimplificado';
+import {ConesaLibroPanel} from './ConesaLibroPanel';
 import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type ScoredMethodId} from './MatrixMethodData';
 import './MatrixMethodHub.css';
 
@@ -239,6 +240,7 @@ function oldConesaArchive(projectId:string):ArchiveStatus{
 export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData}:Props){
  const [active,setActive]=useState<ActiveMethod>('causa-leopold');
  const [legacyOpen,setLegacyOpen]=useState(false);
+ const [conesaVariant,setConesaVariant]=useState<'excel'|'book'>('excel');
  const archive=useMemo(()=>active==='conesa-simplificado-tutorial-v1'
   ?oldConesaArchive(projectId):{present:false,valid:false,count:0},[projectId,active]);
  return <div className="amb-method-hub" data-matrix-method-catalog="v1">
@@ -305,7 +307,17 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
    ?<ImpactMatrixBuilder projectId={projectId} projectName={projectName} registeredImpacts={registeredImpacts}/>
    :active==='conesa-simplificado-tutorial-v1'
      ?<>
-      <ConesaSimplificado key={projectId+':'+active} projectId={projectId} projectName={projectName} pgaData={pgaData}/>
+      <nav className="amb-conesa-variant-switch" aria-label="Variantes de evaluación Conesa" data-conesa-variant-switch>
+       <span>Versión de trabajo</span>
+       <button type="button" aria-pressed={conesaVariant==='book'}
+        onClick={()=>setConesaVariant('book')}>Según libro · Conesa 1997 (experimental)</button>
+       <button type="button" aria-pressed={conesaVariant==='excel'}
+        onClick={()=>setConesaVariant('excel')}>Simplificado · Excel anterior</button>
+       <small>No se convierten ni trasladan resultados entre ediciones; cada versión guarda sus propios datos.</small>
+      </nav>
+      {conesaVariant==='book'
+       ?<ConesaLibroPanel key={projectId+':book'} projectId={projectId} projectName={projectName}/>
+       :<ConesaSimplificado key={projectId+':'+active} projectId={projectId} projectName={projectName} pgaData={pgaData}/>}
       {archive.present&&<section className="amb-conesa-archive" data-conesa-legacy-archive
         aria-label="Archivo de valoraciones Conesa anteriores">
        <div><small>ARCHIVO HISTÓRICO · NO ES OTRO MÉTODO PARA ELEGIR</small>
