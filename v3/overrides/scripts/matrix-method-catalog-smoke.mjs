@@ -21,6 +21,30 @@ try{
    'Legacy Conesa is archival, not an active peer method');
   assert.equal(await page.locator('[data-catalog-method="battelle"] button').count(),0,
    'Battelle requires real environmental indicators');
+  const methodIds=['causa-leopold','conesa-simplificado-tutorial-v1','riam-1998','battelle'];
+  const methodAccents=[];
+  for(const id of methodIds){
+   const card=page.locator('[data-catalog-method="'+id+'"]');
+   assert.equal(await card.locator('.amb-method-cardvisual svg').count(),1,
+    'Each method must have its own vector icon: '+id);
+   assert.equal(await card.locator('.amb-method-cardcopy strong').count(),1);
+   const accent=await card.evaluate(node=>getComputedStyle(node).getPropertyValue('--method-accent').trim());
+   assert(accent,'Method accent must be defined: '+id);
+   methodAccents.push(accent);
+  }
+  assert.equal(new Set(methodAccents).size,4,
+   'Leopold, Conesa, RIAM and Battelle must have visually distinct color identities');
+  assert.equal(await page.locator('.amb-method-matrix-art i').count(),16,
+   'Leopold illustration must show actual matrix cells');
+  assert.equal(await page.locator('.amb-method-conesa-art').count(),1,
+   'Conesa illustration must show its own severity rings');
+  assert.equal(await page.locator('.amb-method-riam-art i').count(),5,
+   'RIAM illustration must show comparative bars');
+  assert.equal(await page.locator('.amb-method-battelle-art').count(),1,
+   'Battelle illustration must show a chart, not a fake active method');
+  assert.equal(await page.locator('.amb-method-card.is-planned button').count(),0,
+   'A nonimplemented method must not become clickable due to visual redesign');
+
   assert.equal(await page.locator('[data-impact-matrix="v1"]').count(),1,
    'Leopold workbench is unchanged');
   assert.equal(await page.locator('[data-matrix-method-catalog] .amb-method-cardbottom button[aria-pressed="true"]').count(),1);
