@@ -73,6 +73,7 @@ jobs:
           node apps/web-v3/scripts/icon-coverage-smoke.mjs
           node apps/web-v3/scripts/impact-matrix-builder-smoke.mjs
           node apps/web-v3/scripts/conesa-simplificado-excel-parity-smoke.mjs
+          node apps/web-v3/scripts/conesa-residual-smoke.mjs
           node apps/web-v3/scripts/matrix-method-catalog-smoke.mjs
           node apps/web-v3/scripts/document-identity-negative-smoke.mjs
           node apps/web-v3/scripts/release-spatial-layout-smoke.mjs
@@ -233,6 +234,14 @@ jobs:
         with:
           name: ambienta-conesa-simplificado-parity
           path: qa/ambienta-conesa-simplificado/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Capturas del escenario residual y seguimiento de incertidumbre
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-conesa-residual-review
+          path: qa/ambienta-conesa-residual/
           if-no-files-found: warn
           retention-days: 30
       - name: Capturas catálogo de metodologías Conesa / RIAM
