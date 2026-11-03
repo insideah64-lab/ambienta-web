@@ -98,7 +98,8 @@ export function reviewResidual(initialEntry:ConesaEntry|undefined,
  if(residual&&!rec.residual.evidence.trim())problems.push('Falta evidencia de la valoración residual');
  if(initial&&residual&&initialEntry?.sign!==rec.residual.sign)
   problems.push('Cambió la naturaleza: requiere análisis distinto, no resta de importancias');
- const comparable=initial&&residual&&initialEntry?.sign===rec.residual.sign;
+ const comparable=initial&&residual&&initialEntry?.sign===rec.residual.sign&&
+  rec.initialFingerprint===fingerprint(initialEntry);
  return {initial,residual,avoided:false,
   delta:comparable?residual.absolute-initial.absolute:null,problems,
   status:problems.length?'revisar':'completo'};
