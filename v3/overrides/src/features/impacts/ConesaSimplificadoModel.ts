@@ -1,7 +1,13 @@
 /**
  * AMBIENTA review variant — "Conesa simplificado", explicit critical modifiers.
- * Source material: user-provided CONESSA Excel (CRITERIOS-ALGORITMO and EJEMPLO),
- * checked against an official regional EIA (DREM San Martin 2024).
+ * Compatibility provenance: user-provided CONESSA Excel (CRITERIOS-ALGORITMO
+ * and EJEMPLO), checked against a regional EIA (DREM San Martin 2024).
+ * PRIMARY METHODOLOGICAL AUDIT SOURCE (not yet implemented in full):
+ * V. Conesa Fernandez-Vitora, Guia metodologica para la evaluacion del impacto
+ * ambiental, 3rd ed. (1997), 2000 reprint, printed pp. 88-129, annexes.
+ * This v1 remains a SIMPLIFIED DRAFT and MUST NOT be claimed as the full book.
+ * Full-book gaps include MO critical +1 in prose, sign x, exceptional MC 4,
+ * threshold conventions, UIP, depuration, red flags, quantified CA=f(M).
  * A workbook row with RV=3 is OUT OF SCALE for this precise variant.
  *
  * Never apply categories as Salta licensing decisions or mix with legacy
