@@ -25,7 +25,7 @@ type MeasureSummary={id:string;title:string;status:string;programLabel:string;
  impactLabels:string[];problems:string[]};
 type ImpactRow = {id:string;code?:string;title?:string;factor?:string;sign?:string;project_phase?:string};
 type ProgramRow = {id:string;code?:string;name?:string;category?:string};
-type EvidenceRow = {id:string;project_id:string;measure_id:string;inspection_id?:string|null;
+type EvidenceRow = {id:string;project_id?:string;measure_id?:string;inspection_id?:string|null;
  label?:string;reference_label?:string;storage_path?:string|null;original_file_name?:string|null;
  file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
 type ProjectDetail = { project:ProjectRow; environmental_impacts:ImpactRow[];
