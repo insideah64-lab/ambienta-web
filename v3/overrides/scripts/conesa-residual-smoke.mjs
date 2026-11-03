@@ -88,6 +88,8 @@ try{
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
   const changed=panel.locator('[data-residual-row="demo-f4::demo-a1"]');
   assert.equal((await changed.locator('[data-residual-state]').innerText()).trim(),'Revisar');
+  assert.equal((await changed.locator('[data-residual-delta]').innerText()).trim(),'No comparable',
+   'A stale original assessment cannot generate a valid comparison');
   await changed.getByRole('button',{name:'Revisar'}).click();
   assert((await panel.locator('.amb-residual-errors').innerText())
    .includes('Cambió la valoración inicial'));
