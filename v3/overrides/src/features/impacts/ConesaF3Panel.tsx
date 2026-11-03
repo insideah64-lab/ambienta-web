@@ -136,10 +136,10 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
  return <section className="amb-f3" data-conesa-f3={F3_METHOD}>
   <header className="amb-f3-head">
    <div>
-    <p className="amb-matrix-overline"><BookOpen size={15}/> FASE F3a · VALORACIÓN CUANTITATIVA EXPERIMENTAL</p>
+    <p className="amb-matrix-overline"><BookOpen size={15}/> FASES F3a / F3b · VALORACIÓN CUANTITATIVA EXPERIMENTAL</p>
     <h3>Indicadores, escenarios y calidad ambiental</h3>
-    <p>Conesa 1997, pp. 107–116. Se comparan magnitudes y calidades por factor, SIN/CON proyecto.
-     No se infieren mediciones, funciones ni eficacia de medidas. F3a no calcula todavía Vj, IA total
+    <p>Conesa 1997, pp. 107–117 y Anejo 4. Se comparan magnitudes y calidades por factor, SIN/CON proyecto.
+     No se infieren mediciones, funciones ni eficacia de medidas. F3 no calcula todavía Vj, IA total
      ni demuestra equivalencia entre la importancia cualitativa y la calidad ambiental.</p>
    </div>
    <div className="amb-f3-actions">
@@ -157,7 +157,7 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
    </div>
   </header>
   <p className="amb-f3-notice" role="note">
-   F3a comienza con funciones <strong>lineales explícitas</strong>, definidas por límites y orientación
+   F3a trabaja con rectas explícitas; F3b admite curvas por nudos documentados, sin extrapolación. Las rectas se definen por límites y orientación
    aportados por el evaluador. Una recta no es una función atribuida automáticamente al libro.
    No extrapolamos, no sumamos unidades físicas distintas y no suponemos sinergia aditiva.
   </p>
