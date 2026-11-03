@@ -56,6 +56,7 @@ export function ConesaF3Comparison({rows}:Props){
        <div className="amb-f3-quality-name">
         <strong>{factor.name}</strong>
         <small>{record.indicator}</small>
+        <small className="amb-f3-quality-kind">SIN {record.without.kind==='medido'?'medido':'estimado'} · CON {record.withProject.kind==='medido'?'medido':'estimado'}</small>
        </div>
        <div className="amb-f3-quality-track" style={style}>
         <span className="amb-f3-quality-connector"/>
