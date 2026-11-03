@@ -113,7 +113,7 @@ export function ConesaF2Panel({projectId,projectName,factors,actions,entries}:Pr
   }
   return '\uFEFF'+rows.map(r=>r.map(csvValue).join(';')).join('\r\n');
  };
- return <section className="amb-f2" data-conesa-f2="conesa-libro-1997-f2">
+ return <section className="amb-f2" data-conesa-f2={F2_METHOD}>
   <div className="amb-f2-head">
    <div>
     <p className="amb-matrix-overline"><BookOpen size={14} aria-hidden="true"/>  FASE F2 · CRIBA Y FACTORES</p>
