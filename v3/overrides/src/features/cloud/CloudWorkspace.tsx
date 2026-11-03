@@ -7,22 +7,28 @@ import { getSupabaseClient } from '../../lib/supabase';
 import { createEnvironmentalRepository } from '../../../../../web/cloud/repository.mjs';
 import {CloudEvidencePilot} from './CloudEvidencePilot';
 import {PrivateIntakeForm,type PrivateIntakeKind} from './PrivateIntakeForm';
+import {PrivateMeasureForm,type PrivateMeasureValues} from './PrivateMeasureForm';
+// @ts-ignore: pure documentary projection, tested natively
+import {privateMeasureSummary} from './private-measure.mjs';
 import './private-workspace.css';
 import './cloud.css';
 
 type ProjectRow = { id:string; owner_id?:string; name:string; province:string; project_phase:string; status:string; created_at:string };
-type MeasureRow = {id:string;title?:string};
+type MeasureRow = {id:string;title?:string;program_id?:string;status?:string};
+type MeasureImpactLinkRow={measure_id:string;impact_id:string;project_id:string};
 type ImpactRow = {id:string;code?:string;title?:string;factor?:string;sign?:string;project_phase?:string};
 type ProgramRow = {id:string;code?:string;name?:string;category?:string};
 type EvidenceRow = {id:string;measure_id?:string;label?:string;storage_path?:string|null;original_file_name?:string|null;file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
 type ProjectDetail = { project:ProjectRow; environmental_impacts:ImpactRow[];
   management_programs:ProgramRow[]; management_measures:MeasureRow[];
+  measure_impact_links:MeasureImpactLinkRow[];
   monitoring_inspections:unknown[]; environmental_evidence:EvidenceRow[];
   audit_findings:unknown[]; corrective_actions:unknown[] };
 type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>Promise<ProjectDetail>;
   createProject:(values:Record<string,string>)=>Promise<ProjectRow>;
   createImpact:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
   createProgram:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
+  createMeasure:(projectId:string,values:PrivateMeasureValues)=>Promise<string>;
   uploadEvidenceFile:(projectId:string,measureId:string,values:{label:string;file:File})=>Promise<unknown>;
   downloadEvidence:(row:EvidenceRow)=>Promise<{blob:Blob;name:string}> };
 function message(cause:unknown):string {
@@ -39,7 +45,7 @@ export function CloudWorkspace() {
   const [error,setError]=useState('');
   const [info,setInfo]=useState('');
   const [mode,setMode]=useState<'login'|'signup'>('login');
-  const [createMode,setCreateMode]=useState<PrivateIntakeKind|null>(null);
+  const [createMode,setCreateMode]=useState<PrivateIntakeKind|'measure'|null>(null);
 
   useEffect(()=>{
     if(!client)return;
@@ -142,6 +148,26 @@ export function CloudWorkspace() {
      try{setSelected(await reader.loadProject(currentProject));}
      catch(cause){setError('Registro creado; no se pudo actualizar la ficha: '+message(cause));}
     }
+   }catch(cause){setError(message(cause));}
+   finally{setBusy(false);}
+  }
+  async function savePrivateMeasure(values:PrivateMeasureValues){
+   if(!reader||!user||!selected||busy)return;
+   const projectId=selected.project.id;
+   // The form restricts both IDs to this project's loaded catalogs.
+   if(!selected.management_programs.some(p=>p.id===values.programId)||
+      !selected.environmental_impacts.some(i=>i.id===values.impactId)){
+    setError('Programa o impacto fuera del expediente activo; actualizá los registros.');
+    return;
+   }
+   setBusy(true);setError('');setInfo('');
+   try{
+    const newId=await reader.createMeasure(projectId,values);
+    setCreateMode(null);
+    setInfo('Medida '+newId+' creada en borrador y vinculada al impacto declarado. No fue aprobada.');
+    // The insert already happened; a subsequent read failure is NOT a failed creation.
+    try{setSelected(await reader.loadProject(projectId));}
+    catch(cause){setError('Medida ya creada; no se pudo actualizar el expediente: '+message(cause));}
    }catch(cause){setError(message(cause));}
    finally{setBusy(false);}
   }
