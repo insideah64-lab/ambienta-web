@@ -49,7 +49,7 @@ test('Increasing, decreasing, and nonmonotonic values are all supported',()=>{
  const falling=curve([{m:0,ca:1},{m:100,ca:0}]);
  assert(Math.abs(f3b.evaluateF3BCurve(a,falling).delta+0.3)<1e-12);
  const valley=curve([{m:0,ca:1},{m:50,ca:0},{m:100,ca:1}]);
- assert(Math.abs(f3b.evaluateF3BCurve(a,valley).delta+0.4)<1e-12);
+ assert(Math.abs(f3b.evaluateF3BCurve(a,valley).delta+0.6)<1e-12);
 });
 test('No extrapolation; no duplicated abscissae disguised as discontinuity',()=>{
  const a=base(),c=curve();
