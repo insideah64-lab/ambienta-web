@@ -17,7 +17,7 @@ export type Measure={
  uncertainty:Uncertainty;quality:Quality;assumptions:string;execution:Execution;
 };
 export type ResidualRecord={
- initialFingerprint:string;outcome:'persiste'|'evitado';
+ initialFingerprint:string;outcome:'persiste'|'evitado';impactId?:string;impactLinkReason?:string;
  residual:ConesaEntry;measure:Measure;
 };
 export type ResidualDocument={
@@ -30,7 +30,7 @@ export const blankMeasure=():Measure=>({
 });
 export const blankResidual=():ConesaEntry=>({sign:null,criteria:{},reason:'',evidence:''});
 export const blankRecord=(source:ConesaEntry|undefined):ResidualRecord=>({
- initialFingerprint:fingerprint(source),outcome:'persiste',residual:blankResidual(),
+ initialFingerprint:fingerprint(source),outcome:'persiste',impactId:'',impactLinkReason:'',residual:blankResidual(),
  measure:blankMeasure()
 });
 export const fingerprint=(source:ConesaEntry|undefined):string=>{
@@ -45,6 +45,8 @@ const executions=['prevista','implementada','verificada'];
 export function isResidualRecord(value:unknown):value is ResidualRecord{
  if(!value||typeof value!=='object'||Array.isArray(value))return false;
  const r=value as Partial<ResidualRecord>,m=r.measure as Partial<Measure>|undefined;
+ if(r.impactId!==undefined&&(typeof r.impactId!=='string'||r.impactId.length>220))return false;
+ if(r.impactLinkReason!==undefined&&(typeof r.impactLinkReason!=='string'||r.impactLinkReason.length>3000))return false;
  if(typeof r.initialFingerprint!=='string'||r.initialFingerprint.length>300||
    !['persiste','evitado'].includes(r.outcome||'')||!validatedConesaEntry(r.residual)||!m)return false;
  if(!hierarchies.includes(m.hierarchy||'')||!uncertainties.includes(m.uncertainty||'')||
