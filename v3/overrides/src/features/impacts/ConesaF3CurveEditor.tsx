@@ -1,6 +1,6 @@
 import type {F3FactorRecord} from './ConesaF3Model';
 import {
- f3bPointProblems,f3bProblems,interpolateF3BCurve,
+ blankF3BCurve,f3bPointProblems,f3bProblems,interpolateF3BCurve,
  type F3BCurve,type F3BCurvePoint
 } from './ConesaF3CurveModel';
 import './ConesaF3CurveEditor.css';
@@ -33,6 +33,16 @@ export function ConesaF3CurveEditor({base,curve,blocked,onChange}:Props){
    automáticamente las curvas impresas de Conesa y no supone que los trazos originales
    sean lineales entre puntos. No admite discontinuidades, abscisas duplicadas ni extrapolación.
   </p>
+  {(curve.indicator!==base.indicator||curve.unit!==base.unit)&&
+   <div role="alert" className="amb-f3b-issues">
+    <strong>Cambió el indicador o su unidad en F3a.</strong>
+    <p>Esta curva no se reutiliza con otra magnitud. Antes de reiniciarla,
+     exportá el JSON F3b si necesitás conservar sus puntos anteriores.</p>
+    <button type="button" disabled={blocked}
+     onClick={()=>onChange(blankF3BCurve(base))}>
+     Reiniciar curva F3b para este indicador y unidad
+    </button>
+   </div>}
   <div className="amb-f3-grid">
    <label>Procedencia de la función
     <select aria-label="F3b procedencia" value={curve.origin} disabled={blocked}
