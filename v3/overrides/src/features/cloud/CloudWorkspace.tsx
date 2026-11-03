@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import {LogIn, LogOut, RefreshCw} from 'lucide-react';
 import {ArtworkIcon} from '../iconography/ArtworkIcon';
 import type { User } from '@supabase/supabase-js';
@@ -39,6 +39,7 @@ function message(cause:unknown):string {
 export function CloudWorkspace() {
   const client=useMemo(()=>getSupabaseClient(),[]);
   const reader=useMemo<Reader|null>(()=>client?createEnvironmentalRepository(client) as unknown as Reader:null,[client]);
+  const authEpoch=useRef(0);
   const [user,setUser]=useState<User|null>(null);
   const [loading,setLoading]=useState(Boolean(client));
   const [busy,setBusy]=useState(false);
@@ -68,7 +69,9 @@ export function CloudWorkspace() {
     }
     const {data:subscription}=client.auth.onAuthStateChange((_event,session)=>{
       ++generation;
+      ++authEpoch.current;
       setUser(null);setProjects([]);setSelected(null);setCreateMode(null);
+      setBusy(false);
       if(!session){setLoading(false);return;}
       setLoading(true);
       // Avoid calling other Supabase APIs synchronously inside the Auth callback.
@@ -81,10 +84,11 @@ export function CloudWorkspace() {
   useEffect(()=>{
     if(!user||!reader){setProjects([]);setSelected(null);return;}
     let active=true;
+    const epoch=authEpoch.current;
     setBusy(true);setProjects([]);setSelected(null);
-    reader.listProjects().then(rows=>{if(active)setProjects(rows);})
-      .catch(cause=>{if(active)setError(message(cause));})
-      .finally(()=>{if(active)setBusy(false);});
+    reader.listProjects().then(rows=>{if(active&&epoch===authEpoch.current)setProjects(rows);})
+      .catch(cause=>{if(active&&epoch===authEpoch.current)setError(message(cause));})
+      .finally(()=>{if(active&&epoch===authEpoch.current)setBusy(false);});
     return ()=>{active=false;};
   },[user?.id,reader]);
 
@@ -122,39 +126,54 @@ export function CloudWorkspace() {
   }
   async function openProject(projectId:string) {
     if(!reader||!user)return;
+    const epoch=authEpoch.current;
     setBusy(true);setError('');setSelected(null);setCreateMode(null);
-    try{setSelected(await reader.loadProject(projectId));}
-    catch(cause){setError(message(cause));}
-    finally{setBusy(false);}
+    try{
+      const result=await reader.loadProject(projectId);
+      if(epoch===authEpoch.current)setSelected(result);
+    }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
+    finally{if(epoch===authEpoch.current)setBusy(false);}
   }
   async function savePrivateRecord(kind:PrivateIntakeKind,values:Record<string,string>){
    if(!reader||!user||busy)return;
+   const epoch=authEpoch.current;
    const currentProject=selected?.project.id;
    setBusy(true);setError('');setInfo('');
    try{
     if(kind==='project'){
      const created=await reader.createProject(values);
+     if(epoch!==authEpoch.current)return;
      setProjects(rows=>[created,...rows.filter(r=>r.id!==created.id)]);
      setCreateMode(null);
      setInfo('Expediente privado registrado como borrador. Los datos no están certificados.');
-     // A failed read after a successful insert must not trigger a duplicate creation.
-     try{setSelected(await reader.loadProject(created.id));}
-     catch(cause){setError('Expediente creado; no se pudo abrir la ficha: '+message(cause));}
+     // Creation already succeeded: do not retry on a failed follow-up SELECT.
+     try{
+      const fresh=await reader.loadProject(created.id);
+      if(epoch===authEpoch.current)setSelected(fresh);
+     }catch(cause){
+      if(epoch===authEpoch.current)setError('Expediente creado; no se pudo abrir la ficha: '+message(cause));
+     }
     }else{
      if(!currentProject)throw Error('Seleccioná un expediente privado.');
      if(kind==='impact')await reader.createImpact(currentProject,values);
      else await reader.createProgram(currentProject,values);
+     if(epoch!==authEpoch.current)return;
      setCreateMode(null);
      setInfo(kind==='impact'?'Impacto registrado, sin valoración ambiental.':
        'Programa PGA registrado, sin medidas ni aprobación.');
-     try{setSelected(await reader.loadProject(currentProject));}
-     catch(cause){setError('Registro creado; no se pudo actualizar la ficha: '+message(cause));}
+     try{
+      const fresh=await reader.loadProject(currentProject);
+      if(epoch===authEpoch.current)setSelected(fresh);
+     }catch(cause){
+      if(epoch===authEpoch.current)setError('Registro creado; no se pudo actualizar la ficha: '+message(cause));
+     }
     }
-   }catch(cause){setError(message(cause));}
-   finally{setBusy(false);}
+   }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
+   finally{if(epoch===authEpoch.current)setBusy(false);}
   }
   async function savePrivateMeasure(values:PrivateMeasureValues){
    if(!reader||!user||!selected||busy)return;
+   const epoch=authEpoch.current;
    const projectId=selected.project.id;
    // The form restricts both IDs to this project's loaded catalogs.
    if(!selected.management_programs.some(p=>p.id===values.programId)||
@@ -165,13 +184,18 @@ export function CloudWorkspace() {
    setBusy(true);setError('');setInfo('');
    try{
     const newId=await reader.createMeasure(projectId,values);
+    if(epoch!==authEpoch.current)return;
     setCreateMode(null);
     setInfo('Medida '+newId+' creada en borrador y vinculada al impacto declarado. No fue aprobada.');
     // The insert already happened; a subsequent read failure is NOT a failed creation.
-    try{setSelected(await reader.loadProject(projectId));}
-    catch(cause){setError('Medida ya creada; no se pudo actualizar el expediente: '+message(cause));}
-   }catch(cause){setError(message(cause));}
-   finally{setBusy(false);}
+    try{
+     const fresh=await reader.loadProject(projectId);
+     if(epoch===authEpoch.current)setSelected(fresh);
+    }catch(cause){
+     if(epoch===authEpoch.current)setError('Medida ya creada; no se pudo actualizar el expediente: '+message(cause));
+    }
+   }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
+   finally{if(epoch===authEpoch.current)setBusy(false);}
   }
   return <div className="v2-cloud-workspace">
     <div className="v2-cloud-heading"><span className="v2-cloud-mark"><ArtworkIcon kind="cloud" size={29}/></span>
