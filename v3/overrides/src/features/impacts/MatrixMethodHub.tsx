@@ -3,7 +3,7 @@ import {ArrowDownToLine,X} from 'lucide-react';
 import {ImpactMatrixBuilder,readMatrixAxes} from './ImpactMatrixBuilder';
 import type {DemoState} from '../../lib/demo';
 import {ConesaSimplificado} from './ConesaSimplificado';
-import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type MethodId,type ScoredMethodId} from './MatrixMethodData';
+import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type ScoredMethodId} from './MatrixMethodData';
 import './MatrixMethodHub.css';
 
 type ExistingImpact={id:string;factor:string;name:string};
