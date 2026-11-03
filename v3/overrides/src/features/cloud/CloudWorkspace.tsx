@@ -8,29 +8,38 @@ import { createEnvironmentalRepository } from '../../../../../web/cloud/reposito
 import {CloudEvidencePilot} from './CloudEvidencePilot';
 import {PrivateIntakeForm,type PrivateIntakeKind} from './PrivateIntakeForm';
 import {PrivateMeasureForm,type PrivateMeasureValues} from './PrivateMeasureForm';
+import {PrivateMonitoringForm,type PrivateInspectionValues,type PrivateEvidenceReferenceValues} from './PrivateMonitoringForm';
+// @ts-ignore: pure documentary projection, tested by Node
+import {privateMonitoringSummary,validatePrivateInspection,validatePrivateEvidenceReference} from './private-monitoring.mjs';
 // @ts-ignore: pure documentary projection, tested natively
 import {privateMeasureSummary} from './private-measure.mjs';
 import './private-workspace.css';
 import './cloud.css';
 
 type ProjectRow = { id:string; owner_id?:string; name:string; province:string; project_phase:string; status:string; created_at:string };
-type MeasureRow = {id:string;title?:string;program_id?:string;status?:string};
+type MeasureRow = {id:string;title?:string;project_id:string;program_id?:string;status?:string};
+type InspectionRow={id:string;project_id:string;measure_id:string;recorded_by?:string;
+ scheduled_for:string;result:string;note:string};
 type MeasureImpactLinkRow={measure_id:string;impact_id:string;project_id:string};
 type MeasureSummary={id:string;title:string;status:string;programLabel:string;
  impactLabels:string[];problems:string[]};
 type ImpactRow = {id:string;code?:string;title?:string;factor?:string;sign?:string;project_phase?:string};
 type ProgramRow = {id:string;code?:string;name?:string;category?:string};
-type EvidenceRow = {id:string;measure_id?:string;label?:string;storage_path?:string|null;original_file_name?:string|null;file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
+type EvidenceRow = {id:string;project_id:string;measure_id:string;inspection_id?:string|null;
+ label?:string;reference_label?:string;storage_path?:string|null;original_file_name?:string|null;
+ file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
 type ProjectDetail = { project:ProjectRow; environmental_impacts:ImpactRow[];
   management_programs:ProgramRow[]; management_measures:MeasureRow[];
   measure_impact_links:MeasureImpactLinkRow[];
-  monitoring_inspections:unknown[]; environmental_evidence:EvidenceRow[];
+  monitoring_inspections:InspectionRow[]; environmental_evidence:EvidenceRow[];
   audit_findings:unknown[]; corrective_actions:unknown[] };
 type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>Promise<ProjectDetail>;
   createProject:(values:Record<string,string>)=>Promise<ProjectRow>;
   createImpact:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
   createProgram:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
   createMeasure:(projectId:string,values:PrivateMeasureValues)=>Promise<string>;
+  createInspection:(projectId:string,measureId:string,values:Omit<PrivateInspectionValues,'measureId'>)=>Promise<InspectionRow>;
+  registerEvidence:(projectId:string,measureId:string,values:Omit<PrivateEvidenceReferenceValues,'measureId'>)=>Promise<EvidenceRow>;
   uploadEvidenceFile:(projectId:string,measureId:string,values:{label:string;file:File})=>Promise<unknown>;
   downloadEvidence:(row:EvidenceRow)=>Promise<{blob:Blob;name:string}> };
 function message(cause:unknown):string {
@@ -48,7 +57,7 @@ export function CloudWorkspace() {
   const [error,setError]=useState('');
   const [info,setInfo]=useState('');
   const [mode,setMode]=useState<'login'|'signup'>('login');
-  const [createMode,setCreateMode]=useState<PrivateIntakeKind|'measure'|null>(null);
+  const [createMode,setCreateMode]=useState<PrivateIntakeKind|'measure'|'inspection'|'reference'|null>(null);
 
   useEffect(()=>{
     if(!client)return;
@@ -197,6 +206,49 @@ export function CloudWorkspace() {
    }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
    finally{if(epoch===authEpoch.current)setBusy(false);}
   }
+  async function savePrivateMonitoring(
+   kind:'inspection'|'reference',
+   values:PrivateInspectionValues|PrivateEvidenceReferenceValues
+  ){
+   if(!reader||!user||!selected||busy)return;
+   const epoch=authEpoch.current,projectId=selected.project.id;
+   // Recheck currently selected project: form options are not an auth boundary.
+   const scope={projectId,measures:selected.management_measures,
+    inspections:selected.monitoring_inspections};
+   let inspection:PrivateInspectionValues|undefined;
+   let reference:PrivateEvidenceReferenceValues|undefined;
+   try{
+    if(kind==='inspection')inspection=validatePrivateInspection(values,scope) as PrivateInspectionValues;
+    else reference=validatePrivateEvidenceReference(values,scope) as PrivateEvidenceReferenceValues;
+   }catch(cause){setError(message(cause));return;}
+   setBusy(true);setError('');setInfo('');
+   try{
+    if(inspection){
+     const {measureId,...entry}=inspection;
+     await reader.createInspection(projectId,measureId,entry);
+    }else if(reference){
+     const {measureId,...entry}=reference;
+     await reader.registerEvidence(projectId,measureId,entry);
+    }
+    if(epoch!==authEpoch.current)return;
+    setCreateMode(null);
+    setInfo(kind==='inspection'
+     ?'Inspección registrada como declaración del usuario; no acredita cumplimiento.'
+     :'Referencia documental creada en estado pendiente; no se adjuntó ningún archivo.');
+    try{
+     const fresh=await reader.loadProject(projectId);
+     if(epoch===authEpoch.current)setSelected(fresh);
+    }catch(cause){
+     if(epoch===authEpoch.current)setError('Registro guardado; la ficha no pudo actualizarse: '+message(cause));
+    }
+   }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
+   finally{if(epoch===authEpoch.current)setBusy(false);}
+  }
+  const monitoring=selected?privateMonitoringSummary(selected) as {
+   inspections:Array<{id:string;measureName:string;date:string;result:string;note:string;warnings:string[]}>;
+   references:Array<{id:string;measureName:string;inspectionId:string;label:string;
+    reference:string;status:string;warnings:string[]}>
+  }:null;
   return <div className="v2-cloud-workspace">
     <div className="v2-cloud-heading"><span className="v2-cloud-mark"><ArtworkIcon kind="cloud" size={29}/></span>
       <div><strong>Expedientes privados</strong><p>Conexión separada de los datos ficticios de la demostración.</p></div>
