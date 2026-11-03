@@ -217,7 +217,7 @@ const CARDS:Card[]=[
   status:'Disponible',source:'Leopold et al. · USGS (1971)',available:true},
  {id:'conesa-simplificado-tutorial-v1',name:'Conesa simplificado',kind:'Importancia ambiental · versión principal',
   detail:'Importancia absoluta y con signo, valoración inicial y residual, clasificación 25/50/75, recargos críticos explícitos y tabla de revisión. RV=3 fuera de escala.',
-  status:'Disponible · con revisión documental',source:'Conesa Fernández-Vítora · variante didáctica contrastada',available:true},
+  status:'Disponible · motor simplificado en revisión',source:'Conesa Fernández-Vítora (1997/2000) · auditoría de fuente primaria',available:true},
  {id:'riam-1998',name:'RIAM',kind:'Comparación de alternativas',
   detail:'Cinco atributos A1, A2, B1, B2 y B3, con valoración estructurada y resultado ES.',
   status:'Disponible · fórmula identificada',source:'Pastakia y Jensen (1998)',available:true},
