@@ -37,3 +37,17 @@
  .ref-shell .ref-tech-head{align-items:flex-start;flex-wrap:wrap;gap:15px}
  .ref-shell .ref-tech-facts{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+@media(min-width:1100px){
+ .ref-shell .ref-tech-conesa{border:1px solid #657d86;border-radius:10px;background:#203e4d;padding:17px 19px;margin:19px 0;color:#e4f2f2}
+ .ref-shell .ref-tech-conesa h4{margin:0 0 7px;font-size:17px!important;color:#f5f9f9}
+ .ref-shell .ref-tech-conesa p{font-size:12px!important;line-height:1.55;color:#d6e7e9;margin:4px 0 12px}
+ .ref-shell .ref-tech-conesa-counts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:13px 0}
+ .ref-shell .ref-tech-conesa-counts span{display:block;background:#254e5a;border:1px solid #6b8990;border-radius:8px;padding:10px;font-size:12px!important;color:#cee7e7}
+ .ref-shell .ref-tech-conesa-counts strong{font-size:22px!important;display:block;color:#ffe1a8}
+ .ref-shell .ref-tech-conesa a{font-size:13px!important;color:#b6e3f4;text-decoration:underline;font-weight:700}
+ .ref-shell .ref-tech-conesa .ref-tech-conesa-issue{border-left:3px solid #d7ab72;color:#ffead5;background:#483c39;padding:9px 11px;margin:9px 0}
+}
+@media(min-width:1100px) and (max-width:1400px){
+ .ref-shell .ref-tech-conesa-counts{grid-template-columns:repeat(2,minmax(0,1fr))}
+}

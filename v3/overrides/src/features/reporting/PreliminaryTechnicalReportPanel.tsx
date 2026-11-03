@@ -1,5 +1,6 @@
 import {useMemo,useState} from 'react';
 import './preliminary-technical-report.css';
+import {readConesaReportAnnex} from './ConesaReportReader';
 import {Link} from 'react-router-dom';
 import {ArtworkIcon} from '../iconography/ArtworkIcon';
 import type {DemoState} from '../../lib/demo';
@@ -10,13 +11,14 @@ type Props={data:DemoState};
 type Readiness={name:string;status:string;detail:string};
 export function PreliminaryTechnicalReportPanel({data}:Props){
  const [message,setMessage]=useState('');
- const model=useMemo(()=>buildPreliminaryTechnicalReview(data),[data]);
+ const conesaAnnex=useMemo(()=>readConesaReportAnnex(data,window.localStorage),[data]);
+ const model=useMemo(()=>buildPreliminaryTechnicalReview(data,conesaAnnex),[data,conesaAnnex]);
  const gaps=model.readiness as Readiness[];
  const unaccredited=gaps.filter(x=>x.status==='No documentado'||
   x.status==='No acreditado'||x.status==='No verificado').length;
  function download(){
   try{
-   const file=preparePreliminaryTechnicalDownload(data);
+   const file=preparePreliminaryTechnicalDownload(data,conesaAnnex);
    const url=URL.createObjectURL(new Blob([file.html],{type:'text/html;charset=utf-8'}));
    const a=document.createElement('a');
    a.href=url;a.download=file.filename;document.body.appendChild(a);a.click();a.remove();
@@ -40,6 +42,29 @@ export function PreliminaryTechnicalReportPanel({data}:Props){
    <div><ArtworkIcon kind="measures" size={24}/><strong>{model.counts.measures}</strong><small>Medidas relacionadas</small></div>
    <div><ArtworkIcon kind="notice" size={24}/><strong data-report-missing={unaccredited}>{unaccredited}</strong><small>Componentes sin acreditación</small></div>
    <div><ArtworkIcon kind="notice" size={24}/><strong>{model.counts.documentaryWarnings}</strong><small>Observaciones de vínculos</small></div>
+  </div>
+  <div className="ref-tech-conesa" data-report-conesa-annex>
+   <div>
+    <h4>Evaluaciones Conesa vinculadas al informe</h4>
+    <p>Se leen los borradores Conesa del navegador para este expediente y se recalculan
+     al exportar, sin escribir sobre los originales. Ninguna puntuación corresponde
+     automáticamente a una medición o validación profesional.</p>
+   </div>
+   <div className="ref-tech-conesa-counts">
+    <span><strong data-report-conesa-initial>{conesaAnnex.counts.initialEntries}</strong> valoraciones iniciales</span>
+    <span><strong data-report-conesa-residual>{conesaAnnex.counts.residualEntries}</strong> escenarios residuales</span>
+    <span><strong data-report-conesa-review>{conesaAnnex.counts.reviewRequired}</strong> pendientes de revisión</span>
+    <span><strong data-report-conesa-chains>{conesaAnnex.counts.documentedChains}</strong> cadenas documentadas</span>
+   </div>
+   {conesaAnnex.rows.length>0
+    ?<p className="ref-tech-conesa-note">Las puntuaciones y sus fundamentos se incluirán
+      en el anexo metodológico. Los valores fuera de escala, referencias faltantes
+      y cadenas incompatibles quedarán marcados para revisión.</p>
+    :<p className="ref-tech-conesa-note">Sin valoraciones guardadas para este expediente.
+      No se generarán puntuaciones de ejemplo en el informe.</p>}
+   {conesaAnnex.issues.map((issue,i)=>
+    <p key={i} className="ref-tech-conesa-issue" role="status">{issue}</p>)}
+   <Link to="/matrices">Abrir el constructor de matrices Conesa</Link>
   </div>
   <div className="ref-tech-readiness">
    <h4>Matriz de información para un futuro EsIA</h4>
