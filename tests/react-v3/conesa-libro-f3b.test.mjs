@@ -69,6 +69,8 @@ test('No CA without provenance, local validity, factor binding and scenarios',()
   c=>{c.assessor=''},
   c=>{c.evidence=''},
   c=>{c.bookPage=null},
+  c=>{c.bookPage=267.5},
+  c=>{c.bookPage=1200},
   c=>{c.indicator='Otro indicador'},
   c=>{c.unit='µg/L'},
   c=>{c.points[1].m=null},
