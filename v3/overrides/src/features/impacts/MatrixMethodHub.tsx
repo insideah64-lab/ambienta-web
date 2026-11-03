@@ -3,7 +3,7 @@ import {ArrowDownToLine,X} from 'lucide-react';
 import {ImpactMatrixBuilder,readMatrixAxes} from './ImpactMatrixBuilder';
 import type {DemoState} from '../../lib/demo';
 import {ConesaSimplificado} from './ConesaSimplificado';
-import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type MethodId,type ScoredMethodId} from './MatrixMethodData';
+import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type ScoredMethodId} from './MatrixMethodData';
 import './MatrixMethodHub.css';
 
 type ExistingImpact={id:string;factor:string;name:string};
@@ -42,8 +42,8 @@ function csvField(input:unknown){
  const safe=/^\s*[=+\-@\t\r]/.test(original)?"'"+original:original;
  return '"'+safe.replaceAll('"','""')+'"';
 }
-function ScoredMatrix({projectId,projectName,method}:{
- projectId:string;projectName:string;method:ScoredMethodId
+function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
+ projectId:string;projectName:string;method:ScoredMethodId;readOnly?:boolean
 }){
  const definition=METHOD_DEFINITIONS[method];
  const [refresh,setRefresh]=useState(0);
@@ -58,6 +58,7 @@ function ScoredMatrix({projectId,projectName,method}:{
   catch{setNotice('Guardado local no disponible. Exportá el JSON para conservar tu evaluación.');}
  },[doc,projectId,method]);
  const edit=(id:string,patch:Partial<Assessment>)=>{
+  if(readOnly)return;
   modified.current=true;
   setDoc(current=>{
    const previous=current.entries[id]||{sign:null,criteria:{},reason:'',evidence:''};
@@ -66,6 +67,7 @@ function ScoredMatrix({projectId,projectName,method}:{
   });
  };
  const remove=(id:string)=>{
+  if(readOnly)return;
   modified.current=true;
   setDoc(cur=>{const entries={...cur.entries};delete entries[id];return {...cur,updatedAt:new Date().toISOString(),entries};});
  };
@@ -96,9 +98,10 @@ function ScoredMatrix({projectId,projectName,method}:{
  return <section className="amb-matrix amb-method-assessment"
    data-method-assessment={method} aria-label={'Evaluación mediante '+definition.shortName}>
    <div className="amb-method-eval-head">
-    <div><p className="amb-matrix-overline">MATRIZ DE VALORACIÓN · BORRADOR LOCAL</p>
+    <div><p className="amb-matrix-overline">{readOnly?'ARCHIVO ANTERIOR · SOLO LECTURA':'MATRIZ DE VALORACIÓN · BORRADOR LOCAL'}</p>
      <h3>{definition.shortName}</h3><p>{definition.version}</p>
      <code>{definition.formula}</code>
+     {readOnly&&<p role="note">Evaluación original de la edición anterior. Solo consulta y exportación; no se combina con el Conesa simplificado vigente.</p>}
     </div>
     <div className="amb-matrix-exports">
      <button type="button" onClick={exportCsv}><ArrowDownToLine size={16}/> CSV</button>
@@ -156,7 +159,7 @@ function ScoredMatrix({projectId,projectName,method}:{
       <button type="button" aria-label="Cerrar ficha del método" onClick={()=>setSelected(null)}><X size={18}/></button>
      </header>
      {method==='conesa-1997-2ex'&&<label>Carácter / naturaleza
-      <select aria-label="Signo Conesa" value={chosen.entry?.sign===-1?'-1':chosen.entry?.sign===1?'1':''}
+      <select aria-label="Signo Conesa" disabled={readOnly} value={chosen.entry?.sign===-1?'-1':chosen.entry?.sign===1?'1':''}
        onChange={e=>edit(selected,{sign:e.target.value?Number(e.target.value) as -1|1:null})}>
        <option value="">Sin valorar</option><option value="-1">Perjudicial (−)</option>
        <option value="1">Beneficioso (+)</option>
@@ -164,7 +167,7 @@ function ScoredMatrix({projectId,projectName,method}:{
      </label>}
      <div className="amb-method-criteria">
       {definition.fields.map(field=><label key={field.id}>{field.name} ({field.id})
-       <select aria-label={field.id+' - '+field.name} value={chosen.entry?.criteria[field.id]??''}
+       <select disabled={readOnly} aria-label={field.id+' - '+field.name} value={chosen.entry?.criteria[field.id]??''}
         onChange={e=>{
          const criteria={...(chosen.entry?.criteria||{})};
          if(e.target.value==='')delete criteria[field.id];
@@ -184,18 +187,18 @@ function ScoredMatrix({projectId,projectName,method}:{
        'Cálculo reproducible; no sustituye el juicio ni la revisión profesional.'}</small>
      </div>
      <label>Fundamento técnico y supuestos
-      <textarea maxLength={5000} rows={3} value={chosen.entry?.reason||''}
+      <textarea disabled={readOnly} maxLength={5000} rows={3} value={chosen.entry?.reason||''}
        onChange={e=>edit(selected,{reason:e.target.value})}
        placeholder="Describir por qué se asignó cada criterio y qué incertidumbre persiste…"/>
      </label>
      <label>Documento o evidencia
-      <input maxLength={1000} value={chosen.entry?.evidence||''}
+      <input disabled={readOnly} maxLength={1000} value={chosen.entry?.evidence||''}
        onChange={e=>edit(selected,{evidence:e.target.value})}
        placeholder="Código de informe, página, enlace o referencia verificable"/>
      </label>
      {chosen.entry&&!chosen.entry.reason.trim()&&<p className="amb-matrix-caution-inline">
       Valoración provisional: falta documentar la justificación.</p>}
-     {chosen.entry&&<button type="button" className="amb-matrix-secondary"
+     {chosen.entry&&!readOnly&&<button type="button" className="amb-matrix-secondary"
        onClick={()=>remove(selected)}>Eliminar valoración de esta interacción</button>}
     </div>}
    </div>
@@ -206,19 +209,15 @@ function ScoredMatrix({projectId,projectName,method}:{
    {notice&&<p role="status" className="amb-matrix-notice">{notice}</p>}
   </section>;
 }
-type ActiveMethod=Exclude<MethodId,'battelle'>|'conesa-simplificado-tutorial-v1';
-const CARDS: Array<{
- id:MethodId|'conesa-simplificado-tutorial-v1';name:string;kind:string;detail:string;status:string;source:string;available:boolean
-}> = [
+type ActiveMethod='causa-leopold'|'conesa-simplificado-tutorial-v1'|'riam-1998';
+type Card={id:ActiveMethod|'battelle';name:string;kind:string;detail:string;status:string;source:string;available:boolean};
+const CARDS:Card[]=[
  {id:'causa-leopold',name:'Identificación y Leopold',kind:'Identificación / valoración',
   detail:'Cruce de acciones y factores, naturaleza del impacto y magnitud/importancia independientes (1–10). Incluye una ponderación experimental separada.',
   status:'Disponible',source:'Leopold et al. · USGS (1971)',available:true},
- {id:'conesa-1997-2ex',name:'Conesa · motor anterior',kind:'Importancia cualitativa · edición anterior',
-  detail:'Diez atributos definidos, signo y fórmula versionada 3IN + 2EX. Nunca hereda cifras de Leopold.',
-  status:'Disponible · fórmula identificada',source:'Conesa (variante 1997) / Vidal y Regaldo',available:true},
- {id:'conesa-simplificado-tutorial-v1',name:'Conesa simplificado · revisión',kind:'Importancia · Excel contrastado',
-  detail:'Importancia absoluta y con signo; criticidad como +4 al valor base; rangos 25/50/75 y tabla de revisión. RV=3 queda marcado como fuera de escala.',
-  status:'Nuevo · variante experimental trazable',source:'Tutorial y Excel aportados / Conesa 2010 (aplicación)',available:true},
+ {id:'conesa-simplificado-tutorial-v1',name:'Conesa simplificado',kind:'Importancia ambiental · versión principal',
+  detail:'Importancia absoluta y con signo, valoración inicial y residual, clasificación 25/50/75, recargos críticos explícitos y tabla de revisión. RV=3 fuera de escala.',
+  status:'Disponible · con revisión documental',source:'Conesa Fernández-Vítora · variante didáctica contrastada',available:true},
  {id:'riam-1998',name:'RIAM',kind:'Comparación de alternativas',
   detail:'Cinco atributos A1, A2, B1, B2 y B3, con valoración estructurada y resultado ES.',
   status:'Disponible · fórmula identificada',source:'Pastakia y Jensen (1998)',available:true},
@@ -226,8 +225,22 @@ const CARDS: Array<{
   detail:'Requiere indicadores medidos, funciones de transformación, pesos y escenarios con/sin proyecto. No es válido calcularlo con valores DEMO.',
   status:'Preparación metodológica',source:'Dee et al. (1973)',available:false}
 ];
+type ArchiveStatus={present:boolean;valid:boolean;count:number};
+function oldConesaArchive(projectId:string):ArchiveStatus{
+ try{
+  const raw=localStorage.getItem(keyFor(projectId,'conesa-1997-2ex'));
+  if(raw===null)return {present:false,valid:false,count:0};
+  const parsed:unknown=JSON.parse(raw);
+  if(!validDocument(parsed,projectId,'conesa-1997-2ex'))
+   return {present:true,valid:false,count:0};
+  return {present:true,valid:true,count:Object.keys(parsed.entries).length};
+ }catch{return {present:true,valid:false,count:0};}
+}
 export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData}:Props){
  const [active,setActive]=useState<ActiveMethod>('causa-leopold');
+ const [legacyOpen,setLegacyOpen]=useState(false);
+ const archive=useMemo(()=>active==='conesa-simplificado-tutorial-v1'
+  ?oldConesaArchive(projectId):{present:false,valid:false,count:0},[projectId,active]);
  return <div className="amb-method-hub" data-matrix-method-catalog="v1">
   <section className="amb-method-catalog" aria-label="Catálogo de métodos ambientales">
    <div className="amb-method-heading">
@@ -259,7 +272,32 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
   {active==='causa-leopold'
    ?<ImpactMatrixBuilder projectId={projectId} projectName={projectName} registeredImpacts={registeredImpacts}/>
    :active==='conesa-simplificado-tutorial-v1'
-     ?<ConesaSimplificado key={projectId+':'+active} projectId={projectId} projectName={projectName} pgaData={pgaData}/>
+     ?<>
+      <ConesaSimplificado key={projectId+':'+active} projectId={projectId} projectName={projectName} pgaData={pgaData}/>
+      {archive.present&&<section className="amb-conesa-archive" data-conesa-legacy-archive
+        aria-label="Archivo de valoraciones Conesa anteriores">
+       <div><small>ARCHIVO HISTÓRICO · NO ES OTRO MÉTODO PARA ELEGIR</small>
+        <h4>Valoraciones guardadas con la edición anterior</h4>
+        <p>{archive.valid
+         ?'Hay '+archive.count+' valoración(es) anteriores en este navegador. Se conservan sin convertir ni mezclar sus puntuaciones.'
+         :'El borrador de la edición anterior no supera la validación del formato. Se conserva intacto; descargá un respaldo para revisar su contenido.'}</p>
+       </div>
+       {archive.valid
+        ?<button type="button" aria-expanded={legacyOpen}
+          onClick={()=>setLegacyOpen(open=>!open)}>
+          {legacyOpen?'Ocultar archivo anterior':'Consultar y exportar valoraciones anteriores'}
+         </button>
+        :<button type="button" onClick={()=>{
+          try{
+           const raw=localStorage.getItem(keyFor(projectId,'conesa-1997-2ex'));
+           if(raw!==null)download('AMBIENTA-Conesa-anterior-respaldo-'+projectId+'.txt','text/plain;charset=utf-8',raw);
+          }catch{/* Keep source unchanged on storage failures. */}
+         }}>Descargar respaldo anterior sin modificar</button>}
+       {archive.valid&&legacyOpen&&
+        <ScoredMatrix key={projectId+':legacy-readonly'} projectId={projectId}
+         projectName={projectName} method="conesa-1997-2ex" readOnly/>}
+      </section>}
+     </>
      :<ScoredMatrix key={projectId+':'+active} projectId={projectId} projectName={projectName} method={active}/>}
  </div>;
 }

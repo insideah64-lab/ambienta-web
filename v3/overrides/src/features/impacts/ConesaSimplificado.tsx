@@ -109,7 +109,7 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
  return <section className="amb-matrix amb-conesa-rev" data-conesa-simplificado={METHOD_ID}>
   <div className="amb-conesa-top">
    <div><p className="amb-matrix-overline">VARIANTE DIDÁCTICA VERSIONADA · BORRADOR LOCAL</p>
-    <h3>Conesa simplificado · revisión metodológica</h3>
+    <h3>Conesa simplificado</h3>
     <p>El signo y la importancia absoluta se muestran por separado. Los recargos por localización y momento críticos se suman al valor base, con justificación documental.</p>
     <code>I<sub>abs</sub> = 3IN + 2(EX + EXcr) + (MO + MOcr) + PE + RV + SI + AC + EF + PR + MC</code>
    </div>
@@ -155,7 +155,7 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
   <div className="amb-conesa-editor" data-conesa-editor>
    {!selected||!selectedItem?<div className="amb-matrix-placeholder">
     <h4>Seleccioná una interacción para valorar</h4>
-    <p>La matriz empieza sin criterios asignados. Un valor pendiente no equivale a ausencia de impacto. Se conservan las valoraciones anteriores del método Conesa 1997 por separado.</p>
+    <p>La matriz empieza sin criterios asignados. Un valor pendiente no equivale a ausencia de impacto. Las valoraciones anteriores se conservan en su archivo histórico y no se convierten automáticamente.</p>
    </div>:<div>
     <header><div><small>VALORACIÓN DE LA INTERACCIÓN</small><h4>{selectedItem.factor.name}</h4><p>{selectedItem.action.name}</p></div>
      <button type="button" aria-label="Cerrar editor de Conesa" onClick={()=>setSelected(null)}><X size={18}/></button>
