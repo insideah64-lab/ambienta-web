@@ -14,6 +14,10 @@ try{
   const privateUI=page.locator('.v2-cloud-workspace');
   await privateUI.waitFor();
   assert((await privateUI.innerText()).includes('Expedientes privados'));
+  assert.equal(await privateUI.locator('[data-private-measure-form]').count(),0,
+   'PGA measure form cannot be available before authentication');
+  assert.equal(await privateUI.getByRole('button',{name:'Nueva medida vinculada'}).count(),0,
+   'PGA measure registration cannot be offered to a guest');
   const configMissing=await privateUI.getByRole('heading',{name:'Conexión privada aún no configurada'}).count()===1;
   if(configMissing){
    assert.equal(await privateUI.locator('[data-private-intake]').count(),0);
