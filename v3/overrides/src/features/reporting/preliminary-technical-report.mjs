@@ -32,6 +32,7 @@ export const TECHNICAL_REPORT_DISCLAIMER='DOCUMENTO DE TRABAJO · DEMOSTRACIÓN.
  'declaración de impacto ambiental, autorización, certificación ni dictamen de cumplimiento. '+
  'Los registros de la demostración no acreditan fuentes oficiales.';
 
+/** @param {any} state @param {any} [providedConesaAnnex] */
 export function buildPreliminaryTechnicalReview(state,providedConesaAnnex=null){
  const impacts=valid(state?.impacts),measures=valid(state?.measures),
   inspections=valid(state?.inspections),evidence=valid(state?.evidence),
@@ -263,6 +264,7 @@ export function renderPreliminaryTechnicalHtml(model){
  '<title>AMBIENTA · Diagnóstico documental preliminar</title><style>'+styles+
  '</style></head><body>'+body+'</body></html>';
 }
+/** @param {any} state @param {any} [conesaAnnex] */
 export function preparePreliminaryTechnicalDownload(state,conesaAnnex=null){
  const model=buildPreliminaryTechnicalReview(state,conesaAnnex);
  const html=renderPreliminaryTechnicalHtml(model);
