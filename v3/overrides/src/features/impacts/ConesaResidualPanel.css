@@ -1,0 +1,38 @@
+.ref-shell .amb-residual{border:1px solid #42697b;border-radius:15px;background:#102d3a;padding:20px;margin:22px 0 10px;color:#e1edf0}
+.ref-shell .amb-residual-head{display:flex;justify-content:space-between;align-items:start;gap:16px;flex-wrap:wrap}
+.ref-shell .amb-residual-head h4{font-size:21px;color:#f5fffb;margin:0 0 8px}
+.ref-shell .amb-residual-head p:not(.amb-matrix-overline){font-size:13px;line-height:1.6;color:#bbd0d9;max-width:780px;margin:0}
+.ref-shell .amb-residual-advice{font-size:12px;line-height:1.65;padding:12px 15px;border-left:3px solid #c9b071;background:#35414a;color:#e5e9e3;margin:16px 0}
+.ref-shell .amb-residual-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.ref-shell .amb-residual-stats span{background:#173b4b;border:1px solid #476875;border-radius:9px;padding:12px}
+.ref-shell .amb-residual-stats strong{display:block;color:#faf2dc;font-size:23px}
+.ref-shell .amb-residual-stats small{font-size:11px;color:#c6d5dd}
+.ref-shell .amb-residual-stages{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.ref-shell .amb-residual-stages span{display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:7px;border:1px solid #48606c;background:#1a3644}
+.ref-shell .amb-residual-stages strong{font-size:12px;color:#f0f4f2}
+.ref-shell .amb-residual-stages small{font-size:11px;color:#b4c9d4}
+.ref-shell .amb-residual-overflow{overflow:auto;max-height:430px;border:1px solid #4d6f80;border-radius:9px}
+.ref-shell .amb-residual-overflow table{border-collapse:collapse;width:100%;min-width:940px;font-size:12px;color:#e3eff0}
+.ref-shell .amb-residual-overflow thead{position:sticky;top:0;background:#224756}
+.ref-shell .amb-residual-overflow th,.ref-shell .amb-residual-overflow td{padding:11px;border-bottom:1px solid #385565;text-align:left}
+.ref-shell .amb-residual-overflow th small{display:block;font-weight:400;margin-top:4px;color:#b5ced9}
+.ref-shell .amb-residual-overflow button{background:#24596a;border:1px solid #72949e;border-radius:7px;padding:7px 10px;color:#eaf6f5;font-weight:700;cursor:pointer}
+.ref-shell .amb-residual-overflow button:disabled{opacity:.4;cursor:not-allowed}
+.ref-shell .amb-residual-overflow tr[data-residual-detached="true"]{background:#453628}
+.ref-shell .amb-residual-editor{background:#163847;border:1px solid #527b8d;border-radius:10px;padding:17px;margin:17px 0}
+.ref-shell .amb-residual-editor-heading{display:flex;justify-content:space-between;gap:12px;align-items:start;margin-bottom:11px}
+.ref-shell .amb-residual-editor-heading small{font-size:11px;color:#b9d1d6}
+.ref-shell .amb-residual-editor-heading h5{color:#f3f5f1;font-size:18px;margin:5px 0}
+.ref-shell .amb-residual-editor-heading p{font-size:12px;color:#bed5dd;margin:4px 0}
+.ref-shell .amb-residual-editor-heading button,.ref-shell .amb-residual-secondary{background:#294b59;border:1px solid #7296a0;color:#e8f2f3;padding:8px 12px;border-radius:7px;display:inline-flex;gap:8px;align-items:center;font-weight:700;font-size:12px;margin:5px;cursor:pointer}
+.ref-shell .amb-residual-fields{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px 14px}
+.ref-shell .amb-residual-editor label{display:block;color:#dceaf0;font-size:12px;font-weight:700;margin:11px 0}
+.ref-shell .amb-residual-editor input,.ref-shell .amb-residual-editor select,.ref-shell .amb-residual-editor textarea{display:block;margin-top:7px;background:#0e2b39;border:1px solid #557584;color:#f2f8f9;border-radius:8px;padding:9px 10px;width:100%;font-size:12px;font-family:inherit}
+.ref-shell .amb-residual-editor label svg{vertical-align:middle}
+.ref-shell .amb-residual-result{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin:16px 0}
+.ref-shell .amb-residual-result span{border:1px solid #637680;background:#234651;border-radius:9px;padding:10px;color:#c1d9df;font-size:12px}
+.ref-shell .amb-residual-result strong{display:block;margin-top:7px;color:#ffdb9c;font-size:20px;overflow-wrap:anywhere}
+.ref-shell .amb-residual-errors{border-left:3px solid #ebb36c;background:#493c35;padding:12px;color:#f9e1b9;font-size:12px;line-height:1.65}
+.ref-shell .amb-residual-footer{font-size:11px;line-height:1.65;color:#aec9d5;border-top:1px solid #426776;padding-top:12px;margin-top:20px}
+@media(max-width:1200px){.ref-shell .amb-residual-fields{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:800px){.ref-shell .amb-residual-fields,.ref-shell .amb-residual-result,.ref-shell .amb-residual-stats{grid-template-columns:1fr}}
