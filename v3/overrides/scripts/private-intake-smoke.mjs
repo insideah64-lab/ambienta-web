@@ -16,6 +16,13 @@ try{
   assert((await privateUI.innerText()).includes('Expedientes privados'));
   assert.equal(await privateUI.locator('[data-private-measure-form]').count(),0,
    'PGA measure form cannot be available before authentication');
+  assert.equal(await privateUI.locator('[data-private-monitoring-form]').count(),0,
+   'Una inspección o evidencia no puede registrarse sin sesión');
+  assert.equal(await privateUI.getByRole('button',{name:'Nueva inspección'}).count(),0,
+   'Los visitantes no pueden registrar inspecciones del PGA');
+  assert.equal(await privateUI.getByRole('button',{name:'Nueva referencia documental'}).count(),0,
+   'Los visitantes no pueden registrar evidencias sin autenticar');
+
   assert.equal(await privateUI.getByRole('button',{name:'Nueva medida vinculada'}).count(),0,
    'PGA measure registration cannot be offered to a guest');
   const configMissing=await privateUI.getByRole('heading',{name:'Conexión privada aún no configurada'}).count()===1;
