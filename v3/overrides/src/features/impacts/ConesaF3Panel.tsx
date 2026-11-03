@@ -70,7 +70,7 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
  const changeTransformation=(changes:Partial<F3FactorRecord['transformation']>)=>
   update({transformation:{...active.transformation,...changes}});
  const exportCSV=()=>{
-  const lines=[['Factor','Indicador','Unidad','Tipo','SIN','Fecha SIN','Fuente SIN','CON',
+  const lines:(string|number)[][]=[['Factor','Indicador','Unidad','Tipo','SIN','Fecha SIN','Fuente SIN','CON',
    'Fecha CON','Fuente CON','CA SIN','CA CON','Delta CA','Delta magnitud',
    'Transformación','Fuente transformación','Método composición','Avisos']];
   for(const row of rows){
