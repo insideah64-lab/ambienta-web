@@ -1,0 +1,19 @@
+.ref-shell .amb-f3 .amb-f3b-library{margin:13px 0 16px;border:1px solid #7ca6b0;background:#1a3745;border-radius:10px;padding:12px 15px;color:#eaf2f5}
+.ref-shell .amb-f3 .amb-f3b-library summary{font-weight:800;color:#a7e6de;font-size:13px;cursor:pointer;padding:4px 0}
+.ref-shell .amb-f3 .amb-f3b-library summary:focus-visible{outline:3px solid #f9cd85;outline-offset:3px;border-radius:4px}
+.ref-shell .amb-f3 .amb-f3b-library-intro{border-left:3px solid #d8b277;padding:9px 12px;background:#274653;border-radius:0 7px 7px 0}
+.ref-shell .amb-f3 .amb-f3b-library-layout{display:grid;grid-template-columns:minmax(220px,1fr) minmax(260px,1.35fr);gap:12px}
+.ref-shell .amb-f3 .amb-f3b-library-results{display:grid;align-content:start;gap:7px;max-height:310px;overflow-y:auto;padding-right:4px}
+.ref-shell .amb-f3 .amb-f3b-library-result{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;background:#274b59;border:1px solid #7195a2;color:#fff;border-radius:7px;padding:9px 11px;font-size:12px;min-height:56px}
+.ref-shell .amb-f3 .amb-f3b-library-result[aria-pressed=true]{border-color:#f0c77a;background:#325d66}
+.ref-shell .amb-f3 .amb-f3b-library-result span{font-size:11px;color:#d5e6eb}
+.ref-shell .amb-f3 .amb-f3b-library-detail{background:#254553;border:1px solid #577e8d;border-radius:8px;padding:13px;min-height:150px}
+.ref-shell .amb-f3 .amb-f3b-library-detail>strong{display:block;font-size:14px;color:#fff;margin-bottom:10px}
+.ref-shell .amb-f3 .amb-f3b-library-detail dl{margin:0;display:grid;gap:7px}
+.ref-shell .amb-f3 .amb-f3b-library-detail dl div{display:grid;grid-template-columns:minmax(115px,.65fr) minmax(150px,1.35fr);gap:9px;border-bottom:1px solid #486779;padding-bottom:7px}
+.ref-shell .amb-f3 .amb-f3b-library-detail dt{font-size:11px;font-weight:700;color:#c3d7e0}
+.ref-shell .amb-f3 .amb-f3b-library-detail dd{font-size:12px;color:#f2f8fa;margin:0;overflow-wrap:anywhere}
+.ref-shell .amb-f3 .amb-f3b-library-compare{padding:8px 11px;border-left:3px solid #ebbd78;background:#315361;border-radius:0 5px 5px 0}
+.ref-shell .amb-f3 .amb-f3b-library-fine{font-size:11px!important;color:#d5e5eb!important}
+.ref-shell .amb-f3 .amb-f3b-library button:focus-visible{outline:3px solid #ffda99;outline-offset:3px}
+@media(max-width:900px){.ref-shell .amb-f3 .amb-f3b-library-layout{grid-template-columns:minmax(0,1fr)}.ref-shell .amb-f3 .amb-f3b-library-detail dl div{grid-template-columns:minmax(110px,1fr) minmax(160px,2fr)}}
