@@ -1,0 +1,24 @@
+/* Only V3 authenticated workspace; V1/V2 CSS remains unchanged. */
+.ref-shell .amb-private-list-header{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.ref-shell .amb-private-list-header h2,.ref-shell .amb-private-list-header h3{margin:0;font-size:19px;color:#e9f3f2}
+.ref-shell .amb-private-list-header p{margin:6px 0;color:#bcd6d8;font-size:12px;line-height:1.55;max-width:660px}
+.ref-shell .amb-private-list-header .v2-action-button{white-space:nowrap}
+.ref-shell .amb-private-intake{display:grid;gap:12px;max-width:100%;padding:18px;border-radius:12px;background:#1a3a4b;border:1px solid #597785;color:#e7f1f5}
+.ref-shell .amb-private-intake header h3{font-size:18px;margin:0 0 7px;color:#fff}
+.ref-shell .amb-private-intake header p{color:#c8dce4;font-size:12px;line-height:1.5;margin:0}
+.ref-shell .amb-private-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px}
+.ref-shell .amb-private-intake label{display:grid;gap:7px;font-size:12px;font-weight:700;color:#e5f0f0}
+.ref-shell .amb-private-intake input,.ref-shell .amb-private-intake select,.ref-shell .amb-private-intake textarea{width:100%;min-width:0;box-sizing:border-box;background:#0c2a39;border:1px solid #6d8795;color:#f3f7f9;font-family:inherit;font-size:13px;border-radius:8px;padding:11px}
+.ref-shell .amb-private-intake input:focus-visible,.ref-shell .amb-private-intake select:focus-visible,.ref-shell .amb-private-intake textarea:focus-visible{outline:2px solid #f2c98a;outline-offset:2px}
+.ref-shell .amb-private-intake-scope,.ref-shell .amb-private-source{font-size:12px!important;line-height:1.6;color:#cee0e4;border-left:3px solid #d2ac70;background:#31414b;padding:10px 13px;border-radius:3px;margin:8px 0}
+.ref-shell .amb-private-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ref-shell .amb-private-actions>button{font-size:12px;padding:9px 12px;border:1px solid #7496a5;background:#285365;color:#ecf8fb;border-radius:8px;cursor:pointer}
+.ref-shell .amb-private-actions>button:disabled{opacity:.6;cursor:not-allowed}
+.ref-shell .amb-private-bootstrap{border:1px solid #487585;background:#153443;border-radius:13px;padding:19px;margin:10px 0}
+.ref-shell .amb-private-record-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:17px}
+.ref-shell .amb-private-record-grid>div{background:#1d4251;border:1px solid #52788a;border-radius:9px;padding:12px;min-width:0}
+.ref-shell .amb-private-record-grid h4{margin:0 0 12px;color:#f0f6f6;font-size:14px}
+.ref-shell .amb-private-record-grid>div>div{padding:10px 0;border-top:1px solid #3f6271}
+.ref-shell .amb-private-record-grid strong{display:block;font-size:12px;color:#e6f0f5;overflow-wrap:anywhere}
+.ref-shell .amb-private-record-grid small{display:block;font-size:11px;color:#c2d6dd;margin-top:4px}
+@media(max-width:900px){.ref-shell .amb-private-record-grid,.ref-shell .amb-private-fields{grid-template-columns:1fr}}
