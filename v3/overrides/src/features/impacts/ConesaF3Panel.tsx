@@ -5,6 +5,7 @@ import {
  f3Problems,evaluateF3Factor,type F3Doc,type F3FactorRecord,type ScenarioF3
 } from './ConesaF3Model';
 import type {F2Factor} from './ConesaF2Model';
+import {ConesaF3Comparison} from './ConesaF3Comparison';
 import './ConesaF3Panel.css';
 type Props={projectId:string;projectName:string;factors:F2Factor[]};
 function readDraft(projectId:string,projectName:string):{doc:F3Doc;damaged:string|null}{
@@ -119,6 +120,7 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
    <span><strong>{rows.filter(r=>r.record&&!r.result).length}</strong><small>Incompletos o fuera de dominio</small></span>
    <span><strong>{orphanIds.length}</strong><small>Registros desvinculados preservados</small></span>
   </div>
+  <ConesaF3Comparison rows={rows}/>
   <div className="amb-f3-list">
    {factors.length===0?<p>Agregá primero factores ambientales al catálogo de matrices.</p>:
     factors.map(f=>{
