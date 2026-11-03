@@ -286,7 +286,7 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pg
     <label>Referencia de la medida / fuente
      <input maxLength={1000} value={record?.measure.reference||''}
       onChange={e=>patchMeasure(selected,{reference:e.target.value})}/></label>
-    <label><Link2 size={14}/> Referencia documental adicional de PGA
+    <label><Link2 size={14}/> Referencia PGA (manual, no sincronizada)
      <input maxLength={300} value={record?.measure.pgaRef||''}
       onChange={e=>patchMeasure(selected,{pgaRef:e.target.value})}/></label>
     <label>Responsable
