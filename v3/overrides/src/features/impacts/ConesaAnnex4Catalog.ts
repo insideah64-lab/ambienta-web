@@ -179,6 +179,6 @@ export function searchAnnex4(query:string,section:Annex4Section|'todas'='todas')
   .toLocaleLowerCase('es').trim();
  const term=normalize(query);
  return ANNEX4_CATALOG.filter(x=>(section==='todas'||x.section===section)&&normalize([
-  x.title,x.indicator,x.unit,x.number.toString(),x.section
+  x.id,x.title,x.indicator,x.unit,x.number.toString(),x.section
  ].join(' ')).includes(term));
 }
