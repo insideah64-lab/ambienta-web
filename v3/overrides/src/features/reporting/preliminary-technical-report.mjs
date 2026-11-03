@@ -14,18 +14,32 @@ const valid=rows=>Array.isArray(rows)?rows:[];
 const registered=(name,count,detail)=>({name,status:count?'Registro DEMO disponible':'No documentado',
  detail});
 export const TECHNICAL_REPORT_SCHEMA='ambienta.preliminary_technical_review.v1';
+const CONESA_ANNEX_SCHEMA='ambienta.conesa-report-annex.v1';
+function conesaAnnexForProject(annex,projectId){
+ if(!annex||typeof annex!=='object'||Array.isArray(annex)||
+  annex.schema!==CONESA_ANNEX_SCHEMA||annex.projectId!==projectId||
+  !Array.isArray(annex.rows)||annex.rows.length>12000||
+  !Array.isArray(annex.issues)||annex.issues.length>1000||
+  !annex.counts||typeof annex.counts!=='object'||!annex.methods)return null;
+ if(!annex.rows.every(row=>row&&typeof row==='object'&&
+  typeof row.id==='string'&&typeof row.reviewStatus==='string'&&
+  Array.isArray(row.warnings)&&Array.isArray(row.inspectionIds)&&
+  Array.isArray(row.evidenceIds)))return null;
+ return annex;
+}
 export const TECHNICAL_REPORT_DISCLAIMER='DOCUMENTO DE TRABAJO · DEMOSTRACIÓN. '+
  'No constituye Estudio de Impacto Ambiental (EsIA), auditoría de campo, '+
  'declaración de impacto ambiental, autorización, certificación ni dictamen de cumplimiento. '+
  'Los registros de la demostración no acreditan fuentes oficiales.';
 
-export function buildPreliminaryTechnicalReview(state){
+export function buildPreliminaryTechnicalReview(state,providedConesaAnnex=null){
  const impacts=valid(state?.impacts),measures=valid(state?.measures),
   inspections=valid(state?.inspections),evidence=valid(state?.evidence),
   findings=valid(state?.findings),actions=valid(state?.correctiveActions),
   programs=valid(state?.programs);
  const project=state?.project??{};
  const audit=auditDocumentLinks(state);
+ const annex=conesaAnnexForProject(providedConesaAnnex,project.id);
  const impactRows=impacts.map(impact=>{
   const linked=unique(impacts,impact.id)?measures.filter(m=>unique(measures,m.id)&&
    Array.isArray(m.impactIds)&&m.impactIds.includes(impact.id)):[];
@@ -72,8 +86,11 @@ export function buildPreliminaryTechnicalReview(state){
    detail:'Los polígonos de ensayo, AOI y capas SIG locales no acreditan una delimitación oficial.'},
   {name:'Línea base físico-biótica y socioeconómica',status:'No documentado',
    detail:'Faltan campañas, datos medidos, metodología, fechas, unidades y fuentes trazables.'},
-  {name:'Evaluación de significancia de impactos',status:'No documentado',
-   detail:'No existen criterios justificados de magnitud, extensión, duración, reversibilidad o ponderación.'},
+  {name:'Evaluación de significancia de impactos',
+   status:annex?.rows.length?'Borrador metodológico (no acreditado)':'No documentado',
+   detail:annex?.rows.length
+    ?'Existen valoraciones Conesa simplificadas locales; revisar las advertencias, criterios y fuentes. Sin homologación legal, línea base validada ni revisión profesional.'
+    :'No existen criterios justificados de magnitud, extensión, duración, reversibilidad o ponderación.'},
   {name:'Normativa y permisos aplicables',status:'No verificado',
    detail:'Jurisdicción, instrumentos y versiones normativas requieren investigación y validación profesional.'},
   {name:'Participación y consulta',status:'No documentado',
@@ -103,7 +120,7 @@ export function buildPreliminaryTechnicalReview(state){
    owner:a.owner,due:a.due,status:a.status,verification:a.verification})),
   documentaryWarnings:audit.issues.map(x=>({origin:x.sourceCollection,
    id:x.id,field:x.field,reference:x.reference,code:x.code,message:x.message})),
-  readiness,disclaimer:TECHNICAL_REPORT_DISCLAIMER
+  readiness,conesaAnnex:annex,disclaimer:TECHNICAL_REPORT_DISCLAIMER
  };
 }
 const td=v=>'<td>'+txt(v)+'</td>';
@@ -198,8 +215,8 @@ export function renderPreliminaryTechnicalHtml(model){
  '<title>AMBIENTA · Diagnóstico documental preliminar</title><style>'+styles+
  '</style></head><body>'+body+'</body></html>';
 }
-export function preparePreliminaryTechnicalDownload(state){
- const model=buildPreliminaryTechnicalReview(state);
+export function preparePreliminaryTechnicalDownload(state,conesaAnnex=null){
+ const model=buildPreliminaryTechnicalReview(state,conesaAnnex);
  const html=renderPreliminaryTechnicalHtml(model);
  const filename='ambienta-diagnostico-preliminar-'+String(model.project.id??'demo')
   .replace(/[^A-Za-z0-9_-]/g,'_')+'.html';
