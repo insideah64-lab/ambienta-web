@@ -1,4 +1,8 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
+import {Link} from 'react-router-dom';
+import type {DemoState} from '../../lib/demo';
+// @ts-ignore: pure read-only selector validated by native Node regression
+import {resolveConesaPgaLink,uniquePgaMeasures} from './conesa-pga-link.mjs';
 import {ArrowDownToLine,Link2,RotateCcw} from 'lucide-react';
 import {CONESA_FIELDS,type ConesaEntry} from './ConesaSimplificadoModel';
 import {blankRecord,fingerprint,isResidualDocument,RESIDUAL_METHOD_ID,reviewResidual,
@@ -7,7 +11,7 @@ import './ConesaResidualPanel.css';
 
 type Axis={id:string;name:string;phase?:string};
 type Props={projectId:string;initialEntries:Record<string,ConesaEntry>;
- actions:Axis[];factors:Axis[]};
+ actions:Axis[];factors:Axis[];pgaData:DemoState};
 const PREFIX='ambienta-conesa-residual-v1:';
 const create=(projectId:string):ResidualDocument=>({
  schema:'ambienta.conesa-residual.v1',method:RESIDUAL_METHOD_ID,
@@ -35,7 +39,7 @@ const hierarchyOptions=[
  ['', 'Seleccionar jerarquía'],['evitar','Evitar'],['minimizar','Minimizar'],
  ['restaurar','Restaurar'],['compensar','Compensar (último recurso)']
 ] as const;
-export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:Props){
+export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pgaData}:Props){
  const [doc,setDoc]=useState<ResidualDocument>(()=>read(projectId));
  const edited=useRef(false);
  const [selected,setSelected]=useState<string|null>(null);
@@ -66,6 +70,8 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
   setDoc(old=>{const entries={...old.entries};delete entries[id];
    return {...old,entries,updatedAt:new Date().toISOString()};});
  };
+ const availablePga=useMemo(()=>uniquePgaMeasures(pgaData,projectId) as Array<{
+  id:string;title:string;owner:string;status:string}>,[pgaData,projectId]);
  const rows=useMemo(()=>{
   const ids=new Set([...Object.keys(initialEntries),...Object.keys(doc.entries)]);
   return [...ids].map(id=>{
@@ -73,21 +79,26 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
    const fid=sep<0?id:id.slice(0,sep),aid=sep<0?'':id.slice(sep+2);
    const factor=factors.find(f=>f.id===fid),action=actions.find(a=>a.id===aid);
    const initial=initialEntries[id],record=doc.entries[id];
+   const review=reviewResidual(initial,record);
+   const pgaId=record?.measure.pgaMeasureId||'';
+   const pgaLink=resolveConesaPgaLink(pgaData,projectId,pgaId);
+   const linkBlocked=Boolean(pgaId)&&(pgaLink.status!=='vinculado'||pgaLink.warnings.length>0);
+   const reviewStatus=linkBlocked&&record?'revisar':review.status;
    return {id,factor:factor?.name||fid,action:action?.name||aid,
     phase:action?.phase||'Sin etapa',detached:!factor||!action,
-    initial,record,review:reviewResidual(initial,record)};
+    initial,record,review,pgaLink,reviewStatus};
   }).filter(r=>r.review.initial||r.record);
- },[initialEntries,doc,actions,factors]);
+ },[initialEntries,doc,actions,factors,pgaData,projectId]);
  const selectedRow=rows.find(x=>x.id===selected);
  const record=selectedRow?.record;
- const validCount=rows.filter(r=>r.review.status==='completo'&&!r.detached).length;
+ const validCount=rows.filter(r=>r.reviewStatus==='completo'&&!r.detached).length;
  const reviewCount=rows.filter(r=>r.record&&
-  (r.review.status!=='completo'||r.detached)).length;
+  (r.reviewStatus!=='completo'||r.detached)).length;
  const stageRows=useMemo(()=>{
   const groups=new Map<string,{total:number;complete:number}>();
   for(const row of rows){
    const g=groups.get(row.phase)||{total:0,complete:0};
-   g.total++;if(row.review.status==='completo'&&!row.detached)g.complete++;
+   g.total++;if(row.reviewStatus==='completo'&&!row.detached)g.complete++;
    groups.set(row.phase,g);
   }
   return [...groups];
@@ -99,6 +110,8 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
    'Estado','Estado catálogo','Jerarquía','Medida','Referencia de medida','PGA referencia manual',
    'Responsable','Indicador','Frecuencia','Incertidumbre declarada',
    'Calidad de evidencia declarada','Implementación declarada','Supuestos',
+   'PGA medida ID','Estado vínculo PGA','PGA programa','PGA estado documental',
+   'PGA inspecciones','PGA evidencias','Advertencias PGA',
    'Fundamento residual','Evidencia residual','Incidencias'];
   const values:(string|number|null)[][]=[header];
   for(const row of rows){
@@ -107,11 +120,15 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
     v.initial?.absolute??null,v.initial?.signed??null,v.initial?.category??'Pendiente',
     v.avoided?'Evitado (sin valor 0)':'Impacto persistente',
     v.residual?.absolute??null,v.residual?.signed??null,v.residual?.category??'Pendiente',
-    v.delta,row.review.status,row.detached?'Desvinculado':'Vinculado',
+    v.delta,row.reviewStatus,row.detached?'Desvinculado':'Vinculado',
     m?.hierarchy||'',m?.description||'',m?.reference||'',m?.pgaRef||'',
     m?.responsible||'',m?.indicator||'',m?.frequency||'',
     m?.uncertainty||'',m?.quality||'',m?.execution||'',m?.assumptions||'',
-    r?.residual.reason||'',r?.residual.evidence||'',v.problems.join(' | ')]);
+    m?.pgaMeasureId||'',row.pgaLink.status,row.pgaLink.program?.name||'',
+    row.pgaLink.measure?.status||'',row.pgaLink.trace?.counts.inspections??null,
+    row.pgaLink.trace?.counts.evidence??null,row.pgaLink.warnings.join(' | '),
+    r?.residual.reason||'',r?.residual.evidence||'',
+    [...v.problems,...row.pgaLink.warnings].join(' | ')]);
   }
   return '\uFEFF'+values.map(r=>r.map(safeCsv).join(';')).join('\r\n');
  };
@@ -134,7 +151,8 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
   <p className="amb-residual-advice">
    <strong>Importante:</strong> este escenario puede ser proyectado, no medido. La ejecución,
    la calidad de evidencia y la incertidumbre son declaraciones del evaluador, no verificaciones
-   automáticas. La referencia PGA es documental; aún no sincroniza registros del módulo PGA.
+   automáticas. Los vínculos PGA son de solo lectura por ID y nunca validan
+   automáticamente la eficacia de la medida ni su correspondencia ambiental.
    Un impacto completamente evitado se registra como <em>Evitado</em>, nunca como I = 0.
   </p>
   <div className="amb-residual-stats">
@@ -150,7 +168,7 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
    aria-label="Comparación de escenarios iniciales y residuales">
    <table>
     <thead><tr><th>Interacción</th><th>Etapa</th><th>Inicial</th>
-     <th>Residual</th><th>Δ importancia abs.</th><th>Estado</th><th>Acción</th></tr></thead>
+     <th>Residual</th><th>Δ importancia abs.</th><th>PGA</th><th>Estado</th><th>Acción</th></tr></thead>
     <tbody>{rows.length?rows.map(r=><tr key={r.id}
      data-residual-row={r.id} data-residual-detached={r.detached?'true':undefined}>
       <th>{r.factor}<small>{r.action}</small></th><td>{r.phase}</td>
@@ -158,11 +176,14 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
       <td data-residual-score>{r.review.avoided?'Evitado':r.review.residual?.signed??'Pendiente'}</td>
       <td data-residual-delta>{r.review.delta===null?'No comparable':
        (r.review.delta>0?'+':'')+r.review.delta}</td>
+      <td data-residual-pga>{r.record?.measure.pgaMeasureId
+       ?r.pgaLink.status==='vinculado'?'Vinculado · '+r.record.measure.pgaMeasureId:'Revisar vínculo'
+       :'Sin vínculo'}</td>
       <td data-residual-state>{r.detached?'Desvinculado':
-       r.review.status==='completo'?'Completo':r.review.status==='sin-valoracion'?'Sin residual':'Revisar'}</td>
+       r.reviewStatus==='completo'?'Completo':r.reviewStatus==='sin-valoracion'?'Sin residual':'Revisar'}</td>
       <td><button type="button" disabled={r.detached||!r.review.initial}
        onClick={()=>setSelected(r.id)}>Revisar</button></td>
-     </tr>):<tr><td colSpan={7}>
+     </tr>):<tr><td colSpan={8}>
       Primero completá una valoración inicial en la matriz Conesa superior.
       Aquí no se generan resultados de ejemplo para el expediente.</td></tr>}</tbody>
    </table>
@@ -229,6 +250,35 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
       onChange={e=>patch(selected,{residual:{...(record?.residual||blankRecord(selectedRow.initial).residual),
        evidence:e.target.value}})}/></label>
    </>}
+   <div className="amb-residual-pga-link" data-pga-link-editor>
+    <label>Vincular medida existente del PGA (solo lectura)
+     <select aria-label="Medida PGA vinculada" value={record?.measure.pgaMeasureId||''}
+      onChange={e=>patchMeasure(selected,{pgaMeasureId:e.target.value})}>
+      <option value="">Sin vínculo con medida registrada</option>
+      {availablePga.map(m=><option key={m.id} value={m.id}>{m.id} · {m.title}</option>)}
+      {record?.measure.pgaMeasureId&&!availablePga.some(m=>m.id===record.measure.pgaMeasureId)&&
+       <option value={record.measure.pgaMeasureId}>ID no disponible: {record.measure.pgaMeasureId}</option>}
+     </select>
+    </label>
+    {selectedRow.pgaLink.status==='vinculado'&&selectedRow.pgaLink.measure&&
+     <div data-pga-linked-detail>
+      <strong>{selectedRow.pgaLink.measure.id} · {selectedRow.pgaLink.measure.title}</strong>
+      <p>Programa: {selectedRow.pgaLink.program?.name||'No resuelto'}
+       {' · '}Responsable PGA: {selectedRow.pgaLink.measure.owner}
+       {' · '}Estado documental: {selectedRow.pgaLink.measure.status}</p>
+      <p>Inspecciones vinculadas: {selectedRow.pgaLink.trace?.counts.inspections??0}
+       {' · '}Evidencias relacionadas: {selectedRow.pgaLink.trace?.counts.evidence??0}</p>
+      <Link to={'/pga?medida='+encodeURIComponent(selectedRow.pgaLink.measure.id)}>
+       Abrir ficha y trazabilidad en PGA
+      </Link>
+      <p>La coincidencia de ID no demuestra que esta medida reduzca el impacto evaluado.
+       Los datos proceden del expediente local y son de demostración.</p>
+     </div>}
+    {selectedRow.pgaLink.warnings.length>0&&
+     <p className="amb-residual-errors" role="status" data-pga-link-warning>
+      {selectedRow.pgaLink.warnings.join(' · ')}
+     </p>}
+   </div>
    <div className="amb-residual-fields">
     <label>Descripción de la medida
      <textarea rows={2} maxLength={5000} value={record?.measure.description||''}
@@ -236,7 +286,7 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
     <label>Referencia de la medida / fuente
      <input maxLength={1000} value={record?.measure.reference||''}
       onChange={e=>patchMeasure(selected,{reference:e.target.value})}/></label>
-    <label><Link2 size={14}/> Referencia PGA (manual, no sincronizada)
+    <label><Link2 size={14}/> Referencia documental adicional de PGA
      <input maxLength={300} value={record?.measure.pgaRef||''}
       onChange={e=>patchMeasure(selected,{pgaRef:e.target.value})}/></label>
     <label>Responsable
@@ -271,7 +321,7 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
     <span>Residual<strong data-residual-editor-score>{selectedRow.review.avoided?'Evitado':
      selectedRow.review.residual?.absolute??'Pendiente'}</strong></span>
     <span>Δ absoluta<strong>{selectedRow.review.delta??'No comparable'}</strong></span>
-    <span>Estado<strong data-residual-editor-state>{selectedRow.review.status}</strong></span>
+    <span>Estado<strong data-residual-editor-state>{selectedRow.reviewStatus}</strong></span>
    </div>
    {record&&selectedRow.review.problems.length>0&&<p className="amb-residual-errors" role="status">
     {selectedRow.review.problems.join(' · ')}</p>}
@@ -286,7 +336,8 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors}:P
   <footer className="amb-residual-footer">
    Las diferencias son aritméticas entre puntuaciones ordinales del mismo método:
    no son porcentajes de mitigación ni resultados medidos. Evitado no se equipara a cero.
-   El estado «completo» expresa integridad de campos, no aprobación técnica.
+   El vínculo PGA se resuelve únicamente por ID en el expediente activo, sin modificar
+   registros originales. «Completo» expresa integridad de campos, no aprobación técnica.
   </footer>
   {notice&&<p role="status">{notice}</p>}
  </section>;
