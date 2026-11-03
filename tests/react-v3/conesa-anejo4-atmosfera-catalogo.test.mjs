@@ -10,7 +10,8 @@ const js=ts.transpileModule(source,{compilerOptions:{
  target:ts.ScriptTarget.ES2022,module:ts.ModuleKind.ESNext
 }}).outputText;
 const catalog=await import('data:text/javascript;base64,'+Buffer.from(js).toString('base64'));
-const entries=catalog.ANNEX4_ATMOSPHERE;
+const entries=catalog.ANNEX4_ATMOSPHERE.slice(0,10);
+const all=catalog.ANNEX4_CATALOG;
 
 test('Anejo 4: ten distinct bibliographic entries verified on printed pages 254–258',()=>{
  assert.equal(entries.length,10);
@@ -46,6 +47,58 @@ test('Anejo 4 search folds accents and does not synthesize extra curves',()=>{
  assert.equal(catalog.searchAnnex4('pArticulas').length,1);
  assert.equal(catalog.searchAnnex4('oraqi').length,1);
  assert.equal(catalog.searchAnnex4('hidrocarburos').length,2);
- assert.equal(catalog.searchAnnex4('DBO').length,0,'No inventar registros aún no transcritos');
- assert.equal(catalog.searchAnnex4('').length,10);
+ assert.equal(catalog.searchAnnex4('DBO').length,1,'La nueva ficha de DBO está documentada');
+ assert.equal(catalog.searchAnnex4('').length,27);
+});
+
+
+test('Extended Annex 4 has 14 atmosphere, 5 soil, 8 water; 27 unique references',()=>{
+ assert.equal(catalog.ANNEX4_ATMOSPHERE.length,14);
+ assert.equal(catalog.ANNEX4_SOIL.length,5);
+ assert.equal(catalog.ANNEX4_WATER.length,8);
+ assert.equal(all.length,27);
+ assert.equal(new Set(all.map(r=>r.id)).size,27);
+ assert.deepEqual(catalog.annex4SectionCounts().map(s=>s.count),[14,5,8]);
+ for(const [group,expectedPages] of [
+  [catalog.ANNEX4_ATMOSPHERE.slice(10),[259,259,260,260]],
+  [catalog.ANNEX4_SOIL,[261,261,262,262,263]],
+  [catalog.ANNEX4_WATER,[264,264,265,265,266,266,267,267]]
+ ]){
+  assert.deepEqual(group.map(e=>e.printedPage),expectedPages);
+  for(const entry of group){
+   assert.equal(entry.pdfPage,entry.printedPage-9);
+   assert.equal(entry.numericCurve,'pendiente-de-digitalizacion');
+   assert(!Object.hasOwn(entry,'points'));
+   assert(!Object.hasOwn(entry,'limits'));
+   assert(entry.graphReading.trim().length>=15);
+   assert(['continua','categorica','varias-series','discontinua'].includes(entry.graphForm));
+  }
+ }
+});
+test('Differentiates categorical and discontinuous figures not reproducible by current F3b',()=>{
+ const byId=id=>all.find(e=>e.id===id);
+ assert.equal(byId('atm-11-ruido-presion').graphForm,'varias-series');
+ assert.equal(byId('atm-13-sonido-agradabilidad').graphForm,'categorica');
+ assert.equal(byId('soil-05-margenes-geologicos').graphForm,'varias-series');
+ assert.equal(byId('water-04-olor-materiales-flotantes').graphForm,'varias-series');
+ assert.equal(byId('water-06-temperatura').graphForm,'varias-series');
+ assert.equal(byId('water-07-sustancias-toxicas').graphForm,'discontinua');
+ assert.equal(byId('water-08-dbo').graphForm,'varias-series');
+ assert.equal(byId('water-03-oxigeno-fluido').indicator,'Cantidad de oxígeno disuelto en agua');
+ assert.equal(byId('soil-01-erosion-sedimentos').unit,'m³/ha/año');
+ assert.equal(byId('water-05-plaguicidas').unit,'Adimensional');
+});
+test('Catalog filters by sections and retains stable locators',()=>{
+ const S='II. Suelo',W='III. Agua',A='I. Atmósfera';
+ assert.equal(catalog.searchAnnex4('',A).length,14);
+ assert.equal(catalog.searchAnnex4('',S).length,5);
+ assert.equal(catalog.searchAnnex4('',W).length,8);
+ assert.equal(catalog.searchAnnex4('erosion',S).length,3);
+ assert.equal(catalog.searchAnnex4('oxigeno',W).length,2);
+ assert.equal(catalog.searchAnnex4('DBO',W).length,1);
+ assert.equal(catalog.searchAnnex4('DBO',A).length,0);
+ assert.equal(catalog.searchAnnex4('Sonido',A).length,1);
+ const ref=all.find(e=>e.id==='water-07-sustancias-toxicas');
+ assert.match(catalog.annex4Citation(ref),/III\. Agua, ficha 7/);
+ assert.match(catalog.annex4Citation(ref),/p\. 267/);
 });
