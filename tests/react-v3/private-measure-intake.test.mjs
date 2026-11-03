@@ -47,7 +47,8 @@ test('Cross-project impact or program IDs cannot pass even when formatted as UUI
   {...base,impactId:OTHER},{...base,programId:OTHER},
   {...base,impactId:'IMP-D-AGU'},{...base,programId:'PGA-001'}
  ]){
-  assert.throws(()=>validatePrivateMeasure(altered,scope),/no pertenece/);
+  assert.throws(()=>validatePrivateMeasure(altered,scope),/no pertenece|entre 36 y 36/,
+   'Either a malformed UUID or a nonmember UUID must be rejected');
  }
  assert.throws(()=>validatePrivateMeasure(base,{...scope,projectId:'DIAB-2026-DEMO'}),/Proyecto privado inválido/);
  assert.throws(()=>validatePrivateMeasure(base,{...scope,programIds:[]}),/no pertenece/);
