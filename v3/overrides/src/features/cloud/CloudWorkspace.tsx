@@ -276,7 +276,7 @@ export function CloudWorkspace() {
             antes de añadir la primera.</p>}
           {(privateMeasureSummary(selected.management_measures,
             selected.measure_impact_links,selected.environmental_impacts,
-            selected.management_programs) as MeasureSummary[]).map(m=>
+            selected.management_programs,selected.project.id) as MeasureSummary[]).map(m=>
             <article key={m.id} data-private-measure={m.id}>
              <div><strong>{m.title}</strong>
               <small>ID: {m.id} · Programa: {m.programLabel}</small>
