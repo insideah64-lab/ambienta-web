@@ -98,14 +98,12 @@ export function ConesaLibroPanel({projectId,projectName}:Props){
    return entry?[{id,action:a.name,phase:a.phase,factor:f.name,entry,
     result:calculateBookConesa(entry),problems:bookProblems(entry),orphan:false}]:[];
   }));
-  for(const [id,entry] of Object.entries(doc.entries)){
-   if(linked.has(id))continue;
-   entries.push({id,action:id.split('::')[1]||'Sin acción',
+  const orphaned=Object.entries(doc.entries).filter(([id])=>!linked.has(id))
+   .map(([id,entry])=>({id,action:id.split('::')[1]||'Sin acción',
     phase:'Desvinculado',factor:id.split('::')[0]||id,entry,
     result:calculateBookConesa(entry),
-    problems:['Identificador fuera del catálogo actual',...bookProblems(entry)],orphan:true});
-  }
-  return entries;
+    problems:['Identificador fuera del catálogo actual',...bookProblems(entry)],orphan:true}));
+  return [...entries,...orphaned];
  },[doc,axes]);
  const count=rows.filter(r=>!r.orphan&&r.result!==null&&r.result.status==='calculado').length;
  const uncertain=rows.filter(r=>!r.orphan&&r.result?.status==='naturaleza-incierta').length;
