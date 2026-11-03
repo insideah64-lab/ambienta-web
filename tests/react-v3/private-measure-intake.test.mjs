@@ -84,21 +84,24 @@ test('Missing session and server RLS denial never count as successful measure cr
  assert.equal(invalid.calls.length,0);
 });
 test('Only server-provided explicit links are shown; dangling links are flagged rather than inferred',()=>{
- const measures=[{id:MEASURE,title:'Control de escorrentía',status:'draft',program_id:PROGRAM}];
+ const measures=[{id:MEASURE,project_id:PROJECT,title:'Control de escorrentía',status:'draft',program_id:PROGRAM}];
  const programs=[{id:PROGRAM,code:'PGA-AGU-001',name:'Programa Agua'}];
  const impacts=[{id:IMPACT,code:'IMP-AGU-001',title:'Riesgo hídrico'}];
  const linked=privateMeasureSummary(measures,[
-  {measure_id:MEASURE,impact_id:IMPACT},
-  {measure_id:MEASURE,impact_id:IMPACT}
- ],impacts,programs);
+  {project_id:PROJECT,measure_id:MEASURE,impact_id:IMPACT},
+  {project_id:PROJECT,measure_id:MEASURE,impact_id:IMPACT}
+ ],impacts,programs,PROJECT);
  assert.equal(linked.length,1);
  assert.deepEqual(linked[0].impactIds,[IMPACT]);
  assert.equal(linked[0].programLabel,'PGA-AGU-001');
  assert.deepEqual(linked[0].problems,[]);
- const orphan=privateMeasureSummary(measures,[],impacts,programs);
+ const orphan=privateMeasureSummary(measures,[],impacts,programs,PROJECT);
  assert.equal(orphan[0].impactIds.length,0);
  assert.match(orphan[0].problems.join(' '),/Sin impacto vinculado/);
- const bad=privateMeasureSummary(measures,[{measure_id:MEASURE,impact_id:OTHER}],impacts,[]);
+ const bad=privateMeasureSummary(measures,[{project_id:PROJECT,measure_id:MEASURE,impact_id:OTHER}],impacts,[],PROJECT);
  assert.equal(bad[0].impactIds[0],OTHER);
  assert(bad[0].problems.some(s=>s.includes('no resuelto')));
+ const foreign=privateMeasureSummary(measures,[{project_id:OTHER,measure_id:MEASURE,impact_id:IMPACT}],
+  impacts,programs,PROJECT);
+ assert.equal(foreign[0].impactIds.length,0,'Never attribute cross-project links even with matching measure IDs');
 });
