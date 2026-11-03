@@ -7,6 +7,7 @@ import {
  type BookEntry,type BookRecovery,type BookNature
 } from './ConesaLibroModel';
 import './ConesaSimplificado.css';
+import {ConesaF2Panel} from './ConesaF2Panel';
 import './ConesaLibroPanel.css';
 
 type Props={projectId:string;projectName:string};
@@ -259,6 +260,8 @@ export function ConesaLibroPanel({projectId,projectName}:Props){
     </tbody></table>
    </div>
   </div>
+  <ConesaF2Panel projectId={projectId} projectName={projectName}
+   factors={axes.factors} actions={axes.actions} entries={doc.entries}/>
   <footer className="amb-matrix-footer">
    <span>Conesa · F1 · fuente 1997/reimp. 2000 · {projectId}</span>
    <span>{BOOK_BOUNDARY_POLICY}</span>
