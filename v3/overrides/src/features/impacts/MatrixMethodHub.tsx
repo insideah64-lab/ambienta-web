@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {ArrowDownToLine,X} from 'lucide-react';
+import {ArrowDownToLine,X,Grid3X3,Target,Scale,Activity,ArrowUpRight,Check} from 'lucide-react';
 import {ImpactMatrixBuilder,readMatrixAxes} from './ImpactMatrixBuilder';
 import type {DemoState} from '../../lib/demo';
 import {ConesaSimplificado} from './ConesaSimplificado';
@@ -248,19 +248,51 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
     <h3>Elegí la metodología de evaluación</h3>
     <p>Los métodos no son intercambiables: cada uno tiene criterios, escala, cálculo y fuentes propios. Cambiar de método no convierte ni traslada puntuaciones de otros.</p>
    </div>
-   <div className="amb-method-cardgrid">{CARDS.map(card=><div key={card.id}
+   <div className="amb-method-cardgrid">{CARDS.map(card=>{
+    const Icon=card.id==='causa-leopold'?Grid3X3:card.id==='conesa-simplificado-tutorial-v1'
+     ?Target:card.id==='riam-1998'?Scale:Activity;
+    return <div key={card.id}
      className={'amb-method-card'+(active===card.id?' is-active':'')+(card.available?'':' is-planned')}
      data-catalog-method={card.id}>
-    <div><small>{card.kind}</small><strong>{card.name}</strong>
-     <p>{card.detail}</p><span className="amb-method-source">{card.source}</span></div>
-    <div className="amb-method-cardbottom">
-     <span>{card.status}</span>
-     {card.available?<button type="button" aria-pressed={active===card.id}
-      onClick={()=>setActive(card.id as ActiveMethod)}>
-      {active===card.id?'Método seleccionado':'Abrir método'}</button>
-      :<span className="amb-method-prerequisite">Requiere datos de base</span>}
-    </div>
-   </div>)}</div>
+     <div className="amb-method-cardtop">
+      <div className="amb-method-cardcopy">
+       <small>{card.kind}</small><strong>{card.name}</strong>
+       <p>{card.detail}</p>
+      </div>
+      <div className="amb-method-cardvisual" aria-hidden="true">
+       <span className="amb-method-icon"><Icon size={27} strokeWidth={1.75}/></span>
+       {card.id==='causa-leopold'&&<span className="amb-method-matrix-art">
+        {Array.from({length:16},(_,i)=><i key={i}/>)}
+       </span>}
+       {card.id==='conesa-simplificado-tutorial-v1'&&<span className="amb-method-conesa-art">
+        <i/><b>25 <em>50</em> 75</b>
+       </span>}
+       {card.id==='riam-1998'&&<span className="amb-method-riam-art">
+        <i/><i/><i/><i/><i/>
+       </span>}
+       {card.id==='battelle'&&<svg className="amb-method-battelle-art"
+        viewBox="0 0 144 66" fill="none" focusable="false" aria-hidden="true">
+        <path d="M0 55H144M0 34H144M0 14H144" stroke="currentColor" strokeOpacity=".15"/>
+        <path d="M7 48L34 35L56 43L83 17L108 27L136 10"
+         stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"/>
+        <circle cx="83" cy="17" r="4" fill="currentColor"/>
+       </svg>}
+      </div>
+     </div>
+     <div className="amb-method-cardbottom">
+      <span className="amb-method-status">
+       <i aria-hidden="true"/>{card.status}
+      </span>
+      <span className="amb-method-source">{card.source}</span>
+      {card.available?<button type="button" aria-pressed={active===card.id}
+       onClick={()=>setActive(card.id as ActiveMethod)}>
+       {active===card.id?<><Check size={15} strokeWidth={2.5}/> Método seleccionado</>
+        :<>Abrir método <ArrowUpRight size={15}/></>}
+      </button>
+       :<span className="amb-method-prerequisite">Próximamente</span>}
+     </div>
+    </div>;
+   })}</div>
   </section>
   <section className="amb-method-purpose" aria-label="Finalidades y etapas de las matrices">
    <h4>Otros tipos de matrices: etapas y finalidades, no necesariamente otros métodos</h4>
