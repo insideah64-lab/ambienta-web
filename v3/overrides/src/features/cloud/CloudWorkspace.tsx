@@ -114,10 +114,36 @@ export function CloudWorkspace() {
   }
   async function openProject(projectId:string) {
     if(!reader||!user)return;
-    setBusy(true);setError('');setSelected(null);
+    setBusy(true);setError('');setSelected(null);setCreateMode(null);
     try{setSelected(await reader.loadProject(projectId));}
     catch(cause){setError(message(cause));}
     finally{setBusy(false);}
+  }
+  async function savePrivateRecord(kind:PrivateIntakeKind,values:Record<string,string>){
+   if(!reader||!user||busy)return;
+   const currentProject=selected?.project.id;
+   setBusy(true);setError('');setInfo('');
+   try{
+    if(kind==='project'){
+     const created=await reader.createProject(values);
+     setProjects(rows=>[created,...rows.filter(r=>r.id!==created.id)]);
+     setCreateMode(null);
+     setInfo('Expediente privado registrado como borrador. Los datos no están certificados.');
+     // A failed read after a successful insert must not trigger a duplicate creation.
+     try{setSelected(await reader.loadProject(created.id));}
+     catch(cause){setError('Expediente creado; no se pudo abrir la ficha: '+message(cause));}
+    }else{
+     if(!currentProject)throw Error('Seleccioná un expediente privado.');
+     if(kind==='impact')await reader.createImpact(currentProject,values);
+     else await reader.createProgram(currentProject,values);
+     setCreateMode(null);
+     setInfo(kind==='impact'?'Impacto registrado, sin valoración ambiental.':
+       'Programa PGA registrado, sin medidas ni aprobación.');
+     try{setSelected(await reader.loadProject(currentProject));}
+     catch(cause){setError('Registro creado; no se pudo actualizar la ficha: '+message(cause));}
+    }
+   }catch(cause){setError(message(cause));}
+   finally{setBusy(false);}
   }
   return <div className="v2-cloud-workspace">
     <div className="v2-cloud-heading"><span className="v2-cloud-mark"><ArtworkIcon kind="cloud" size={29}/></span>
