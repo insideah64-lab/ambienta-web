@@ -1,13 +1,15 @@
-.ref-shell .amb-f3-quality{
- --f3-viz-ink:hsl(var(--ink,216 28% 12%));
- --f3-viz-ink-soft:hsl(var(--ink-soft,215 14% 35%));
- --f3-viz-ink-muted:hsl(var(--ink-muted,215 10% 50%));
- --f3-viz-surface:hsl(var(--surface,43 36% 98%));
- --f3-viz-surface-muted:hsl(var(--surface-muted,39 29% 95%));
- --f3-viz-line:hsl(var(--line,212 17% 82%));
- --f3-viz-before:hsl(var(--warning,38 92% 48%));
- --f3-viz-after:hsl(var(--brand,187 73% 30%));
- --f3-viz-accent:hsl(var(--accent,165 58% 35%));
+.ref-shell .amb-f3 .amb-f3-quality{
+ /* La tarjeta clara no hereda colores del editor oscuro.
+    Tokens locales completos: no suponer que --ink u otros valores globales son HSL. */
+ --f3-viz-ink:hsl(210 25% 17%);
+ --f3-viz-ink-soft:hsl(210 18% 31%);
+ --f3-viz-ink-muted:hsl(208 16% 38%);
+ --f3-viz-surface:hsl(42 25% 98%);
+ --f3-viz-surface-muted:hsl(42 15% 95%);
+ --f3-viz-line:hsl(209 15% 78%);
+ --f3-viz-before:hsl(32 78% 35%);
+ --f3-viz-after:hsl(189 73% 28%);
+ --f3-viz-accent:hsl(168 63% 27%);
  margin:18px 0 22px;
  padding:20px 22px;
  background:var(--f3-viz-surface);
@@ -17,10 +19,10 @@
  box-shadow:0 3px 14px rgba(0,0,0,.08);
 }
 .ref-shell .amb-f3-quality-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
-.ref-shell .amb-f3-quality h4{font-size:18px;color:var(--f3-viz-ink);margin:3px 0 7px}
-.ref-shell .amb-f3-quality p{font-size:12px;color:var(--f3-viz-ink-soft);line-height:1.6;margin:4px 0 10px}
+.ref-shell .amb-f3 .amb-f3-quality h4{font-size:18px;color:var(--f3-viz-ink);margin:3px 0 7px}
+.ref-shell .amb-f3 .amb-f3-quality p{font-size:12px;color:var(--f3-viz-ink-soft);line-height:1.6;margin:4px 0 10px}
 .ref-shell .amb-f3-quality-head>div{max-width:800px}
-.ref-shell .amb-f3-quality-eyebrow{font-size:10px!important;font-weight:800;letter-spacing:.10em;color:var(--f3-viz-accent)!important}
+.ref-shell .amb-f3 .amb-f3-quality .amb-f3-quality-eyebrow{font-size:10px!important;font-weight:800;letter-spacing:.10em;color:var(--f3-viz-accent)!important}
 .ref-shell .amb-f3-quality-count{flex-shrink:0;border:1px solid var(--f3-viz-line);border-radius:999px;padding:7px 11px;font-size:11px;font-weight:750;color:var(--f3-viz-ink-soft);background:var(--f3-viz-surface-muted)}
 .ref-shell .amb-f3-quality-empty{background:var(--f3-viz-surface-muted);border:1px dashed var(--f3-viz-line);padding:20px;border-radius:9px;margin:14px 0}
 .ref-shell .amb-f3-quality-empty strong{font-size:14px;color:var(--f3-viz-ink)}
@@ -56,7 +58,7 @@
 .ref-shell .amb-f3-quality thead th{background:var(--f3-viz-surface-muted);font-size:11px;white-space:nowrap}
 .ref-shell .amb-f3-quality tbody th{min-width:150px}
 .ref-shell .amb-f3-quality tbody small{display:block;font-size:10px;line-height:1.5;color:var(--f3-viz-ink-muted);overflow-wrap:anywhere}
-.ref-shell .amb-f3-quality-incomplete{margin-top:13px!important;font-weight:700;color:hsl(var(--danger,0 68% 38%))!important}
+.ref-shell .amb-f3 .amb-f3-quality .amb-f3-quality-incomplete{margin-top:13px!important;font-weight:700;color:hsl(0 62% 34%)!important}
 .ref-shell .amb-f3-quality-footnote{border-left:3px solid var(--f3-viz-before);padding-left:11px;margin-top:16px!important}
 @media(max-width:850px){
  .ref-shell .amb-f3-quality-axis,.ref-shell .amb-f3-quality-row{grid-template-columns:minmax(120px,155px) minmax(140px,1fr) 67px;gap:10px}
