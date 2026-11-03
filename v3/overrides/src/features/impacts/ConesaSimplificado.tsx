@@ -2,10 +2,11 @@ import {useEffect,useMemo,useRef,useState} from 'react';
 import {ArrowDownToLine,RefreshCcw,X} from 'lucide-react';
 import {readMatrixAxes} from './ImpactMatrixBuilder';
 import {ConesaResidualPanel} from './ConesaResidualPanel';
+import type {DemoState} from '../../lib/demo';
 import {calculateConesa,conesaProblems,CONESA_FIELDS,METHOD_ID,validatedConesaEntry,type ConesaEntry} from './ConesaSimplificadoModel';
 import './ConesaSimplificado.css';
 
-type Props={projectId:string;projectName:string};
+type Props={projectId:string;projectName:string;pgaData:DemoState};
 type Draft={schema:'ambienta.conesa-simplificado.v1';projectId:string;projectName:string;updatedAt:string;entries:Record<string,ConesaEntry>};
 const STORAGE_PREFIX='ambienta-conesa-simplificado-v1:';
 const blank=(id:string,name:string):Draft=>({schema:'ambienta.conesa-simplificado.v1',
@@ -36,7 +37,7 @@ function csvSafe(x:string|number|null){
  const value=typeof x==='number'?raw:/^\s*[=+\-@\t\r]/.test(raw)?"'"+raw:raw;
  return '"'+value.replaceAll('"','""')+'"';
 }
-export function ConesaSimplificado({projectId,projectName}:Props){
+export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
  const [doc,setDoc]=useState<Draft>(()=>readDraft(projectId,projectName));
  const edited=useRef(false);
  const [refresh,setRefresh]=useState(0);
@@ -217,7 +218,7 @@ export function ConesaSimplificado({projectId,projectName}:Props){
    </div>
   </div>
   <ConesaResidualPanel projectId={projectId} initialEntries={doc.entries}
-   actions={axes.actions} factors={axes.factors}/>
+   actions={axes.actions} factors={axes.factors} pgaData={pgaData}/>
   <footer className="amb-matrix-footer">
    <span>Método: {METHOD_ID} · guardado en este navegador por expediente · {projectId}</span>
    <span>El resultado es descriptivo y requiere revisión profesional antes de incluirlo en un EsIA o PGA.</span>
