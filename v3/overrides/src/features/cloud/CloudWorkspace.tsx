@@ -80,6 +80,8 @@ export function CloudWorkspace() {
       ++generation;
       ++authEpoch.current;
       setUser(null);setProjects([]);setSelected(null);setCreateMode(null);
+      // A prior account's ID or success message must never remain after sign-out.
+      setInfo('');setError('');
       setBusy(false);
       if(!session){setLoading(false);return;}
       setLoading(true);
