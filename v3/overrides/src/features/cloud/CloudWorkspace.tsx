@@ -276,7 +276,7 @@ export function CloudWorkspace() {
           programs={selected.management_programs}
           impacts={selected.environmental_impacts}
           busy={busy} onSave={savePrivateMeasure}
-          onCancel={()=>setCreateMode(null)}/>} }
+          onCancel={()=>setCreateMode(null)}/>} 
          <div className="amb-private-record-grid">
           <div><h4>Impactos identificados · {selected.environmental_impacts.length}</h4>
            {!selected.environmental_impacts.length&&<p>Sin impactos registrados.</p>}
