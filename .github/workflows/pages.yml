@@ -21,6 +21,10 @@ jobs:
           node-version: "22"
           cache: npm
       - name: Compilar aplicación
+        env:
+          # Public Vite variables for V3 only. Never use service-role/secret keys.
+          AMBIENTA_SUPABASE_URL: ${{ vars.AMBIENTA_SUPABASE_URL }}
+          AMBIENTA_SUPABASE_PUBLISHABLE_KEY: ${{ vars.AMBIENTA_SUPABASE_PUBLISHABLE_KEY }}
         run: |
           npm ci --no-fund --no-audit
           npm run build
@@ -35,6 +39,8 @@ jobs:
           cp -a apps/web/dist/. dist/v2/
           # V3 is an independent build; never overwrite V1 or V2.
           sha256sum dist/index.html dist/v2/index.html > /tmp/ambienta-v1-v2-before.sha
+          VITE_SUPABASE_URL="$AMBIENTA_SUPABASE_URL" \
+          VITE_SUPABASE_PUBLISHABLE_KEY="$AMBIENTA_SUPABASE_PUBLISHABLE_KEY" \
           bash v3/scripts/build-v3.sh
           node --test tests/react-v3/*.test.mjs
           sha256sum -c /tmp/ambienta-v1-v2-before.sha
