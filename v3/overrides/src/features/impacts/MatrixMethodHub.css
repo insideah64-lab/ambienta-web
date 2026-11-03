@@ -7,8 +7,8 @@
 }
 .ref-shell .amb-method-heading h3{font-size:23px;letter-spacing:-.02em;margin:5px 0 8px}
 .ref-shell .amb-method-heading p:not(.amb-matrix-overline){max-width:880px;color:#c1dce3;font-size:13px;line-height:1.6;margin:0 0 16px}
-.ref-shell .amb-method-cardgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
-.ref-shell .amb-method-card:last-child{grid-column:span 2}
+.ref-shell .amb-method-cardgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.ref-shell .amb-method-card:last-child{grid-column:auto}
 .ref-shell .amb-method-card{
  display:flex;flex-direction:column;justify-content:space-between;min-width:0;
  border:1px solid #426878;border-radius:12px;padding:15px;
@@ -82,3 +82,12 @@
  .ref-shell .amb-method-catalog{padding:16px}
  .ref-shell .amb-method-stats{grid-template-columns:1fr}
 }
+
+.ref-shell .amb-conesa-archive{margin-top:20px;border:1px solid #627e8c;background:#142d3b;color:#e0eff0;border-radius:12px;padding:18px;display:grid;gap:12px}
+.ref-shell .amb-conesa-archive>div>small{font-size:10px;font-weight:800;letter-spacing:.06em;color:#b0d3da}
+.ref-shell .amb-conesa-archive h4{font-size:16px;color:#edf7f5;margin:6px 0}
+.ref-shell .amb-conesa-archive p{font-size:12px;line-height:1.6;color:#cbdee2;margin:0}
+.ref-shell .amb-conesa-archive>button{justify-self:start;border:1px solid #6aabb2;border-radius:8px;background:#245563;color:#f2fffe;padding:10px 14px;cursor:pointer;font-size:12px;font-weight:750}
+.ref-shell .amb-conesa-archive>button:focus-visible{outline:2px solid #f4db93;outline-offset:2px}
+.ref-shell .amb-conesa-archive [data-method-assessment]{margin-top:4px;border-top:1px solid #486976;padding-top:18px}
+.ref-shell .amb-conesa-archive [data-method-assessment] :disabled{opacity:.78;cursor:not-allowed}
