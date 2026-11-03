@@ -9,7 +9,8 @@ import type {F2Factor} from './ConesaF2Model';
 import type {F3FactorRecord,F3Quality} from './ConesaF3Model';
 
 export type F3ComparisonRow={
- factor:F2Factor;record:F3FactorRecord|undefined;result:F3Quality|null;issues:string[]
+ factor:F2Factor;record:F3FactorRecord|undefined;result:F3Quality|null;issues:string[];
+ methodDescription?:string;methodSource?:string
 };
 type Props={rows:readonly F3ComparisonRow[]};
 const format=(v:number)=>v.toFixed(4);
@@ -81,14 +82,14 @@ export function ConesaF3Comparison({rows}:Props){
         <th scope="col">Referencia CON</th>
         <th scope="col">Función</th>
        </tr></thead>
-       <tbody>{valid.map(({factor,record,result})=><tr key={factor.id}>
+       <tbody>{valid.map(({factor,record,result,methodDescription,methodSource})=><tr key={factor.id}>
         <th scope="row">{factor.name}<small>{record.indicator} · {record.unit}</small></th>
         <td>{format(result.without)}</td>
         <td>{format(result.withProject)}</td>
         <td>{signed(result.delta)}</td>
         <td>{record.without.kind==='medido'?'Medido':'Estimado'} · {record.without.date}<small>{record.without.source}</small></td>
         <td>{record.withProject.kind==='medido'?'Medido':'Estimado'} · {record.withProject.date}<small>{record.withProject.source}</small></td>
-        <td>Lineal {record.transformation.orientation}<small>{record.transformation.source}</small></td>
+        <td>{methodDescription??'F3a · lineal'}<small>{methodSource??record.transformation.source}</small></td>
        </tr>)}</tbody>
       </table>
      </div>
