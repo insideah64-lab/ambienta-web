@@ -173,8 +173,16 @@ export function CloudWorkspace() {
     {client&&!loading&&user&&<div className="v2-cloud-private">
       <p className="v2-cloud-identity">Sesión verificada: <strong>{user.email??'Usuario autenticado'}</strong></p>
       {busy&&<p role="status">Consultando registros…</p>}
-      {!selected&&<div className="v2-cloud-list">
-        <h2>Mis expedientes</h2>
+      {!selected&&<div className="v2-cloud-list" data-private-project-list>
+        <div className="amb-private-list-header">
+         <div><h2>Mis expedientes</h2><p>Registros privados de esta cuenta, protegidos por las reglas RLS del servidor.</p></div>
+         <button type="button" className="v2-action-button" disabled={busy}
+          onClick={()=>{setCreateMode(createMode==='project'?null:'project');setError('');}}>
+           {createMode==='project'?'Cerrar formulario':'Nuevo expediente privado'}</button>
+        </div>
+        {createMode==='project'&&<PrivateIntakeForm kind="project" busy={busy}
+         onSave={values=>savePrivateRecord('project',values)}
+         onCancel={()=>setCreateMode(null)}/>}
         {!busy&&!projects.length&&<p>Aún no hay expedientes disponibles para esta cuenta.</p>}
         {projects.map(p=><button type="button" key={p.id} disabled={busy}
           className="v2-cloud-project" onClick={()=>void openProject(p.id)}>
@@ -183,9 +191,13 @@ export function CloudWorkspace() {
         </button>)}
       </div>}
       {selected&&<div className="v2-cloud-detail">
-        <button type="button" className="v2-cloud-switch" onClick={()=>setSelected(null)}>← Volver a mis expedientes</button>
+        <button type="button" className="v2-cloud-switch" disabled={busy}
+         onClick={()=>{setSelected(null);setCreateMode(null);}}>← Volver a mis expedientes</button>
         <h2>{selected.project.name}</h2>
         <p>{selected.project.province} · {selected.project.status}</p>
+        <p className="amb-private-source" role="note">Fuente: expediente privado autenticado.
+         Son declaraciones registradas, no mediciones verificadas, dictámenes
+         ni documentos oficiales acreditados. No se mezclan con Diablillos DEMO.</p>
         <div className="v2-cloud-counts">
           {([['Impactos',selected.environmental_impacts.length],['Programas PGA',selected.management_programs.length],
             ['Medidas',selected.management_measures.length],['Inspecciones',selected.monitoring_inspections.length],
@@ -193,11 +205,44 @@ export function CloudWorkspace() {
             ['Acciones correctivas',selected.corrective_actions.length]] as [string,number][]).map(([label,count])=>
               <div key={label}><span>{label}</span><strong>{count}</strong></div>)}
         </div>
+        <section className="amb-private-bootstrap" data-private-records>
+         <div className="amb-private-list-header">
+          <div><h3>Identificación ambiental del expediente</h3>
+           <p>Alta de impactos y programas PGA; evaluación y aprobación profesional pendientes.</p></div>
+          <div className="amb-private-actions">
+           <button type="button" disabled={busy} onClick={()=>setCreateMode(createMode==='impact'?null:'impact')}>Registrar impacto</button>
+           <button type="button" disabled={busy} onClick={()=>setCreateMode(createMode==='program'?null:'program')}>Nuevo programa PGA</button>
+          </div>
+         </div>
+         {(createMode==='impact'||createMode==='program')&&
+          <PrivateIntakeForm kind={createMode} busy={busy}
+           onSave={values=>savePrivateRecord(createMode,values)}
+           onCancel={()=>setCreateMode(null)}/>}
+         <div className="amb-private-record-grid">
+          <div><h4>Impactos identificados · {selected.environmental_impacts.length}</h4>
+           {!selected.environmental_impacts.length&&<p>Sin impactos registrados.</p>}
+           {selected.environmental_impacts.map(i=><div key={i.id}>
+            <strong>{i.code||i.id} · {i.title||'Impacto sin título'}</strong>
+            <small>{i.factor||'Factor pendiente'} · {i.project_phase||'Sin etapa'} · {i.sign||'Sin naturaleza'}</small>
+           </div>)}
+          </div>
+          <div><h4>Programas PGA · {selected.management_programs.length}</h4>
+           {!selected.management_programs.length&&<p>Sin programas registrados.</p>}
+           {selected.management_programs.map(p=><div key={p.id}>
+            <strong>{p.code||p.id} · {p.name||'Programa sin nombre'}</strong>
+            <small>{p.category||'Categoría pendiente'}</small>
+           </div>)}
+          </div>
+         </div>
+        </section>
         <CloudEvidencePilot projectId={selected.project.id} measures={selected.management_measures}
           evidence={selected.environmental_evidence} reader={reader!} onUploaded={async()=>{
            if(user&&reader){const latest=await reader.loadProject(selected.project.id);setSelected(latest);}
           }}/>
-        <p className="v2-cloud-readonly">Los demás formularios de edición y las aprobaciones siguen fuera de esta V2 experimental. No se certificó autorización cruzada con dos usuarios.</p>
+        <p className="v2-cloud-readonly">Los vínculos entre impactos, medidas, monitoreo y matrices profesionales
+         aún no están conectados al expediente real. El rol de revisor independiente y
+         las aprobaciones permanecen inhabilitados hasta diseñar políticas y comprobar
+         acceso cruzado con dos usuarios autenticados distintos.</p>
       </div>}
     </div>}
   </div>;
