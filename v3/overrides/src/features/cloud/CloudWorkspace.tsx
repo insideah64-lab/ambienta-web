@@ -253,6 +253,46 @@ export function CloudWorkspace() {
    }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
    finally{if(epoch===authEpoch.current)setBusy(false);}
   }
+  async function savePrivateAudit(
+   kind:'finding'|'action',values:PrivateFindingValues|PrivateCorrectiveActionValues
+  ){
+   if(!reader||!user||!selected||busy)return;
+   const epoch=authEpoch.current,projectId=selected.project.id;
+   const scope={projectId,inspections:selected.monitoring_inspections,
+    findings:selected.audit_findings};
+   let finding:PrivateFindingValues|undefined;
+   let action:PrivateCorrectiveActionValues|undefined;
+   try{
+    if(kind==='finding')finding=validatePrivateFinding(values,scope) as PrivateFindingValues;
+    else action=validatePrivateCorrectiveAction(values,scope) as PrivateCorrectiveActionValues;
+   }catch(cause){setError(message(cause));return;}
+   setBusy(true);setError('');setInfo('');
+   try{
+    if(finding){
+     const {inspectionId,...fields}=finding;
+     await reader.createFinding(projectId,inspectionId,fields);
+    }else if(action){
+     const {findingId,...fields}=action;
+     await reader.createCorrectiveAction(projectId,findingId,fields);
+    }
+    if(epoch!==authEpoch.current)return;
+    setCreateMode(null);
+    setInfo(kind==='finding'
+     ?'Hallazgo creado en estado abierto; no es un dictamen ni una aprobación.'
+     :'Acción correctiva creada en estado abierto; no acredita implementación ni cierre.');
+    try{
+     const fresh=await reader.loadProject(projectId);
+     if(epoch===authEpoch.current)setSelected(fresh);
+    }catch(cause){
+     if(epoch===authEpoch.current)setError('Registro creado; no se pudo refrescar el expediente: '+message(cause));
+    }
+   }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
+   finally{if(epoch===authEpoch.current)setBusy(false);}
+  }
+  const auditing=selected?privateAuditSummary(selected) as {
+   findings:Array<{id:string;inspectionId:string;inspectionDate:string;title:string;description:string;severity:string;status:string;warnings:string[]}>;
+   actions:Array<{id:string;findingId:string;linkedTitle:string;action:string;owner:string;dueDate:string;status:string;warnings:string[]}>
+  }:null;
   const monitoring=selected?privateMonitoringSummary(selected) as {
    inspections:Array<{id:string;measureName:string;date:string;result:string;note:string;warnings:string[]}>;
    references:Array<{id:string;measureName:string;inspectionId:string;label:string;
