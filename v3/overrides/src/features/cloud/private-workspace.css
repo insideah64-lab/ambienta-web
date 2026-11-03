@@ -22,3 +22,15 @@
 .ref-shell .amb-private-record-grid strong{display:block;font-size:12px;color:#e6f0f5;overflow-wrap:anywhere}
 .ref-shell .amb-private-record-grid small{display:block;font-size:11px;color:#c2d6dd;margin-top:4px}
 @media(max-width:900px){.ref-shell .amb-private-record-grid,.ref-shell .amb-private-fields{grid-template-columns:1fr}}
+
+.ref-shell .amb-private-fields .amb-private-wide{grid-column:1/-1}
+.ref-shell .amb-private-measure-register{margin-top:20px;padding:16px;border:1px solid #547686;background:#173c4e;border-radius:10px}
+.ref-shell .amb-private-measure-register h4{font-size:16px;color:#e9f5f6;margin:0 0 12px}
+.ref-shell .amb-private-measure-register>p{font-size:12px;line-height:1.6;color:#c6d8df}
+.ref-shell .amb-private-measure-register article{display:flex;justify-content:space-between;gap:16px;padding:13px 0;border-top:1px solid #426474;align-items:flex-start}
+.ref-shell .amb-private-measure-register article>div{min-width:0;flex:1}
+.ref-shell .amb-private-measure-register article strong{display:block;font-size:13px;color:#ecf7f7;overflow-wrap:anywhere}
+.ref-shell .amb-private-measure-register article small{display:block;color:#c5dbe1;font-size:12px;margin-top:6px;overflow-wrap:anywhere}
+.ref-shell .amb-private-draft-state{background:#574c3d;color:#ffe5ac;border:1px solid #ad9361;padding:5px 9px;border-radius:6px;font-size:11px;white-space:nowrap}
+.ref-shell .amb-private-measure-warning{font-size:12px;color:#ffdfbd;margin:8px 0;border-left:3px solid #e6b366;padding-left:8px}
+@media(max-width:800px){.ref-shell .amb-private-measure-register article{flex-wrap:wrap}}

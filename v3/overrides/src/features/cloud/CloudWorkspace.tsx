@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import {LogIn, LogOut, RefreshCw} from 'lucide-react';
 import {ArtworkIcon} from '../iconography/ArtworkIcon';
 import type { User } from '@supabase/supabase-js';
@@ -7,22 +7,30 @@ import { getSupabaseClient } from '../../lib/supabase';
 import { createEnvironmentalRepository } from '../../../../../web/cloud/repository.mjs';
 import {CloudEvidencePilot} from './CloudEvidencePilot';
 import {PrivateIntakeForm,type PrivateIntakeKind} from './PrivateIntakeForm';
+import {PrivateMeasureForm,type PrivateMeasureValues} from './PrivateMeasureForm';
+// @ts-ignore: pure documentary projection, tested natively
+import {privateMeasureSummary} from './private-measure.mjs';
 import './private-workspace.css';
 import './cloud.css';
 
 type ProjectRow = { id:string; owner_id?:string; name:string; province:string; project_phase:string; status:string; created_at:string };
-type MeasureRow = {id:string;title?:string};
+type MeasureRow = {id:string;title?:string;program_id?:string;status?:string};
+type MeasureImpactLinkRow={measure_id:string;impact_id:string;project_id:string};
+type MeasureSummary={id:string;title:string;status:string;programLabel:string;
+ impactLabels:string[];problems:string[]};
 type ImpactRow = {id:string;code?:string;title?:string;factor?:string;sign?:string;project_phase?:string};
 type ProgramRow = {id:string;code?:string;name?:string;category?:string};
 type EvidenceRow = {id:string;measure_id?:string;label?:string;storage_path?:string|null;original_file_name?:string|null;file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
 type ProjectDetail = { project:ProjectRow; environmental_impacts:ImpactRow[];
   management_programs:ProgramRow[]; management_measures:MeasureRow[];
+  measure_impact_links:MeasureImpactLinkRow[];
   monitoring_inspections:unknown[]; environmental_evidence:EvidenceRow[];
   audit_findings:unknown[]; corrective_actions:unknown[] };
 type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>Promise<ProjectDetail>;
   createProject:(values:Record<string,string>)=>Promise<ProjectRow>;
   createImpact:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
   createProgram:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
+  createMeasure:(projectId:string,values:PrivateMeasureValues)=>Promise<string>;
   uploadEvidenceFile:(projectId:string,measureId:string,values:{label:string;file:File})=>Promise<unknown>;
   downloadEvidence:(row:EvidenceRow)=>Promise<{blob:Blob;name:string}> };
 function message(cause:unknown):string {
@@ -31,6 +39,7 @@ function message(cause:unknown):string {
 export function CloudWorkspace() {
   const client=useMemo(()=>getSupabaseClient(),[]);
   const reader=useMemo<Reader|null>(()=>client?createEnvironmentalRepository(client) as unknown as Reader:null,[client]);
+  const authEpoch=useRef(0);
   const [user,setUser]=useState<User|null>(null);
   const [loading,setLoading]=useState(Boolean(client));
   const [busy,setBusy]=useState(false);
@@ -39,7 +48,7 @@ export function CloudWorkspace() {
   const [error,setError]=useState('');
   const [info,setInfo]=useState('');
   const [mode,setMode]=useState<'login'|'signup'>('login');
-  const [createMode,setCreateMode]=useState<PrivateIntakeKind|null>(null);
+  const [createMode,setCreateMode]=useState<PrivateIntakeKind|'measure'|null>(null);
 
   useEffect(()=>{
     if(!client)return;
@@ -60,7 +69,9 @@ export function CloudWorkspace() {
     }
     const {data:subscription}=client.auth.onAuthStateChange((_event,session)=>{
       ++generation;
+      ++authEpoch.current;
       setUser(null);setProjects([]);setSelected(null);setCreateMode(null);
+      setBusy(false);
       if(!session){setLoading(false);return;}
       setLoading(true);
       // Avoid calling other Supabase APIs synchronously inside the Auth callback.
@@ -73,10 +84,11 @@ export function CloudWorkspace() {
   useEffect(()=>{
     if(!user||!reader){setProjects([]);setSelected(null);return;}
     let active=true;
+    const epoch=authEpoch.current;
     setBusy(true);setProjects([]);setSelected(null);
-    reader.listProjects().then(rows=>{if(active)setProjects(rows);})
-      .catch(cause=>{if(active)setError(message(cause));})
-      .finally(()=>{if(active)setBusy(false);});
+    reader.listProjects().then(rows=>{if(active&&epoch===authEpoch.current)setProjects(rows);})
+      .catch(cause=>{if(active&&epoch===authEpoch.current)setError(message(cause));})
+      .finally(()=>{if(active&&epoch===authEpoch.current)setBusy(false);});
     return ()=>{active=false;};
   },[user?.id,reader]);
 
@@ -114,36 +126,76 @@ export function CloudWorkspace() {
   }
   async function openProject(projectId:string) {
     if(!reader||!user)return;
+    const epoch=authEpoch.current;
     setBusy(true);setError('');setSelected(null);setCreateMode(null);
-    try{setSelected(await reader.loadProject(projectId));}
-    catch(cause){setError(message(cause));}
-    finally{setBusy(false);}
+    try{
+      const result=await reader.loadProject(projectId);
+      if(epoch===authEpoch.current)setSelected(result);
+    }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
+    finally{if(epoch===authEpoch.current)setBusy(false);}
   }
   async function savePrivateRecord(kind:PrivateIntakeKind,values:Record<string,string>){
    if(!reader||!user||busy)return;
+   const epoch=authEpoch.current;
    const currentProject=selected?.project.id;
    setBusy(true);setError('');setInfo('');
    try{
     if(kind==='project'){
      const created=await reader.createProject(values);
+     if(epoch!==authEpoch.current)return;
      setProjects(rows=>[created,...rows.filter(r=>r.id!==created.id)]);
      setCreateMode(null);
      setInfo('Expediente privado registrado como borrador. Los datos no están certificados.');
-     // A failed read after a successful insert must not trigger a duplicate creation.
-     try{setSelected(await reader.loadProject(created.id));}
-     catch(cause){setError('Expediente creado; no se pudo abrir la ficha: '+message(cause));}
+     // Creation already succeeded: do not retry on a failed follow-up SELECT.
+     try{
+      const fresh=await reader.loadProject(created.id);
+      if(epoch===authEpoch.current)setSelected(fresh);
+     }catch(cause){
+      if(epoch===authEpoch.current)setError('Expediente creado; no se pudo abrir la ficha: '+message(cause));
+     }
     }else{
      if(!currentProject)throw Error('Seleccioná un expediente privado.');
      if(kind==='impact')await reader.createImpact(currentProject,values);
      else await reader.createProgram(currentProject,values);
+     if(epoch!==authEpoch.current)return;
      setCreateMode(null);
      setInfo(kind==='impact'?'Impacto registrado, sin valoración ambiental.':
        'Programa PGA registrado, sin medidas ni aprobación.');
-     try{setSelected(await reader.loadProject(currentProject));}
-     catch(cause){setError('Registro creado; no se pudo actualizar la ficha: '+message(cause));}
+     try{
+      const fresh=await reader.loadProject(currentProject);
+      if(epoch===authEpoch.current)setSelected(fresh);
+     }catch(cause){
+      if(epoch===authEpoch.current)setError('Registro creado; no se pudo actualizar la ficha: '+message(cause));
+     }
     }
-   }catch(cause){setError(message(cause));}
-   finally{setBusy(false);}
+   }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
+   finally{if(epoch===authEpoch.current)setBusy(false);}
+  }
+  async function savePrivateMeasure(values:PrivateMeasureValues){
+   if(!reader||!user||!selected||busy)return;
+   const epoch=authEpoch.current;
+   const projectId=selected.project.id;
+   // The form restricts both IDs to this project's loaded catalogs.
+   if(!selected.management_programs.some(p=>p.id===values.programId)||
+      !selected.environmental_impacts.some(i=>i.id===values.impactId)){
+    setError('Programa o impacto fuera del expediente activo; actualizá los registros.');
+    return;
+   }
+   setBusy(true);setError('');setInfo('');
+   try{
+    const newId=await reader.createMeasure(projectId,values);
+    if(epoch!==authEpoch.current)return;
+    setCreateMode(null);
+    setInfo('Medida '+newId+' creada en borrador y vinculada al impacto declarado. No fue aprobada.');
+    // The insert already happened; a subsequent read failure is NOT a failed creation.
+    try{
+     const fresh=await reader.loadProject(projectId);
+     if(epoch===authEpoch.current)setSelected(fresh);
+    }catch(cause){
+     if(epoch===authEpoch.current)setError('Medida ya creada; no se pudo actualizar el expediente: '+message(cause));
+    }
+   }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
+   finally{if(epoch===authEpoch.current)setBusy(false);}
   }
   return <div className="v2-cloud-workspace">
     <div className="v2-cloud-heading"><span className="v2-cloud-mark"><ArtworkIcon kind="cloud" size={29}/></span>
@@ -212,12 +264,19 @@ export function CloudWorkspace() {
           <div className="amb-private-actions">
            <button type="button" disabled={busy} onClick={()=>setCreateMode(createMode==='impact'?null:'impact')}>Registrar impacto</button>
            <button type="button" disabled={busy} onClick={()=>setCreateMode(createMode==='program'?null:'program')}>Nuevo programa PGA</button>
+           <button type="button" disabled={busy} onClick={()=>setCreateMode(createMode==='measure'?null:'measure')}>Nueva medida vinculada</button>
           </div>
          </div>
          {(createMode==='impact'||createMode==='program')&&
           <PrivateIntakeForm kind={createMode} busy={busy}
            onSave={values=>savePrivateRecord(createMode,values)}
            onCancel={()=>setCreateMode(null)}/>}
+         {createMode==='measure'&&<PrivateMeasureForm
+          projectId={selected.project.id}
+          programs={selected.management_programs}
+          impacts={selected.environmental_impacts}
+          busy={busy} onSave={savePrivateMeasure}
+          onCancel={()=>setCreateMode(null)}/>} 
          <div className="amb-private-record-grid">
           <div><h4>Impactos identificados · {selected.environmental_impacts.length}</h4>
            {!selected.environmental_impacts.length&&<p>Sin impactos registrados.</p>}
@@ -233,6 +292,26 @@ export function CloudWorkspace() {
             <small>{p.category||'Categoría pendiente'}</small>
            </div>)}
           </div>
+         </div>
+         <div className="amb-private-measure-register" data-private-measures>
+          <h4>Medidas del PGA vinculadas · {selected.management_measures.length}</h4>
+          {!selected.management_measures.length&&
+           <p>No hay medidas registradas en este expediente. Elegí un programa y un impacto
+            antes de añadir la primera.</p>}
+          {(privateMeasureSummary(selected.management_measures,
+            selected.measure_impact_links,selected.environmental_impacts,
+            selected.management_programs,selected.project.id) as MeasureSummary[]).map(m=>
+            <article key={m.id} data-private-measure={m.id}>
+             <div><strong>{m.title}</strong>
+              <small>ID: {m.id} · Programa: {m.programLabel}</small>
+              <small>Impactos vinculados: {m.impactLabels.length?m.impactLabels.join(' · '):'Sin vínculos'}</small>
+              {m.problems.length>0&&
+               <p className="amb-private-measure-warning" role="status">{m.problems.join(' · ')}</p>}
+             </div>
+             <span className="amb-private-draft-state">{m.status==='draft'?'Borrador':m.status.replaceAll('_',' ')}</span>
+            </article>)}
+          <p>Los enlaces provienen de <code>measure_impact_links</code>; no se deducen
+           por coincidencias de nombres ni constituyen acreditación de cumplimiento.</p>
          </div>
         </section>
         <CloudEvidencePilot projectId={selected.project.id} measures={selected.management_measures}
