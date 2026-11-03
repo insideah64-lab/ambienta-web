@@ -9,6 +9,9 @@ import {CloudEvidencePilot} from './CloudEvidencePilot';
 import {PrivateIntakeForm,type PrivateIntakeKind} from './PrivateIntakeForm';
 import {PrivateMeasureForm,type PrivateMeasureValues} from './PrivateMeasureForm';
 import {PrivateMonitoringForm,type PrivateInspectionValues,type PrivateEvidenceReferenceValues} from './PrivateMonitoringForm';
+import {PrivateAuditForm,type PrivateFindingValues,type PrivateCorrectiveActionValues} from './PrivateAuditForm';
+// @ts-ignore: read-only projection and validators have Node test coverage
+import {privateAuditSummary,validatePrivateFinding,validatePrivateCorrectiveAction} from './private-audit.mjs';
 // @ts-ignore: pure documentary projection, tested by Node
 import {privateMonitoringSummary,validatePrivateInspection,validatePrivateEvidenceReference} from './private-monitoring.mjs';
 // @ts-ignore: pure documentary projection, tested natively
@@ -25,6 +28,8 @@ type MeasureSummary={id:string;title:string;status:string;programLabel:string;
  impactLabels:string[];problems:string[]};
 type ImpactRow = {id:string;code?:string;title?:string;factor?:string;sign?:string;project_phase?:string};
 type ProgramRow = {id:string;code?:string;name?:string;category?:string};
+type FindingRow={id:string;project_id:string;inspection_id:string;title:string;description:string;severity:string;status:string};
+type CorrectiveActionRow={id:string;project_id:string;finding_id:string;action:string;owner_label:string;due_date:string|null;status:string};
 type EvidenceRow = {id:string;project_id?:string;measure_id?:string;inspection_id?:string|null;
  label?:string;reference_label?:string;storage_path?:string|null;original_file_name?:string|null;
  file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
@@ -32,7 +37,7 @@ type ProjectDetail = { project:ProjectRow; environmental_impacts:ImpactRow[];
   management_programs:ProgramRow[]; management_measures:MeasureRow[];
   measure_impact_links:MeasureImpactLinkRow[];
   monitoring_inspections:InspectionRow[]; environmental_evidence:EvidenceRow[];
-  audit_findings:unknown[]; corrective_actions:unknown[] };
+  audit_findings:FindingRow[]; corrective_actions:CorrectiveActionRow[] };
 type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>Promise<ProjectDetail>;
   createProject:(values:Record<string,string>)=>Promise<ProjectRow>;
   createImpact:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
@@ -40,6 +45,8 @@ type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>
   createMeasure:(projectId:string,values:PrivateMeasureValues)=>Promise<string>;
   createInspection:(projectId:string,measureId:string,values:Omit<PrivateInspectionValues,'measureId'>)=>Promise<InspectionRow>;
   registerEvidence:(projectId:string,measureId:string,values:Omit<PrivateEvidenceReferenceValues,'measureId'>)=>Promise<EvidenceRow>;
+  createFinding:(projectId:string,inspectionId:string,values:Omit<PrivateFindingValues,'inspectionId'>)=>Promise<FindingRow>;
+  createCorrectiveAction:(projectId:string,findingId:string,values:Omit<PrivateCorrectiveActionValues,'findingId'>)=>Promise<CorrectiveActionRow>;
   uploadEvidenceFile:(projectId:string,measureId:string,values:{label:string;file:File})=>Promise<unknown>;
   downloadEvidence:(row:EvidenceRow)=>Promise<{blob:Blob;name:string}> };
 function message(cause:unknown):string {
@@ -57,7 +64,7 @@ export function CloudWorkspace() {
   const [error,setError]=useState('');
   const [info,setInfo]=useState('');
   const [mode,setMode]=useState<'login'|'signup'>('login');
-  const [createMode,setCreateMode]=useState<PrivateIntakeKind|'measure'|'inspection'|'reference'|null>(null);
+  const [createMode,setCreateMode]=useState<PrivateIntakeKind|'measure'|'inspection'|'reference'|'finding'|'action'|null>(null);
 
   useEffect(()=>{
     if(!client)return;
