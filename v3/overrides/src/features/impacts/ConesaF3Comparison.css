@@ -1,0 +1,69 @@
+.ref-shell .amb-f3-quality{
+ --f3-viz-ink:hsl(var(--ink,216 28% 12%));
+ --f3-viz-ink-soft:hsl(var(--ink-soft,215 14% 35%));
+ --f3-viz-ink-muted:hsl(var(--ink-muted,215 10% 50%));
+ --f3-viz-surface:hsl(var(--surface,43 36% 98%));
+ --f3-viz-surface-muted:hsl(var(--surface-muted,39 29% 95%));
+ --f3-viz-line:hsl(var(--line,212 17% 82%));
+ --f3-viz-before:hsl(var(--warning,38 92% 48%));
+ --f3-viz-after:hsl(var(--brand,187 73% 30%));
+ --f3-viz-accent:hsl(var(--accent,165 58% 35%));
+ margin:18px 0 22px;
+ padding:20px 22px;
+ background:var(--f3-viz-surface);
+ color:var(--f3-viz-ink);
+ border:1px solid var(--f3-viz-line);
+ border-radius:13px;
+ box-shadow:0 3px 14px rgba(0,0,0,.08);
+}
+.ref-shell .amb-f3-quality-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap}
+.ref-shell .amb-f3-quality h4{font-size:18px;color:var(--f3-viz-ink);margin:3px 0 7px}
+.ref-shell .amb-f3-quality p{font-size:12px;color:var(--f3-viz-ink-soft);line-height:1.6;margin:4px 0 10px}
+.ref-shell .amb-f3-quality-head>div{max-width:800px}
+.ref-shell .amb-f3-quality-eyebrow{font-size:10px!important;font-weight:800;letter-spacing:.10em;color:var(--f3-viz-accent)!important}
+.ref-shell .amb-f3-quality-count{flex-shrink:0;border:1px solid var(--f3-viz-line);border-radius:999px;padding:7px 11px;font-size:11px;font-weight:750;color:var(--f3-viz-ink-soft);background:var(--f3-viz-surface-muted)}
+.ref-shell .amb-f3-quality-empty{background:var(--f3-viz-surface-muted);border:1px dashed var(--f3-viz-line);padding:20px;border-radius:9px;margin:14px 0}
+.ref-shell .amb-f3-quality-empty strong{font-size:14px;color:var(--f3-viz-ink)}
+.ref-shell .amb-f3-quality-empty p{margin-bottom:0}
+.ref-shell .amb-f3-quality-legend{display:flex;gap:17px;align-items:center;flex-wrap:wrap;font-size:11px;color:var(--f3-viz-ink-soft);margin:14px 0 12px}
+.ref-shell .amb-f3-quality-legend span{display:flex;align-items:center;gap:7px}
+.ref-shell .amb-f3-dot{display:inline-block;width:12px;height:12px;border-radius:50%;box-sizing:border-box}
+.ref-shell .amb-f3-dot-before{border:3px solid var(--f3-viz-before);background:var(--f3-viz-surface)}
+.ref-shell .amb-f3-dot-after{background:var(--f3-viz-after)}
+.ref-shell .amb-f3-quality-link-key{width:16px;height:3px;background:var(--f3-viz-ink-muted);border-radius:4px}
+.ref-shell .amb-f3-quality-graph{padding:4px 0 8px;max-height:460px;overflow-y:auto}
+.ref-shell .amb-f3-quality-axis,.ref-shell .amb-f3-quality-row{display:grid;grid-template-columns:minmax(140px,220px) minmax(170px,1fr) 88px;gap:14px;align-items:center}
+.ref-shell .amb-f3-quality-axis{padding-bottom:8px;font-size:11px;color:var(--f3-viz-ink-muted)}
+.ref-shell .amb-f3-quality-axis::before,.ref-shell .amb-f3-quality-axis::after{content:''}
+.ref-shell .amb-f3-quality-axis span{display:none}
+.ref-shell .amb-f3-quality-axis{position:relative}
+.ref-shell .amb-f3-quality-axis span:first-child{display:block;position:absolute;left:calc(220px + 14px);bottom:0}
+.ref-shell .amb-f3-quality-axis span:last-child{display:block;position:absolute;right:88px;bottom:0}
+.ref-shell .amb-f3-quality-row{min-height:58px;border-top:1px solid var(--f3-viz-line);padding:9px 0}
+.ref-shell .amb-f3-quality-name{min-width:0}
+.ref-shell .amb-f3-quality-name strong{display:block;font-size:12px;color:var(--f3-viz-ink);overflow-wrap:anywhere}
+.ref-shell .amb-f3-quality-name small{display:block;margin-top:2px;font-size:11px;line-height:1.35;color:var(--f3-viz-ink-muted);overflow-wrap:anywhere}
+.ref-shell .amb-f3-quality-track{position:relative;height:32px;border-left:1px solid var(--f3-viz-line);border-right:1px solid var(--f3-viz-line);background:linear-gradient(to right,transparent calc(25% - 1px),var(--f3-viz-line) 25%,transparent calc(25% + 1px),transparent calc(50% - 1px),var(--f3-viz-line) 50%,transparent calc(50% + 1px),transparent calc(75% - 1px),var(--f3-viz-line) 75%,transparent calc(75% + 1px));}
+.ref-shell .amb-f3-quality-connector{position:absolute;left:var(--f3-connector-start);width:var(--f3-connector-width);height:3px;top:14px;background:var(--f3-viz-ink-muted);border-radius:4px}
+.ref-shell .amb-f3-quality-marker{position:absolute;box-sizing:border-box;top:8px;width:16px;height:16px;border-radius:50%;transform:translateX(-50%);box-shadow:0 0 0 2px var(--f3-viz-surface)}
+.ref-shell .amb-f3-quality-marker-before{left:var(--f3-before);border:4px solid var(--f3-viz-before);background:var(--f3-viz-surface);z-index:1}
+.ref-shell .amb-f3-quality-marker-after{left:var(--f3-after);background:var(--f3-viz-after);border:2px solid var(--f3-viz-surface);z-index:2}
+.ref-shell .amb-f3-quality-delta{text-align:right;font-size:13px;color:var(--f3-viz-ink);font-variant-numeric:tabular-nums}
+.ref-shell .amb-f3-quality-disclosure{margin-top:13px;border-top:1px solid var(--f3-viz-line);padding-top:13px}
+.ref-shell .amb-f3-quality-disclosure summary{cursor:pointer;color:var(--f3-viz-after);font-size:12px;font-weight:750;list-style-position:inside}
+.ref-shell .amb-f3-quality-disclosure summary:focus-visible{outline:3px solid var(--f3-viz-before);outline-offset:4px;border-radius:4px}
+.ref-shell .amb-f3-quality-table-wrap{margin-top:12px;max-width:100%;overflow-x:auto}
+.ref-shell .amb-f3-quality table{border-collapse:collapse;width:100%;font-size:11px;color:var(--f3-viz-ink)}
+.ref-shell .amb-f3-quality caption{padding:8px;text-align:left;color:var(--f3-viz-ink-soft);font-size:11px}
+.ref-shell .amb-f3-quality th,.ref-shell .amb-f3-quality td{border-bottom:1px solid var(--f3-viz-line);padding:10px;vertical-align:top;text-align:left}
+.ref-shell .amb-f3-quality thead th{background:var(--f3-viz-surface-muted);font-size:11px;white-space:nowrap}
+.ref-shell .amb-f3-quality tbody th{min-width:150px}
+.ref-shell .amb-f3-quality tbody small{display:block;font-size:10px;line-height:1.5;color:var(--f3-viz-ink-muted);overflow-wrap:anywhere}
+.ref-shell .amb-f3-quality-incomplete{margin-top:13px!important;font-weight:700;color:hsl(var(--danger,0 68% 38%))!important}
+.ref-shell .amb-f3-quality-footnote{border-left:3px solid var(--f3-viz-before);padding-left:11px;margin-top:16px!important}
+@media(max-width:850px){
+ .ref-shell .amb-f3-quality-axis,.ref-shell .amb-f3-quality-row{grid-template-columns:minmax(120px,155px) minmax(140px,1fr) 67px;gap:10px}
+ .ref-shell .amb-f3-quality-axis span:first-child{left:calc(155px + 10px)}
+ .ref-shell .amb-f3-quality-axis span:last-child{right:67px}
+ .ref-shell .amb-f3-quality{padding:16px}
+}
