@@ -3,6 +3,8 @@ import {Link} from 'react-router-dom';
 import type {DemoState} from '../../lib/demo';
 // @ts-ignore: pure read-only selector validated by native Node regression
 import {resolveConesaPgaLink,uniquePgaMeasures} from './conesa-pga-link.mjs';
+// @ts-ignore: pure explicit-ID audit selector
+import {resolveConesaImpactChain,uniqueRegisteredImpacts} from './conesa-impact-chain.mjs';
 import {ArrowDownToLine,Link2,RotateCcw} from 'lucide-react';
 import {CONESA_FIELDS,type ConesaEntry} from './ConesaSimplificadoModel';
 import {blankRecord,fingerprint,isResidualDocument,RESIDUAL_METHOD_ID,reviewResidual,
@@ -72,6 +74,8 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pg
  };
  const availablePga=useMemo(()=>uniquePgaMeasures(pgaData,projectId) as Array<{
   id:string;title:string;owner:string;status:string}>,[pgaData,projectId]);
+ const availableImpacts=useMemo(()=>uniqueRegisteredImpacts(pgaData,projectId) as Array<{
+  id:string;name:string;factor:string;phase:string;sign:string}>,[pgaData,projectId]);
  const rows=useMemo(()=>{
   const ids=new Set([...Object.keys(initialEntries),...Object.keys(doc.entries)]);
   return [...ids].map(id=>{
@@ -82,11 +86,14 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pg
    const review=reviewResidual(initial,record);
    const pgaId=record?.measure.pgaMeasureId||'';
    const pgaLink=resolveConesaPgaLink(pgaData,projectId,pgaId);
-   const linkBlocked=Boolean(pgaId)&&(pgaLink.status!=='vinculado'||pgaLink.warnings.length>0);
-   const reviewStatus=linkBlocked&&record?'revisar':review.status;
+   const impactId=record?.impactId||'';
+   const chain=resolveConesaImpactChain(pgaData,projectId,impactId,pgaId);
+   const chainClaim=Boolean(impactId||pgaId);
+   const chainBlocked=chainClaim&&(chain.status!=='vinculado'||!record?.impactLinkReason?.trim());
+   const reviewStatus=chainBlocked&&record?'revisar':review.status;
    return {id,factor:factor?.name||fid,action:action?.name||aid,
     phase:action?.phase||'Sin etapa',detached:!factor||!action,
-    initial,record,review,pgaLink,reviewStatus};
+    initial,record,review,pgaLink,chain,reviewStatus};
   }).filter(r=>r.review.initial||r.record);
  },[initialEntries,doc,actions,factors,pgaData,projectId]);
  const selectedRow=rows.find(x=>x.id===selected);
@@ -112,7 +119,9 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pg
    'Calidad de evidencia declarada','Implementación declarada','Supuestos',
    'PGA medida ID','Estado vínculo PGA','PGA programa','PGA estado documental',
    'PGA inspecciones','PGA evidencias','Advertencias PGA',
-   'Fundamento residual','Evidencia residual','Incidencias'];
+   'Fundamento residual','Evidencia residual','Incidencias',
+   'Impacto registrado ID','Impacto registrado nombre','Estado cadena de vínculos',
+   'Inspecciones asociadas IDs','Evidencias asociadas IDs','Fundamento del vínculo'];
   const values:(string|number|null)[][]=[header];
   for(const row of rows){
    const {record:r,review:v}=row,m=r?.measure;
@@ -128,7 +137,12 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pg
     row.pgaLink.measure?.status||'',row.pgaLink.trace?.counts.inspections??null,
     row.pgaLink.trace?.counts.evidence??null,row.pgaLink.warnings.join(' | '),
     r?.residual.reason||'',r?.residual.evidence||'',
-    [...v.problems,...row.pgaLink.warnings].join(' | ')]);
+    [...v.problems,...row.chain.warnings,
+     ...(r?.impactId&&r.measure.pgaMeasureId&&!r.impactLinkReason?.trim()
+      ?['Falta fundamento de vínculo impacto-medida']:[])].join(' | '),
+    r?.impactId||'',row.chain.impact?.name||'',row.chain.status,
+    row.chain.inspectionIds.join(' | '),row.chain.evidenceIds.join(' | '),
+    r?.impactLinkReason||'']);
   }
   return '\uFEFF'+values.map(r=>r.map(safeCsv).join(';')).join('\r\n');
  };
@@ -168,7 +182,7 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pg
    aria-label="Comparación de escenarios iniciales y residuales">
    <table>
     <thead><tr><th>Interacción</th><th>Etapa</th><th>Inicial</th>
-     <th>Residual</th><th>Δ importancia abs.</th><th>PGA</th><th>Estado</th><th>Acción</th></tr></thead>
+     <th>Residual</th><th>Δ importancia abs.</th><th>PGA</th><th>Cadena</th><th>Estado</th><th>Acción</th></tr></thead>
     <tbody>{rows.length?rows.map(r=><tr key={r.id}
      data-residual-row={r.id} data-residual-detached={r.detached?'true':undefined}>
       <th>{r.factor}<small>{r.action}</small></th><td>{r.phase}</td>
@@ -179,11 +193,13 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pg
       <td data-residual-pga>{r.record?.measure.pgaMeasureId
        ?r.pgaLink.status==='vinculado'?'Vinculado · '+r.record.measure.pgaMeasureId:'Revisar vínculo'
        :'Sin vínculo'}</td>
+      <td data-residual-chain>{r.chain.status==='vinculado'?'ID concordantes':
+       r.chain.status==='sin-referencias'?'Sin identificar':'Revisar correspondencia'}</td>
       <td data-residual-state>{r.detached?'Desvinculado':
        r.reviewStatus==='completo'?'Completo':r.reviewStatus==='sin-valoracion'?'Sin residual':'Revisar'}</td>
       <td><button type="button" disabled={r.detached||!r.review.initial}
        onClick={()=>setSelected(r.id)}>Revisar</button></td>
-     </tr>):<tr><td colSpan={8}>
+     </tr>):<tr><td colSpan={9}>
       Primero completá una valoración inicial en la matriz Conesa superior.
       Aquí no se generan resultados de ejemplo para el expediente.</td></tr>}</tbody>
    </table>
@@ -251,6 +267,21 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pg
        evidence:e.target.value}})}/></label>
    </>}
    <div className="amb-residual-pga-link" data-pga-link-editor>
+    <label>Vincular impacto del expediente (por ID)
+     <select aria-label="Impacto registrado vinculado" value={record?.impactId||''}
+      onChange={e=>patch(selected,{impactId:e.target.value})}>
+      <option value="">Sin impacto registrado seleccionado</option>
+      {availableImpacts.map(i=><option key={i.id} value={i.id}>{i.id} · {i.name}</option>)}
+      {record?.impactId&&!availableImpacts.some(i=>i.id===record.impactId)&&
+       <option value={record.impactId}>Impacto no disponible: {record.impactId}</option>}
+     </select>
+    </label>
+    <label>Fundamento de correspondencia impacto × interacción × medida
+     <textarea aria-label="Fundamento de vínculo impacto medida" rows={2} maxLength={3000}
+      placeholder="Explicar por qué esta interacción Conesa representa el impacto identificado y por qué corresponde la medida propuesta."
+      value={record?.impactLinkReason||''}
+      onChange={e=>patch(selected,{impactLinkReason:e.target.value})}/>
+    </label>
     <label>Vincular medida existente del PGA (solo lectura)
      <select aria-label="Medida PGA vinculada" value={record?.measure.pgaMeasureId||''}
       onChange={e=>patchMeasure(selected,{pgaMeasureId:e.target.value})}>
@@ -278,6 +309,30 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pg
      <p className="amb-residual-errors" role="status" data-pga-link-warning>
       {selectedRow.pgaLink.warnings.join(' · ')}
      </p>}
+    {(record?.impactId||record?.measure.pgaMeasureId)&&<div className="amb-conesa-chain" data-conesa-chain>
+     <strong>Cadena documental: impacto → Conesa → PGA → monitoreo</strong>
+     <p data-chain-status>Correspondencia por identificador: {selectedRow.chain.status}</p>
+     {selectedRow.chain.impact&&<p data-chain-impact>
+      Impacto {selectedRow.chain.impact.id} · {selectedRow.chain.impact.name}
+      {' · '}Factor: {selectedRow.chain.impact.factor}</p>}
+     {selectedRow.chain.status==='vinculado'&&<p data-chain-confirmed>
+      La medida PGA declara este ID de impacto en su propio registro.
+      La correspondencia técnica de factores y acciones depende del fundamento del evaluador.</p>}
+     {selectedRow.chain.warnings.length>0&&<p role="status" className="amb-residual-errors" data-chain-warnings>
+      {selectedRow.chain.warnings.join(' · ')}</p>}
+     {selectedRow.chain.status==='vinculado'&&!record?.impactLinkReason?.trim()&&
+      <p role="status" className="amb-residual-errors">Falta fundamentar la correspondencia ambiental.</p>}
+     <div data-chain-monitoring>Monitoreo documental: {selectedRow.chain.monitoring==='con-registros'
+       ?String(selectedRow.chain.inspectionIds.length)+' inspección(es) vinculada(s)':'Sin inspecciones vinculadas por ID'}</div>
+     {selectedRow.chain.status==='vinculado'&&
+      <ul>{(selectedRow.chain.trace?.inspections||[]).map((i:{id:string;date:string;result:string;note:string})=>
+       <li key={i.id} data-chain-inspection={i.id}>
+        <Link to={'/monitoreo?inspeccion='+encodeURIComponent(i.id)}>{i.id}</Link>
+        {' · '}{i.date} · resultado declarado: {i.result}
+       </li>)}</ul>}
+     <p>Las inspecciones y evidencias son documentos vinculados, no mediciones
+      de eficacia ni verificación de la mitigación; pueden ser registros DEMO.</p>
+    </div>}
    </div>
    <div className="amb-residual-fields">
     <label>Descripción de la medida
