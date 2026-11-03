@@ -158,7 +158,7 @@ function Matrices({data}:{data:DemoState}) {
     <Panel kicker="HERRAMIENTAS · EVALUACIÓN AMBIENTAL" icon="measures" title="Constructor de matrices">
       <p className="v2-panel-note">Espacio de trabajo independiente para elaborar matrices de identificación y valoración. Los impactos ya registrados se consultan en <Link to="/impactos">Impactos</Link>; las ediciones del constructor se guardan en un borrador local vinculado al identificador del expediente, sin modificar el registro original.</p>
     </Panel>
-    <MatrixMethodHub projectId={data.project.id} projectName={data.project.name} registeredImpacts={data.impacts}/>
+    <MatrixMethodHub projectId={data.project.id} projectName={data.project.name} registeredImpacts={data.impacts} pgaData={data}/>
   </div>;
 }
 function Evidencias({data,onAction,onApply}:{data:DemoState;onAction:(kind:DemoActionKind)=>void;onApply:(operation:Transaction,message:string)=>void}) {
