@@ -4,6 +4,7 @@
  * Solo muestra pares CA validables; la tabla semántica conserva números y procedencia.
  */
 import type {CSSProperties} from 'react';
+import './ConesaF3Comparison.css';
 import type {F2Factor} from './ConesaF2Model';
 import type {F3FactorRecord,F3Quality} from './ConesaF3Model';
 
@@ -40,7 +41,9 @@ export function ConesaF3Comparison({rows}:Props){
     </div>
     <div className="amb-f3-quality-graph" aria-hidden="true">
      <div className="amb-f3-quality-axis">
-      <span>0</span><span>0,25</span><span>0,50</span><span>0,75</span><span>1</span>
+      <span aria-hidden="true"/>
+      <div className="amb-f3-quality-ticks"><span>0</span><span>0,25</span><span>0,50</span><span>0,75</span><span>1</span></div>
+      <span aria-hidden="true"/>
      </div>
      {valid.map(({factor,record,result})=>{
       const before=100*result.without,after=100*result.withProject;
