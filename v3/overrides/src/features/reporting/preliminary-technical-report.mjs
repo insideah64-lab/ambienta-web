@@ -164,30 +164,32 @@ export function renderPreliminaryTechnicalHtml(model){
  const annex=model.conesaAnnex;
  const hasAnnex=Boolean(annex&&(annex.rows.length||annex.issues.length));
  const conesaTable=hasAnnex?table([
-  'Interacción','Factor / acción','Etapa','Vínculo catálogo',
-  'I inicial absoluta','I inicial con signo','Categoría inicial',
-  'Estado residual','I residual absoluta','I residual con signo','Categoría residual',
-  'Δ absoluta','Estado de revisión'
- ],annex.rows.map(x=>[x.id,safe(x.factor)+' / '+safe(x.action),x.phase,x.catalogStatus,
-  x.initialAbsolute,x.initialSigned,x.initialCategory,
-  x.residualOutcome,x.residualAbsolute,x.residualSigned,x.residualCategory,
-  x.delta,x.reviewStatus])):'';
- const conesaCriteriaTable=hasAnnex?table([
-  'Interacción','Criterios iniciales (incluidos recargos)','Criterios residuales',
-  'Fundamento inicial','Fuente inicial','Fundamento residual','Fuente residual'
- ],annex.rows.map(x=>[x.id,x.initialCriteria,x.residualCriteria,x.initialReason,
-  x.initialEvidence,x.residualReason,x.residualEvidence])):'';
- const conesaTraceTable=hasAnnex?table([
-  'Interacción','Impacto ID','Medida PGA ID','Estado de cadena','Inspecciones ID',
-  'Evidencias ID','Jerarquía','Medida y fuente','Referencia PGA',
-  'Responsable / indicador / frecuencia','Incertidumbre y evidencia',
-  'Ejecución declarada','Supuestos','Fundamento vínculo','Advertencias'
+  'Interacción','Factor / acción y etapa','Inicial (absoluta / signo / categoría)',
+  'Residual (absoluta / signo / categoría)','Δ absoluta','Estado de revisión'
  ],annex.rows.map(x=>[
-  x.id,x.impactId,x.measureId,x.chainStatus,join(x.inspectionIds),join(x.evidenceIds),
-  x.hierarchy,safe(x.measureDescription)+' / '+safe(x.measureReference),x.pgaReference,
-  safe(x.responsible)+' / '+safe(x.indicator)+' / '+safe(x.frequency),
-  safe(x.uncertainty)+' / '+safe(x.evidenceQuality),x.declaredExecution,
-  x.assumptions,x.impactLinkReason,join(x.warnings)
+  x.id,safe(x.factor)+' / '+safe(x.action)+' / '+safe(x.phase)+' / '+safe(x.catalogStatus),
+  safe(x.initialAbsolute)+' / '+safe(x.initialSigned)+' / '+safe(x.initialCategory),
+  safe(x.residualOutcome)+' / '+safe(x.residualAbsolute)+' / '+safe(x.residualSigned)+
+   ' / '+safe(x.residualCategory),x.delta,x.reviewStatus
+ ])):'';
+ const conesaCriteriaTable=hasAnnex?table([
+  'Interacción','Criterios iniciales','Criterios residuales',
+  'Fundamento y fuente inicial','Fundamento y fuente residual'
+ ],annex.rows.map(x=>[x.id,x.initialCriteria,x.residualCriteria,
+  safe(x.initialReason)+' / '+safe(x.initialEvidence),
+  safe(x.residualReason)+' / '+safe(x.residualEvidence)])):'';
+ const conesaTraceTable=hasAnnex?table([
+  'Interacción','Impacto / medida PGA / estado','Medida y seguimiento',
+  'Monitoreo documental (IDs)','Incertidumbre y supuestos','Vínculo y advertencias'
+ ],annex.rows.map(x=>[
+  x.id,safe(x.impactId)+' / '+safe(x.measureId)+' / '+safe(x.chainStatus),
+  safe(x.hierarchy)+' · '+safe(x.measureDescription)+' · '+safe(x.measureReference)+
+    ' · PGA: '+safe(x.pgaReference)+' · Responsable: '+safe(x.responsible)+
+    ' · Indicador: '+safe(x.indicator)+' · Frecuencia: '+safe(x.frequency),
+  'Inspecciones: '+join(x.inspectionIds)+' · Evidencias: '+join(x.evidenceIds),
+  'Incertidumbre: '+safe(x.uncertainty)+' · Calidad: '+safe(x.evidenceQuality)+
+    ' · Ejecución: '+safe(x.declaredExecution)+' · Supuestos: '+safe(x.assumptions),
+  'Fundamento: '+safe(x.impactLinkReason)+' · Revisar: '+join(x.warnings)
  ])):'';
  const conesaIssues=hasAnnex?table(['Avisos de lectura de borradores'],annex.issues.map(x=>[x])):'';
  const styles=`
