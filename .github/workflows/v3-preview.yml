@@ -68,6 +68,7 @@ jobs:
           node apps/web-v3/scripts/document-link-audit-smoke.mjs
           node apps/web-v3/scripts/document-issue-export-smoke.mjs
           node apps/web-v3/scripts/preliminary-technical-report-smoke.mjs
+          node apps/web-v3/scripts/conesa-report-annex-smoke.mjs
           node apps/web-v3/scripts/desktop-palette-smoke.mjs
           node apps/web-v3/scripts/ambienta-iconography-smoke.mjs
           node apps/web-v3/scripts/icon-coverage-smoke.mjs
@@ -202,6 +203,14 @@ jobs:
         with:
           name: ambienta-v370-informe-integrado-desktop
           path: qa/ambienta-integral-report/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Capturas del anexo Conesa en el informe técnico
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-conesa-integral-report
+          path: qa/ambienta-conesa-report/
           retention-days: 30
           if-no-files-found: warn
       - name: Capturas de AMBIENTA real según referencia visual
