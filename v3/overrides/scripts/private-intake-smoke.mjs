@@ -18,6 +18,10 @@ try{
    'PGA measure form cannot be available before authentication');
   assert.equal(await privateUI.locator('[data-private-monitoring-form]').count(),0,
    'Una inspección o evidencia no puede registrarse sin sesión');
+  assert.equal(await privateUI.locator('[data-private-audit-form]').count(),0,
+   'No audit findings or corrective actions are available before authentication');
+  assert.equal(await privateUI.getByRole('button',{name:'Nuevo hallazgo'}).count(),0);
+  assert.equal(await privateUI.getByRole('button',{name:'Nueva acción correctiva'}).count(),0);
   assert.equal(await privateUI.getByRole('button',{name:'Nueva inspección'}).count(),0,
    'Los visitantes no pueden registrar inspecciones del PGA');
   assert.equal(await privateUI.getByRole('button',{name:'Nueva referencia documental'}).count(),0,
