@@ -12,6 +12,14 @@ import {blankRecord,fingerprint,isResidualDocument,RESIDUAL_METHOD_ID,reviewResi
 import './ConesaResidualPanel.css';
 
 type Axis={id:string;name:string;phase?:string};
+type ImpactChainView={
+ status:string;
+ impact:{id:string;name:string;factor:string}|null;
+ warnings:string[];
+ inspectionIds:string[];evidenceIds:string[];
+ monitoring:string;
+ trace:{inspections:Array<{id:string;date:string;result:string;note:string}>}|null;
+};
 type Props={projectId:string;initialEntries:Record<string,ConesaEntry>;
  actions:Axis[];factors:Axis[];pgaData:DemoState};
 const PREFIX='ambienta-conesa-residual-v1:';
@@ -87,7 +95,7 @@ export function ConesaResidualPanel({projectId,initialEntries,actions,factors,pg
    const pgaId=record?.measure.pgaMeasureId||'';
    const pgaLink=resolveConesaPgaLink(pgaData,projectId,pgaId);
    const impactId=record?.impactId||'';
-   const chain=resolveConesaImpactChain(pgaData,projectId,impactId,pgaId);
+   const chain=resolveConesaImpactChain(pgaData,projectId,impactId,pgaId) as unknown as ImpactChainView;
    const chainClaim=Boolean(impactId||pgaId);
    const chainBlocked=chainClaim&&(chain.status!=='vinculado'||!record?.impactLinkReason?.trim());
    const reviewStatus=chainBlocked&&record?'revisar':review.status;
