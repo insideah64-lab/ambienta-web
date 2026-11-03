@@ -9,6 +9,9 @@ import {CloudEvidencePilot} from './CloudEvidencePilot';
 import {PrivateIntakeForm,type PrivateIntakeKind} from './PrivateIntakeForm';
 import {PrivateMeasureForm,type PrivateMeasureValues} from './PrivateMeasureForm';
 import {PrivateMonitoringForm,type PrivateInspectionValues,type PrivateEvidenceReferenceValues} from './PrivateMonitoringForm';
+import {PrivateAuditForm,type PrivateFindingValues,type PrivateCorrectiveActionValues} from './PrivateAuditForm';
+// @ts-ignore: read-only projection and validators have Node test coverage
+import {privateAuditSummary,validatePrivateFinding,validatePrivateCorrectiveAction} from './private-audit.mjs';
 // @ts-ignore: pure documentary projection, tested by Node
 import {privateMonitoringSummary,validatePrivateInspection,validatePrivateEvidenceReference} from './private-monitoring.mjs';
 // @ts-ignore: pure documentary projection, tested natively
@@ -25,6 +28,8 @@ type MeasureSummary={id:string;title:string;status:string;programLabel:string;
  impactLabels:string[];problems:string[]};
 type ImpactRow = {id:string;code?:string;title?:string;factor?:string;sign?:string;project_phase?:string};
 type ProgramRow = {id:string;code?:string;name?:string;category?:string};
+type FindingRow={id:string;project_id:string;inspection_id:string;title:string;description:string;severity:string;status:string};
+type CorrectiveActionRow={id:string;project_id:string;finding_id:string;action:string;owner_label:string;due_date:string|null;status:string};
 type EvidenceRow = {id:string;project_id?:string;measure_id?:string;inspection_id?:string|null;
  label?:string;reference_label?:string;storage_path?:string|null;original_file_name?:string|null;
  file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
@@ -32,7 +37,7 @@ type ProjectDetail = { project:ProjectRow; environmental_impacts:ImpactRow[];
   management_programs:ProgramRow[]; management_measures:MeasureRow[];
   measure_impact_links:MeasureImpactLinkRow[];
   monitoring_inspections:InspectionRow[]; environmental_evidence:EvidenceRow[];
-  audit_findings:unknown[]; corrective_actions:unknown[] };
+  audit_findings:FindingRow[]; corrective_actions:CorrectiveActionRow[] };
 type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>Promise<ProjectDetail>;
   createProject:(values:Record<string,string>)=>Promise<ProjectRow>;
   createImpact:(projectId:string,values:Record<string,string>)=>Promise<unknown>;
@@ -40,6 +45,8 @@ type Reader = { listProjects:()=>Promise<ProjectRow[]>;loadProject:(id:string)=>
   createMeasure:(projectId:string,values:PrivateMeasureValues)=>Promise<string>;
   createInspection:(projectId:string,measureId:string,values:Omit<PrivateInspectionValues,'measureId'>)=>Promise<InspectionRow>;
   registerEvidence:(projectId:string,measureId:string,values:Omit<PrivateEvidenceReferenceValues,'measureId'>)=>Promise<EvidenceRow>;
+  createFinding:(projectId:string,inspectionId:string,values:Omit<PrivateFindingValues,'inspectionId'>)=>Promise<FindingRow>;
+  createCorrectiveAction:(projectId:string,findingId:string,values:Omit<PrivateCorrectiveActionValues,'findingId'>)=>Promise<CorrectiveActionRow>;
   uploadEvidenceFile:(projectId:string,measureId:string,values:{label:string;file:File})=>Promise<unknown>;
   downloadEvidence:(row:EvidenceRow)=>Promise<{blob:Blob;name:string}> };
 function message(cause:unknown):string {
@@ -57,7 +64,7 @@ export function CloudWorkspace() {
   const [error,setError]=useState('');
   const [info,setInfo]=useState('');
   const [mode,setMode]=useState<'login'|'signup'>('login');
-  const [createMode,setCreateMode]=useState<PrivateIntakeKind|'measure'|'inspection'|'reference'|null>(null);
+  const [createMode,setCreateMode]=useState<PrivateIntakeKind|'measure'|'inspection'|'reference'|'finding'|'action'|null>(null);
 
   useEffect(()=>{
     if(!client)return;
@@ -246,6 +253,46 @@ export function CloudWorkspace() {
    }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
    finally{if(epoch===authEpoch.current)setBusy(false);}
   }
+  async function savePrivateAudit(
+   kind:'finding'|'action',values:PrivateFindingValues|PrivateCorrectiveActionValues
+  ){
+   if(!reader||!user||!selected||busy)return;
+   const epoch=authEpoch.current,projectId=selected.project.id;
+   const scope={projectId,inspections:selected.monitoring_inspections,
+    findings:selected.audit_findings};
+   let finding:PrivateFindingValues|undefined;
+   let action:PrivateCorrectiveActionValues|undefined;
+   try{
+    if(kind==='finding')finding=validatePrivateFinding(values,scope) as PrivateFindingValues;
+    else action=validatePrivateCorrectiveAction(values,scope) as PrivateCorrectiveActionValues;
+   }catch(cause){setError(message(cause));return;}
+   setBusy(true);setError('');setInfo('');
+   try{
+    if(finding){
+     const {inspectionId,...fields}=finding;
+     await reader.createFinding(projectId,inspectionId,fields);
+    }else if(action){
+     const {findingId,...fields}=action;
+     await reader.createCorrectiveAction(projectId,findingId,fields);
+    }
+    if(epoch!==authEpoch.current)return;
+    setCreateMode(null);
+    setInfo(kind==='finding'
+     ?'Hallazgo creado en estado abierto; no es un dictamen ni una aprobación.'
+     :'Acción correctiva creada en estado abierto; no acredita implementación ni cierre.');
+    try{
+     const fresh=await reader.loadProject(projectId);
+     if(epoch===authEpoch.current)setSelected(fresh);
+    }catch(cause){
+     if(epoch===authEpoch.current)setError('Registro creado; no se pudo refrescar el expediente: '+message(cause));
+    }
+   }catch(cause){if(epoch===authEpoch.current)setError(message(cause));}
+   finally{if(epoch===authEpoch.current)setBusy(false);}
+  }
+  const auditing=selected?privateAuditSummary(selected) as {
+   findings:Array<{id:string;inspectionId:string;inspectionDate:string;title:string;description:string;severity:string;status:string;warnings:string[]}>;
+   actions:Array<{id:string;findingId:string;linkedTitle:string;action:string;owner:string;dueDate:string;status:string;warnings:string[]}>
+  }:null;
   const monitoring=selected?privateMonitoringSummary(selected) as {
    inspections:Array<{id:string;measureName:string;date:string;result:string;note:string;warnings:string[]}>;
    references:Array<{id:string;measureName:string;inspectionId:string;label:string;
@@ -426,9 +473,71 @@ export function CloudWorkspace() {
           La creación de archivos privados y la firma profesional permanecen bloqueadas.
          </p>
         </section>
+        <section className="amb-private-monitoring" data-private-audit>
+         <div className="amb-private-list-header">
+          <div><h3>Auditoría ambiental y acciones correctivas</h3>
+           <p>Seguimiento documental por inspección, hallazgo y acción.
+            No se certifica ejecución ni cierre profesional.</p></div>
+          <div className="amb-private-actions">
+           <button type="button" disabled={busy} onClick={()=>{
+            setCreateMode(createMode==='finding'?null:'finding');setError('');
+           }}>Nuevo hallazgo</button>
+           <button type="button" disabled={busy} onClick={()=>{
+            setCreateMode(createMode==='action'?null:'action');setError('');
+           }}>Nueva acción correctiva</button>
+          </div>
+         </div>
+         {(createMode==='finding'||createMode==='action')&&
+          <PrivateAuditForm kind={createMode}
+           projectId={selected.project.id}
+           inspections={selected.monitoring_inspections}
+           findings={selected.audit_findings}
+           busy={busy} onSave={values=>savePrivateAudit(createMode,values)}
+           onCancel={()=>setCreateMode(null)}/>}
+         <div className="amb-private-monitoring-grid">
+          <div>
+           <h4>Hallazgos abiertos · {auditing?.findings.length??0}</h4>
+           {!(auditing?.findings.length)&&<p>Aún no hay hallazgos registrados.</p>}
+           {(auditing?.findings||[]).map(f=>
+            <article key={f.id} data-private-finding={f.id}>
+             <strong>{f.title}</strong>
+             <small>Inspección: {f.inspectionId} · Fecha declarada: {f.inspectionDate}</small>
+             <small>Severidad: {f.severity==='observation'?'Observación':
+              f.severity==='minor'?'Menor':f.severity==='major'?'Mayor':'Sin clasificar'}
+              {' · '}Estado: {f.status==='open'?'Abierto':f.status==='investigating'?'En investigación':f.status}</small>
+             <p>{f.description}</p>
+             {f.warnings.length>0&&<p role="status" className="amb-private-measure-warning">
+              {f.warnings.join(' · ')}</p>}
+            </article>)}
+          </div>
+          <div>
+           <h4>Acciones correctivas · {auditing?.actions.length??0}</h4>
+           {!(auditing?.actions.length)&&<p>Aún no hay acciones correctivas registradas.</p>}
+           {(auditing?.actions||[]).map(a=>
+            <article key={a.id} data-private-corrective-action={a.id}>
+             <strong>{a.action}</strong>
+             <small>Hallazgo: {a.linkedTitle}</small>
+             <small>Responsable declarado: {a.owner}</small>
+             <small>Fecha objetivo: {a.dueDate||'No declarada'}</small>
+             <small>Estado: {a.status==='open'?'Abierta':a.status==='in_progress'?
+              'En progreso (declarado)':a.status}</small>
+             {a.warnings.length>0&&<p role="status" className="amb-private-measure-warning">
+              {a.warnings.join(' · ')}</p>}
+            </article>)}
+          </div>
+         </div>
+         <p className="amb-private-monitoring-disclaimer">Los registros son declaraciones
+          del titular del expediente. Un hallazgo o acción abierta no implica
+          incumplimiento verificado ni corrección ejecutada. La revisión
+          independiente, las aprobaciones y la firma siguen desactivadas.</p>
+        </section>
         <CloudEvidencePilot projectId={selected.project.id} measures={selected.management_measures}
           evidence={selected.environmental_evidence} reader={reader!} onUploaded={async()=>{
-           if(user&&reader){const latest=await reader.loadProject(selected.project.id);setSelected(latest);}
+           if(user&&reader){
+            const epoch=authEpoch.current,projectId=selected.project.id;
+            const latest=await reader.loadProject(projectId);
+            if(epoch===authEpoch.current)setSelected(latest);
+           }
           }}/>
         <p className="v2-cloud-readonly">Los vínculos entre impactos, medidas, monitoreo y matrices profesionales
          aún no están conectados al expediente real. El rol de revisor independiente y
