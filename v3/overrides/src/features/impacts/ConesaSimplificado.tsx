@@ -1,6 +1,7 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ArrowDownToLine,RefreshCcw,X} from 'lucide-react';
 import {readMatrixAxes} from './ImpactMatrixBuilder';
+import {ConesaResidualPanel} from './ConesaResidualPanel';
 import {calculateConesa,conesaProblems,CONESA_FIELDS,METHOD_ID,validatedConesaEntry,type ConesaEntry} from './ConesaSimplificadoModel';
 import './ConesaSimplificado.css';
 
@@ -215,6 +216,8 @@ export function ConesaSimplificado({projectId,projectName}:Props){
     </table>
    </div>
   </div>
+  <ConesaResidualPanel projectId={projectId} initialEntries={doc.entries}
+   actions={axes.actions} factors={axes.factors}/>
   <footer className="amb-matrix-footer">
    <span>Método: {METHOD_ID} · guardado en este navegador por expediente · {projectId}</span>
    <span>El resultado es descriptivo y requiere revisión profesional antes de incluirlo en un EsIA o PGA.</span>
