@@ -16,6 +16,8 @@ import './cloud.css';
 type ProjectRow = { id:string; owner_id?:string; name:string; province:string; project_phase:string; status:string; created_at:string };
 type MeasureRow = {id:string;title?:string;program_id?:string;status?:string};
 type MeasureImpactLinkRow={measure_id:string;impact_id:string;project_id:string};
+type MeasureSummary={id:string;title:string;status:string;programLabel:string;
+ impactLabels:string[];problems:string[]};
 type ImpactRow = {id:string;code?:string;title?:string;factor?:string;sign?:string;project_phase?:string};
 type ProgramRow = {id:string;code?:string;name?:string;category?:string};
 type EvidenceRow = {id:string;measure_id?:string;label?:string;storage_path?:string|null;original_file_name?:string|null;file_size_bytes?:number|null;sha256_client?:string|null;status?:string};
@@ -238,12 +240,19 @@ export function CloudWorkspace() {
           <div className="amb-private-actions">
            <button type="button" disabled={busy} onClick={()=>setCreateMode(createMode==='impact'?null:'impact')}>Registrar impacto</button>
            <button type="button" disabled={busy} onClick={()=>setCreateMode(createMode==='program'?null:'program')}>Nuevo programa PGA</button>
+           <button type="button" disabled={busy} onClick={()=>setCreateMode(createMode==='measure'?null:'measure')}>Nueva medida vinculada</button>
           </div>
          </div>
          {(createMode==='impact'||createMode==='program')&&
           <PrivateIntakeForm kind={createMode} busy={busy}
            onSave={values=>savePrivateRecord(createMode,values)}
            onCancel={()=>setCreateMode(null)}/>}
+         {createMode==='measure'&&<PrivateMeasureForm
+          projectId={selected.project.id}
+          programs={selected.management_programs}
+          impacts={selected.environmental_impacts}
+          busy={busy} onSave={savePrivateMeasure}
+          onCancel={()=>setCreateMode(null)}/>} }
          <div className="amb-private-record-grid">
           <div><h4>Impactos identificados · {selected.environmental_impacts.length}</h4>
            {!selected.environmental_impacts.length&&<p>Sin impactos registrados.</p>}
@@ -259,6 +268,26 @@ export function CloudWorkspace() {
             <small>{p.category||'Categoría pendiente'}</small>
            </div>)}
           </div>
+         </div>
+         <div className="amb-private-measure-register" data-private-measures>
+          <h4>Medidas del PGA vinculadas · {selected.management_measures.length}</h4>
+          {!selected.management_measures.length&&
+           <p>No hay medidas registradas en este expediente. Elegí un programa y un impacto
+            antes de añadir la primera.</p>}
+          {(privateMeasureSummary(selected.management_measures,
+            selected.measure_impact_links,selected.environmental_impacts,
+            selected.management_programs) as MeasureSummary[]).map(m=>
+            <article key={m.id} data-private-measure={m.id}>
+             <div><strong>{m.title}</strong>
+              <small>ID: {m.id} · Programa: {m.programLabel}</small>
+              <small>Impactos vinculados: {m.impactLabels.length?m.impactLabels.join(' · '):'Sin vínculos'}</small>
+              {m.problems.length>0&&
+               <p className="amb-private-measure-warning" role="status">{m.problems.join(' · ')}</p>}
+             </div>
+             <span className="amb-private-draft-state">{m.status==='draft'?'Borrador':m.status.replaceAll('_',' ')}</span>
+            </article>)}
+          <p>Los enlaces provienen de <code>measure_impact_links</code>; no se deducen
+           por coincidencias de nombres ni constituyen acreditación de cumplimiento.</p>
          </div>
         </section>
         <CloudEvidencePilot projectId={selected.project.id} measures={selected.management_measures}
