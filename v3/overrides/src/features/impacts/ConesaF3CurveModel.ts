@@ -88,7 +88,8 @@ export function f3bProblems(base:F3FactorRecord|undefined,curve:F3BCurve|undefin
  if(curve.assessor.trim().length<3)errors.push('Identificar a quien adopta la función');
  if(curve.evidence.trim().length<8)errors.push('Registrar evidencia o procedimiento de construcción');
  if(curve.origin==='anejo4'&&
-  (curve.bookPage===null||curve.bookPage<253))
+  (curve.bookPage===null||!Number.isInteger(curve.bookPage)||
+   curve.bookPage<253||curve.bookPage>999))
   errors.push('Indicar página impresa del Anejo 4 (desde p. 253)');
  errors.push(...f3bPointProblems(curve.points));
  const validDomain=f3bPointProblems(curve.points).length===0;
