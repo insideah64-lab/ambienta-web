@@ -78,6 +78,7 @@ jobs:
           node apps/web-v3/scripts/conesa-libro-1997-smoke.mjs
           node apps/web-v3/scripts/conesa-libro-f2-smoke.mjs
           node apps/web-v3/scripts/conesa-libro-f3a-smoke.mjs
+          node apps/web-v3/scripts/conesa-libro-f3b-smoke.mjs
           node apps/web-v3/scripts/conesa-residual-smoke.mjs
           node apps/web-v3/scripts/matrix-method-catalog-smoke.mjs
           node apps/web-v3/scripts/document-identity-negative-smoke.mjs
@@ -265,6 +266,14 @@ jobs:
           path: qa/ambienta-conesa-libro-f1/
           if-no-files-found: warn
           retention-days: 30
+      - name: Capturas Conesa F3b · funciones no lineales documentadas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-conesa-curvas-f3b
+          path: qa/ambienta-conesa-f3b/
+          retention-days: 30
+          if-no-files-found: warn
       - name: Capturas de Conesa F3a · indicadores y calidad ambiental
         if: always()
         uses: actions/upload-artifact@v4
