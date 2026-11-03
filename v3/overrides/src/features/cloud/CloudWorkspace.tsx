@@ -366,6 +366,64 @@ export function CloudWorkspace() {
            por coincidencias de nombres ni constituyen acreditación de cumplimiento.</p>
          </div>
         </section>
+        <section className="amb-private-monitoring" data-private-monitoring>
+         <div className="amb-private-list-header">
+          <div><h3>Monitoreo del PGA y referencias documentales</h3>
+           <p>Registros del expediente autenticado, asociados por identificador a medidas ya existentes.</p></div>
+          <div className="amb-private-actions">
+           <button type="button" disabled={busy}
+            onClick={()=>{setCreateMode(createMode==='inspection'?null:'inspection');setError('');}}>
+            Nueva inspección</button>
+           <button type="button" disabled={busy}
+            onClick={()=>{setCreateMode(createMode==='reference'?null:'reference');setError('');}}>
+            Nueva referencia documental</button>
+          </div>
+         </div>
+         {(createMode==='inspection'||createMode==='reference')&&
+          <PrivateMonitoringForm
+           kind={createMode} projectId={selected.project.id}
+           busy={busy} measures={selected.management_measures}
+           inspections={selected.monitoring_inspections}
+           onSave={values=>savePrivateMonitoring(createMode,values)}
+           onCancel={()=>setCreateMode(null)}/>}
+         <div className="amb-private-monitoring-grid">
+          <div>
+           <h4>Inspecciones registradas · {monitoring?.inspections.length??0}</h4>
+           {!(monitoring?.inspections.length)&&<p>Todavía no hay inspecciones registradas.</p>}
+           {(monitoring?.inspections||[]).map(i=>
+            <article key={i.id} data-private-inspection={i.id}>
+             <strong>{i.measureName}</strong>
+             <small>Fecha declarada: {i.date} · ID: {i.id}</small>
+             <small>Resultado: {i.result==='pending'?'Pendiente':i.result==='conformant'
+              ?'Conforme, declarado por usuario':i.result==='observed'
+              ?'Con observaciones, declarado':i.result==='not_applicable'
+              ?'No aplica, declarado':'Estado no reconocido'}</small>
+             <p>{i.note}</p>
+             {i.warnings.length>0&&<p className="amb-private-measure-warning"
+              role="status">{i.warnings.join(' · ')}</p>}
+            </article>)}
+          </div>
+          <div>
+           <h4>Referencias sin archivo · {monitoring?.references.length??0}</h4>
+           {!(monitoring?.references.length)&&<p>Sin referencias documentales registradas.</p>}
+           {(monitoring?.references||[]).map(e=>
+            <article key={e.id} data-private-reference={e.id}>
+             <strong>{e.label}</strong>
+             <small>Medida: {e.measureName}</small>
+             <small>Inspección: {e.inspectionId||'Referencia directa a medida'}</small>
+             <p>Fuente declarada: {e.reference}</p>
+             <small>Estado: {e.status==='pending'?'Pendiente, no validada':e.status}</small>
+             {e.warnings.length>0&&<p className="amb-private-measure-warning"
+              role="status">{e.warnings.join(' · ')}</p>}
+            </article>)}
+          </div>
+         </div>
+         <p className="amb-private-monitoring-disclaimer">
+          Los estados y resultados son declaraciones cargadas por el usuario.
+          No verifican cumplimiento, mediciones de campo ni eficacia de las medidas.
+          La creación de archivos privados y la firma profesional permanecen bloqueadas.
+         </p>
+        </section>
         <CloudEvidencePilot projectId={selected.project.id} measures={selected.management_measures}
           evidence={selected.environmental_evidence} reader={reader!} onUploaded={async()=>{
            if(user&&reader){const latest=await reader.loadProject(selected.project.id);setSelected(latest);}
