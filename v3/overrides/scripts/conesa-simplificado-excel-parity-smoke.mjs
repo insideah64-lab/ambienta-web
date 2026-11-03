@@ -112,6 +112,35 @@ try{
   assert.equal(await page.locator('[data-method-assessment="conesa-1997-2ex"] [data-method-cell]').count(),28);
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
   assert.equal(await panel.locator('[data-conesa-review-row]').count(),4);
+  // Removing a factor or action from the shared catalog must not erase the valuation.
+  const detachedKey='deleted-factor::deleted-action';
+  await page.evaluate(({projectId,detachedKey})=>{
+   const key='ambienta-conesa-simplificado-v1:'+projectId;
+   const doc=JSON.parse(localStorage.getItem(key));
+   doc.entries[detachedKey]={sign:-1,criteria:{
+    IN:2,EX:2,EX_CR:0,MO:4,MO_CR:0,PE:4,RV:1,SI:1,AC:1,EF:4,PR:1,MC:2
+   },reason:'Valoración histórica conservada',evidence:'Documento histórico · 12'};
+   localStorage.setItem(key,JSON.stringify(doc));
+  },{projectId,detachedKey});
+  await page.reload();
+  await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
+  const preserved=page.locator('[data-conesa-review-row="deleted-factor::deleted-action"]');
+  assert.equal(await preserved.count(),1,'Deleted catalog items must remain auditable');
+  assert.equal(await preserved.getAttribute('data-conesa-orphan'),'true');
+  assert.equal((await preserved.locator('[data-review-absolute]').innerText()).trim(),'28');
+  assert.equal((await preserved.locator('[data-review-diagnostics]').innerText()).includes('ausente del catálogo actual'),true);
+  assert.equal((await preserved.locator('[data-review-link]').innerText()).trim(),'Desvinculado');
+  assert.equal((await page.locator('.amb-conesa-kpis span').nth(3).locator('strong').innerText()).trim(),'1');
+  const [orphanDownload]=await Promise.all([
+   page.waitForEvent('download'),
+   page.locator('[data-conesa-simplificado] button').filter({hasText:'CSV'}).first().click()
+  ]);
+  const preservedCsv=await fs.readFile(await orphanDownload.path(),'utf8');
+  assert(preservedCsv.includes('deleted-factor')&&preservedCsv.includes('deleted-action'));
+  assert(preservedCsv.includes('Valoración histórica conservada'));
+  assert(preservedCsv.includes('Desvinculado'));
+  assert.equal(await preserved.locator('button').isDisabled(),true,
+   'Detached row is read only until axes identifiers are restored');
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   assert(overflow<=6,'No page-wide horizontal overflow at '+width+' px: '+overflow);
   assert.deepEqual(errors,[]);

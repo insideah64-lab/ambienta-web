@@ -76,3 +76,18 @@ al cambiar criterios, recargo EX_CR +4 aplicado dentro de 2EX,
 bloqueo de criticidad sin respaldo, CSV, recarga y almacenamiento aislado.
 El caso de prueba se carga en localStorage **solo durante QA** y nunca
 se agrega al expediente de producción Diablillos.
+
+## Continuidad QA 03/11/2026: cambio del catálogo compartido
+
+La tabla de revisión incluye las valoraciones persistidas cuyo ID de factor o
+acción dejó de existir en el catálogo actual. Se señalan como **Desvinculado**,
+conservan la puntuación calculada original y las notas, pero no cuentan como
+valoraciones completas del catálogo y se bloquea su edición hasta restaurar
+los identificadores correspondientes. CSV incluye la columna `Estado de vínculo`.
+Esta salvaguarda evita pérdida silenciosa al reorganizar factores y acciones.
+No hay migración automática, borrado ni reasignación a otros IDs.
+
+QA adicional: inyección controlada de una valoración histórica desvinculada,
+recarga del navegador, verificación de advertencia, presencia de fila,
+exactitud del cálculo y exportación CSV. Los casos de Excel mantienen su
+regresión original. Esta revisión es independiente de Diablillos.
