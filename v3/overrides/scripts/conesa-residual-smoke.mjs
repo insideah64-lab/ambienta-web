@@ -62,12 +62,25 @@ try{
   await editor.getByLabel('Referencia PGA (manual, no sincronizada)').fill('PGA-M01');
   assert.equal((await row.locator('[data-residual-state]').innerText()).trim(),'Completo');
   assert.equal((await panel.locator('.amb-residual-stats span').first().locator('strong').innerText()).trim(),'1');
+  // Link one existing PGA measure by its unique ID, without mutating PGA source data.
+  const selector=editor.getByRole('combobox',{name:'Medida PGA vinculada'});
+  assert((await selector.locator('option').count())>1);
+  const sourceId=await selector.locator('option').nth(1).getAttribute('value');
+  assert(sourceId);
+  await selector.selectOption(sourceId);
+  assert.equal((await row.locator('[data-residual-pga]').innerText()).trim(),'Vinculado · '+sourceId);
+  assert.equal(await editor.locator('[data-pga-linked-detail]').count(),1);
+  assert((await editor.getByRole('link',{name:'Abrir ficha y trazabilidad en PGA'}).getAttribute('href'))
+   .includes('/pga?medida='+encodeURIComponent(sourceId)));
+  assert.equal((await row.locator('[data-residual-state]').innerText()).trim(),'Completo');
   await page.screenshot({path:out+'/conesa-residual-'+width+'.png',animations:'disabled'});
   const [download]=await Promise.all([page.waitForEvent('download'),
     panel.getByRole('button',{name:'CSV',exact:true}).click()]);
   const csv=await fs.readFile(await download.path(),'utf8');
   assert(csv.includes('"-15"')&&csv.includes('"PGA-M01"')&&csv.includes('"alta"'));
   assert(csv.includes('"conesa-simplificado-residual-v1"'));
+  assert(csv.includes('"' + sourceId + '"')&&csv.includes('"vinculado"'),
+   'CSV must preserve exact PGA measure ID and documented linkage status');
   const original=await page.evaluate(projectId=>
    JSON.parse(localStorage.getItem('ambienta-conesa-simplificado-v1:'+projectId)).entries['demo-f4::demo-a1'],
    projectId);
@@ -103,6 +116,20 @@ try{
   assert.equal((await changed.locator('[data-residual-state]').innerText()).trim(),'Revisar');
   await editor.getByRole('combobox',{name:'Jerarquía de mitigación'}).selectOption('evitar');
   assert.equal((await changed.locator('[data-residual-state]').innerText()).trim(),'Completo');
+  // A now-missing PGA ID is retained as an unresolved reference and blocks completeness.
+  await page.evaluate(projectId=>{
+   const k='ambienta-conesa-residual-v1:'+projectId,d=JSON.parse(localStorage.getItem(k));
+   d.entries['demo-f4::demo-a1'].measure.pgaMeasureId='MED-NOT-EXIST';
+   localStorage.setItem(k,JSON.stringify(d));
+  },projectId);
+  await page.reload();
+  await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
+  const missing=panel.locator('[data-residual-row="demo-f4::demo-a1"]');
+  assert.equal((await missing.locator('[data-residual-state]').innerText()).trim(),'Revisar');
+  assert.equal((await missing.locator('[data-residual-pga]').innerText()).trim(),'Revisar vínculo');
+  await missing.getByRole('button',{name:'Revisar'}).click();
+  assert((await panel.locator('[data-pga-link-warning]').innerText()).includes('no existe'));
+  assert.equal(await panel.locator('[data-pga-linked-detail]').count(),0);
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   assert(overflow<=6,'Desktop page overflow at '+width+' px: '+overflow);
   assert.deepEqual(errors,[]);

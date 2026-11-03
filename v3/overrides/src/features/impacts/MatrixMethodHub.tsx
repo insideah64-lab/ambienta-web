@@ -1,12 +1,13 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ArrowDownToLine,X} from 'lucide-react';
 import {ImpactMatrixBuilder,readMatrixAxes} from './ImpactMatrixBuilder';
+import type {DemoState} from '../../lib/demo';
 import {ConesaSimplificado} from './ConesaSimplificado';
 import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type MethodId,type ScoredMethodId} from './MatrixMethodData';
 import './MatrixMethodHub.css';
 
 type ExistingImpact={id:string;factor:string;name:string};
-type Props={projectId:string;projectName:string;registeredImpacts:ExistingImpact[]};
+type Props={projectId:string;projectName:string;registeredImpacts:ExistingImpact[];pgaData:DemoState};
 type MethodDocument={schema:'ambienta.scored-matrix.v1';projectId:string;projectName:string;
  method:ScoredMethodId;updatedAt:string;entries:Record<string,Assessment>};
 const PREFIX='ambienta-scored-matrix-v1:';
@@ -225,7 +226,7 @@ const CARDS: Array<{
   detail:'Requiere indicadores medidos, funciones de transformación, pesos y escenarios con/sin proyecto. No es válido calcularlo con valores DEMO.',
   status:'Preparación metodológica',source:'Dee et al. (1973)',available:false}
 ];
-export function MatrixMethodHub({projectId,projectName,registeredImpacts}:Props){
+export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData}:Props){
  const [active,setActive]=useState<ActiveMethod>('causa-leopold');
  return <div className="amb-method-hub" data-matrix-method-catalog="v1">
   <section className="amb-method-catalog" aria-label="Catálogo de métodos ambientales">
@@ -258,7 +259,7 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts}:Props)
   {active==='causa-leopold'
    ?<ImpactMatrixBuilder projectId={projectId} projectName={projectName} registeredImpacts={registeredImpacts}/>
    :active==='conesa-simplificado-tutorial-v1'
-     ?<ConesaSimplificado key={projectId+':'+active} projectId={projectId} projectName={projectName}/>
+     ?<ConesaSimplificado key={projectId+':'+active} projectId={projectId} projectName={projectName} pgaData={pgaData}/>
      :<ScoredMatrix key={projectId+':'+active} projectId={projectId} projectName={projectName} method={active}/>}
  </div>;
 }

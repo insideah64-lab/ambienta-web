@@ -12,7 +12,7 @@ export type Uncertainty=''|'alta'|'media'|'baja';
 export type Quality=''|'declarada'|'documental'|'campo';
 export type Execution='prevista'|'implementada'|'verificada';
 export type Measure={
- hierarchy:Hierarchy;description:string;reference:string;pgaRef:string;
+ hierarchy:Hierarchy;description:string;reference:string;pgaRef:string;pgaMeasureId?:string;
  responsible:string;indicator:string;frequency:string;
  uncertainty:Uncertainty;quality:Quality;assumptions:string;execution:Execution;
 };
@@ -25,7 +25,7 @@ export type ResidualDocument={
  projectId:string;updatedAt:string;entries:Record<string,ResidualRecord>;
 };
 export const blankMeasure=():Measure=>({
- hierarchy:'',description:'',reference:'',pgaRef:'',responsible:'',indicator:'',
+ hierarchy:'',description:'',reference:'',pgaRef:'',pgaMeasureId:'',responsible:'',indicator:'',
  frequency:'',uncertainty:'',quality:'',assumptions:'',execution:'prevista'
 });
 export const blankResidual=():ConesaEntry=>({sign:null,criteria:{},reason:'',evidence:''});
@@ -51,6 +51,7 @@ export function isResidualRecord(value:unknown):value is ResidualRecord{
     !qualities.includes(m.quality||'')||!executions.includes(m.execution||''))return false;
  const sizes:Record<string,number>={description:5000,reference:1000,pgaRef:300,
   responsible:300,indicator:500,frequency:300,assumptions:3000};
+ if(m.pgaMeasureId!==undefined&&(typeof m.pgaMeasureId!=='string'||m.pgaMeasureId.length>300))return false;
  return Object.entries(sizes).every(([k,max])=>{
   const v=m[k as keyof Measure];return typeof v==='string'&&v.length<=max;
  });
