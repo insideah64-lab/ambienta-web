@@ -21,7 +21,7 @@ try{
   // This catches accidental inheritance from the surrounding dark F3 editor.
   const contrast=await f3.locator('.amb-f3-quality').evaluate(root=>{
    const color=(css)=>{
-    const n=css.match(/[\\d.]+/g)?.slice(0,3).map(Number);
+    const n=css.match(/[0-9.]+/g)?.slice(0,3).map(Number);
     return n&&n.length===3?n:null;
    };
    const luminance=(rgb)=>{
