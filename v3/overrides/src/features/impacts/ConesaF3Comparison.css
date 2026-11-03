@@ -34,11 +34,8 @@
 .ref-shell .amb-f3-quality-graph{padding:4px 0 8px;max-height:460px;overflow-y:auto}
 .ref-shell .amb-f3-quality-axis,.ref-shell .amb-f3-quality-row{display:grid;grid-template-columns:minmax(140px,220px) minmax(170px,1fr) 88px;gap:14px;align-items:center}
 .ref-shell .amb-f3-quality-axis{padding-bottom:8px;font-size:11px;color:var(--f3-viz-ink-muted)}
-.ref-shell .amb-f3-quality-axis::before,.ref-shell .amb-f3-quality-axis::after{content:''}
-.ref-shell .amb-f3-quality-axis span{display:none}
-.ref-shell .amb-f3-quality-axis{position:relative}
-.ref-shell .amb-f3-quality-axis span:first-child{display:block;position:absolute;left:calc(220px + 14px);bottom:0}
-.ref-shell .amb-f3-quality-axis span:last-child{display:block;position:absolute;right:88px;bottom:0}
+ .ref-shell .amb-f3-quality-axis>span{visibility:hidden}
+.ref-shell .amb-f3-quality-ticks{display:flex;justify-content:space-between;gap:8px;font-variant-numeric:tabular-nums;color:var(--f3-viz-ink-muted);font-size:11px}
 .ref-shell .amb-f3-quality-row{min-height:58px;border-top:1px solid var(--f3-viz-line);padding:9px 0}
 .ref-shell .amb-f3-quality-name{min-width:0}
 .ref-shell .amb-f3-quality-name strong{display:block;font-size:12px;color:var(--f3-viz-ink);overflow-wrap:anywhere}
@@ -63,7 +60,5 @@
 .ref-shell .amb-f3-quality-footnote{border-left:3px solid var(--f3-viz-before);padding-left:11px;margin-top:16px!important}
 @media(max-width:850px){
  .ref-shell .amb-f3-quality-axis,.ref-shell .amb-f3-quality-row{grid-template-columns:minmax(120px,155px) minmax(140px,1fr) 67px;gap:10px}
- .ref-shell .amb-f3-quality-axis span:first-child{left:calc(155px + 10px)}
- .ref-shell .amb-f3-quality-axis span:last-child{right:67px}
  .ref-shell .amb-f3-quality{padding:16px}
 }
