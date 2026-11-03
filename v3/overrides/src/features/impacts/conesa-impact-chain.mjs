@@ -8,13 +8,17 @@
  */
 import {resolveConesaPgaLink} from './conesa-pga-link.mjs';
 
-const result=(status,impact=null,link=null,warnings=[])=>({
- status,impact,measure:link?.measure??null,program:link?.program??null,
- trace:link?.trace??null,warnings,
- inspectionIds:link?.trace?.inspections?.map(i=>i.id)??[],
- evidenceIds:link?.trace?.evidence?.map(e=>e.record.id)??[],
- monitoring:link?.trace?.inspections?.length?'con-registros':'sin-inspecciones'
-});
+const result=(status,impact=null,link=null,warnings=[])=>{
+ const sameImpact=status==='vinculado'||status==='revisar-documentos';
+ const trace=sameImpact?link?.trace??null:null;
+ return {
+  status,impact,measure:link?.measure??null,program:link?.program??null,
+  trace,warnings,
+  inspectionIds:trace?.inspections?.map(i=>i.id)??[],
+  evidenceIds:trace?.evidence?.map(e=>e.record.id)??[],
+  monitoring:trace?.inspections?.length?'con-registros':'sin-inspecciones'
+ };
+};
 
 export function uniqueRegisteredImpacts(state,projectId){
  if(!state||state.project?.id!==projectId)return [];
