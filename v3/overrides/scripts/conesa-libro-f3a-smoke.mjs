@@ -40,6 +40,8 @@ try{
   assert(v.includes('-0.3000')||v.includes('−0.3000'),v);
   assert.equal(await f3.locator('[data-f3-visual-empty]').count(),0);
   assert.equal(await f3.locator('[data-f3-chart-row]').count(),1);
+  assert.match(await f3.locator('[data-f3-chart-row]').first().innerText(),/SIN medido · CON estimado/);
+
   await f3.locator('.amb-f3-quality-disclosure summary').click();
   assert.equal(await f3.locator('.amb-f3-quality-disclosure tbody tr').count(),1);
   const exact=await f3.locator('.amb-f3-quality-disclosure tbody').innerText();
