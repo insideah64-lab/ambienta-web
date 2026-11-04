@@ -117,4 +117,3 @@ try{
 }finally{await browser.close();}
 await fs.writeFile(out+'/results.json',JSON.stringify(results,null,2));
 console.log(JSON.stringify(results));
-

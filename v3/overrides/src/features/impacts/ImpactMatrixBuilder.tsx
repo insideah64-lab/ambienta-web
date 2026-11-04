@@ -541,4 +541,3 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
   </footer>
  </section>;
 }
-
