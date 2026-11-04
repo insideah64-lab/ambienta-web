@@ -1,0 +1,39 @@
+.ref-shell .amb-leopold-review{margin:16px 0;padding:18px;border:1px solid #536b79;border-radius:12px;
+ background:linear-gradient(140deg,#142632,#203a43);color:#eff7f5}
+.ref-shell .amb-leopold-review h4{font-size:19px;color:#fff;margin:1px 0 7px}
+.ref-shell .amb-leopold-review h5{font-size:13px;color:#ecf5f4;margin:0 0 9px}
+.ref-shell .amb-leopold-review p{font-size:12px;line-height:1.6;color:#c5d7db;margin:6px 0}
+.ref-shell .amb-leopold-review-settings{display:flex;flex-wrap:wrap;gap:12px;margin:15px 0 10px}
+.ref-shell .amb-leopold-review-settings label{display:flex;gap:8px;align-items:center;flex-wrap:wrap;
+ background:#102832;border:1px solid #496674;padding:8px 11px;border-radius:8px;font-size:13px}
+.ref-shell .amb-leopold-review-settings select{background:#f8fbfb;color:#15343f;border:1px solid #b1c7cb;
+ border-radius:6px;font-size:13px;padding:7px;max-width:220px}
+.ref-shell .amb-leopold-review .amb-leopold-review-disclaimer{border-left:3px solid #dfbd7b;
+ background:#473f342a;padding:10px 12px;color:#eee2ce}
+.ref-shell .amb-leopold-review-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:14px 0}
+.ref-shell .amb-leopold-review-stats span{padding:11px;border-radius:8px;border:1px solid #3c5966;background:#112e38}
+.ref-shell .amb-leopold-review-stats strong{display:block;font-size:22px;color:#e4faf4}
+.ref-shell .amb-leopold-review-stats small{display:block;font-size:11px;color:#bfd3d7}
+.ref-shell .amb-leopold-review-axis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}
+.ref-shell .amb-leopold-review-axis>div{border:1px solid #49636e;border-radius:8px;padding:12px;min-width:0}
+.ref-shell .amb-leopold-review-axis ul{list-style:none;padding:0;margin:0;max-height:172px;overflow-y:auto}
+.ref-shell .amb-leopold-review-axis li{display:flex;justify-content:space-between;gap:9px;
+ border-bottom:1px solid #47616b;padding:7px 0;font-size:12px;overflow-wrap:anywhere}
+.ref-shell .amb-leopold-review-axis li strong{color:#edd49a;white-space:nowrap}
+.ref-shell .amb-leopold-review-table-scroll{overflow:auto;max-height:420px;border:1px solid #54707b;border-radius:9px}
+.ref-shell .amb-leopold-review-table-scroll table{border-collapse:collapse;width:100%;min-width:760px;font-size:12px}
+.ref-shell .amb-leopold-review-table-scroll th,.ref-shell .amb-leopold-review-table-scroll td{
+ padding:10px;border-bottom:1px solid #405a66;text-align:left;vertical-align:top}
+.ref-shell .amb-leopold-review-table-scroll thead{position:sticky;top:0;background:#26505a;z-index:1}
+.ref-shell .amb-leopold-review-table-scroll tbody tr:nth-child(even){background:#1d42474d}
+.ref-shell .amb-leopold-review-table-scroll th small,.ref-shell .amb-leopold-review-table-scroll th em{
+ display:block;font-size:11px;color:#bfd1d6;font-weight:400;margin-top:3px}
+.ref-shell .amb-leopold-review-table-scroll th em{font-style:normal;color:#efd18f}
+.ref-shell .amb-leopold-review-table-scroll button{background:#c5ded9;border:1px solid #a0c9c6;
+ color:#103a42;border-radius:7px;padding:7px 10px;font-weight:700}
+.ref-shell .amb-leopold-review-table-scroll button:focus-visible,
+.ref-shell .amb-leopold-review-settings select:focus-visible{outline:3px solid #ffce80;outline-offset:2px}
+.ref-shell .amb-leopold-review .amb-leopold-review-empty{padding:12px;border:1px dashed #8c9ca3;border-radius:8px}
+.ref-shell .amb-leopold-review .amb-leopold-review-footer{margin:12px 0 0;color:#b8ccd0}
+@media(max-width:980px){.ref-shell .amb-leopold-review-axis{grid-template-columns:1fr}
+ .ref-shell .amb-leopold-review-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
