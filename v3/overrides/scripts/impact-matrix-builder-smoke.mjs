@@ -32,16 +32,36 @@ try {
    const label=table.querySelector('.amb-matrix-corner-label');
    if(!header||!corner||!label)throw Error('Missing compact matrix header');
    const h=header.getBoundingClientRect(),c=corner.getBoundingClientRect(),l=label.getBoundingClientRect();
+   const ink=document.createRange();
+   ink.selectNodeContents(label);
+   const textBounds=ink.getBoundingClientRect();
+   const style=getComputedStyle(label);
+   const actionTitle=table.querySelector('.amb-matrix-column-head>span');
+   const actionTitleDisplay=actionTitle?getComputedStyle(actionTitle).display:'missing';
    return {height:h.height,cornerCenter:c.top+c.height/2,labelCenter:l.top+l.height/2,
-    actions:table.querySelectorAll('.amb-matrix-column-head').length};
+    textCenter:textBounds.top+textBounds.height/2,
+    textHeight:textBounds.height,labelDisplay:style.display,labelAlign:style.alignItems,
+    actionTitleDisplay,actions:table.querySelectorAll('.amb-matrix-column-head').length};
   });
   assert(headingGeometry.height<=88,
    'Column header must be compact; screenshot regression: '+JSON.stringify(headingGeometry));
   assert(Math.abs(headingGeometry.cornerCenter-headingGeometry.labelCenter)<=5,
    'Factor heading must be vertically centered, not stuck to the bottom of an empty header');
   assert.equal(headingGeometry.actions,4,'All action labels keep an inline control row');
-  await grid.locator('thead').screenshot({path:output+'/matrix-header-compact-'+width+'.png',
+  assert.equal(headingGeometry.labelDisplay,'flex',
+   'Corner text must actually use flex; a more specific generic span rule must not override it');
+  assert.equal(headingGeometry.labelAlign,'center');
+  assert(headingGeometry.textHeight>8,
+   'Text ink must be measurable in the browser: '+JSON.stringify(headingGeometry));
+  assert(Math.abs(headingGeometry.cornerCenter-headingGeometry.textCenter)<=5,
+   'Actual letter ink, not merely the label box, must be visually centered: '+
+    JSON.stringify(headingGeometry));
+  assert(['-webkit-box','flow-root'].includes(headingGeometry.actionTitleDisplay),
+   'Action headings must keep their 2-line clamp layout rather than generic display:block: '+
+    JSON.stringify(headingGeometry));
+  await grid.locator('thead').screenshot({path:output+'/matrix-header-text-centered-'+width+'.png',
    animations:'disabled'});
+  await page.screenshot({path:output+'/matrix-centered-overview-'+width+'.png',animations:'disabled'});
   assert.equal(await grid.locator('tbody tr').count(),7,'7 factors, no fake evaluations');
   assert.equal(await page.locator('.amb-matrix-kpis>span').nth(1).locator('strong').innerText(),'0');
   assert.equal(await page.locator('.amb-matrix-cell--negative,.amb-matrix-cell--positive').count(),0);
