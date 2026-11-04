@@ -193,7 +193,7 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
    </div>
   </header>
   <div className="amb-matrix-caution" role="note">
-   <strong>No es una declaración de impacto ambiental.</strong> Catálogo inicial ilustrativo; sin coordenadas, línea de base o mediciones verificadas. Los criterios deben fundamentarse en evidencia y revisión profesional. Se guarda solo en este navegador, por expediente.
+   <strong>No es una declaración de impacto ambiental.</strong> Catálogo inicial reducido e ilustrativo, no el inventario completo de 100 acciones y 88 factores de la matriz clásica; sin coordenadas, línea de base o mediciones verificadas. Los criterios deben fundamentarse en evidencia y revisión profesional. Se guarda solo en este navegador, por expediente.
   </div>
   <div className="amb-matrix-kpis">
    <span><strong>{doc.actions.length} × {doc.factors.length}</strong><small>acciones × factores</small></span>
@@ -209,13 +209,13 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
     <button type="button" aria-pressed={mode==='ponderada'} onClick={()=>setMode('ponderada')}>Ponderación exploratoria</button>
    </div>
    <label className="amb-matrix-filter"><input type="checkbox" checked={onlyEvaluated} onChange={e=>setOnlyEvaluated(e.target.checked)}/> Solo factores con interacciones</label>
-    {mode==='leopold'&&<label className="amb-matrix-filter"><input type="checkbox" data-leopold-diagonal-toggle checked={diagonal} onChange={e=>setDiagonal(e.target.checked)}/> Celdas diagonales</label>}
+    {mode==='leopold'&&<label className="amb-matrix-filter"><input type="checkbox" data-leopold-diagonal-toggle checked={diagonal} onChange={e=>setDiagonal(e.target.checked)}/> Mostrar diagonal clásica M/I</label>}
   </div>
   <div className="amb-matrix-legend">
    {mode==='identificacion'
     ? 'Identificación: + impacto beneficioso; − impacto adverso; ∅ sin interacción declarada; — no evaluado.'
     : mode==='leopold'
-      ? 'Leopold: magnitud con signo / importancia (1–10). Los agregados por acción/factor son descriptivos y no implican compensación ambiental.'
+      ? 'Leopold según la matriz clásica: signo y magnitud (1–10) arriba; importancia (1–10) abajo. El producto M×I es una adaptación didáctica, no un índice oficial de aprobación.'
       : 'Vista exploratoria: signo × magnitud × importancia × peso editable. NO es la importancia de Conesa ni una clasificación legal.'}
   </div>
   <div className="amb-matrix-scroll" role="region" tabIndex={0} aria-label="Matriz editable, desplazamiento horizontal disponible">
@@ -311,7 +311,7 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
         </select>
        </label>
       </div>
-      <p className="amb-matrix-guidance">Magnitud: extensión o intensidad estimada; importancia: trascendencia contextual. No son equivalentes.</p>
+      <p className="amb-matrix-guidance">Según Conesa (1997), apdo. 6.2.1.1, pp. 60–61: magnitud (1–10) describe la dimensión de la alteración, con signo; importancia (1–10) expresa la incidencia o trascendencia contextual (por ejemplo, local o regional). Son dos juicios diferentes, sin puntuaciones automáticas.</p>
      </>}
      {chosen.cell&&<>
       <label>Fundamento técnico y supuestos
