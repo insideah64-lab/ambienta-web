@@ -6,6 +6,7 @@ import {
  type F3BAudit
 } from './ConesaF3DigitizationModel';
 import {ANNEX4_CATALOG} from './ConesaAnnex4Catalog';
+import {ConesaF3VisualDigitizer} from './ConesaF3VisualDigitizer';
 import './ConesaF3DigitizationAudit.css';
 
 type Props={projectId:string;factorId:string;curve:F3BCurve;blocked:boolean};
@@ -83,7 +84,9 @@ export function ConesaF3DigitizationAudit({projectId,factorId,curve,blocked}:Pro
    <p className="amb-f3b-audit-help">
     Expediente de revisión <strong>local</strong> para curvas continuas del Anejo 4.
     Debés conservar el gráfico original, calibrar los ejes y registrar
-    dos lecturas independientes de los mismos nudos. El módulo compara
+    dos lecturas independientes de los mismos nudos. Podés marcarlos sobre una
+    imagen local en el digitalizador visual o ingresar las coordenadas a mano.
+    El módulo compara
     las lecturas con los nudos actuales de F3b, pero no digitaliza imágenes
     ni habilita automáticamente funciones para otros proyectos.
    </p>
@@ -130,6 +133,7 @@ export function ConesaF3DigitizationAudit({projectId,factorId,curve,blocked}:Pro
      </label>)}
     </div>
    </fieldset>
+   <ConesaF3VisualDigitizer audit={audit} blocked={locked} onPatch={update}/>
    <fieldset>
     <legend>2. Lecturas independientes A y B</legend>
     <div className="amb-f3b-audit-grid">
