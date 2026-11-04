@@ -21,6 +21,10 @@ try {
   await page.locator('[data-impact-matrix="v1"]').waitFor();
   assert.equal(await page.locator('[data-page-role="environmental-matrices-tool"]').count(),1);
   const grid=page.locator('.amb-matrix-grid');
+  assert.equal(await page.locator('[data-matrix-inline-builder]').count(),1,
+   'Create rows/columns directly next to the grid');
+  assert.equal(await page.locator('[data-matrix-canvas] [data-matrix-inspector]').count(),1,
+   'Cell evaluation belongs alongside the matrix, not below it');
   assert.equal(await grid.locator('thead th').count(),5,'4 action examples plus factor header');
   assert.equal(await grid.locator('tbody tr').count(),7,'7 factors, no fake evaluations');
   assert.equal(await page.locator('.amb-matrix-kpis>span').nth(1).locator('strong').innerText(),'0');
@@ -29,6 +33,10 @@ try {
     'The evaluation workbench lives on its own tools page');
   await page.screenshot({path:output+'/matrix-empty-'+width+'.png',animations:'disabled'});
   await page.locator('.amb-matrix-cell').first().click();
+  assert.equal(await page.locator('[data-matrix-inspector]').isVisible(),true);
+  await page.getByRole('button',{name:'− Adverso'}).click();
+  assert.equal(await page.locator('.amb-matrix-cell--negative').count(),1,
+   'Direct scoring shortcuts mark the clicked matrix cell');
   const nature=page.getByRole('combobox',{name:'Naturaleza de la interacción'});
   await nature.selectOption('-1');
   await page.getByRole('combobox',{name:'Magnitud del impacto'}).selectOption('7');
@@ -49,12 +57,33 @@ try {
   await page.getByRole('button',{name:'Identificación'}).click();
   await page.getByRole('button',{name:'Incorporar factores existentes del expediente'}).click();
   assert(await grid.locator('tbody tr').count()>=7,'Existing impact factors imported by name only');
+  assert.equal(await page.locator('[data-matrix-inline-builder] [aria-label="Nombre de nueva acción"]').count(),1);
   await page.getByRole('textbox',{name:'Nombre de nueva acción'}).fill('Obra piloto de ejemplo');
+  await page.getByRole('combobox',{name:'Etapa de nueva acción'}).selectOption('cierre');
   await page.getByRole('button',{name:'Acción',exact:true}).click();
+  assert.equal(await grid.locator('thead th').last().locator('small').innerText(),'Cierre');
   assert.equal(await grid.locator('thead th').count(),6,'Add action');
   await page.getByRole('textbox',{name:'Nombre de nuevo factor'}).fill('Humedales de referencia');
   await page.getByRole('button',{name:'Factor',exact:true}).click();
   assert(await grid.getByRole('rowheader',{name:/Humedales de referencia/}).count()===1,'Add factor');
+  await page.getByRole('button',{name:'Editar columna Obra piloto de ejemplo'}).click();
+  const actionEditor=page.locator('[data-matrix-edit-action]');
+  assert.equal(await actionEditor.count(),1);
+  await actionEditor.getByRole('textbox',{name:'Editar nombre de acción en matriz'}).fill('Restauración de humedales');
+  await actionEditor.getByRole('combobox',{name:'Editar etapa de acción en matriz'}).selectOption('operacion');
+  await actionEditor.getByRole('button',{name:'Guardar cambios de acción'}).click();
+  assert.equal(await grid.getByRole('columnheader',{name:/Restauración de humedales/}).count(),1);
+  assert.equal(await grid.getByRole('columnheader',{name:/Operación.*Restauración de humedales/}).count(),1);
+  await page.getByRole('button',{name:'Editar fila Humedales de referencia'}).click();
+  const factorEditor=page.locator('[data-matrix-edit-factor]');
+  await factorEditor.getByRole('textbox',{name:'Editar nombre de factor en matriz'}).fill('Humedales de altura');
+  await factorEditor.getByRole('textbox',{name:'Editar grupo ambiental en matriz'}).fill('Medio biótico');
+  await factorEditor.getByRole('spinbutton',{name:'Editar peso de factor en matriz'}).fill('1.5');
+  await factorEditor.getByRole('button',{name:'Guardar cambios de factor'}).click();
+  assert.equal(await grid.getByRole('rowheader',{name:/Humedales de altura/}).count(),1);
+  assert.equal(await page.locator('.amb-matrix-cell--negative').count(),1,
+   'Renaming axes by stable IDs must not delete an assessed cell');
+  await page.screenshot({path:output+'/matrix-build-inline-'+width+'.png',animations:'disabled'});
   const [csvDownload]=await Promise.all([
     page.waitForEvent('download'),page.getByRole('button',{name:'CSV',exact:true}).click()
   ]);
@@ -66,8 +95,17 @@ try {
   ]);
   const imported=JSON.parse(await fs.readFile(await jsonDownload.path(),'utf8'));
   assert.equal(imported.schema,'ambienta.impact-matrix.v1');
-  assert(imported.actions.some(x=>x.name==='Obra piloto de ejemplo'));
+  assert(imported.actions.some(x=>x.name==='Restauración de humedales'&&x.phase==='operacion'));
+  assert(imported.factors.some(x=>x.name==='Humedales de altura'&&x.group==='Medio biótico'&&x.weight===1.5));
   assert.equal(Object.values(imported.cells).filter(c=>c.sign!==0).length,1);
+  page.once('dialog',d=>{void d.accept();});
+  await page.getByRole('button',{name:'Eliminar columna Restauración de humedales'}).click();
+  assert.equal(await grid.locator('thead th').count(),5,'Column deletion only on explicit confirmation');
+  page.once('dialog',d=>{void d.accept();});
+  await page.getByRole('button',{name:'Eliminar fila Humedales de altura'}).click();
+  assert.equal(await grid.getByRole('rowheader',{name:/Humedales de altura/}).count(),0);
+  assert.equal(await page.locator('.amb-matrix-cell--negative').count(),1,
+   'Deleting an unrelated new axis must retain the original evaluated interaction');
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   assert(overflow<=6,'No page-wide horizontal overflow at width '+width+' ('+overflow+')');
   assert.deepEqual(errors,[]);
