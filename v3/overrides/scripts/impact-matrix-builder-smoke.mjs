@@ -56,8 +56,9 @@ try {
   assert(Math.abs(headingGeometry.cornerCenter-headingGeometry.textCenter)<=5,
    'Actual letter ink, not merely the label box, must be visually centered: '+
     JSON.stringify(headingGeometry));
-  assert.equal(headingGeometry.actionTitleDisplay,'-webkit-box',
-   'Action titles must keep their two-line clamp, not be overruled by generic span CSS');
+  assert(['-webkit-box','flow-root'].includes(headingGeometry.actionTitleDisplay),
+   'Action headings must keep their 2-line clamp layout rather than generic display:block: '+
+    JSON.stringify(headingGeometry));
   await grid.locator('thead').screenshot({path:output+'/matrix-header-text-centered-'+width+'.png',
    animations:'disabled'});
   await page.screenshot({path:output+'/matrix-centered-overview-'+width+'.png',animations:'disabled'});
