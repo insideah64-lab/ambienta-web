@@ -6,7 +6,7 @@ import type {DemoState} from '../../lib/demo';
 import {calculateConesa,conesaProblems,CONESA_FIELDS,METHOD_ID,validatedConesaEntry,type ConesaEntry} from './ConesaSimplificadoModel';
 import './ConesaSimplificado.css';
 
-type Props={projectId:string;projectName:string;pgaData:DemoState};
+type Props={projectId:string;projectName:string;pgaData:DemoState;readOnly?:boolean};
 type Draft={schema:'ambienta.conesa-simplificado.v1';projectId:string;projectName:string;updatedAt:string;entries:Record<string,ConesaEntry>};
 const STORAGE_PREFIX='ambienta-conesa-simplificado-v1:';
 const blank=(id:string,name:string):Draft=>({schema:'ambienta.conesa-simplificado.v1',
@@ -37,7 +37,7 @@ function csvSafe(x:string|number|null){
  const value=typeof x==='number'?raw:/^\s*[=+\-@\t\r]/.test(raw)?"'"+raw:raw;
  return '"'+value.replaceAll('"','""')+'"';
 }
-export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
+export function ConesaSimplificado({projectId,projectName,pgaData,readOnly=false}:Props){
  const [doc,setDoc]=useState<Draft>(()=>readDraft(projectId,projectName));
  const edited=useRef(false);
  const [refresh,setRefresh]=useState(0);
@@ -45,11 +45,12 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
  const [notice,setNotice]=useState('');
  const axes=useMemo(()=>readMatrixAxes(projectId,projectName),[projectId,projectName,refresh]);
  useEffect(()=>{
-  if(!edited.current)return;
+  if(readOnly||!edited.current)return;
   try{localStorage.setItem(STORAGE_PREFIX+projectId,JSON.stringify(doc));}
   catch{setNotice('No se pudo conservar el borrador en este navegador. Exportá JSON.');}
- },[doc,projectId]);
+ },[doc,projectId,readOnly]);
  const patch=(id:string,update:Partial<ConesaEntry>)=>{
+  if(readOnly)return;
   edited.current=true;
   setDoc(previous=>{
    const old=previous.entries[id]||{sign:null,criteria:{},reason:'',evidence:''};
@@ -58,6 +59,7 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
   });
  };
  const clear=(id:string)=>{
+  if(readOnly)return;
   edited.current=true;
   setDoc(old=>{const entries={...old.entries};delete entries[id];
    return {...old,entries,updatedAt:new Date().toISOString()};});
@@ -108,8 +110,8 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
  };
  return <section className="amb-matrix amb-conesa-rev" data-conesa-simplificado={METHOD_ID}>
   <div className="amb-conesa-top">
-   <div><p className="amb-matrix-overline">VARIANTE DIDÁCTICA VERSIONADA · BORRADOR LOCAL</p>
-    <h3>Conesa simplificado</h3>
+   <div><p className="amb-matrix-overline">{readOnly?'ARCHIVO HISTÓRICO · SOLO LECTURA':'VARIANTE DIDÁCTICA VERSIONADA · BORRADOR LOCAL'}</p>
+    <h3>{readOnly?'Conesa · evaluaciones anteriores':'Conesa simplificado'}</h3>
     <p>El signo y la importancia absoluta se muestran por separado. Los recargos por localización y momento críticos se suman al valor base, con justificación documental.</p>
     <code>I<sub>abs</sub> = 3IN + 2(EX + EXcr) + (MO + MOcr) + PE + RV + SI + AC + EF + PR + MC</code>
    </div>
@@ -119,7 +121,7 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
    </div>
   </div>
   <p className="amb-conesa-disclaimer" role="note">
-   Esta ficha utiliza una variante didáctica contrastada con el tutorial y el Excel. El ejemplar completo de Conesa Fernández-Vítora, 3.ª edición (1997, reimpresión de 2000), es ahora la referencia principal de su auditoría metodológica. La implementación completa del libro está pendiente.
+   {readOnly?'Esta edición permanece archivada. No podés cambiar sus criterios: consultá o exportá las evaluaciones originales. ':''}Esta ficha utiliza una variante didáctica contrastada con el tutorial y el Excel. El ejemplar completo de Conesa Fernández-Vítora, 3.ª edición (1997, reimpresión de 2000), es ahora la referencia principal de su auditoría metodológica. La implementación completa del libro está pendiente.
    <strong> No es una homologación normativa para Salta.</strong> El caso didáctico con RV = 3 queda fuera de esta variante (RV: 1, 2, 4), y no se acepta sin revisión.
    Las categorías de severidad para impactos negativos se asignan por importancia absoluta: menos de 25 irrelevante, 25 a menos de 50 moderado, 50 a menos de 75 severo y 75 o más crítico. Los impactos positivos se identifican como beneficiosos, sin etiquetarlos como críticos.
    <a href="https://www.dremsm.gob.pe/archivos/rdr/rdr24/rdr35.pdf" target="_blank" rel="noreferrer"> Fuente complementaria: aplicación ambiental, 2024</a>. La 4.ª edición de 2010 es posterior y requiere cotejo adicional antes de homologar cambios.
@@ -132,7 +134,7 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
   </div>
   <div className="amb-conesa-toolbar">
    <p>El catálogo de factores y acciones proviene de la herramienta de identificación, no de puntuaciones de Leopold.</p>
-   <button type="button" onClick={()=>{setRefresh(x=>x+1);setSelected(null);}}><RefreshCcw size={15}/> Actualizar catálogo</button>
+   {!readOnly&&<button type="button" onClick={()=>{setRefresh(x=>x+1);setSelected(null);}}><RefreshCcw size={15}/> Actualizar catálogo</button>}
   </div>
   <div className="amb-matrix-scroll" tabIndex={0} role="region" aria-label="Matriz de Conesa simplificado; desplazamiento horizontal">
    <table className="amb-matrix-grid">
@@ -161,14 +163,14 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
      <button type="button" aria-label="Cerrar editor de Conesa" onClick={()=>setSelected(null)}><X size={18}/></button>
     </header>
     <label>Naturaleza
-     <select aria-label="Naturaleza Conesa revisado" value={selectedItem.entry?.sign===-1?'-1':selectedItem.entry?.sign===1?'1':''}
+     <select aria-label="Naturaleza Conesa revisado" disabled={readOnly} value={selectedItem.entry?.sign===-1?'-1':selectedItem.entry?.sign===1?'1':''}
       onChange={e=>patch(selected,{sign:e.target.value?Number(e.target.value) as -1|1:null})}>
       <option value="">No evaluada</option><option value="-1">Negativo (−)</option><option value="1">Positivo (+)</option>
      </select>
     </label>
     <div className="amb-conesa-fields">{CONESA_FIELDS.map(field=><label key={field.id}>
      {field.label} ({field.id})
-     <select aria-label={'Conesa '+field.id} value={selectedItem.entry?.criteria[field.id]??''}
+     <select aria-label={'Conesa '+field.id} disabled={readOnly} value={selectedItem.entry?.criteria[field.id]??''}
       onChange={e=>{
        const criteria={...(selectedItem.entry?.criteria||{})};
        if(e.target.value==='')delete criteria[field.id];else criteria[field.id]=Number(e.target.value);
@@ -185,13 +187,13 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
     </div>
     {selectedItem.entry&&conesaProblems(selectedItem.entry).length>0&&
      <p className="amb-conesa-problems" data-conesa-problems>{conesaProblems(selectedItem.entry).join(' · ')}</p>}
-    <label>Fundamento y supuestos<textarea rows={3} maxLength={5000}
+    <label>Fundamento y supuestos<textarea disabled={readOnly} rows={3} maxLength={5000}
      placeholder="Justificar cada criterio, especialmente si se asignó criticidad…"
      value={selectedItem.entry?.reason||''} onChange={e=>patch(selected,{reason:e.target.value})}/></label>
-    <label>Referencia verificable<input maxLength={1000}
+    <label>Referencia verificable<input disabled={readOnly} maxLength={1000}
      placeholder="Documento, página, evidencia y ubicación de interés crítico…"
      value={selectedItem.entry?.evidence||''} onChange={e=>patch(selected,{evidence:e.target.value})}/></label>
-    {selectedItem.entry&&<button type="button" className="amb-matrix-secondary" onClick={()=>clear(selected)}>Eliminar valoración</button>}
+    {selectedItem.entry&&!readOnly&&<button type="button" className="amb-matrix-secondary" onClick={()=>clear(selected)}>Eliminar valoración</button>}
    </div>}
   </div>
   <div className="amb-conesa-review" data-conesa-review>
@@ -217,8 +219,8 @@ export function ConesaSimplificado({projectId,projectName,pgaData}:Props){
     </table>
    </div>
   </div>
-  <ConesaResidualPanel projectId={projectId} initialEntries={doc.entries}
-   actions={axes.actions} factors={axes.factors} pgaData={pgaData}/>
+  {!readOnly&&<ConesaResidualPanel projectId={projectId} initialEntries={doc.entries}
+   actions={axes.actions} factors={axes.factors} pgaData={pgaData}/>}
   <footer className="amb-matrix-footer">
    <span>Método: {METHOD_ID} · guardado en este navegador por expediente · {projectId}</span>
    <span>El resultado es descriptivo y requiere revisión profesional antes de incluirlo en un EsIA o PGA.</span>

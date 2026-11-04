@@ -7,7 +7,7 @@ import {readFile} from 'node:fs/promises';
  * The complete 3rd-edition book can be adopted only with a new versioned
  * algorithm and explicit review of the method's documented exceptional cases.
  */
-test('Conesa complete-book adoption is accurately described as an AUDIT, not a completed migration',async()=>{
+test('Conesa single book workbench preserves distinct historic drafts and audit provenance',async()=>{
  const base='apps/web-v3/src/features/impacts/';
  const [model,ui,hub,audit]=await Promise.all([
   readFile(base+'ConesaSimplificadoModel.ts','utf8'),
@@ -19,7 +19,12 @@ test('Conesa complete-book adoption is accurately described as an AUDIT, not a c
  assert.match(model,/3\*v\.IN\+2\*\(v\.EX\+v\.EX_CR\)/);
  assert.match(model,/3rd ed\. \(1997\)/);
  assert.match(ui,/La implementación completa del libro está pendiente/);
- assert.match(hub,/motor simplificado en revisión/);
+ assert.match(hub,/name:'Conesa'/);
+ assert.match(hub,/<ConesaLibroPanel key=/);
+ assert.doesNotMatch(hub,/data-conesa-variant-switch/);
+ assert.match(hub,/data-conesa-simplified-archive/);
+ assert.match(hub,/readOnly\/>/);
+ assert.match(hub,/oldSimplifiedArchive/);
  assert.match(audit,/1997.*2000/);
  assert.match(audit,/Sin cambios|SIN cambiar cálculo/);
  assert.match(audit,/Umbral|bordes 50 y 75/i);

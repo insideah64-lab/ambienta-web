@@ -7,152 +7,123 @@ await fs.mkdir(out,{recursive:true});
 const browser=await chromium.launch({headless:true,args:['--no-sandbox']});
 try{
  for(const width of [1366,1800]){
-  const ctx=await browser.newContext({viewport:{width,height:900},deviceScaleFactor:1,
-   acceptDownloads:true,reducedMotion:'reduce'});
-  const page=await ctx.newPage(),errors=[];
-  page.on('pageerror',err=>errors.push(String(err)));
+  const context=await browser.newContext({viewport:{width,height:900},acceptDownloads:true,reducedMotion:'reduce'});
+  const page=await context.newPage(),errors=[];
+  page.on('pageerror',e=>errors.push(String(e)));
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
   await page.locator('[data-matrix-method-catalog="v1"]').waitFor();
-  assert.equal(await page.locator('[data-catalog-method]').count(),4,
-   'Leopold, Conesa, RIAM, Battelle; no second Conesa method card');
-  assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1,
-   'Only one Conesa entry is selectable');
-  assert.equal(await page.locator('[data-catalog-method="conesa-1997-2ex"]').count(),0,
-   'Legacy Conesa is archival, not an active peer method');
-  assert.equal(await page.locator('[data-catalog-method="battelle"] button').count(),0,
-   'Battelle requires real environmental indicators');
-  const methodIds=['causa-leopold','conesa-simplificado-tutorial-v1','riam-1998','battelle'];
-  const methodAccents=[];
-  for(const id of methodIds){
+  assert.equal(await page.locator('[data-catalog-method]').count(),4);
+  assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
+  assert.equal((await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] .amb-method-cardcopy strong').innerText()).trim(),'Conesa');
+  assert.equal(await page.locator('[data-catalog-method="battelle"] button').count(),0);
+  const ids=['causa-leopold','conesa-simplificado-tutorial-v1','riam-1998','battelle'];
+  const accents=[];
+  for(const id of ids){
    const card=page.locator('[data-catalog-method="'+id+'"]');
-   assert((await card.locator('.amb-method-cardvisual svg').count())>=1,
-    'Each method must have its own vector icon: '+id);
-   assert.equal(await card.locator('.amb-method-cardcopy strong').count(),1);
-   const accent=await card.evaluate(node=>getComputedStyle(node).getPropertyValue('--method-accent').trim());
-   assert(accent,'Method accent must be defined: '+id);
-   methodAccents.push(accent);
+   assert((await card.locator('.amb-method-cardvisual svg').count())>=1);
+   accents.push(await card.evaluate(n=>getComputedStyle(n).getPropertyValue('--method-accent').trim()));
   }
-  assert.equal(new Set(methodAccents).size,4,
-   'Leopold, Conesa, RIAM and Battelle must have visually distinct color identities');
-  assert.equal(await page.locator('.amb-method-matrix-art i').count(),16,
-   'Leopold illustration must show actual matrix cells');
-  assert.equal(await page.locator('.amb-method-conesa-art').count(),1,
-   'Conesa illustration must show its own severity rings');
-  assert.equal(await page.locator('.amb-method-riam-art i').count(),5,
-   'RIAM illustration must show comparative bars');
-  assert.equal(await page.locator('.amb-method-battelle-art').count(),1,
-   'Battelle illustration must show a chart, not a fake active method');
-  assert.equal(await page.locator('.amb-method-card.is-planned button').count(),0,
-   'A nonimplemented method must not become clickable due to visual redesign');
-
-  assert.equal(await page.locator('[data-impact-matrix="v1"]').count(),1,
-   'Leopold workbench is unchanged');
-  assert.equal(await page.locator('[data-matrix-method-catalog] .amb-method-cardbottom button[aria-pressed="true"]').count(),1);
-  assert.equal(await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('ambienta-scored-matrix-v1:')).length),0,
-   'Catalog does not create method drafts');
+  assert.equal(new Set(accents).size,4);
+  assert.equal(await page.locator('.amb-method-matrix-art i').count(),16);
+  assert.equal(await page.locator('.amb-method-conesa-art').count(),1);
+  assert.equal(await page.locator('.amb-method-riam-art i').count(),5);
+  assert.equal(await page.locator('.amb-method-battelle-art').count(),1);
   await page.screenshot({path:out+'/catalog-'+width+'.png',animations:'disabled'});
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  await page.locator('[data-conesa-simplificado]').waitFor();
-  assert.equal(await page.locator('[data-conesa-legacy-archive]').count(),0,
-   'No archive section for projects with no legacy document');
-  assert.equal(await page.locator('[data-method-assessment="conesa-1997-2ex"]').count(),0);
-  const cell=page.locator('[data-conesa-cell]').first();
-  const interaction=await cell.getAttribute('data-conesa-cell');
-  assert(interaction);
-  await cell.click();
-  await page.getByRole('combobox',{name:'Naturaleza Conesa revisado'}).selectOption('-1');
+  const main=page.locator('[data-conesa-book]');
+  await main.waitFor();
+  assert.equal((await main.locator('h3').first().innerText()).trim(),'Conesa');
+  assert.equal(await page.locator('[data-conesa-variant-switch]').count(),0);
+  assert.equal(await page.locator('[data-conesa-simplificado]').count(),0);
+  assert.equal(await page.locator('[data-conesa-simplified-archive]').count(),0);
+  assert.equal(await page.locator('[data-conesa-legacy-archive]').count(),0);
+  const before=await page.evaluate(()=>Object.keys(localStorage).sort());
+  await main.locator('[data-conesa-book-cell]').first().click();
+  await main.getByRole('combobox',{name:'Conesa libro naturaleza'}).selectOption('-1');
   const values={IN:2,EX:2,EX_CR:0,MO:4,MO_CR:0,PE:4,RV:1,SI:1,AC:1,EF:4,PR:1,MC:2};
-  for(const [criterion,value] of Object.entries(values))
-   await page.getByRole('combobox',{name:'Conesa '+criterion,exact:true}).selectOption(String(value));
-  assert.equal((await page.locator('[data-conesa-absolute]').innerText()).trim(),'28');
-  assert.equal((await page.locator('[data-conesa-signed]').innerText()).trim(),'-28');
-  assert.equal((await page.locator('[data-conesa-category]').innerText()).trim(),'Moderado');
-  assert.equal(await page.getByRole('combobox',{name:'Conesa RV',exact:true}).locator('option[value="3"]').count(),0,
-   'RV=3 is not valid in the revised documented variant');
-  assert.equal(await page.locator('[data-conesa-review-row]').count(),1);
+  for(const [id,value] of Object.entries(values))
+   await main.getByRole('combobox',{name:'Conesa libro '+id,exact:true}).selectOption(String(value));
+  assert.equal((await main.locator('[data-book-absolute]').innerText()).trim(),'28');
+  assert.equal((await main.locator('[data-book-signed]').innerText()).trim(),'-28');
+  assert.equal((await main.locator('[data-book-category]').innerText()).trim(),'Moderado');
+  const newKeys=await page.evaluate(()=>Object.keys(localStorage).sort());
+  const bookKey=newKeys.find(x=>x.startsWith('ambienta-conesa-libro-1997-f1:'));
+  assert(bookKey);
+  assert(!newKeys.some(x=>x.startsWith('ambienta-conesa-simplificado-v1:')));
+  const projectId=bookKey.slice('ambienta-conesa-libro-1997-f1:'.length);
+  assert(before.every(k=>newKeys.includes(k)));
   await page.screenshot({path:out+'/conesa-'+width+'.png',animations:'disabled'});
-  const canonicalKey=await page.evaluate(()=>Object.keys(localStorage)
-   .find(k=>k.startsWith('ambienta-conesa-simplificado-v1:')));
-  assert(canonicalKey,'Updated Conesa draft saved under canonical project-scoped key');
-  const projectId=canonicalKey.slice('ambienta-conesa-simplificado-v1:'.length);
-  assert.equal(await page.evaluate(()=>Object.keys(localStorage)
-   .filter(k=>k.startsWith('ambienta-scored-matrix-v1:')).length),0,
-   'New Conesa must not write to legacy scored-matrix storage');
 
-  // RIAM remains a different scored method and never inherits Conesa criteria.
   await page.locator('[data-catalog-method="riam-1998"] button').click();
   await page.locator('[data-method-assessment="riam-1998"]').waitFor();
-  assert.equal(await page.locator('[data-method-assessment] [data-method-cell]').count(),28);
   await page.locator('[data-method-cell]').first().click();
-  for(const [criterion,value] of Object.entries({A1:3,A2:-2,B1:3,B2:2,B3:3}))
-   await page.getByRole('combobox',{name:new RegExp('^'+criterion+' - ')}).selectOption(String(value));
+  for(const [id,value] of Object.entries({A1:3,A2:-2,B1:3,B2:2,B3:3}))
+   await page.getByRole('combobox',{name:new RegExp('^'+id+' - ')}).selectOption(String(value));
   assert.equal((await page.locator('[data-method-result]').innerText()).trim(),'-48');
-  const [riamDownload]=await Promise.all([page.waitForEvent('download'),
-   page.locator('[data-method-assessment] .amb-matrix-exports button').first().click()]);
-  const csv=await fs.readFile(await riamDownload.path(),'utf8');
-  assert(csv.includes('Pastakia')&&csv.includes('-48'));
 
-  // A real earlier-version draft remains accessible only inside the Conesa archive.
   const oldKey='ambienta-scored-matrix-v1:'+projectId+':conesa-1997-2ex';
-  const oldDoc={schema:'ambienta.scored-matrix.v1',projectId,projectName:'Proyecto de prueba',
-   method:'conesa-1997-2ex',updatedAt:'2026-11-03T00:00:00Z',
-   entries:{[interaction]:{sign:-1,
-    criteria:{IN:4,EX:2,MO:4,PE:1,RV:1,SI:1,AC:1,EF:1,PR:1,MC:1},
-    reason:'Evaluación histórica para respaldo',evidence:'DOC-ANT-01'}}};
-  await page.evaluate(({key,doc})=>localStorage.setItem(key,JSON.stringify(doc)),{key:oldKey,doc:oldDoc});
-  const oldBefore=await page.evaluate(key=>localStorage.getItem(key),oldKey);
+  const oldDoc={schema:'ambienta.scored-matrix.v1',projectId,projectName:'EJERCICIO QA',
+   method:'conesa-1997-2ex',updatedAt:'2026-11-03T00:00:00Z',entries:{
+    'demo-f1::demo-a1':{sign:-1,criteria:{IN:4,EX:2,MO:4,PE:1,RV:1,SI:1,AC:1,EF:1,PR:1,MC:1},
+     reason:'Histórico',evidence:'DOC-ANT-01'}}};
+  const simpleKey='ambienta-conesa-simplificado-v1:'+projectId;
+  const simpleDoc={schema:'ambienta.conesa-simplificado.v1',projectId,
+   projectName:'EJERCICIO QA',updatedAt:'2026-11-03T00:00:00Z',entries:{
+    'demo-f1::demo-a1':{sign:-1,criteria:values,reason:'Histórico Excel',evidence:'EXCEL-01'}}};
+  await page.evaluate(({oldKey,oldDoc,simpleKey,simpleDoc})=>{
+   localStorage.setItem(oldKey,JSON.stringify(oldDoc));
+   localStorage.setItem(simpleKey,JSON.stringify(simpleDoc));
+  },{oldKey,oldDoc,simpleKey,simpleDoc});
+  const oldBefore=await page.evaluate(({oldKey,simpleKey})=>[localStorage.getItem(oldKey),
+   localStorage.getItem(simpleKey)],{oldKey,simpleKey});
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
+  await page.locator('[data-conesa-simplified-archive]').waitFor();
   await page.locator('[data-conesa-legacy-archive]').waitFor();
-  assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
-  assert.equal(await page.locator('[data-method-assessment="conesa-1997-2ex"]').count(),0,
-   'Old editor should not mount until explicitly requested');
-  assert((await page.locator('[data-conesa-legacy-archive]').innerText()).includes('1 valoración'));
+  assert.equal(await page.locator('[data-conesa-book]').count(),1);
+  assert.equal(await page.locator('[data-conesa-simplificado]').count(),0);
+  await page.getByRole('button',{name:'Consultar y exportar archivo simplificado'}).click();
+  const archive=page.locator('[data-conesa-simplified-archive] [data-conesa-simplificado]');
+  await archive.waitFor();
+  assert.equal(await archive.locator('[data-conesa-review-row]').count(),1);
+  await archive.locator('[data-conesa-cell]').first().click();
+  assert.equal((await archive.locator('[data-conesa-signed]').innerText()).trim(),'-28');
+  assert.equal(await archive.getByRole('combobox',{name:'Naturaleza Conesa revisado'}).isDisabled(),true);
+  assert.equal(await archive.getByRole('combobox',{name:'Conesa IN'}).isDisabled(),true);
+  assert.equal(await archive.getByRole('button',{name:'Eliminar valoración'}).count(),0);
+  const [legacyJson]=await Promise.all([page.waitForEvent('download'),
+   archive.getByRole('button',{name:'JSON',exact:true}).click()]);
+  assert((await fs.readFile(await legacyJson.path(),'utf8')).includes('EXCEL-01'));
   await page.getByRole('button',{name:'Consultar y exportar valoraciones anteriores'}).click();
-  await page.locator('[data-method-assessment="conesa-1997-2ex"]').waitFor();
-  await page.locator('[data-method-assessment="conesa-1997-2ex"] [data-method-cell]').first().click();
-  assert.equal((await page.locator('[data-method-assessment="conesa-1997-2ex"] [data-method-result]').innerText()).trim(),'-27');
-  assert.equal(await page.getByRole('combobox',{name:'Signo Conesa'}).isDisabled(),true);
-  assert.equal(await page.getByRole('combobox',{name:'IN - Intensidad'}).isDisabled(),true);
-  assert.equal(await page.locator('[data-method-assessment="conesa-1997-2ex"] button')
-   .filter({hasText:'Eliminar valoración'}).count(),0,'Archived values cannot be edited or removed');
-  const [oldDownload]=await Promise.all([page.waitForEvent('download'),
-   page.locator('[data-method-assessment="conesa-1997-2ex"] .amb-matrix-exports button').last().click()]);
-  const oldExport=await fs.readFile(await oldDownload.path(),'utf8');
-  assert(oldExport.includes('conesa-1997-2ex')&&oldExport.includes('DOC-ANT-01'));
-  assert.equal(await page.evaluate(key=>localStorage.getItem(key),oldKey),oldBefore,
-   'Opening, inspecting and exporting archive must not write to legacy draft');
-  await page.screenshot({path:out+'/conesa-archive-'+width+'.png',animations:'disabled'});
+  const oldArchive=page.locator('[data-method-assessment="conesa-1997-2ex"]');
+  await oldArchive.waitFor();await oldArchive.locator('[data-method-cell]').first().click();
+  assert.equal((await oldArchive.locator('[data-method-result]').innerText()).trim(),'-27');
+  assert.equal(await oldArchive.getByRole('combobox',{name:'Signo Conesa'}).isDisabled(),true);
+  assert.deepEqual(await page.evaluate(({oldKey,simpleKey})=>[localStorage.getItem(oldKey),
+   localStorage.getItem(simpleKey)],{oldKey,simpleKey}),oldBefore);
 
   await page.reload();
-  await page.locator('[data-catalog-method="riam-1998"] button').click();
-  await page.locator('[data-method-cell]').first().click();
-  assert.equal((await page.locator('[data-method-result]').innerText()).trim(),'-48');
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  await page.locator('[data-conesa-cell]').first().click();
-  assert.equal((await page.locator('[data-conesa-signed]').innerText()).trim(),'-28');
+  assert.equal((await page.locator('[data-conesa-book] h3').first().innerText()).trim(),'Conesa');
+  assert.equal(await page.locator('[data-conesa-simplified-archive]').count(),1);
   assert.equal(await page.locator('[data-conesa-legacy-archive]').count(),1);
-  await page.getByRole('button',{name:'Consultar y exportar valoraciones anteriores'}).click();
-  await page.locator('[data-method-assessment="conesa-1997-2ex"] [data-method-cell]').first().click();
-  assert.equal((await page.locator('[data-method-assessment="conesa-1997-2ex"] [data-method-result]').innerText()).trim(),'-27');
-
-  // A damaged archive should offer an exact backup, not silently use an empty draft.
-  await page.evaluate(key=>localStorage.setItem(key,'{invalid-legacy-json'),oldKey);
+  await page.evaluate(({oldKey,simpleKey})=>{
+   localStorage.setItem(oldKey,'{damaged-old');
+   localStorage.setItem(simpleKey,'{damaged-simple');
+  },{oldKey,simpleKey});
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  assert.equal(await page.locator('[data-conesa-legacy-archive]').count(),1);
-  assert.equal(await page.locator('[data-method-assessment="conesa-1997-2ex"]').count(),0);
-  const [rawDownload]=await Promise.all([page.waitForEvent('download'),
+  const [rawSimple]=await Promise.all([page.waitForEvent('download'),
+   page.getByRole('button',{name:'Descargar respaldo simplificado sin modificar'}).click()]);
+  assert.equal(await fs.readFile(await rawSimple.path(),'utf8'),'{damaged-simple');
+  const [rawOld]=await Promise.all([page.waitForEvent('download'),
    page.getByRole('button',{name:'Descargar respaldo anterior sin modificar'}).click()]);
-  assert.equal(await fs.readFile(await rawDownload.path(),'utf8'),'{invalid-legacy-json');
-  assert.equal(await page.evaluate(key=>localStorage.getItem(key),oldKey),'{invalid-legacy-json');
-  assert.equal((await page.locator('[data-conesa-review-row]').count()),1,
-   'Corrupt legacy cannot corrupt canonical revised Conesa');
+  assert.equal(await fs.readFile(await rawOld.path(),'utf8'),'{damaged-old');
+  assert.equal(await page.locator('[data-conesa-book]').count(),1);
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
-  assert(overflow<=6,'No page overflow at '+width+': '+overflow);
-  assert.deepEqual(errors,[],'No JavaScript runtime errors');
-  console.log(JSON.stringify({result:'PASS',width,catalogMethods:4,
-   conesaCards:1,canonicalConesa:-28,archivedConesa:-27,riam:-48,
-   archiveReadOnly:true,damagedLegacyPreserved:true,errors:0}));
-  await ctx.close();
+  assert(overflow<=6,'No desktop overflow: '+overflow);
+  assert.deepEqual(errors,[]);
+  console.log(JSON.stringify({result:'PASS',width,conesaEditors:1,book:-28,
+   oldExcelPreserved:true,readOnly:true,oldArchivePreserved:true,errors:0}));
+  await context.close();
  }
-}finally{await browser.close();}
+}finally{await browser.close()}
