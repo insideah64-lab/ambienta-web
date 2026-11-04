@@ -17,6 +17,7 @@ try{
   }
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
   await open();
+  await page.locator('[data-conesa-phase-tab="f3a"]').click();
   const f3=page.locator('[data-conesa-f3]');
   assert.equal(await f3.locator('[data-f3-factor]').count(),7);
   assert.equal(await f3.locator('[data-f3-visual-empty]').count(),1);
@@ -43,6 +44,8 @@ try{
    .find(k=>k.startsWith('ambienta-conesa-libro-1997-f3a:')));
   assert(f3aKey);
   const f3aRaw=await page.evaluate(k=>localStorage.getItem(k),f3aKey);
+  await page.locator('[data-conesa-phase-tab="f3b"]').click();
+  assert.equal(await f3.getAttribute('data-conesa-f3-focus'),'f3b');
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('curva');
   assert.equal(await editor.locator('[data-f3b-curve-editor]').count(),1);
   assert.equal(await editor.locator('[data-f3-results]').count(),0,
@@ -89,12 +92,12 @@ try{
   assert.match(await editor.locator('[data-f3-results]').innerText(),/-0.5500/);
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('curva');
   assert.match(await editor.locator('[data-f3-results]').innerText(),/0.1000/);
-  await page.reload();await open();
+  await page.reload();await open();await page.locator('[data-conesa-phase-tab="f3b"]').click();
   await f3.locator('[data-f3-factor]').first().click();
   assert.equal(await editor.getByRole('combobox',{name:'F3 tipo de función'}).inputValue(),'curva');
   assert.match(await editor.locator('[data-f3-results]').innerText(),/0.1000/);
   await page.evaluate(k=>localStorage.setItem(k,'{damaged-F3b-draft'),f3bKey);
-  await page.reload();await open();
+  await page.reload();await open();await page.locator('[data-conesa-phase-tab="f3b"]').click();
   assert.equal(await f3.locator('[data-f3b-damaged]').count(),1);
   const [raw]=await Promise.all([
    page.waitForEvent('download'),
