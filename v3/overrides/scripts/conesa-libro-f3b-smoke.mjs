@@ -46,6 +46,8 @@ try{
   const f3aRaw=await page.evaluate(k=>localStorage.getItem(k),f3aKey);
   await page.locator('[data-conesa-phase-tab="f3b"]').click();
   assert.equal(await f3.getAttribute('data-conesa-f3-focus'),'f3b');
+  assert.equal(await editor.locator('[data-f3-results]').count(),0,
+   'Curves view must never present linear CA as an unconfigured curve');
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('curva');
   assert.equal(await editor.locator('[data-f3b-curve-editor]').count(),1);
   assert.equal(await editor.locator('[data-f3-results]').count(),0,
@@ -70,11 +72,19 @@ try{
   const f3bOutput=await editor.locator('[data-f3-results]').innerText();
   assert(f3bOutput.includes('0.4000')&&f3bOutput.includes('0.5000')
    &&f3bOutput.includes('0.1000'),f3bOutput);
-  assert.equal(await f3.locator('[data-f3-chart-row]').count(),1);
+  assert.equal(await f3.locator('[data-f3b-workspace]').count(),1);
+  assert.equal(await f3.locator('[data-f3a-workspace]').count(),0,
+   'Curves must not repeat the SIN/CON comparison page');
+  assert.equal(await f3.locator('[data-f3-chart-row]').count(),0);
+  assert.equal(await f3.locator('[data-f3b-overview] strong').nth(1).innerText(),'1');
+  assert.equal(await f3.locator('[data-f3b-curve-card]').first().getAttribute('data-f3b-curve-card'),await f3.locator('[data-f3-factor]').first().getAttribute('data-f3-factor'));
   assert.equal(await editor.locator('[data-f3b-preview] path[stroke="#4ed5c1"]').count(),1);
+  await page.locator('[data-conesa-phase-tab="f3a"]').click();
+  assert.equal(await f3.locator('[data-f3-chart-row]').count(),1);
   await f3.locator('.amb-f3-quality-disclosure summary').click();
   const compare=await f3.locator('.amb-f3-quality-disclosure tbody').innerText();
   assert(compare.includes('F3b · interpolación por tramos')&&compare.includes('0.1000'),compare);
+  await page.locator('[data-conesa-phase-tab="f3b"]').click();
   const f3bKey=await page.evaluate(()=>Object.keys(localStorage)
    .find(k=>k.startsWith('ambienta-conesa-libro-1997-f3b:')));
   assert(f3bKey);
@@ -89,7 +99,12 @@ try{
   await page.screenshot({path:out+'/curvas-f3b-'+width+'.png',
    animations:'disabled',fullPage:true});
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('lineal');
-  assert.match(await editor.locator('[data-f3-results]').innerText(),/-0.5500/);
+  assert.equal(await editor.locator('[data-f3-results]').count(),0,
+   'F3b must not show F3a linear output as a curve interpolation');
+  await page.locator('[data-conesa-phase-tab="f3a"]').click();
+  assert.match(await editor.locator('[data-f3-results]').innerText(),/-0.5500/,
+   'Linear result remains available in the environmental quality tab');
+  await page.locator('[data-conesa-phase-tab="f3b"]').click();
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('curva');
   assert.match(await editor.locator('[data-f3-results]').innerText(),/0.1000/);
   await page.reload();await open();await page.locator('[data-conesa-phase-tab="f3b"]').click();
