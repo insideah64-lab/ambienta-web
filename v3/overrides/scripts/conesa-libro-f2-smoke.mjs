@@ -13,7 +13,7 @@ try{
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
   assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
-  await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+  await page.locator('[data-conesa-book]').waitFor();
   const book=page.locator('[data-conesa-book]'),f2=page.locator('[data-conesa-f2]');
   await f2.waitFor();
   assert.equal(await f2.locator('[data-f2-interaction]').count(),0);
@@ -80,7 +80,7 @@ try{
    'F2 never writes F1 scores');
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+  await page.locator('[data-conesa-book]').waitFor();
   assert.equal(await f2.locator('[data-f2-interaction]').count(),1);
   assert.equal((await f2.locator('.amb-f2-summary span').nth(3).locator('strong').innerText()).trim(),'1');
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),f2key),f2Before,
@@ -88,7 +88,7 @@ try{
   await page.evaluate(key=>localStorage.setItem(key,'{invalid-F2-json'),f2key);
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+  await page.locator('[data-conesa-book]').waitFor();
   assert.equal(await f2.locator('[role="alert"]').count(),1);
   const [raw]=await Promise.all([page.waitForEvent('download'),
    f2.getByRole('button',{name:'Descargar original sin modificar'}).click()]);
