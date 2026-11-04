@@ -82,7 +82,8 @@ try{
     localStorage.setItem('ambienta-impact-matrix-v1:'+projectId,JSON.stringify(draft)),
     {projectId,draft});
   await page.reload();await page.locator('[data-impact-matrix="v1"]').waitFor();
-  await page.getByRole('button',{name:'2 · Leopold'}).click();
+  assert.equal(await page.locator('[data-leopold-unified="true"]').count(),1,
+   'Workbook must load directly in the unified Leopold editor');
   const panel=page.locator('[data-leopold-summary]');
   await panel.waitFor();
   assert.equal(await panel.locator('[data-leopold-total-positive]').innerText(),'18');
