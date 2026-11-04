@@ -1,9 +1,10 @@
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {useEffect,useId,useMemo,useRef,useState} from 'react';
 import {Link} from 'react-router-dom';
 import {ArrowDownToLine,Check,ChevronDown,Pencil,Plus,RotateCcw,UploadCloud,X} from 'lucide-react';
 import './ImpactMatrixBuilder.css';
 import {LeopoldSummaryPanel} from './LeopoldSummaryPanel';
 import {LeopoldReviewPanel} from './LeopoldReviewPanel';
+import {leopoldReadiness,nextLeopoldCell} from './LeopoldWorkflow';
 
 type Sign = -1|0|1;
 type Phase = 'preparacion'|'construccion'|'operacion'|'cierre';
@@ -108,6 +109,9 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
  const modified=useRef(false);
  const [showWeighted,setShowWeighted]=useState(false);
  const [selected,setSelected]=useState<string|null>(null);
+ const [inspectorOpen,setInspectorOpen]=useState(false);
+ const inspectorId=useId();
+ const cellButtons=useRef(new Map<string,HTMLButtonElement>());
  const [actionName,setActionName]=useState('');
  const [factorName,setFactorName]=useState('');
  const [newActionPhase,setNewActionPhase]=useState<Phase>('construccion');
@@ -139,6 +143,8 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
  });};
  const populated=Object.values(doc.cells);
  const scored=populated.filter(c=>c.sign!==0&&c.magnitude!==null&&c.importance!==null).length;
+ const documented=populated.filter(c=>leopoldReadiness(c).documented).length;
+ const unassessed=doc.actions.length*doc.factors.length-populated.length;
  const pending=populated.filter(c=>c.sign!==0&&(c.magnitude===null||c.importance===null)).length;
  const negative=populated.filter(c=>c.sign===-1).length;
  const weightedRows=doc.factors.map(factor=>{
@@ -155,6 +161,11 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
  const weightedAdverse=weightedRows.reduce((sum,row)=>sum+row.adverse,0);
  const weightedBeneficial=weightedRows.reduce((sum,row)=>sum+row.beneficial,0);
  const filteredFactors=onlyEvaluated?doc.factors.filter(f=>doc.actions.some(a=>!!doc.cells[cellKey(f.id,a.id)])):doc.factors;
+ const visibleKeys=filteredFactors.flatMap(f=>doc.actions.map(a=>cellKey(f.id,a.id)));
+ const nextPending=nextLeopoldCell(visibleKeys,doc.cells,selected,'valuation');
+ const nextUndocumented=nextLeopoldCell(visibleKeys,doc.cells,selected,'documentation');
+ const openCell=(key:string)=>{setSelected(key);setInspectorOpen(true);};
+ const goToCell=(key:string|null)=>{if(key){openCell(key);cellButtons.current.get(key)?.focus();}};
  const exportJson=()=>download('AMBIENTA-matriz-'+projectId+'.json','application/json',JSON.stringify(doc,null,2));
  const addAction=()=>{if(!actionName.trim())return;const label=actionName.trim().slice(0,250);
   if(doc.actions.length>=150)return setNotice('Límite de 150 acciones por matriz.');
@@ -229,16 +240,10 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
     </label>
    </div>
   </header>
-  <div className="amb-matrix-caution" role="note">
-   <strong>No es una declaración de impacto ambiental.</strong> Catálogo inicial reducido e ilustrativo, no el inventario completo de 100 acciones y 88 factores de la matriz clásica; sin coordenadas, línea de base o mediciones verificadas. Los criterios deben fundamentarse en evidencia y revisión profesional. Se guarda solo en este navegador, por expediente.
-  </div>
-  <div className="amb-matrix-kpis">
-   <span><strong>{doc.actions.length} × {doc.factors.length}</strong><small>acciones × factores</small></span>
-   <span><strong>{populated.filter(c=>c.sign!==0).length}</strong><small>interacciones identificadas</small></span>
-   <span><strong>{scored}</strong><small>valoradas por completo</small></span>
-   <span><strong>{pending}</strong><small>pendientes de valoración</small></span>
-   <span><strong>{negative}</strong><small>adversas declaradas</small></span>
-  </div>
+  <details className="amb-matrix-caution">
+   <summary><strong>No es una declaración de impacto ambiental.</strong> Guardado solo en este navegador · consultar alcance</summary>
+   <p>Catálogo inicial reducido e ilustrativo, no el inventario completo de 100 acciones y 88 factores de la matriz clásica; sin coordenadas, línea de base o mediciones verificadas. Los criterios deben fundamentarse en evidencia y revisión profesional. Se guarda solo en este navegador, por expediente.</p>
+  </details>
   <div className="amb-matrix-tools amb-matrix-tools-unified" data-leopold-unified-toolbar>
    <div className="amb-matrix-primary-label">
     <strong>Identificación y valoración</strong>
@@ -260,8 +265,8 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
     </button>
    </details>
   </div>
-  <div className="amb-matrix-mode-guide" data-matrix-mode-guide="leopold" role="note">
-   <strong>Una sola matriz: identificar y después valorar</strong>
+  <details className="amb-matrix-mode-guide" data-matrix-mode-guide="leopold">
+   <summary>Ayuda: identificar, valorar y documentar</summary>
    <p><b>—</b> no evaluada · <b>∅</b> sin interacción declarada · <b>− / +</b> impacto
     adverso o beneficioso identificado. Después completá <b>magnitud (1–10)</b> e
     <b> importancia (1–10)</b>. Ejemplo ficticio: <b>−7/5</b>. Sin valores automáticos.</p>
@@ -270,7 +275,7 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
     sin cambiar de vista.</p>:
     <p data-matrix-leopold-ready>{scored} interacción(es) con ambos criterios completos.
      Las identificadas sin magnitud o importancia permanecen pendientes.</p>}
-  </div>
+  </details>
   <div className="amb-matrix-construction" data-matrix-inline-builder aria-label="Construcción directa de filas y columnas">
    <div className="amb-matrix-construction-head">
     <strong>Construí la matriz desde la tabla</strong>
@@ -298,7 +303,14 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
     </div>
    </div>
   </div>
-  <div className="amb-matrix-canvas" data-matrix-canvas>
+  <div className="amb-matrix-navigation" aria-label="Recorrido de interacciones">
+   <button type="button" disabled={!nextPending} onClick={()=>goToCell(nextPending)}>Siguiente pendiente de valorar</button>
+   <button type="button" disabled={!nextUndocumented} onClick={()=>goToCell(nextUndocumented)}>Siguiente por documentar</button>
+   <button type="button" aria-expanded={inspectorOpen} aria-controls={inspectorId}
+    onClick={()=>setInspectorOpen(value=>!value)}>{inspectorOpen?'Ocultar editor':'Mostrar editor'}</button>
+   <small>En la tabla: flechas para recorrer · Inicio/Fin para extremos de la fila.</small>
+  </div>
+  <div className={'amb-matrix-canvas'+(inspectorOpen?'':' is-editor-collapsed')} data-matrix-canvas>
   <div className="amb-matrix-scroll" role="region" tabIndex={0} aria-label="Matriz editable, desplazamiento horizontal disponible">
    <table className="amb-matrix-grid">
     <thead><tr><th className="amb-matrix-sticky" scope="col"><span className="amb-matrix-corner-label">Componente ambiental</span></th>
@@ -367,7 +379,21 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
        const value=btnScore(cell?.sign??null,cell);
        const diag=diagonal&&!!cell&&cell.sign!==0&&cell.magnitude!==null&&cell.importance!==null;
        return <td key={key}><button type="button" className={'amb-matrix-cell amb-matrix-cell--'+cellTone(cell)+(selected===key?' is-selected':'')+(diag?' amb-matrix-cell--diagonal':'')}
-        onClick={()=>setSelected(key)} aria-label={'Evaluar '+title+'. '+(cell?'Interacción registrada':'Sin evaluar')}
+        ref={node=>{if(node)cellButtons.current.set(key,node);else cellButtons.current.delete(key);}}
+        onClick={()=>openCell(key)}
+        onKeyDown={event=>{
+         const row=filteredFactors.findIndex(f=>f.id===factor.id),column=doc.actions.findIndex(a=>a.id===action.id);
+         let target=visibleKeys.indexOf(key);
+         if(event.key==='ArrowRight')target++;
+         else if(event.key==='ArrowLeft')target--;
+         else if(event.key==='ArrowDown')target+=doc.actions.length;
+         else if(event.key==='ArrowUp')target-=doc.actions.length;
+         else if(event.key==='Home')target=row*doc.actions.length;
+         else if(event.key==='End')target=row*doc.actions.length+doc.actions.length-1;
+         else return;
+         event.preventDefault();
+         if(target>=0&&target<visibleKeys.length&&column>=0)goToCell(visibleKeys[target]);
+        }} aria-label={'Evaluar '+title+'. '+(cell?'Interacción registrada':'Sin evaluar')}
         aria-pressed={selected===key} title={title}>
         {diag&&cell?<span className="amb-leopold-diagonal" aria-hidden="true"><span>{cell.sign===-1?'−':'+'}{cell.magnitude}</span><span>{cell.importance}</span></span>:value}
        </button></td>;
@@ -375,11 +401,11 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
     </tr>)}</tbody>
    </table>
   </div>
-   <div className="amb-matrix-inspector" data-matrix-inspector>
+   <div className="amb-matrix-inspector" id={inspectorId} hidden={!inspectorOpen} data-matrix-inspector>
     {chosen&&selected?<div>
      <div className="amb-matrix-inspector-head"><div><small>INTERACCIÓN SELECCIONADA</small><h4>{chosen.factor.name}</h4>
       <p>{chosen.action.name} · {PHASES[chosen.action.phase]}</p></div>
-      <button type="button" title="Cerrar editor" aria-label="Cerrar editor de celda" onClick={()=>setSelected(null)}><X size={20}/></button>
+      <button type="button" title="Cerrar editor" aria-label="Cerrar editor de celda" onClick={()=>{setInspectorOpen(false);if(selected)cellButtons.current.get(selected)?.focus();}}><X size={20}/></button>
      </div>
      <div className="amb-matrix-fast-sign" aria-label="Marcar interacción desde la matriz">
       <span>Marcación rápida</span>
@@ -422,7 +448,12 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
       <label>Referencia documental o evidencia
        <input maxLength={1000} placeholder="Código, página, enlace o informe verificable…" value={chosen.cell.evidence} onChange={e=>setCell(selected,{evidence:e.target.value})}/>
       </label>
-      {!chosen.cell.reason.trim()&&<p className="amb-matrix-caution-inline">Valoración provisional: falta explicar el fundamento técnico.</p>}
+      <p className="amb-matrix-caution-inline" data-matrix-cell-documentation>
+       {chosen.cell.sign===0?'Sin interacción declarada; el fundamento y la referencia explican esta decisión.':
+        leopoldReadiness(chosen.cell).documented?'Fundamento y referencia registrados; pendientes de verificación técnica.':
+        'Documentación pendiente: '+[!chosen.cell.reason.trim()?'fundamento técnico':null,!chosen.cell.evidence.trim()?'referencia documental':null].filter(Boolean).join(' y ')+
+        (chosen.cell.reason.trim()&&chosen.cell.evidence.trim()?'completar magnitud e importancia.':'.')}
+      </p>
       <button type="button" className="amb-matrix-secondary" onClick={clearCell}>Eliminar valoración de esta celda</button>
      </>}
     </div>:<div className="amb-matrix-placeholder"><h4>Seleccioná una celda</h4>
@@ -430,11 +461,24 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
      <p>Las celdas sin evaluar no cuentan como ausencia de impacto.</p></div>}
    </div>
   </div>
+  <div className="amb-matrix-kpis">
+   <span><strong>{doc.actions.length} × {doc.factors.length}</strong><small>acciones × factores</small></span>
+   <span><strong>{populated.filter(c=>c.sign!==0).length}</strong><small>interacciones identificadas</small></span>
+   <span><strong>{scored}</strong><small>con magnitud e importancia</small></span>
+   <span><strong>{pending}</strong><small>pendientes de valoración</small></span>
+   <span><strong>{negative}</strong><small>adversas declaradas</small></span>
+  </div>
+  <p className="amb-matrix-progress" data-matrix-documentation-status aria-live="polite">
+   <span><strong data-matrix-unassessed>{unassessed}</strong> sin evaluar</span>
+   <span><strong data-matrix-documented>{documented}</strong> valoradas con fundamento y referencia</span>
+   <span><strong data-matrix-undocumented>{scored-documented}</strong> valoradas por documentar</span>
+   <small>Documentación registrada no equivale a evidencia verificada.</small>
+  </p>
   <LeopoldSummaryPanel projectId={projectId} actions={doc.actions} factors={doc.factors}
    visibleFactors={filteredFactors} cells={doc.cells}/>
   <LeopoldReviewPanel actions={doc.actions} factors={doc.factors} cells={doc.cells}
    onReviewCell={key=>{
-    setSelected(key);
+    openCell(key);
     document.querySelector('[data-matrix-inspector]')?.scrollIntoView({behavior:'smooth',block:'center'});
    }}/>
   {showWeighted&&<section className="amb-matrix-weighted-report" data-matrix-weighted-report

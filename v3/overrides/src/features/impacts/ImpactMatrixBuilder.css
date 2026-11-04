@@ -8,6 +8,21 @@
  box-shadow:0 14px 34px #0002
 }
 .ref-shell .amb-matrix *{box-sizing:border-box}
+.ref-shell [data-leopold-unified] .amb-matrix-top>div:first-child{flex:1 1 340px;min-width:0}
+.ref-shell [data-leopold-unified] .amb-matrix-kpis{display:flex;flex-wrap:wrap;margin:12px 0}
+.ref-shell [data-leopold-unified] .amb-matrix-kpis>span{flex:1 1 125px;padding:9px}
+.ref-shell [data-leopold-unified] .amb-matrix-kpis strong{font-size:20px}
+.ref-shell .amb-matrix-canvas.is-editor-collapsed{grid-template-columns:minmax(0,1fr)}
+.ref-shell .amb-matrix-canvas>[hidden]{display:none}
+.ref-shell .amb-matrix-progress{display:flex;gap:8px 18px;flex-wrap:wrap;color:#cce2e6;font-size:12px;margin:0 0 12px}
+.ref-shell .amb-matrix-progress small{flex-basis:100%;color:#aecbd1;font-size:11px}
+.ref-shell .amb-matrix-navigation{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.ref-shell .amb-matrix-navigation button{padding:9px 12px;min-height:40px;border:1px solid #68989e;border-radius:8px;background:#164553;color:#edfafa;font:inherit;font-size:12px;cursor:pointer}
+.ref-shell .amb-matrix-navigation button:disabled{opacity:.5;cursor:default}
+.ref-shell .amb-matrix-navigation button:focus-visible,.ref-shell .amb-matrix-cell:focus-visible{outline:3px solid #f6d89c;outline-offset:-3px}
+.ref-shell .amb-matrix-navigation small{font-size:11px;color:#bed4db}
+.ref-shell .amb-matrix-caution>summary,.ref-shell .amb-matrix-mode-guide>summary{cursor:pointer;font-size:12px;line-height:1.5}
+.ref-shell .amb-matrix-construction-head p{display:none}
 .ref-shell .amb-matrix-top{display:flex;justify-content:space-between;gap:22px;align-items:start}
 .ref-shell .amb-matrix-overline{margin:0 0 7px;font-size:11px;letter-spacing:.11em;font-weight:800;color:#96e8cb}
 .ref-shell .amb-matrix-top h3{font-size:24px;line-height:1.2;letter-spacing:-.02em;margin:0 0 9px}

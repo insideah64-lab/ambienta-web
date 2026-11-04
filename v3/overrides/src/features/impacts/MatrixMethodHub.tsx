@@ -266,6 +266,9 @@ function downloadStoredRaw(key:string,filename:string){
 export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData}:Props){
  const [active,setActive]=useState<ActiveMethod>('causa-leopold');
  const [legacyOpen,setLegacyOpen]=useState(false);
+ const [detailsOpen,setDetailsOpen]=useState(false);
+ const [expanded,setExpanded]=useState(false);
+ const workspace=useRef<HTMLDivElement>(null);
 
  const archive=useMemo(()=>active==='conesa-simplificado-tutorial-v1'
   ?oldConesaArchive(projectId):{present:false,valid:false,count:0},[projectId,active]);
@@ -274,7 +277,22 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
  const residualArchive=useMemo(()=>active==='conesa-simplificado-tutorial-v1'
   ?hasResidualArchive(projectId):false,[projectId,active]);
  const [simplifiedOpen,setSimplifiedOpen]=useState(false);
- return <div className="amb-method-hub" data-matrix-method-catalog="v1">
+ return <div ref={workspace} className={'amb-method-hub'+(detailsOpen?'':' is-compact')} data-matrix-method-catalog="v1"
+  data-workspace-expanded={expanded}>
+  <div className="amb-workspace-toolbar" aria-label="Espacio de trabajo de matrices">
+   <strong>Constructor de matrices <small>{projectId} · borrador local</small></strong>
+   <div>
+    <button type="button" onClick={()=>{
+     const target=[...workspace.current!.querySelectorAll<HTMLElement>('.amb-matrix-scroll,[data-conesa-phase-panel]')]
+      .find(node=>node.getBoundingClientRect().height>0);
+     if(target){if(!target.hasAttribute('tabindex'))target.tabIndex=-1;target.focus({preventScroll:true});target.scrollIntoView({block:'start'});}
+    }}>Ir a evaluación</button>
+    <button type="button" aria-expanded={detailsOpen} onClick={()=>setDetailsOpen(value=>!value)}>
+     {detailsOpen?'Ocultar descripción de métodos':'Ver descripción de métodos'}</button>
+    <button type="button" aria-pressed={expanded} onClick={()=>setExpanded(value=>!value)}>
+     {expanded?'Restaurar navegación':'Ampliar espacio de trabajo'}</button>
+   </div>
+  </div>
   <section className="amb-method-catalog" aria-label="Catálogo de métodos ambientales">
    <div className="amb-method-heading">
     <p className="amb-matrix-overline">HERRAMIENTAS · MATRICES AMBIENTALES</p>
@@ -318,7 +336,7 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
       </span>
       <span className="amb-method-source">{card.source}</span>
       {card.available?<button type="button" aria-pressed={active===card.id}
-       onClick={()=>setActive(card.id as ActiveMethod)}>
+       onClick={()=>{setActive(card.id as ActiveMethod);setDetailsOpen(false);}}>
        {active===card.id?<><Check size={15} strokeWidth={2.5}/> Método seleccionado</>
         :<>Abrir método <ArrowUpRight size={15}/></>}
       </button>
@@ -327,13 +345,14 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
     </div>;
    })}</div>
   </section>
-  <section className="amb-method-purpose" aria-label="Finalidades y etapas de las matrices">
+  <details hidden={!detailsOpen} className="amb-method-purpose" aria-label="Finalidades y etapas de las matrices">
+   <summary>Consultar otras finalidades y etapas</summary>
    <h4>Otros tipos de matrices: etapas y finalidades, no necesariamente otros métodos</h4>
    <p><strong>Valoración absoluta / relativa:</strong> etapas y ponderaciones que deben documentar su método base.
     <strong> Impactos residuales:</strong> valoración posterior a medidas de mitigación.
     <strong> Efectos acumulativos:</strong> análisis específico de interacciones y escenarios.
     <strong> Seguimiento del PGA:</strong> seguimiento de compromisos, indicadores y verificaciones, no una puntuación de impacto.</p>
-  </section>
+  </details>
   {active==='causa-leopold'
    ?<ImpactMatrixBuilder projectId={projectId} projectName={projectName} registeredImpacts={registeredImpacts}/>
    :active==='conesa-simplificado-tutorial-v1'
