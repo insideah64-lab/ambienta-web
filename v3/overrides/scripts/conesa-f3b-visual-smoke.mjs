@@ -17,11 +17,13 @@ try{
   };
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
   await open();
+  await page.locator('[data-conesa-phase-tab="f3a"]').click();
   const f3=page.locator('[data-conesa-f3]');
   await f3.locator('[data-f3-factor]').first().click();
   const editor=f3.locator('[data-f3-editor]');
   await editor.getByRole('textbox',{name:'F3 indicador'}).fill('Concentración media diaria');
   await editor.getByRole('textbox',{name:'F3 unidad'}).fill('p.p.m.');
+  await page.locator('[data-conesa-phase-tab="f3b"]').click();
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('curva');
   const library=editor.locator('[data-f3b-library]');
   await library.locator('summary').click();
@@ -147,7 +149,7 @@ try{
   assert(await page.evaluate(()=>Object.values(localStorage).every(s=>
    typeof s!=='string'||!s.includes('data:image/png;base64'))));
   await page.screenshot({path:root+'/visual-f3b-'+width+'.png',fullPage:true,animations:'disabled'});
-  await page.reload();await open();await f3.locator('[data-f3-factor]').first().click();
+  await page.reload();await open();await page.locator('[data-conesa-phase-tab="f3b"]').click();await f3.locator('[data-f3-factor]').first().click();
   await audit.locator('summary').click();
   assert.equal(await visual.locator('[data-f3b-visual-canvas]').count(),0,
    'Original raster must never be persisted in localStorage');
