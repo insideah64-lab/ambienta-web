@@ -74,8 +74,11 @@ try{
   await clickPoint(100,350);await clickPoint(300,200);await clickPoint(500,50);
   const preview=await visual.locator('[data-f3b-visual-preview]').innerText();
   assert(preview.includes('3 puntos seleccionados'),preview);
-  assert.match(preview,/10\./);
-  assert.match(preview,/0\.5/);
+  const previewRows=await visual.locator('[data-f3b-visual-preview] tbody tr').allInnerTexts();
+  assert.equal(previewRows.length,3);
+  const [middleM,middleCA]=previewRows[1].split('\t').slice(1,3).map(Number);
+  assert(Math.abs(middleM-10)<.12,'Origen M alterado por presentación SVG');
+  assert(Math.abs(middleCA-.5)<.012,'Origen CA alterado por presentación SVG');
   const f3bKey=await page.evaluate(()=>Object.keys(localStorage).find(k=>
    k.startsWith('ambienta-conesa-libro-1997-f3b:')));
   assert(f3bKey);
@@ -103,6 +106,44 @@ try{
   assert(Math.abs(Number(record.xPixelA)-100)<1);
   assert.equal(record.readingA,record.readingB);
   assert.equal(record.approval,null);
+  // QA3 — zoom changes the SVG view only, never source-pixel coordinates.
+  await visual.getByRole('button',{name:'Ampliar a 2x'}).click();
+  assert.match(await visual.locator('[data-f3b-viewport]').innerText(),/2×/);
+  await visual.getByRole('button',{name:'Desplazar a la derecha'}).click();
+  assert.match(await visual.locator('[data-f3b-viewport]').innerText(),/225\.0/);
+  await visual.getByLabel('Radio de selección en píxeles').selectOption('2');
+  assert.match(await visual.locator('[data-f3b-pixel-sensitivity]').innerText(),
+   /Sensibilidad estimada/);
+  // In a multi-curve figure, QA1 transfer is intentionally unavailable.
+  await visual.getByRole('radio',{name:/Varias series/}).check();
+  assert.equal(await visual.locator('[data-f3b-visual-apply]').count(),0);
+  await visual.getByLabel('Nombre de serie en el gráfico').fill('Corriente lenta');
+  await clickPoint(260,200);await clickPoint(360,200);
+  await visual.getByRole('button',{name:'Conservar serie en esta sesión'}).click();
+  assert.match(await visual.locator('[data-f3b-series-count]').innerText(),/1 series separadas/);
+  await visual.getByLabel('Nombre de serie en el gráfico').fill('Corriente rápida');
+  await clickPoint(300,170);await clickPoint(400,140);
+  await visual.getByRole('button',{name:'Conservar serie en esta sesión'}).click();
+  assert.match(await visual.locator('[data-f3b-series-count]').innerText(),/2 series separadas/);
+  const [multiDownload]=await Promise.all([
+   page.waitForEvent('download'),
+   visual.getByRole('button',{name:'Exportar series JSON (sin certificar)'}).click()
+  ]);
+  const series=JSON.parse(await fs.readFile(await multiDownload.path(),'utf8'));
+  assert.equal(series.schema,'ambienta.conesa.f3b.qa3.multiserie-sesion.v1');
+  assert.deepEqual(series.series.map(s=>s.label),['Corriente lenta','Corriente rápida']);
+  assert.equal(series.series[0].points.length,2);
+  assert.equal(series.series[1].points.length,2);
+  assert.equal(series.series[1].assumedClickRadiusPx,2);
+  assert(!Object.hasOwn(series,'image'));
+  assert.equal(await page.evaluate(k=>localStorage.getItem(k),f3bKey),before);
+  assert.equal(await audit.getByLabel('Auditoría lectura A').inputValue(),firstReading);
+  assert.equal(await audit.getByLabel('Auditoría lectura B').inputValue(),secondReading);
+  await page.screenshot({path:root+'/visual-f3b-qa3-'+width+'.png',
+   fullPage:true,animations:'disabled'});
+  // A new axis calibration invalidates all unsaved series in the session.
+  await audit.getByLabel('Auditoría Magnitud X · referencia 2').fill('30');
+  assert.match(await visual.locator('[data-f3b-series-count]').innerText(),/0 series separadas/);
   assert(await page.evaluate(()=>Object.values(localStorage).every(s=>
    typeof s!=='string'||!s.includes('data:image/png;base64'))));
   await page.screenshot({path:root+'/visual-f3b-'+width+'.png',fullPage:true,animations:'disabled'});
