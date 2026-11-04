@@ -130,7 +130,7 @@ export function ConesaLibroPanel({projectId,projectName}:Props){
   <div className="amb-conesa-top">
    <div>
     <p className="amb-matrix-overline"><BookOpen size={15} aria-hidden="true"/> EDICIÓN BIBLIOGRÁFICA · CUALITATIVA F1</p>
-    <h3>Conesa según libro · 3.ª edición (1997)</h3>
+    <h3>Conesa</h3>
     <p>Valoración cualitativa versionada; no contiene aún matriz depurada, pesos UIP ni valoración cuantitativa del libro. Los valores son declaraciones del evaluador y requieren fundamento técnico.</p>
     <code>I = ± [3IN + 2(EX+EXcr) + (MO+MOcr) + PE + RV + SI + AC + EF + PR + MC]</code>
    </div>
