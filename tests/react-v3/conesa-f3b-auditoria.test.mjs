@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
-const require=createRequire(new URL('../../v3/overrides/package.json',import.meta.url));
+const require=createRequire(new URL('../../apps/web-v3/package.json',import.meta.url));
 const esbuild=require('esbuild');
 const built=await esbuild.build({
  entryPoints:['v3/overrides/src/features/impacts/ConesaF3DigitizationModel.ts'],
