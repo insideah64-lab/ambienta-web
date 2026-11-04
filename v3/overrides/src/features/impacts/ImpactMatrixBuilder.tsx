@@ -7,7 +7,6 @@ import {LeopoldReviewPanel} from './LeopoldReviewPanel';
 
 type Sign = -1|0|1;
 type Phase = 'preparacion'|'construccion'|'operacion'|'cierre';
-type Mode = 'identificacion'|'leopold'|'ponderada';
 type Action = {id:string;name:string;phase:Phase};
 type Factor = {id:string;name:string;group:string;weight:number};
 type AxisDraft = {kind:'action';id:string;name:string;phase:Phase}|
@@ -98,14 +97,16 @@ function matrixCsv(doc:Matrix){
 }
 function btnScore(sign:Sign|null,c?:Cell){if(!c)return '—';if(sign===0)return '∅';
  const label=sign===1?'+':'−';
- return c.magnitude!==null&&c.importance!==null?label+c.magnitude+'/'+c.importance:label+' identificado';
+ if(c.magnitude!==null&&c.importance!==null)return label+c.magnitude+'/'+c.importance;
+ if(c.magnitude===null&&c.importance===null)return label+' · por valorar';
+ return label+(c.magnitude??'—')+'/'+(c.importance??'—');
 }
 function cellTone(c:Cell|undefined){return !c?'empty':c.sign===0?'none':c.sign>0?'positive':'negative';}
 
 export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Props){
  const [doc,setDoc]=useState<Matrix>(()=>readMatrix(projectId,projectName));
  const modified=useRef(false);
- const [mode,setMode]=useState<Mode>('identificacion');
+ const [showWeighted,setShowWeighted]=useState(false);
  const [selected,setSelected]=useState<string|null>(null);
  const [actionName,setActionName]=useState('');
  const [factorName,setFactorName]=useState('');
@@ -140,10 +141,19 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
  const scored=populated.filter(c=>c.sign!==0&&c.magnitude!==null&&c.importance!==null).length;
  const pending=populated.filter(c=>c.sign!==0&&(c.magnitude===null||c.importance===null)).length;
  const negative=populated.filter(c=>c.sign===-1).length;
- const adverseScore=doc.factors.reduce((sum,factor)=>sum+doc.actions.reduce((v,action)=>{
-  const c=doc.cells[cellKey(factor.id,action.id)];
-  return v+(c?.sign===-1&&c.magnitude&&c.importance?c.magnitude*c.importance*factor.weight:0);
- },0),0);
+ const weightedRows=doc.factors.map(factor=>{
+  let adverse=0,beneficial=0,complete=0;
+  for(const action of doc.actions){
+   const c=doc.cells[cellKey(factor.id,action.id)];
+   if(!c||c.sign===0||c.magnitude===null||c.importance===null)continue;
+   const score=c.magnitude*c.importance*factor.weight;
+   if(c.sign===-1)adverse+=score;else beneficial+=score;
+   complete++;
+  }
+  return {id:factor.id,name:factor.name,weight:factor.weight,adverse,beneficial,complete};
+ });
+ const weightedAdverse=weightedRows.reduce((sum,row)=>sum+row.adverse,0);
+ const weightedBeneficial=weightedRows.reduce((sum,row)=>sum+row.beneficial,0);
  const filteredFactors=onlyEvaluated?doc.factors.filter(f=>doc.actions.some(a=>!!doc.cells[cellKey(f.id,a.id)])):doc.factors;
  const exportJson=()=>download('AMBIENTA-matriz-'+projectId+'.json','application/json',JSON.stringify(doc,null,2));
  const addAction=()=>{if(!actionName.trim())return;const label=actionName.trim().slice(0,250);
@@ -203,11 +213,13 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
   setNotice('Cambios del catálogo guardados. Se conservan las interacciones y valoraciones vinculadas.');
   setAxisDraft(null);
  };
- return <section className="amb-matrix" data-impact-matrix="v1" data-impact-mode={mode} aria-label="Constructor de matrices ambientales">
+ return <section className="amb-matrix" data-impact-matrix="v1" data-impact-mode="leopold"
+  data-leopold-unified="true" aria-label="Matriz de Leopold integrada">
   <header className="amb-matrix-top">
    <div><p className="amb-matrix-overline">LABORATORIO DE EVALUACIÓN · BORRADOR LOCAL</p>
-    <h3>Constructor de matrices de impacto</h3>
-    <p>Acciones del proyecto × componentes ambientales. Las celdas permanecen sin evaluar hasta que alguien registra el criterio técnico.</p>
+    <h3>Matriz de Leopold</h3>
+    <p>Identificá y valorá impactos en una misma matriz. Seleccioná una celda para marcar el
+     signo y completar magnitud e importancia, sin cambiar de pantalla.</p>
    </div>
    <div className="amb-matrix-exports">
     <button type="button" onClick={()=>download('AMBIENTA-matriz-'+projectId+'.csv','text/csv;charset=utf-8',matrixCsv(doc))}><ArrowDownToLine size={17}/> CSV</button>
@@ -227,50 +239,37 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
    <span><strong>{pending}</strong><small>pendientes de valoración</small></span>
    <span><strong>{negative}</strong><small>adversas declaradas</small></span>
   </div>
-  <div className="amb-matrix-tools">
-   <div className="amb-matrix-view-choices">
-    <div className="amb-matrix-modes" aria-label="Etapas principales de la matriz">
-     <button type="button" aria-pressed={mode==='identificacion'} onClick={()=>setMode('identificacion')}>1 · Identificación</button>
-     <button type="button" aria-pressed={mode==='leopold'} onClick={()=>setMode('leopold')}>2 · Leopold</button>
-    </div>
-    <details className="amb-matrix-optional" data-matrix-optional>
-     <summary>Opciones avanzadas</summary>
-     <button type="button" aria-pressed={mode==='ponderada'} onClick={()=>setMode('ponderada')}>
-      Ponderación exploratoria · no normativa
-     </button>
-    </details>
+  <div className="amb-matrix-tools amb-matrix-tools-unified" data-leopold-unified-toolbar>
+   <div className="amb-matrix-primary-label">
+    <strong>Identificación y valoración</strong>
+    <small>Una sola matriz · Leopold</small>
    </div>
    <div className="amb-matrix-tool-filters">
     <label className="amb-matrix-filter"><input type="checkbox" checked={onlyEvaluated}
      onChange={e=>setOnlyEvaluated(e.target.checked)}/> Solo factores con interacciones</label>
-    {mode==='leopold'&&<label className="amb-matrix-filter"><input type="checkbox"
-     data-leopold-diagonal-toggle checked={diagonal} onChange={e=>setDiagonal(e.target.checked)}/>
-     Mostrar diagonal clásica M/I</label>}
+    <label className="amb-matrix-filter"><input type="checkbox" data-leopold-diagonal-toggle
+     checked={diagonal} onChange={e=>setDiagonal(e.target.checked)}/> Mostrar diagonal clásica M/I</label>
    </div>
+   <details className="amb-matrix-optional" data-matrix-optional>
+    <summary>Herramientas complementarias</summary>
+    <p>La ponderación por factor es un análisis didáctico separado, no forma parte de la
+     puntuación clásica de Leopold y no determina la aprobación ambiental de un proyecto.</p>
+    <button type="button" data-matrix-weighted-toggle aria-pressed={showWeighted}
+     onClick={()=>setShowWeighted(value=>!value)}>
+     {showWeighted?'Ocultar análisis exploratorio':'Ver ponderación exploratoria no normativa'}
+    </button>
+   </details>
   </div>
-  <div className="amb-matrix-mode-guide" data-matrix-mode-guide={mode} role="note">
-   {mode==='identificacion'?<>
-    <strong>Etapa 1 · Identificar interacciones</strong>
-    <p>Marcá en cada cruce un impacto adverso (−), beneficioso (+), ausencia de interacción (∅)
-     o dejalo sin evaluar (—). <b>Ejemplo visual: −</b>. No se asignan números automáticamente.</p>
-   </>:mode==='leopold'?<>
-    <strong>Etapa 2 · Valorar con Leopold</strong>
-    <p>Las celdas valoradas muestran signo y dos criterios diferentes: magnitud e importancia (1–10).
-     <b> Ejemplo ficticio: −7/5</b> = magnitud adversa 7, importancia 5.</p>
-    {scored===0?<p className="amb-matrix-guide-alert" data-matrix-leopold-empty>
-     Todavía no hay celdas completamente valoradas. Seleccioná una celda y completá su signo,
-     magnitud e importancia. Por eso, si todas están vacías, esta vista parece igual a Identificación.</p>:
-     <p data-matrix-leopold-ready>{scored} interacción(es) con magnitud e importancia registradas.
-      Las celdas incompletas siguen señaladas como pendientes.</p>}
-   </>:<>
-    <strong>Herramienta avanzada · Ponderación exploratoria</strong>
-    <p>Se calcula signo × magnitud × importancia × peso editable del factor.
-     <b> Ejemplo ilustrativo: −7 × 5 × 1 = −35</b>.
-     Este producto no pertenece al cálculo clásico de Leopold, no es la importancia de Conesa
-     y no determina la aprobación ambiental de un proyecto.</p>
-    <button type="button" className="amb-matrix-back-leopold"
-     onClick={()=>setMode('leopold')}>Volver a Leopold</button>
-   </>}
+  <div className="amb-matrix-mode-guide" data-matrix-mode-guide="leopold" role="note">
+   <strong>Una sola matriz: identificar y después valorar</strong>
+   <p><b>—</b> no evaluada · <b>∅</b> sin interacción declarada · <b>− / +</b> impacto
+    adverso o beneficioso identificado. Después completá <b>magnitud (1–10)</b> e
+    <b> importancia (1–10)</b>. Ejemplo ficticio: <b>−7/5</b>. Sin valores automáticos.</p>
+   {scored===0?<p className="amb-matrix-guide-alert" data-matrix-leopold-empty>
+    No hay interacciones completamente valoradas todavía. Marcá una celda y completá ambos criterios,
+    sin cambiar de vista.</p>:
+    <p data-matrix-leopold-ready>{scored} interacción(es) con ambos criterios completos.
+     Las identificadas sin magnitud o importancia permanecen pendientes.</p>}
   </div>
   <div className="amb-matrix-construction" data-matrix-inline-builder aria-label="Construcción directa de filas y columnas">
    <div className="amb-matrix-construction-head">
@@ -361,13 +360,9 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
      </th>
      {doc.actions.map(action=>{
        const key=cellKey(factor.id,action.id),cell=doc.cells[key];
-       const score=cell&&cell.magnitude!==null&&cell.importance!==null&&cell.sign!==0
-        ?Math.round(cell.sign*cell.magnitude*cell.importance*factor.weight*100)/100:null;
        const title=action.name+' × '+factor.name;
-       const value=mode==='identificacion'?(cell?(cell.sign===0?'∅':cell.sign>0?'+':'−'):'—')
-        :mode==='ponderada'?(score===null?(cell?'Pend.':'—'):String(score))
-        :btnScore(cell?.sign??null,cell);
-       const diag=mode==='leopold'&&diagonal&&!!cell&&cell.sign!==0&&cell.magnitude!==null&&cell.importance!==null;
+       const value=btnScore(cell?.sign??null,cell);
+       const diag=diagonal&&!!cell&&cell.sign!==0&&cell.magnitude!==null&&cell.importance!==null;
        return <td key={key}><button type="button" className={'amb-matrix-cell amb-matrix-cell--'+cellTone(cell)+(selected===key?' is-selected':'')+(diag?' amb-matrix-cell--diagonal':'')}
         onClick={()=>setSelected(key)} aria-label={'Evaluar '+title+'. '+(cell?'Interacción registrada':'Sin evaluar')}
         aria-pressed={selected===key} title={title}>
@@ -432,14 +427,35 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
      <p>Las celdas sin evaluar no cuentan como ausencia de impacto.</p></div>}
    </div>
   </div>
-  {mode==='leopold'&&<>
-    <LeopoldSummaryPanel projectId={projectId} actions={doc.actions} factors={doc.factors} visibleFactors={filteredFactors} cells={doc.cells}/>
-    <LeopoldReviewPanel actions={doc.actions} factors={doc.factors} cells={doc.cells}
-     onReviewCell={key=>{
-      setSelected(key);
-      document.querySelector('[data-matrix-inspector]')?.scrollIntoView({behavior:'smooth',block:'center'});
-     }}/>
-   </>}
+  <LeopoldSummaryPanel projectId={projectId} actions={doc.actions} factors={doc.factors}
+   visibleFactors={filteredFactors} cells={doc.cells}/>
+  <LeopoldReviewPanel actions={doc.actions} factors={doc.factors} cells={doc.cells}
+   onReviewCell={key=>{
+    setSelected(key);
+    document.querySelector('[data-matrix-inspector]')?.scrollIntoView({behavior:'smooth',block:'center'});
+   }}/>
+  {showWeighted&&<section className="amb-matrix-weighted-report" data-matrix-weighted-report
+   aria-label="Ponderación exploratoria de factores">
+   <div className="amb-matrix-weighted-head">
+    <div><strong>Ponderación exploratoria · análisis complementario</strong>
+     <p>Producto M × I × peso editable. Se muestran por separado valores adversos y beneficiosos.
+      No se compensan entre sí ni representan un índice de aprobación ambiental.</p></div>
+    <button type="button" onClick={()=>setShowWeighted(false)}>Cerrar análisis</button>
+   </div>
+   <div className="amb-matrix-weighted-totals">
+    <span>Productos adversos ponderados: <strong>{weightedAdverse.toFixed(2)}</strong></span>
+    <span>Productos beneficiosos ponderados: <strong>{weightedBeneficial.toFixed(2)}</strong></span>
+   </div>
+   <div className="amb-matrix-weighted-scroll" role="region" tabIndex={0}
+    aria-label="Desglose exploratorio por factor">
+    <table><thead><tr><th>Factor</th><th>Peso</th><th>Interacciones completas</th>
+     <th>Adversos</th><th>Beneficiosos</th></tr></thead>
+     <tbody>{weightedRows.map(row=><tr key={row.id}>
+      <th scope="row">{row.name}</th><td>{row.weight}</td><td>{row.complete}</td>
+      <td>{row.adverse.toFixed(2)}</td><td>{row.beneficial.toFixed(2)}</td>
+     </tr>)}</tbody></table>
+   </div>
+  </section>}
   <div className="amb-matrix-bottom">
    <div className="amb-matrix-side">
     <h4>Herramientas avanzadas</h4>
@@ -461,7 +477,6 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
       <button type="button" aria-label={'Quitar '+f.name} onClick={()=>deleteFactor(f.id)}><X size={16}/></button>
      </div>)}
     </details>
-    {mode==='ponderada'&&<p className="amb-matrix-index">Suma de magnitudes adversas ponderadas: <strong>{adverseScore.toFixed(2)}</strong> · índice exploratorio sin umbral legal</p>}
     <button type="button" className="amb-matrix-reset" onClick={()=>{
       if(window.confirm('¿Reemplazar por catálogo de ejemplo vacío de valoraciones? Se perderán los cambios locales no exportados.')){
        modified.current=true;setDoc(initial(projectId,projectName));setSelected(null);setNotice('Matriz reiniciada.');}
