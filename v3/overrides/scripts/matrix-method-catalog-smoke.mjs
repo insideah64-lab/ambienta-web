@@ -52,8 +52,17 @@ try{
   assert.equal(await page.locator('[data-conesa-phase-tab="f2"]').getAttribute('aria-selected'),'true');
   await page.locator('[data-conesa-phase-tab="f3a"]').click();
   assert.equal(await page.locator('[data-conesa-f3]').getAttribute('data-conesa-f3-focus'),'f3a');
+  assert.equal(await page.locator('[data-f3a-workspace]').count(),1);
+  assert.equal(await page.locator('[data-f3b-workspace]').count(),0);
+  assert.equal(await page.locator('[data-f3-visual="pair"]').count(),1,
+   'Comparative quality chart belongs to F3a');
   await page.locator('[data-conesa-phase-tab="f3b"]').click();
   assert.equal(await page.locator('[data-conesa-f3]').getAttribute('data-conesa-f3-focus'),'f3b');
+  assert.equal(await page.locator('[data-f3b-workspace]').count(),1);
+  assert.equal(await page.locator('[data-f3a-workspace]').count(),0);
+  assert.equal(await page.locator('[data-f3-visual="pair"]').count(),0,
+   'F3b must show curve inventory instead of repeated scenario comparison');
+  assert.equal(await page.locator('[data-f3b-curve-card]').count(),7);
   await page.locator('[data-conesa-phase-tab="f1"]').click();
   assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage).sort()),originalKeys,
    'Navigation through empty stages must not seed or rewrite Conesa drafts');
