@@ -4,7 +4,7 @@ import {ArrowDownToLine,Check,ChevronDown,Pencil,Plus,RotateCcw,UploadCloud,X} f
 import './ImpactMatrixBuilder.css';
 import {LeopoldSummaryPanel} from './LeopoldSummaryPanel';
 import {LeopoldReviewPanel} from './LeopoldReviewPanel';
-import {leopoldReadiness,nextLeopoldCell} from './LeopoldWorkflow';
+import {leopoldCatalogCells,leopoldReadiness,nextLeopoldCell} from './LeopoldWorkflow';
 
 type Sign = -1|0|1;
 type Phase = 'preparacion'|'construccion'|'operacion'|'cierre';
@@ -141,7 +141,8 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
  const clearCell=()=>{if(!selected)return;update(current=>{
   const cells={...current.cells};delete cells[selected];return {...current,cells};
  });};
- const populated=Object.values(doc.cells);
+ const catalogKeys=doc.factors.flatMap(f=>doc.actions.map(a=>cellKey(f.id,a.id)));
+ const populated=leopoldCatalogCells(catalogKeys,doc.cells);
  const scored=populated.filter(c=>c.sign!==0&&c.magnitude!==null&&c.importance!==null).length;
  const documented=populated.filter(c=>leopoldReadiness(c).documented).length;
  const unassessed=doc.actions.length*doc.factors.length-populated.length;

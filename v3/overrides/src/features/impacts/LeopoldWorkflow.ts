@@ -1,5 +1,8 @@
 /** Presentation states only. Does not calculate or change Leopold scores. */
 type WorkflowCell={sign:-1|0|1;magnitude:number|null;importance:number|null;reason:string;evidence:string};
+export function leopoldCatalogCells<T>(keys:readonly string[],cells:Readonly<Record<string,T>>):T[]{
+ return keys.filter(key=>Object.prototype.hasOwnProperty.call(cells,key)).map(key=>cells[key]);
+}
 export function leopoldReadiness(cell:WorkflowCell|undefined){
  const scored=!!cell&&cell.sign!==0&&cell.magnitude!==null&&cell.importance!==null;
  return {scored,documented:scored&&!!cell.reason.trim()&&!!cell.evidence.trim()};

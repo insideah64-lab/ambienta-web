@@ -3,8 +3,15 @@ import assert from 'node:assert/strict';
 import {createRequire} from 'node:module';
 const require=createRequire(new URL('../../apps/web-v3/package.json',import.meta.url));
 const built=await require('esbuild').build({entryPoints:['v3/overrides/src/features/impacts/LeopoldWorkflow.ts'],bundle:true,write:false,format:'esm',platform:'node'});
-const {leopoldReadiness,nextLeopoldCell}=await import('data:text/javascript;base64,'+Buffer.from(built.outputFiles[0].text).toString('base64'));
+const {leopoldCatalogCells,leopoldReadiness,nextLeopoldCell}=await import('data:text/javascript;base64,'+Buffer.from(built.outputFiles[0].text).toString('base64'));
 const full={sign:-1,magnitude:7,importance:5,reason:'',evidence:''};
+test('Catalog counters exclude retained historic cells and preserve their original data',()=>{
+ const cells={'current::action':full,'old::removed':{...full,reason:'Histórico',evidence:'Archivo 1'}};
+ const before=JSON.stringify(cells);
+ assert.deepEqual(leopoldCatalogCells(['current::action','empty::action'],cells),[full]);
+ assert.deepEqual(leopoldCatalogCells([],cells),[]);
+ assert.equal(JSON.stringify(cells),before);
+});
 test('Complete numerical valuation is independent of documentation and does not mutate scores',()=>{
  const original=structuredClone(full);
  assert.deepEqual(leopoldReadiness(full),{scored:true,documented:false});

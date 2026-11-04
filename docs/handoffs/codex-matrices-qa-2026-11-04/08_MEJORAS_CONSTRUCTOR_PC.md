@@ -7,8 +7,10 @@ Fecha: 2026-11-04. Solicitud: mejorar el constructor revisado, con alcance de ac
 - Main comprobado antes de la mejora: `841f1356f86a3561be70fb0d3c7ce961a8d3640b`.
 - Base de esta mejora: `71af2916d98274d06d870aff2677d17b7eb57f9b`.
 - Implementación y regresiones: `ba1f8a9cada4be96d9ace1b2d8c46885e3bbf230`.
-- CI del código: [run 41890657557](https://github.com/insideah64-lab/ambienta-web/actions/runs/41890657557). **PASS: workflow completo satisfactorio**, incluidas compilaciones, 223 pruebas unitarias, 44 scripts de navegador, conservación de V1/V2 y subida de artefactos. Este documento posterior no modifica el código validado.
+- CI de la primera implementación: [run 41890657557](https://github.com/insideah64-lab/ambienta-web/actions/runs/41890657557). **PASS: workflow completo satisfactorio**, incluidas compilaciones, 223 pruebas unitarias, 44 scripts de navegador, conservación de V1/V2 y subida de artefactos. El HEAD documental anterior también pasó el CI completo: [run 41891922212](https://github.com/insideah64-lab/ambienta-web/actions/runs/41891922212).
 - No se fusiona ni se despliega: continúan abiertos los P0 históricos no reproducidos de [03_CONTINUIDAD_QA_Y_HOLD.md](03_CONTINUIDAD_QA_Y_HOLD.md). Este cambio de usabilidad no se presenta como solución demostrada de aquellos incidentes.
+
+Revisión posterior sobre el HEAD `274dcdd29196072ec3ac35388ddae5580fe74328`: los contadores ahora se limitan al catálogo actual; las celdas históricas ajenas a este catálogo permanecen intactas y exportables. Se agregaron una prueba unitaria y una regresión de navegador que carga y vuelve a descargar ese caso. El resultado definitivo del CI de esta revisión queda enlazado en el PR #85.
 
 ## Comportamiento entregado
 
@@ -28,7 +30,7 @@ No hay cambios de fórmulas, escalas, categorías, identificadores, esquemas, cl
 | Comprobación | Resultado |
 |---|---|
 | TypeScript y build V3 | PASS |
-| Pruebas unitarias completas | PASS: 223/223; incluye dos pruebas nuevas sobre independencia de documentación, ausencia de interacción, filtros y recorrido circular |
+| Pruebas unitarias completas | PASS: 224/224 locales; incluye tres pruebas nuevas sobre independencia de documentación, ausencia de interacción, filtros y recorrido circular; conservación de celdas históricas fuera del catálogo |
 | Nuevo recorrido Playwright PC | PASS a 1366 y 1800: presentación sin escritura local; modo ampliado/restauración; salto con foco; estados documentales; teclado; ausencia de interacción; recarga; JSON descargado y leído |
 | Regresión existente de constructor | PASS a 1366/1800: edición, altas, persistencia y descargas CSV/JSON |
 | Catálogo y archivos históricos Conesa | PASS a 1366/1800, sin convertir archivos anteriores |
@@ -59,7 +61,7 @@ La nueva prueba de aceptación solo incluye PC. Se realizó una comprobación m�
 - `header-1366.png`, `header-1800.png`: encabezados ampliados.
 - `workbench-1366.png`, `workbench-1800.png`: acceso directo a la evaluación.
 - `documented-1366.png`, `documented-1800.png`, `editor-1366.png`, `editor-1800.png`: valoración y editor.
-- `matrix-1366.json`, `matrix-1800.json`: descargas verificadas, sin cambiar el esquema.
+- `matrix-1366.json`, `matrix-1800.json`: descargas verificadas, sin cambiar el esquema; conserva también las celdas históricas fuera del catálogo.
 - `results.json`: medidas y resultados por ancho.
 
 Comandos desde la raíz del repositorio, tras preparar V3 con el procedimiento existente:

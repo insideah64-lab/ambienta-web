@@ -61,6 +61,15 @@ try{
   await page.keyboard.press('ArrowDown');
   assert.equal(await grid.locator('tbody .amb-matrix-cell').nth(7).getAttribute('aria-pressed'),'true');
   await first.click();
+  // Historic payload remains exportable but does not inflate the current catalog's counters.
+  await page.evaluate(()=>{
+   const key='ambienta-impact-matrix-v1:DEMO-001',doc=JSON.parse(localStorage.getItem(key));
+   doc.cells['historic-factor::removed-action']={sign:-1,magnitude:9,importance:9,reason:'Histórico ficticio QA',evidence:'Archivo sintético'};
+   localStorage.setItem(key,JSON.stringify(doc));
+  });
+  await page.reload();await grid.waitFor();await first.click();
+  assert.equal(await page.locator('[data-matrix-unassessed]').innerText(),'26');
+  assert.equal(await page.locator('[data-matrix-documented]').innerText(),'1');
   await page.screenshot({path:out+'/documented-'+width+'.png',fullPage:true});
   if(width>=1366)await page.locator('[data-matrix-canvas]').screenshot({path:out+'/editor-'+width+'.png'});
   await page.reload();await grid.waitFor();
@@ -72,6 +81,7 @@ try{
   const doc=JSON.parse(await fs.readFile(filename,'utf8'));
   assert.equal(doc.cells['demo-f1::demo-a1'].magnitude,7);assert.equal(doc.cells['demo-f1::demo-a1'].importance,5);
   assert.equal(doc.schema,'ambienta.impact-matrix.v1');
+  assert.equal(doc.cells['historic-factor::removed-action'].magnitude,9,'Keep historic cells intact in export');
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
   assert.equal(overflow,false,'Page must not overflow horizontally; grid owns its scroll');
   assert.deepEqual(errors,[]);
