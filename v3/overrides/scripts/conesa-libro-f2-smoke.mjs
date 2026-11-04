@@ -15,7 +15,9 @@ try{
   assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
   await page.locator('[data-conesa-book]').waitFor();
   const book=page.locator('[data-conesa-book]'),f2=page.locator('[data-conesa-f2]');
-  await f2.waitFor();
+  await f2.waitFor({state:'attached'});
+  assert.equal(await f2.isVisible(),false,'F2 is mounted but hidden until selected');
+
   assert.equal(await f2.locator('[data-f2-interaction]').count(),0);
   assert.equal((await f2.locator('[data-f2-uip-total]').count()),0,
    'Weight proposal is hidden until explicit expansion');
