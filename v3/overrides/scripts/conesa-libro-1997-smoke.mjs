@@ -13,13 +13,16 @@ try{
   page.on('pageerror',e=>errors.push(String(e)));
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  await page.locator('[data-conesa-variant-switch]').waitFor();
+  await page.locator('[data-conesa-book]').waitFor();
+  assert.equal(await page.locator('[data-conesa-variant-switch]').count(),0,
+   'Conesa is a single primary workbench, no version toggle');
+  assert.equal((await page.locator('[data-conesa-book] h3').first().innerText()).trim(),'Conesa');
   assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1,
    'Book and workbook must not create two Conesa method cards');
-  assert.equal(await page.locator('[data-conesa-simplificado]').count(),1,
-   'Compatibility default keeps tutorial draft accessible');
+  assert.equal(await page.locator('[data-conesa-simplificado]').count(),0,
+   'Simplified archive must never mount as a second main editor');
   const oldKeys=await page.evaluate(()=>Object.keys(localStorage).sort());
-  await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+  await page.locator('[data-conesa-book]').waitFor();
   const panel=page.locator('[data-conesa-book]');
   await panel.waitFor();
   assert.equal(await page.locator('[data-conesa-simplificado]').count(),0,
@@ -74,15 +77,13 @@ try{
   const csvText=await fs.readFile(await csv.path(),'utf8');
   assert(csvText.includes('conesa-libro-1997-cualitativo-f1'));
   assert(csvText.includes('compensable'));
-  await page.getByRole('button',{name:'Simplificado · Excel anterior'}).click();
-  await page.locator('[data-conesa-simplificado]').waitFor();
-  assert.equal(await page.locator('[data-conesa-book]').count(),0);
-  await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+  assert.equal(await page.locator('[data-conesa-book]').count(),1,
+   'There is no switch back to a second Conesa workbench');
   await panel.locator('[data-conesa-book-cell]').first().click();
   assert.equal((await panel.locator('[data-book-absolute]').innerText()).trim(),'30');
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+  await page.locator('[data-conesa-book]').waitFor();
   await page.locator('[data-conesa-book-cell]').first().click();
   assert.equal((await panel.locator('[data-book-absolute]').innerText()).trim(),'30');
   assert.equal((await panel.locator('[data-book-category]').innerText()).trim(),'Moderado');
@@ -90,7 +91,7 @@ try{
   await page.evaluate(key=>localStorage.setItem(key,'{malformed-F1'),bookKey);
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+  await page.locator('[data-conesa-book]').waitFor();
   assert.equal(await panel.locator('[role="alert"]').count(),1);
   await panel.locator('[data-conesa-book-cell]').first().click();
   assert.equal(await panel.getByRole('combobox',{name:'Conesa libro naturaleza'}).isDisabled(),true);
