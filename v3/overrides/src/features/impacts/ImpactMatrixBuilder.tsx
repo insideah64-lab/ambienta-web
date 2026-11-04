@@ -109,6 +109,8 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
  const [selected,setSelected]=useState<string|null>(null);
  const [actionName,setActionName]=useState('');
  const [factorName,setFactorName]=useState('');
+ const [newActionPhase,setNewActionPhase]=useState<Phase>('construccion');
+ const [newFactorGroup,setNewFactorGroup]=useState('Sin clasificar');
  const [axisDraft,setAxisDraft]=useState<AxisDraft|null>(null);
  const [notice,setNotice]=useState('');
  const [onlyEvaluated,setOnlyEvaluated]=useState(false);
@@ -146,11 +148,11 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
  const exportJson=()=>download('AMBIENTA-matriz-'+projectId+'.json','application/json',JSON.stringify(doc,null,2));
  const addAction=()=>{if(!actionName.trim())return;const label=actionName.trim().slice(0,250);
   if(doc.actions.length>=150)return setNotice('Límite de 150 acciones por matriz.');
-  update(cur=>({...cur,actions:[...cur.actions,{id:uid('a'),name:label,phase:'construccion'}]}));setActionName('');
+  update(cur=>({...cur,actions:[...cur.actions,{id:uid('a'),name:label,phase:newActionPhase}]}));setActionName('');
  };
  const addFactor=()=>{if(!factorName.trim())return;const label=factorName.trim().slice(0,250);
   if(doc.factors.length>=150)return setNotice('Límite de 150 factores por matriz.');
-  update(cur=>({...cur,factors:[...cur.factors,{id:uid('f'),name:label,group:'Sin clasificar',weight:1}]}));setFactorName('');setOnlyEvaluated(false);
+  update(cur=>({...cur,factors:[...cur.factors,{id:uid('f'),name:label,group:newFactorGroup.trim().slice(0,140)||'Sin clasificar',weight:1}]}));setFactorName('');setOnlyEvaluated(false);
  };
  const importFactors=()=>{
   const known=new Set(doc.factors.map(f=>f.name.trim().toLocaleLowerCase('es')));
@@ -241,16 +243,92 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
       ? 'Leopold según la matriz clásica: signo y magnitud (1–10) arriba; importancia (1–10) abajo. El producto M×I es una adaptación didáctica, no un índice oficial de aprobación.'
       : 'Vista exploratoria: signo × magnitud × importancia × peso editable. NO es la importancia de Conesa ni una clasificación legal.'}
   </div>
+  <div className="amb-matrix-construction" data-matrix-inline-builder aria-label="Construcción directa de filas y columnas">
+   <div className="amb-matrix-construction-head">
+    <strong>Construí la matriz desde la tabla</strong>
+    <p>Agregá columnas y filas aquí. Usá el lápiz en cada encabezado para cambiar nombres, etapas, grupos y pesos.
+     Seleccioná una celda para registrar la interacción en el panel contiguo.</p>
+   </div>
+   <div className="amb-matrix-add-controls">
+    <div className="amb-matrix-entry">
+     <input aria-label="Nombre de nueva acción" value={actionName}
+      onChange={e=>setActionName(e.target.value)} maxLength={250} placeholder="Nueva acción del proyecto"
+      onKeyDown={e=>{if(e.key==='Enter')addAction();}}/>
+     <select aria-label="Etapa de nueva acción" value={newActionPhase}
+      onChange={e=>setNewActionPhase(e.target.value as Phase)}>
+      {Object.entries(PHASES).map(([id,label])=><option key={id} value={id}>{label}</option>)}
+     </select>
+     <button type="button" onClick={addAction} disabled={!actionName.trim()}><Plus size={17}/> Acción</button>
+    </div>
+    <div className="amb-matrix-entry">
+     <input aria-label="Nombre de nuevo factor" value={factorName}
+      onChange={e=>setFactorName(e.target.value)} maxLength={250} placeholder="Nuevo factor ambiental"
+      onKeyDown={e=>{if(e.key==='Enter')addFactor();}}/>
+     <input aria-label="Grupo de nuevo factor" value={newFactorGroup}
+      onChange={e=>setNewFactorGroup(e.target.value)} maxLength={140} placeholder="Grupo ambiental"/>
+     <button type="button" onClick={addFactor} disabled={!factorName.trim()}><Plus size={17}/> Factor</button>
+    </div>
+   </div>
+  </div>
+  <div className="amb-matrix-canvas" data-matrix-canvas>
   <div className="amb-matrix-scroll" role="region" tabIndex={0} aria-label="Matriz editable, desplazamiento horizontal disponible">
    <table className="amb-matrix-grid">
     <thead><tr><th className="amb-matrix-sticky">Componente ambiental</th>
-     {doc.actions.map(action=><th key={action.id} scope="col">
-      <small>{PHASES[action.phase]}</small><span>{action.name}</span>
+     {doc.actions.map(action=><th key={action.id} scope="col" className={axisDraft?.kind==='action'&&axisDraft.id===action.id?'amb-matrix-axis-editing':''}>
+      {axisDraft?.kind==='action'&&axisDraft.id===action.id?
+       <div className="amb-matrix-axis-editor" data-matrix-edit-action={action.id}>
+        <input autoFocus aria-label="Editar nombre de acción en matriz" maxLength={250}
+         value={axisDraft.name} onChange={e=>setAxisDraft({...axisDraft,name:e.target.value})}
+         onKeyDown={e=>{if(e.key==='Enter')saveAxis();if(e.key==='Escape')setAxisDraft(null);}}/>
+        <select aria-label="Editar etapa de acción en matriz" value={axisDraft.phase}
+         onChange={e=>setAxisDraft({...axisDraft,phase:e.target.value as Phase})}>
+         {Object.entries(PHASES).map(([id,label])=><option key={id} value={id}>{label}</option>)}
+        </select>
+        <div className="amb-matrix-axis-actions">
+         <button type="button" onClick={saveAxis} aria-label="Guardar cambios de acción"><Check size={15}/></button>
+         <button type="button" onClick={()=>setAxisDraft(null)} aria-label="Cancelar edición de acción"><X size={15}/></button>
+        </div>
+       </div>:
+       <>
+        <small>{PHASES[action.phase]}</small><span>{action.name}</span>
+        <div className="amb-matrix-axis-actions">
+         <button type="button" aria-label={'Editar columna '+action.name}
+          onClick={()=>setAxisDraft({kind:'action',id:action.id,name:action.name,phase:action.phase})}>
+          <Pencil size={14}/></button>
+         <button type="button" aria-label={'Eliminar columna '+action.name}
+          onClick={()=>deleteAction(action.id)}><X size={14}/></button>
+        </div>
+       </>}
      </th>)}
     </tr></thead>
     <tbody>{filteredFactors.map(factor=><tr key={factor.id}>
      <th className="amb-matrix-sticky" scope="row">
-      <strong>{factor.name}</strong><small>{factor.group}</small>
+      {axisDraft?.kind==='factor'&&axisDraft.id===factor.id?
+       <div className="amb-matrix-axis-editor" data-matrix-edit-factor={factor.id}>
+        <input autoFocus aria-label="Editar nombre de factor en matriz" maxLength={250}
+         value={axisDraft.name} onChange={e=>setAxisDraft({...axisDraft,name:e.target.value})}
+         onKeyDown={e=>{if(e.key==='Enter')saveAxis();if(e.key==='Escape')setAxisDraft(null);}}/>
+        <input aria-label="Editar grupo ambiental en matriz" maxLength={140} value={axisDraft.group}
+         onChange={e=>setAxisDraft({...axisDraft,group:e.target.value})}/>
+        <label>Peso exploratorio
+         <input type="number" aria-label="Editar peso de factor en matriz" min="0.1" max="5" step="0.25"
+          value={axisDraft.weight} onChange={e=>setAxisDraft({...axisDraft,weight:Number(e.target.value)})}/>
+        </label>
+        <div className="amb-matrix-axis-actions">
+         <button type="button" onClick={saveAxis} aria-label="Guardar cambios de factor"><Check size={15}/></button>
+         <button type="button" onClick={()=>setAxisDraft(null)} aria-label="Cancelar edición de factor"><X size={15}/></button>
+        </div>
+       </div>:
+       <>
+        <strong>{factor.name}</strong><small>{factor.group}</small>
+        <div className="amb-matrix-axis-actions">
+         <button type="button" aria-label={'Editar fila '+factor.name}
+          onClick={()=>setAxisDraft({kind:'factor',id:factor.id,name:factor.name,group:factor.group,weight:factor.weight})}>
+          <Pencil size={14}/></button>
+         <button type="button" aria-label={'Eliminar fila '+factor.name}
+          onClick={()=>deleteFactor(factor.id)}><X size={14}/></button>
+        </div>
+       </>}
      </th>
      {doc.actions.map(action=>{
        const key=cellKey(factor.id,action.id),cell=doc.cells[key];
@@ -270,51 +348,18 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
     </tr>)}</tbody>
    </table>
   </div>
-  {mode==='leopold'&&<>
-    <LeopoldSummaryPanel projectId={projectId} actions={doc.actions} factors={doc.factors} visibleFactors={filteredFactors} cells={doc.cells}/>
-    <LeopoldReviewPanel actions={doc.actions} factors={doc.factors} cells={doc.cells}
-     onReviewCell={key=>{
-      setSelected(key);
-      document.querySelector('[data-matrix-inspector]')?.scrollIntoView({behavior:'smooth',block:'center'});
-     }}/>
-   </>}
-  <div className="amb-matrix-bottom">
-   <div className="amb-matrix-side">
-    <h4>Construir la matriz</h4>
-    <p>Agregá acciones por etapa y factores ambientales. No se crean valoraciones automáticas.</p>
-    <div className="amb-matrix-entry"><input aria-label="Nombre de nueva acción" value={actionName}
-     onChange={e=>setActionName(e.target.value)} maxLength={250} placeholder="Nueva acción del proyecto"/>
-     <button type="button" onClick={addAction}><Plus size={17}/> Acción</button></div>
-    <div className="amb-matrix-entry"><input aria-label="Nombre de nuevo factor" value={factorName}
-     onChange={e=>setFactorName(e.target.value)} maxLength={250} placeholder="Nuevo factor ambiental"/>
-     <button type="button" onClick={addFactor}><Plus size={17}/> Factor</button></div>
-    <button type="button" className="amb-matrix-secondary" onClick={importFactors}>Incorporar factores existentes del expediente</button>
-    <details className="amb-matrix-catalog"><summary>Editar catálogo y pesos <ChevronDown size={14}/></summary>
-     <h5>Acciones</h5>{doc.actions.map(a=><div key={a.id} className="amb-matrix-editrow">
-      <input aria-label={'Renombrar acción '+a.name} value={a.name} maxLength={250} onChange={e=>update(cur=>({...cur,actions:cur.actions.map(x=>x.id===a.id?{...x,name:e.target.value}:x)}))}/>
-      <select aria-label={'Etapa de '+a.name} value={a.phase} onChange={e=>update(cur=>({...cur,actions:cur.actions.map(x=>x.id===a.id?{...x,phase:e.target.value as Phase}:x)}))}>
-       {Object.entries(PHASES).map(([key,value])=><option key={key} value={key}>{value}</option>)}
-      </select><button type="button" aria-label={'Quitar '+a.name} onClick={()=>deleteAction(a.id)}><X size={16}/></button>
-     </div>)}
-     <h5>Factores y ponderaciones</h5>{doc.factors.map(f=><div key={f.id} className="amb-matrix-editrow">
-      <input aria-label={'Renombrar factor '+f.name} value={f.name} maxLength={250} onChange={e=>update(cur=>({...cur,factors:cur.factors.map(x=>x.id===f.id?{...x,name:e.target.value}:x)}))}/>
-      <input type="number" min="0.1" max="5" step="0.25" aria-label={'Peso de '+f.name} value={f.weight} onChange={e=>{
-       const n=Number(e.target.value);if(n>=0.1&&n<=5)update(cur=>({...cur,factors:cur.factors.map(x=>x.id===f.id?{...x,weight:n}:x)}));
-      }}/>
-      <button type="button" aria-label={'Quitar '+f.name} onClick={()=>deleteFactor(f.id)}><X size={16}/></button>
-     </div>)}
-    </details>
-    {mode==='ponderada'&&<p className="amb-matrix-index">Suma de magnitudes adversas ponderadas: <strong>{adverseScore.toFixed(2)}</strong> · índice exploratorio sin umbral legal</p>}
-    <button type="button" className="amb-matrix-reset" onClick={()=>{
-      if(window.confirm('¿Reemplazar por catálogo de ejemplo vacío de valoraciones? Se perderán los cambios locales no exportados.')){
-       modified.current=true;setDoc(initial(projectId,projectName));setSelected(null);setNotice('Matriz reiniciada.');}
-    }}><RotateCcw size={15}/> Reiniciar borrador</button>
-   </div>
    <div className="amb-matrix-inspector" data-matrix-inspector>
     {chosen&&selected?<div>
      <div className="amb-matrix-inspector-head"><div><small>INTERACCIÓN SELECCIONADA</small><h4>{chosen.factor.name}</h4>
       <p>{chosen.action.name} · {PHASES[chosen.action.phase]}</p></div>
       <button type="button" title="Cerrar editor" aria-label="Cerrar editor de celda" onClick={()=>setSelected(null)}><X size={20}/></button>
+     </div>
+     <div className="amb-matrix-fast-sign" aria-label="Marcar interacción desde la matriz">
+      <span>Marcación rápida</span>
+      {([[-1,'− Adverso'],[1,'+ Beneficioso'],[0,'∅ Sin interacción']] as [Sign,string][]).map(([sign,label])=>
+       <button type="button" key={sign} aria-pressed={chosen.cell?.sign===sign}
+        onClick={()=>setCell(selected,{sign,...(sign===0?{magnitude:null,importance:null}:{})})}>{label}</button>)}
+      <button type="button" aria-pressed={!chosen.cell} onClick={clearCell}>— No evaluado</button>
      </div>
      <label>Relación causa–efecto
       <select aria-label="Naturaleza de la interacción" value={chosen.cell?.sign===0?'0':chosen.cell?.sign===1?'1':chosen.cell?.sign===-1?'-1':'unassessed'}
@@ -357,6 +402,43 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
      <p>Indicá si existe interacción y su signo. Después, de forma opcional, cargá magnitud, importancia y referencia documental.</p>
      <p>Las celdas sin evaluar no cuentan como ausencia de impacto.</p></div>}
    </div>
+  </div>
+  {mode==='leopold'&&<>
+    <LeopoldSummaryPanel projectId={projectId} actions={doc.actions} factors={doc.factors} visibleFactors={filteredFactors} cells={doc.cells}/>
+    <LeopoldReviewPanel actions={doc.actions} factors={doc.factors} cells={doc.cells}
+     onReviewCell={key=>{
+      setSelected(key);
+      document.querySelector('[data-matrix-inspector]')?.scrollIntoView({behavior:'smooth',block:'center'});
+     }}/>
+   </>}
+  <div className="amb-matrix-bottom">
+   <div className="amb-matrix-side">
+    <h4>Herramientas avanzadas</h4>
+    <p>El catálogo se construye en la tabla de arriba. Aquí podés importar factores, revisar pesos y administrar el borrador.</p>
+
+    <button type="button" className="amb-matrix-secondary" onClick={importFactors}>Incorporar factores existentes del expediente</button>
+    <details className="amb-matrix-catalog"><summary>Editar catálogo y pesos <ChevronDown size={14}/></summary>
+     <h5>Acciones</h5>{doc.actions.map(a=><div key={a.id} className="amb-matrix-editrow">
+      <input aria-label={'Renombrar acción '+a.name} value={a.name} maxLength={250} onChange={e=>update(cur=>({...cur,actions:cur.actions.map(x=>x.id===a.id?{...x,name:e.target.value}:x)}))}/>
+      <select aria-label={'Etapa de '+a.name} value={a.phase} onChange={e=>update(cur=>({...cur,actions:cur.actions.map(x=>x.id===a.id?{...x,phase:e.target.value as Phase}:x)}))}>
+       {Object.entries(PHASES).map(([key,value])=><option key={key} value={key}>{value}</option>)}
+      </select><button type="button" aria-label={'Quitar '+a.name} onClick={()=>deleteAction(a.id)}><X size={16}/></button>
+     </div>)}
+     <h5>Factores y ponderaciones</h5>{doc.factors.map(f=><div key={f.id} className="amb-matrix-editrow">
+      <input aria-label={'Renombrar factor '+f.name} value={f.name} maxLength={250} onChange={e=>update(cur=>({...cur,factors:cur.factors.map(x=>x.id===f.id?{...x,name:e.target.value}:x)}))}/>
+      <input type="number" min="0.1" max="5" step="0.25" aria-label={'Peso de '+f.name} value={f.weight} onChange={e=>{
+       const n=Number(e.target.value);if(n>=0.1&&n<=5)update(cur=>({...cur,factors:cur.factors.map(x=>x.id===f.id?{...x,weight:n}:x)}));
+      }}/>
+      <button type="button" aria-label={'Quitar '+f.name} onClick={()=>deleteFactor(f.id)}><X size={16}/></button>
+     </div>)}
+    </details>
+    {mode==='ponderada'&&<p className="amb-matrix-index">Suma de magnitudes adversas ponderadas: <strong>{adverseScore.toFixed(2)}</strong> · índice exploratorio sin umbral legal</p>}
+    <button type="button" className="amb-matrix-reset" onClick={()=>{
+      if(window.confirm('¿Reemplazar por catálogo de ejemplo vacío de valoraciones? Se perderán los cambios locales no exportados.')){
+       modified.current=true;setDoc(initial(projectId,projectName));setSelected(null);setNotice('Matriz reiniciada.');}
+    }}><RotateCcw size={15}/> Reiniciar borrador</button>
+   </div>
+
   </div>
   {notice&&<p className="amb-matrix-notice" role="status">{notice} <button type="button" onClick={()=>setNotice('')}>Cerrar</button></p>}
   <footer className="amb-matrix-footer">
