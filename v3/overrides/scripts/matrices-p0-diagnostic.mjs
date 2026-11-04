@@ -82,6 +82,9 @@ try {
   assert.match(await page.locator('.v2-topbar').innerText(),/DEMO-001/);
   await fs.writeFile(`${out}/${width}-diagnostic.json`,JSON.stringify({base,width,measurements,logs,storage},null,2));
   assert.deepEqual(logs.pageerror,[]);
+  assert.deepEqual(logs.failed,[],'The diagnostic journey must not hide failed requests');
+  assert.deepEqual(logs.responses.filter(r=>r.status>=400&&r.url.startsWith(base)),[],
+   'Application resources must not silently return HTTP errors');
   console.log(JSON.stringify({width,pageerrors:logs.pageerror,failed:logs.failed,
    measurements:measurements.map(m=>({tag:m.tag,cell:m.cell,text:m.text,css:m.css}))}));
   await ctx.close();
