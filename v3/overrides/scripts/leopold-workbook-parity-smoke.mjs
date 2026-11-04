@@ -82,7 +82,7 @@ try{
     localStorage.setItem('ambienta-impact-matrix-v1:'+projectId,JSON.stringify(draft)),
     {projectId,draft});
   await page.reload();await page.locator('[data-impact-matrix="v1"]').waitFor();
-  await page.getByRole('button',{name:'Leopold',exact:true}).click();
+  await page.getByRole('button',{name:'2 · Leopold'}).click();
   const panel=page.locator('[data-leopold-summary]');
   await panel.waitFor();
   assert.equal(await panel.locator('[data-leopold-total-positive]').innerText(),'18');
