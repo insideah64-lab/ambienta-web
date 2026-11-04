@@ -341,7 +341,7 @@ export function ConesaF3Panel({projectId,projectName,factors,focus='f3a',onStage
       value={active.transformation.scope}
       onChange={e=>changeTransformation({scope:e.target.value})}/></label>
    </fieldset>}
-   {quality?(focus==='f3b'?<div className="amb-f3b-evaluation" data-f3-results>
+   {focus==='f3b'&&!curveActive?null:quality?(focus==='f3b'?<div className="amb-f3b-evaluation" data-f3-results>
     <strong>Resultado de la función de transformación activa</strong>
     <p>CA del escenario SIN: <b>{quality.without.toFixed(4)}</b> ·
      CA del escenario CON: <b>{quality.withProject.toFixed(4)}</b> ·
