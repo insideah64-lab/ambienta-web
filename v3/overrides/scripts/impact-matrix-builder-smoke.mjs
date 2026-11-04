@@ -32,15 +32,28 @@ try {
    const label=table.querySelector('.amb-matrix-corner-label');
    if(!header||!corner||!label)throw Error('Missing compact matrix header');
    const h=header.getBoundingClientRect(),c=corner.getBoundingClientRect(),l=label.getBoundingClientRect();
-   return {height:h.height,cornerCenter:c.top+c.height/2,labelCenter:l.top+l.height/2,
+   const range=document.createRange();
+   range.selectNodeContents(label);
+   const glyph=range.getBoundingClientRect();
+   const glyphCenter=glyph.top+glyph.height/2;
+   const cornerCenter=c.top+c.height/2;
+   return {height:h.height,cornerCenter,labelCenter:l.top+l.height/2,
+    glyphCenter,glyphHeight:glyph.height,glyphCenterError:Math.abs(cornerCenter-glyphCenter),
+    labelDisplay:getComputedStyle(label).display,
     actions:table.querySelectorAll('.amb-matrix-column-head').length};
   });
   assert(headingGeometry.height<=88,
    'Column header must be compact; screenshot regression: '+JSON.stringify(headingGeometry));
-  assert(Math.abs(headingGeometry.cornerCenter-headingGeometry.labelCenter)<=5,
-   'Factor heading must be vertically centered, not stuck to the bottom of an empty header');
+  assert.equal(headingGeometry.labelDisplay,'grid',
+   'Corner label must use CSS grid; generic thead th span rule previously forced display:block');
+  assert(headingGeometry.glyphHeight>9,
+   'Actual text glyph must be measurable, not just the empty wrapper');
+  assert(headingGeometry.glyphCenterError<=5,
+   'Actual text glyph must be visually centered within the header cell: '+JSON.stringify(headingGeometry));
   assert.equal(headingGeometry.actions,4,'All action labels keep an inline control row');
   await grid.locator('thead').screenshot({path:output+'/matrix-header-compact-'+width+'.png',
+   animations:'disabled'});
+  await page.screenshot({path:output+'/matrix-header-visual-context-'+width+'.png',
    animations:'disabled'});
   assert.equal(await grid.locator('tbody tr').count(),7,'7 factors, no fake evaluations');
   assert.equal(await page.locator('.amb-matrix-kpis>span').nth(1).locator('strong').innerText(),'0');
