@@ -11,7 +11,7 @@ try{
   page.on('pageerror',e=>errors.push(String(e)));
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+  await page.locator('[data-conesa-book]').waitFor();
   const f3=page.locator('[data-conesa-f3]');await f3.waitFor();
   assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
   assert.equal(await f3.locator('[data-f3-factor]').count(),7);
@@ -98,7 +98,7 @@ try{
   assert.equal(first.without.value,20);assert.equal(first.withProject.value,50);
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+  await page.locator('[data-conesa-book]').waitFor();
   await f3.locator('[data-f3-factor]').first().click();
   assert(await f3.locator('[data-f3-results]').count()===1,'F3 persists through reload');
   assert.equal(await f3.locator('[data-f3-chart-row]').count(),1,'Chart derives from persisted F3 data');
@@ -106,7 +106,7 @@ try{
   await page.evaluate(k=>localStorage.setItem(k,'{corrupt-F3a-json'),key);
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-  await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+  await page.locator('[data-conesa-book]').waitFor();
   assert.equal(await f3.locator('[role="alert"]').count(),1);
   const [raw]=await Promise.all([page.waitForEvent('download'),
    f3.getByRole('button',{name:'Descargar original sin modificar'}).click()]);
