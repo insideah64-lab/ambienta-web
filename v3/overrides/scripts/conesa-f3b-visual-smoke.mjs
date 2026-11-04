@@ -103,7 +103,8 @@ try{
   assert(Math.abs(Number(record.xPixelA)-100)<1);
   assert.equal(record.readingA,record.readingB);
   assert.equal(record.approval,null);
-  assert(!Object.values(localStorage).some(s=>typeof s==='string'&&s.includes('data:image/png;base64')));
+  assert(await page.evaluate(()=>Object.values(localStorage).every(s=>
+   typeof s!=='string'||!s.includes('data:image/png;base64'))));
   await page.screenshot({path:root+'/visual-f3b-'+width+'.png',fullPage:true,animations:'disabled'});
   await page.reload();await open();await f3.locator('[data-f3-factor]').first().click();
   await audit.locator('summary').click();
