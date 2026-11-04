@@ -70,11 +70,19 @@ try{
   const f3bOutput=await editor.locator('[data-f3-results]').innerText();
   assert(f3bOutput.includes('0.4000')&&f3bOutput.includes('0.5000')
    &&f3bOutput.includes('0.1000'),f3bOutput);
-  assert.equal(await f3.locator('[data-f3-chart-row]').count(),1);
+  assert.equal(await f3.locator('[data-f3b-workspace]').count(),1);
+  assert.equal(await f3.locator('[data-f3a-workspace]').count(),0,
+   'Curves must not repeat the SIN/CON comparison page');
+  assert.equal(await f3.locator('[data-f3-chart-row]').count(),0);
+  assert.equal(await f3.locator('[data-f3b-overview] strong').nth(1).innerText(),'1');
+  assert.equal(await f3.locator('[data-f3b-curve-card]').first().getAttribute('data-f3b-curve-card'),await f3.locator('[data-f3-factor]').first().getAttribute('data-f3-factor'));
   assert.equal(await editor.locator('[data-f3b-preview] path[stroke="#4ed5c1"]').count(),1);
+  await page.locator('[data-conesa-phase-tab="f3a"]').click();
+  assert.equal(await f3.locator('[data-f3-chart-row]').count(),1);
   await f3.locator('.amb-f3-quality-disclosure summary').click();
   const compare=await f3.locator('.amb-f3-quality-disclosure tbody').innerText();
   assert(compare.includes('F3b · interpolación por tramos')&&compare.includes('0.1000'),compare);
+  await page.locator('[data-conesa-phase-tab="f3b"]').click();
   const f3bKey=await page.evaluate(()=>Object.keys(localStorage)
    .find(k=>k.startsWith('ambienta-conesa-libro-1997-f3b:')));
   assert(f3bKey);
