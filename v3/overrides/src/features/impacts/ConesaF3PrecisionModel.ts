@@ -66,11 +66,14 @@ export function seriesSessionExport(args:{
   qualification:'Lecturas locales no certificadas; no importables en F3b monoserie',
   sourceName:args.sourceName,dimensions:{width:args.width,height:args.height},
   calibration:args.calibration,
-  series:args.series.map(s=>({
-   label:s.label,assumedClickRadiusPx:s.radiusPixels,
-   sensitivity:pixelSensitivity(args.calibration,s.radiusPixels),
-   points:usableVisualPoints(s.points).points,
-   sourcePixels:s.points.map(p=>p.pixel)
-  }))
+  series:args.series.map(s=>{
+   const ordered=[...s.points].sort((a,b)=>a.m-b.m);
+   return {
+    label:s.label,assumedClickRadiusPx:s.radiusPixels,
+    sensitivity:pixelSensitivity(args.calibration,s.radiusPixels),
+    points:ordered.map(p=>({m:p.m,ca:p.ca})),
+    sourcePixels:ordered.map(p=>p.pixel)
+   };
+  })
  };
 }
