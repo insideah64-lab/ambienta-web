@@ -46,6 +46,8 @@ try{
   const f3aRaw=await page.evaluate(k=>localStorage.getItem(k),f3aKey);
   await page.locator('[data-conesa-phase-tab="f3b"]').click();
   assert.equal(await f3.getAttribute('data-conesa-f3-focus'),'f3b');
+  assert.equal(await editor.locator('[data-f3-results]').count(),0,
+   'Curves view must never present linear CA as an unconfigured curve');
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('curva');
   assert.equal(await editor.locator('[data-f3b-curve-editor]').count(),1);
   assert.equal(await editor.locator('[data-f3-results]').count(),0,
