@@ -2,6 +2,8 @@
 
 Fecha: 2026-11-04. Rama nueva: feature/battelle-columbus-2026-11-04. Base verificada: fb29ec73a378b6df6549fec70eb9275b4acd5d95 (constructor PC del PR #85). El PR de Battelle se dirige a esa rama para separar esta ampliación del trabajo previo. No se modifica main ni se publica.
 
+PR de revisión: https://github.com/insideah64-lab/ambienta-web/pull/86. Commits de código: `c9b72319da5f5dea61e981fc9c06b21d405eee81` (perfil, motor, pantalla, pruebas y CI) y `1ad3eb9dadc4dbb2aedf0aac0a0981f22a3d8e20` (filtro y ficha sincronizados, sin crear ni reescribir mediciones). Los checks del PR identifican el commit documental final validado.
+
 ## Fuentes y alcance real de la investigación
 
 Se revisaron las páginas completas del PDF aportado de Conesa, 3.ª edición 1997, reimpresión 2000: sección 6.2.5, impresas 66–69 / archivo 61–64. Se renderizaron y abrieron los cuadros 4 y 5 (archivo 62–63) y la explicación de la página 69 (archivo 64). El PDF y las páginas escaneadas no se incorporan al repositorio. Anejo 4, introducción impresa 253 / archivo 244, ya contrastado: las funciones necesitan identidad de indicador/unidad y una convención de calidad consistente; no son umbrales argentinos universales.
