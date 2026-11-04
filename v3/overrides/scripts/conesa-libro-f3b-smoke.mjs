@@ -99,7 +99,12 @@ try{
   await page.screenshot({path:out+'/curvas-f3b-'+width+'.png',
    animations:'disabled',fullPage:true});
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('lineal');
-  assert.match(await editor.locator('[data-f3-results]').innerText(),/-0.5500/);
+  assert.equal(await editor.locator('[data-f3-results]').count(),0,
+   'F3b must not show F3a linear output as a curve interpolation');
+  await page.locator('[data-conesa-phase-tab="f3a"]').click();
+  assert.match(await editor.locator('[data-f3-results]').innerText(),/-0.5500/,
+   'Linear result remains available in the environmental quality tab');
+  await page.locator('[data-conesa-phase-tab="f3b"]').click();
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('curva');
   assert.match(await editor.locator('[data-f3-results]').innerText(),/0.1000/);
   await page.reload();await open();await page.locator('[data-conesa-phase-tab="f3b"]').click();
