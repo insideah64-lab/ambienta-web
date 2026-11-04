@@ -18,11 +18,13 @@ try{
   };
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
   await open();
+  await page.locator('[data-conesa-phase-tab="f3a"]').click();
   const f3=page.locator('[data-conesa-f3]');
   await f3.locator('[data-f3-factor]').first().click();
   const editor=f3.locator('[data-f3-editor]');
   await editor.getByRole('textbox',{name:'F3 indicador'}).fill('Concentración media diaria');
   await editor.getByRole('textbox',{name:'F3 unidad'}).fill('p.p.m.');
+  await page.locator('[data-conesa-phase-tab="f3b"]').click();
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('curva');
   const lib=editor.locator('[data-f3b-library]');
   await lib.locator('summary').click();
@@ -89,12 +91,12 @@ try{
   await editor.getByRole('spinbutton',{name:'F3b CA nudo 2'}).fill('0.55');
   assert.match(await audit.locator('[data-f3b-audit-status]').innerText(),/no vigente/i);
   assert.match(await audit.getByRole('alert').last().innerText(),/decisión anterior/i);
-  await page.reload();await open();await f3.locator('[data-f3-factor]').first().click();
+  await page.reload();await open();await page.locator('[data-conesa-phase-tab="f3b"]').click();await f3.locator('[data-f3-factor]').first().click();
   await editor.locator('[data-f3b-audit] summary').click();
   assert.match(await audit.locator('[data-f3b-audit-status]').innerText(),/no vigente/i);
   const f3bAfter=await page.evaluate(k=>localStorage.getItem(k),f3bKey);
   await page.evaluate(k=>localStorage.setItem(k,'{invalid audit record'),auditKey);
-  await page.reload();await open();await f3.locator('[data-f3-factor]').first().click();
+  await page.reload();await open();await page.locator('[data-conesa-phase-tab="f3b"]').click();await f3.locator('[data-f3-factor]').first().click();
   await editor.locator('[data-f3b-audit] summary').click();
   assert.equal(await audit.locator('[data-f3b-audit-damaged]').count(),1);
   const [raw]=await Promise.all([
