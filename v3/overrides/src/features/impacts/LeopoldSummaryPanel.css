@@ -5,7 +5,7 @@
 .ref-shell .amb-leopold-analysis-head p:not(.amb-matrix-overline){font-size:12px;color:#b2d2da;line-height:1.6;margin:0;max-width:690px}
 .ref-shell .amb-leopold-analysis-head button{padding:10px 13px;background:#245b60;border:1px solid #80bea9;
  color:#f1fff5;border-radius:8px;font-weight:700;white-space:nowrap;font-size:12px}
-.ref-shell .amb-leopold-overview{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px;margin:17px 0 12px}
+.ref-shell .amb-leopold-overview{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:9px;margin:17px 0 12px}
 .ref-shell .amb-leopold-overview span{display:block;background:#082a36;border:1px solid #355d70;border-radius:8px;padding:10px}
 .ref-shell .amb-leopold-overview strong{display:block;font-size:23px;color:#dafde9}
 .ref-shell .amb-leopold-overview small{display:block;font-size:11px;color:#afc9d3}
@@ -30,4 +30,7 @@
 .ref-shell .amb-leopold-diagonal span:first-child{grid-column:1;grid-row:1;text-align:center;align-self:center;font-size:15px}
 .ref-shell .amb-leopold-diagonal span:last-child{grid-column:2;grid-row:2;text-align:center;align-self:center;font-size:15px}
 @media(max-width:1500px){.ref-shell .amb-leopold-analysis-grid{grid-template-columns:1fr}}
+@media(max-width:900px){.ref-shell .amb-leopold-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+@media(max-width:1550px){.ref-shell .amb-leopold-overview{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:900px){.ref-shell .amb-leopold-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}

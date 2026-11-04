@@ -18,6 +18,8 @@ export type LeopoldAxis={id:string};
 export type LeopoldSlice={
  positive:number;
  negative:number;
+ beneficialProducts:number;
+ adverseProducts:number;
  evaluated:number;
  pending:number;
  none:number;
@@ -29,7 +31,7 @@ export type LeopoldSummary={
  byFactor:Record<string,LeopoldSlice>;
  byAction:Record<string,LeopoldSlice>;
 };
-const fresh=():LeopoldSlice=>({positive:0,negative:0,evaluated:0,pending:0,none:0,unassessed:0,signedSum:0});
+const fresh=():LeopoldSlice=>({positive:0,negative:0,beneficialProducts:0,adverseProducts:0,evaluated:0,pending:0,none:0,unassessed:0,signedSum:0});
 function accumulate(target:LeopoldSlice,item:LeopoldInteraction|undefined){
  if(!item){target.unassessed++;return;}
  if(item.sign===0){target.none++;return;}
@@ -40,8 +42,10 @@ function accumulate(target:LeopoldSlice,item:LeopoldInteraction|undefined){
   target.pending++;return;
  }
  target.evaluated++;
- if(item.sign===1)target.positive++;else target.negative++;
- target.signedSum+=item.sign*item.magnitude*item.importance;
+ const product=item.magnitude*item.importance;
+ if(item.sign===1){target.positive++;target.beneficialProducts+=product;}
+ else{target.negative++;target.adverseProducts+=product;}
+ target.signedSum+=item.sign*product;
 }
 export function summarizeLeopold(
  factors:readonly LeopoldAxis[],actions:readonly LeopoldAxis[],
@@ -58,4 +62,17 @@ export function summarizeLeopold(
   accumulate(total,item);
  }
  return {total,byFactor,byAction};
+}
+
+/** Name collisions merit review, but are not proof of duplicate environmental effects. */
+export function possibleLeopoldDuplicateNames(items:readonly {name:string}[]):string[]{
+ const seen=new Set<string>(),repeated=new Map<string,string>();
+ for(const item of items){
+  const label=item.name.trim().replace(/\s+/g,' ');
+  const id=label.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es');
+  if(!id)continue;
+  if(seen.has(id))repeated.set(id,label);
+  seen.add(id);
+ }
+ return [...repeated.values()];
 }

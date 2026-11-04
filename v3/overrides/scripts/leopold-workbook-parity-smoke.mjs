@@ -100,6 +100,14 @@ try{
    assert.equal((await row.locator('[data-leopold-sum]').innerText()).trim(),
     String(expectedByAction[i]),'Workbook column '+actionNames[i]);
   }
+  const auxiliaryBenefits=magnitudes.reduce((sum,row,i)=>sum+
+   row.reduce((v,m,j)=>v+(m>0?m*importance[i][j]:0),0),0);
+  const auxiliaryAdverse=magnitudes.reduce((sum,row,i)=>sum+
+   row.reduce((v,m,j)=>v+(m<0?-m*importance[i][j]:0),0),0);
+  assert.equal(auxiliaryBenefits-auxiliaryAdverse,4);
+  assert.equal(Number(await panel.locator('[data-leopold-positive-products]').innerText()),auxiliaryBenefits);
+  assert.equal(Number(await panel.locator('[data-leopold-negative-products]').innerText()),auxiliaryAdverse);
+  assert.match(await panel.innerText(),/adaptación didáctica|planilla didáctica/);
   await page.screenshot({path:out+'/leopold-parity-'+width+'.png',animations:'disabled'});
   await page.locator('[data-leopold-diagonal-toggle]').check();
   const first=page.locator('.amb-matrix-grid .amb-matrix-cell').first();
@@ -123,6 +131,25 @@ try{
   assert.equal(await page.locator('[data-leopold-total-negative]').innerText(),'31');
   assert.equal(await page.locator('[data-leopold-total-sum]').innerText(),'6',
    'Original signed −2 excluded when importance becomes pending');
+  // Adding a row with no evaluations, then filtering it visually,
+  // must not change ANY action's totals or completeness counts.
+  await page.getByRole('textbox',{name:'Nombre de nuevo factor'}).fill('Factor sin evaluar');
+  await page.getByRole('button',{name:'Factor',exact:true}).click();
+  assert.equal(await panel.locator('[data-leopold-total-unassessed]').innerText(),'5');
+  const firstAction=panel.locator('[data-leopold-axis="action"]').first();
+  const beforeFilter={
+   sum:await firstAction.locator('[data-leopold-sum]').innerText(),
+   unassessed:await firstAction.locator('[data-leopold-unassessed]').innerText()
+  };
+  assert.equal(beforeFilter.unassessed,'1');
+  await page.getByRole('checkbox',{name:'Solo factores con interacciones'}).check();
+  assert.equal(await firstAction.locator('[data-leopold-unassessed]').innerText(),beforeFilter.unassessed);
+  assert.equal(await firstAction.locator('[data-leopold-sum]').innerText(),beforeFilter.sum);
+  assert.equal(await panel.locator('[data-leopold-total-unassessed]').innerText(),'5');
+  assert.match(await panel.locator('.amb-leopold-filter-note').innerText(),/ambas tablas/i);
+  await page.getByRole('textbox',{name:'Nombre de nueva acción'}).fill('MOVILIDAD');
+  await page.getByRole('button',{name:'Acción',exact:true}).click();
+  assert.match(await panel.locator('[data-leopold-possible-duplicates]').innerText(),/Movilidad/i);
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   assert(overflow<=6,'No page horizontal overflow at '+width+': '+overflow);
   assert.deepEqual(errors,[],'No browser errors');
