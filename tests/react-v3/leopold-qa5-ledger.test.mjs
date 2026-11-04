@@ -40,3 +40,11 @@ test('Reject wrong project, duplicate IDs and corrupt review history',()=>{
  assert.equal(model.isReviewLedger({...first,entries:[{...entry,snapshot:{...snapshot,magnitude:0}}]},projectId),false);
  assert.equal(model.isReviewLedger({...first,entries:[entry,entry]},projectId),false);
 });
+
+test('Changes to source justification or evidence invalidate previous review snapshot',()=>{
+ const original={...cell};
+ assert.equal(model.reviewCurrency(entry,original,'Agua','Excavación'),'vigente');
+ assert.equal(model.reviewCurrency(entry,{...original,reason:'Nuevo fundamento'},'Agua','Excavación'),'modificada');
+ assert.equal(model.reviewCurrency(entry,{...original,evidence:'E-2'},'Agua','Excavación'),'modificada');
+ assert.equal(model.reviewCurrency(entry,original,undefined,'Excavación'),'eliminada');
+});
