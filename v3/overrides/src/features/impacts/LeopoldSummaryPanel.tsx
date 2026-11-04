@@ -34,7 +34,7 @@ export function LeopoldSummaryPanel({projectId,actions,factors,visibleFactors,ce
   for(const a of actions){
    const x=all.byAction[a.id];
    rows.push(['Acción',a.name,x.positive,x.negative,x.evaluated,x.pending,x.none,x.unassessed,
-    hasScore(x)?x.signedSum:'']);
+    hasScore(x)?x.beneficialProducts:'',hasScore(x)?x.adverseProducts:'',hasScore(x)?x.signedSum:'']);
   }
   const x=all.total;
   rows.push(['Todos','Agregado descriptivo',x.positive,x.negative,x.evaluated,x.pending,
@@ -71,8 +71,8 @@ export function LeopoldSummaryPanel({projectId,actions,factors,visibleFactors,ce
    <span><strong data-leopold-total-pending>{all.total.pending}</strong><small>pendientes</small></span>
    <span><strong data-leopold-total-unassessed>{all.total.unassessed}</strong><small>sin evaluar</small></span>
    <span><strong data-leopold-total-sum>{value(all.total)}</strong><small>Σ M×I con signo · auxiliar</small></span>
-   <span><strong data-leopold-positive-products>{value(all.total.evaluated?{...all.total,signedSum:all.total.beneficialProducts}:all.total)}</strong><small>productos beneficiosos · auxiliar</small></span>
-   <span><strong data-leopold-negative-products>{value(all.total.evaluated?{...all.total,signedSum:all.total.adverseProducts}:all.total)}</strong><small>productos adversos absolutos · auxiliar</small></span>
+   <span><strong data-leopold-positive-products>{hasScore(all.total)?all.total.beneficialProducts:'—'}</strong><small>productos beneficiosos · auxiliar</small></span>
+   <span><strong data-leopold-negative-products>{hasScore(all.total)?all.total.adverseProducts:'—'}</strong><small>productos adversos absolutos · auxiliar</small></span>
   </div>
   <p className="amb-leopold-caveat" role="note">
    El agregado algebraico es un resumen <strong>auxiliar de la planilla didáctica</strong>, no una fórmula de aprobación ambiental definida por el texto de Conesa: <strong>no demuestra un saldo ambiental favorable ni autoriza compensar
@@ -97,7 +97,7 @@ export function LeopoldSummaryPanel({projectId,actions,factors,visibleFactors,ce
    <div className="amb-leopold-table-wrap">
     <h5>Resultados por acción del proyecto</h5>
     <div className="amb-leopold-table-scroll" tabIndex={0} role="region" aria-label="Totales por acción">
-     <table><thead><tr><th>Acción</th><th>+</th><th>−</th><th>Valoradas</th><th>Pend.</th><th>Sin eval.</th><th>Σ sin peso</th></tr></thead>
+     <table><thead><tr><th>Acción</th><th>+</th><th>−</th><th>Valoradas</th><th>Pend.</th><th>Sin eval.</th><th>Σ M×I auxiliar</th></tr></thead>
       <tbody>{renderRows(actions,'action')}</tbody>
      </table>
     </div>
