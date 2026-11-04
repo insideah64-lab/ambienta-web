@@ -4,6 +4,7 @@ import {ImpactMatrixBuilder,readMatrixAxes} from './ImpactMatrixBuilder';
 import type {DemoState} from '../../lib/demo';
 import {ConesaSimplificado} from './ConesaSimplificado';
 import {ConesaLibroPanel} from './ConesaLibroPanel';
+import {validatedConesaEntry} from './ConesaSimplificadoModel';
 import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type ScoredMethodId} from './MatrixMethodData';
 import './MatrixMethodHub.css';
 
@@ -216,9 +217,9 @@ const CARDS:Card[]=[
  {id:'causa-leopold',name:'Identificación y Leopold',kind:'Identificación / valoración',
   detail:'Cruce de acciones y factores, naturaleza del impacto y magnitud/importancia independientes (1–10). Incluye una ponderación experimental separada.',
   status:'Disponible',source:'Leopold et al. · USGS (1971)',available:true},
- {id:'conesa-simplificado-tutorial-v1',name:'Conesa simplificado',kind:'Importancia ambiental · versión principal',
-  detail:'Importancia absoluta y con signo, valoración inicial y residual, clasificación 25/50/75, recargos críticos explícitos y tabla de revisión. RV=3 fuera de escala.',
-  status:'Disponible · motor simplificado en revisión',source:'Conesa Fernández-Vítora (1997/2000) · auditoría de fuente primaria',available:true},
+ {id:'conesa-simplificado-tutorial-v1',name:'Conesa',kind:'Evaluación del impacto ambiental',
+  detail:'Valoración cualitativa de impactos, criterios técnicos, importancia y revisión documental, basada en la guía metodológica.',
+  status:'Disponible · revisión técnica',source:'Conesa Fernández-Vítora · guía metodológica',available:true},
  {id:'riam-1998',name:'RIAM',kind:'Comparación de alternativas',
   detail:'Cinco atributos A1, A2, B1, B2 y B3, con valoración estructurada y resultado ES.',
   status:'Disponible · fórmula identificada',source:'Pastakia y Jensen (1998)',available:true},
@@ -237,12 +238,42 @@ function oldConesaArchive(projectId:string):ArchiveStatus{
   return {present:true,valid:true,count:Object.keys(parsed.entries).length};
  }catch{return {present:true,valid:false,count:0};}
 }
+function oldSimplifiedArchive(projectId:string):ArchiveStatus{
+ try{
+  const raw=localStorage.getItem('ambienta-conesa-simplificado-v1:'+projectId);
+  if(raw===null)return {present:false,valid:false,count:0};
+  const parsed:unknown=JSON.parse(raw);
+  if(!parsed||typeof parsed!=='object'||Array.isArray(parsed))return {present:true,valid:false,count:0};
+  const v=parsed as {schema?:unknown;projectId?:unknown;entries?:unknown};
+  if(v.schema!=='ambienta.conesa-simplificado.v1'||v.projectId!==projectId||
+   !v.entries||typeof v.entries!=='object'||Array.isArray(v.entries))return {present:true,valid:false,count:0};
+  const entries=Object.entries(v.entries);
+  if(entries.length>12000||!entries.every(([id,e])=>id.length<=220&&validatedConesaEntry(e)))
+   return {present:true,valid:false,count:0};
+  return {present:true,valid:true,count:entries.length};
+ }catch{return {present:true,valid:false,count:0};}
+}
+function hasResidualArchive(projectId:string):boolean{
+ try{return localStorage.getItem('ambienta-conesa-residual-v1:'+projectId)!==null;}
+ catch{return false;}
+}
+function downloadStoredRaw(key:string,filename:string){
+ try{
+  const raw=localStorage.getItem(key);
+  if(raw!==null)download(filename,'text/plain;charset=utf-8',raw);
+ }catch{/* Never mutate archived data on storage failure. */}
+}
 export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData}:Props){
  const [active,setActive]=useState<ActiveMethod>('causa-leopold');
  const [legacyOpen,setLegacyOpen]=useState(false);
- const [conesaVariant,setConesaVariant]=useState<'excel'|'book'>('excel');
+
  const archive=useMemo(()=>active==='conesa-simplificado-tutorial-v1'
   ?oldConesaArchive(projectId):{present:false,valid:false,count:0},[projectId,active]);
+ const simplifiedArchive=useMemo(()=>active==='conesa-simplificado-tutorial-v1'
+  ?oldSimplifiedArchive(projectId):{present:false,valid:false,count:0},[projectId,active]);
+ const residualArchive=useMemo(()=>active==='conesa-simplificado-tutorial-v1'
+  ?hasResidualArchive(projectId):false,[projectId,active]);
+ const [simplifiedOpen,setSimplifiedOpen]=useState(false);
  return <div className="amb-method-hub" data-matrix-method-catalog="v1">
   <section className="amb-method-catalog" aria-label="Catálogo de métodos ambientales">
    <div className="amb-method-heading">
@@ -307,17 +338,33 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
    ?<ImpactMatrixBuilder projectId={projectId} projectName={projectName} registeredImpacts={registeredImpacts}/>
    :active==='conesa-simplificado-tutorial-v1'
      ?<>
-      <nav className="amb-conesa-variant-switch" aria-label="Variantes de evaluación Conesa" data-conesa-variant-switch>
-       <span>Versión de trabajo</span>
-       <button type="button" aria-pressed={conesaVariant==='book'}
-        onClick={()=>setConesaVariant('book')}>Según libro · Conesa 1997 (experimental)</button>
-       <button type="button" aria-pressed={conesaVariant==='excel'}
-        onClick={()=>setConesaVariant('excel')}>Simplificado · Excel anterior</button>
-       <small>No se convierten ni trasladan resultados entre ediciones; cada versión guarda sus propios datos.</small>
-      </nav>
-      {conesaVariant==='book'
-       ?<ConesaLibroPanel key={projectId+':book'} projectId={projectId} projectName={projectName}/>
-       :<ConesaSimplificado key={projectId+':'+active} projectId={projectId} projectName={projectName} pgaData={pgaData}/>}
+      <ConesaLibroPanel key={projectId+':book'} projectId={projectId} projectName={projectName}/>
+      {simplifiedArchive.present&&<section className="amb-conesa-archive" data-conesa-simplified-archive
+        aria-label="Archivo histórico de Conesa simplificado">
+       <div><small>ARCHIVO HISTÓRICO · EVALUACIONES ANTERIORES</small>
+        <h4>Trabajos anteriores de Conesa</h4>
+        <p>{simplifiedArchive.valid
+         ?'Hay '+simplifiedArchive.count+' valoración(es) guardadas con el Excel simplificado. Se conservan consultables y exportables, sin mezclarse con la edición principal.'
+         :'El archivo anterior no supera la validación del formato. Se conserva intacto y podés exportar su texto original.'}</p>
+       </div>
+       {simplifiedArchive.valid
+        ?<button type="button" aria-expanded={simplifiedOpen} onClick={()=>setSimplifiedOpen(open=>!open)}>
+          {simplifiedOpen?'Ocultar archivo anterior':'Consultar y exportar archivo simplificado'}</button>
+        :<button type="button" onClick={()=>downloadStoredRaw(
+         'ambienta-conesa-simplificado-v1:'+projectId,'AMBIENTA-Conesa-simplificado-respaldo-'+projectId+'.txt')}>
+          Descargar respaldo simplificado sin modificar</button>}
+       {simplifiedArchive.valid&&simplifiedOpen&&<ConesaSimplificado key={projectId+':simplificado-readonly'}
+        projectId={projectId} projectName={projectName} pgaData={pgaData} readOnly/>}
+      </section>}
+      {residualArchive&&<section className="amb-conesa-archive" data-conesa-residual-archive>
+       <div><small>ARCHIVO HISTÓRICO · IMPACTOS RESIDUALES</small>
+        <h4>Respaldo residual anterior</h4>
+        <p>El archivo conserva el seguimiento residual simplificado. No se convierte ni se mezcla con Conesa.</p>
+       </div>
+       <button type="button" onClick={()=>downloadStoredRaw(
+        'ambienta-conesa-residual-v1:'+projectId,'AMBIENTA-Conesa-residual-anterior-'+projectId+'.json')}>
+        Exportar archivo residual original</button>
+      </section>}
       {archive.present&&<section className="amb-conesa-archive" data-conesa-legacy-archive
         aria-label="Archivo de valoraciones Conesa anteriores">
        <div><small>ARCHIVO HISTÓRICO · NO ES OTRO MÉTODO PARA ELEGIR</small>
