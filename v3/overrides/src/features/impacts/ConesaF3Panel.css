@@ -109,3 +109,11 @@
  .ref-shell .amb-f3b-overview{grid-template-columns:repeat(2,minmax(0,1fr));}
  .ref-shell .amb-f3b-curve-index{grid-template-columns:minmax(0,1fr);}
 }
+
+.ref-shell .amb-f3b-evaluation{
+ padding:13px 16px;margin:15px 0;border-left:3px solid #c2a7da;
+ border-radius:0 8px 8px 0;background:#464058;
+}
+.ref-shell .amb-f3b-evaluation strong{display:block;color:#fff3d4;font-size:13px;}
+.ref-shell .amb-f3b-evaluation p{font-size:12px;line-height:1.6;margin:7px 0 0;color:#f0eaf2;}
+.ref-shell .amb-f3b-evaluation b{color:#fff;font-variant-numeric:tabular-nums;}
