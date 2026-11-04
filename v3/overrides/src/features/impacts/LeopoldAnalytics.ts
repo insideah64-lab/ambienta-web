@@ -68,8 +68,8 @@ export function summarizeLeopold(
 export function possibleLeopoldDuplicateNames(items:readonly {name:string}[]):string[]{
  const seen=new Set<string>(),repeated=new Map<string,string>();
  for(const item of items){
-  const label=item.name.trim().replace(/\\s+/g,' ');
-  const id=label.normalize('NFD').replace(/[\\u0300-\\u036f]/g,'').toLocaleLowerCase('es');
+  const label=item.name.trim().replace(/\s+/g,' ');
+  const id=label.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLocaleLowerCase('es');
   if(!id)continue;
   if(seen.has(id))repeated.set(id,label);
   seen.add(id);
