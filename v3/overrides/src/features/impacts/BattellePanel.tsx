@@ -69,7 +69,9 @@ export function BattellePanel({projectId,projectName}:{projectId:string;projectN
    const rows=summary.rows.filter(r=>r.parameter.category===cat),ready=rows.filter(r=>r.ready);
    return <span key={cat}><b>{BATTELLE_CATEGORIES[cat]}</b> {rows.reduce((s,r)=>s+r.parameter.weight,0)} UIP · {ready.length}/{rows.length} calculables · Δ parcial {fmt(ready.length?ready.reduce((s,r)=>s+r.delta!,0):null)}</span>;
   })}</div>
-  <div className="amb-battelle-toolbar"><h4>2 · Parámetros y resultados</h4><label>Categoría<select aria-label="Filtrar categoría Battelle" value={category} onChange={e=>setCategory(e.target.value as Category|'')}><option value="">Todas las categorías</option>{Object.entries(BATTELLE_CATEGORIES).map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label></div>
+  <div className="amb-battelle-toolbar"><h4>2 · Parámetros y resultados</h4><label>Categoría<select aria-label="Filtrar categoría Battelle" value={category} onChange={e=>{
+   const value=e.target.value as Category|'';setCategory(value);setSelected(BATTELLE_PARAMETERS.find(p=>!value||p.category===value)!.id);
+  }}><option value="">Todas las categorías</option>{Object.entries(BATTELLE_CATEGORIES).map(([id,label])=><option key={id} value={id}>{label}</option>)}</select></label></div>
   <div className="amb-matrix-scroll amb-battelle-scroll" tabIndex={0} role="region" aria-label="Tabla de parámetros Battelle con desplazamiento">
    <table><caption>Seleccioná un parámetro para documentar sus mediciones y función.</caption><thead><tr><th scope="col">Parámetro / componente</th><th scope="col">UIP</th><th scope="col">CA SIN</th><th scope="col">CA CON</th><th scope="col">UIA SIN</th><th scope="col">UIA CON</th><th scope="col">ΔUIA</th><th scope="col">Señal de alerta</th></tr></thead>
     <tbody>{visible.map(r=><tr key={r.parameter.id} data-bc-row={r.parameter.id} aria-selected={selected===r.parameter.id}>

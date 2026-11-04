@@ -14,6 +14,10 @@ try{
   const panel=page.locator('[data-battelle]');await panel.waitFor();
   assert.equal(await panel.locator('[data-bc-row]').count(),78);assert.equal(await panel.locator('[data-bc-ready]').innerText(),'0 / 78');assert.equal(await panel.locator('[data-bc-total]').innerText(),'—');
   assert.equal(await page.evaluate(()=>localStorage.getItem('ambienta-battelle-v1:DEMO-001')),null);
+  await panel.getByLabel('Filtrar categoría Battelle',{exact:true}).selectOption('pollution');
+  assert.equal(await panel.locator('[data-bc-row]').count(),24);assert.match(await panel.locator('[data-bc-editor] legend').innerText(),/19\. Basin hydrologic loss/);
+  await panel.getByLabel('Filtrar categoría Battelle',{exact:true}).selectOption('');
+  assert.equal(await page.evaluate(()=>localStorage.getItem('ambienta-battelle-v1:DEMO-001')),null,'Filtering must neither create nor rewrite measurements');
   await page.screenshot({path:out+'/initial-'+width+'.png',fullPage:true});
   await panel.getByRole('textbox',{name:'Alternativa Battelle',exact:true}).fill('Alternativa sintética QA, no evaluación de DEMO-001');
   await panel.getByRole('textbox',{name:'Horizonte Battelle',exact:true}).fill('2030, comparación simultánea QA');
