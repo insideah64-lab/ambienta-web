@@ -31,6 +31,10 @@ try {
   assert.equal(await page.locator('.amb-matrix-cell--negative,.amb-matrix-cell--positive').count(),0);
   assert.equal(await page.locator('[data-page-role="environmental-matrices-tool"]').count(),1,
     'The evaluation workbench lives on its own tools page');
+  await page.getByRole('button',{name:'2 · Leopold'}).click();
+  assert.equal(await page.locator('[data-matrix-leopold-empty]').count(),1,
+   'Empty scores must explain why two modes can appear identical');
+  await page.getByRole('button',{name:'1 · Identificación'}).click();
   await page.screenshot({path:output+'/matrix-empty-'+width+'.png',animations:'disabled'});
   await page.locator('.amb-matrix-cell').first().click();
   assert.equal(await page.locator('[data-matrix-inspector]').isVisible(),true);
@@ -44,17 +48,38 @@ try {
   await page.getByPlaceholder('Describir relación causal, escenario, temporalidad e incertidumbre…').fill('Hipótesis de laboratorio, sin mediciones ni observaciones de campo.');
   await page.getByPlaceholder('Código, página, enlace o informe verificable…').fill('Fuente pendiente de verificación');
   assert.equal(await page.locator('.amb-matrix-cell--negative').count(),1);
-  await page.getByRole('button',{name:'Leopold',exact:true}).click();
+  assert.equal(await page.locator('.amb-matrix-modes button').count(),2,
+   'Only identification and the Leopold method belong in the primary navigation');
+  assert.equal(await page.locator('[data-matrix-optional] button').isVisible(),false,
+   'Exploratory weighting is hidden as an optional advanced tool');
+  assert.equal(await page.locator('[data-impact-mode]').getAttribute('data-impact-mode'),'identificacion');
+  assert.equal((await page.locator('.amb-matrix-cell--negative').first().innerText()).trim(),'−');
+  await page.locator('.amb-matrix-tools').evaluate(el=>el.scrollIntoView({block:'start'}));
+  await page.screenshot({path:output+'/matrix-mode-identificacion-'+width+'.png',animations:'disabled'});
+  await page.getByRole('button',{name:'2 · Leopold'}).click();
+  assert.equal(await page.locator('[data-impact-mode]').getAttribute('data-impact-mode'),'leopold');
   assert.equal((await page.locator('.amb-matrix-cell--negative').first().innerText()).trim(),'−7/5');
-  await page.getByRole('button',{name:'Ponderación exploratoria'}).click();
+  assert.equal(await page.locator('[data-matrix-leopold-ready]').count(),1);
+  assert.equal(await page.locator('[data-leopold-axis]').count()>0,true);
+  await page.locator('.amb-matrix-tools').evaluate(el=>el.scrollIntoView({block:'start'}));
+  await page.screenshot({path:output+'/matrix-mode-leopold-'+width+'.png',animations:'disabled'});
+  await page.locator('[data-matrix-optional] summary').click();
+  await page.getByRole('button',{name:'Ponderación exploratoria · no normativa'}).click();
+  assert.equal(await page.locator('[data-impact-mode]').getAttribute('data-impact-mode'),'ponderada');
   assert.equal((await page.locator('.amb-matrix-cell--negative').first().innerText()).trim(),'-35');
+  assert.equal(await page.locator('[data-matrix-mode-guide="ponderada"]').count(),1);
+  await page.locator('.amb-matrix-tools').evaluate(el=>el.scrollIntoView({block:'start'}));
+  await page.screenshot({path:output+'/matrix-mode-exploratoria-'+width+'.png',animations:'disabled'});
   await page.screenshot({path:output+'/matrix-edited-'+width+'.png',animations:'disabled'});
+  await page.getByRole('button',{name:'Volver a Leopold'}).click();
+  assert.equal(await page.locator('[data-impact-mode]').getAttribute('data-impact-mode'),'leopold');
+  assert.equal((await page.locator('.amb-matrix-cell--negative').first().innerText()).trim(),'−7/5');
   const before=await page.evaluate(()=>Object.keys(localStorage).filter(k=>k.startsWith('ambienta-impact-matrix-v1:')));
   assert.equal(before.length,1,'Project scoped storage only');
   await page.reload();await page.locator('[data-impact-matrix]').waitFor();
   assert.equal(await page.locator('.amb-matrix-cell--negative').count(),1,'Draft must persist across reload');
   assert.equal(await page.locator('.amb-matrix-kpis>span').nth(2).locator('strong').innerText(),'1');
-  await page.getByRole('button',{name:'Identificación'}).click();
+  await page.getByRole('button',{name:'1 · Identificación'}).click();
   await page.getByRole('button',{name:'Incorporar factores existentes del expediente'}).click();
   assert(await grid.locator('tbody tr').count()>=7,'Existing impact factors imported by name only');
   assert.equal(await page.locator('[data-matrix-inline-builder] [aria-label="Nombre de nueva acción"]').count(),1);

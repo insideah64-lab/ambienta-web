@@ -194,3 +194,53 @@
  .ref-shell .amb-matrix-canvas{grid-template-columns:minmax(0,1fr);}
  .ref-shell .amb-matrix-canvas>.amb-matrix-inspector{max-height:none;}
 }
+
+/* Distinguish real Leopold valuation from optional non-normative computations. */
+.ref-shell .amb-matrix-view-choices{display:flex;gap:10px;align-items:center;flex-wrap:wrap;}
+.ref-shell .amb-matrix-modes{flex:none;}
+.ref-shell .amb-matrix-optional{position:relative;min-width:0;}
+.ref-shell .amb-matrix-optional summary{
+ display:inline-flex;align-items:center;gap:7px;
+ font-size:12px;line-height:1.3;font-weight:750;cursor:pointer;color:#e2ddc9;
+ background:#243d47;border:1px solid #58717b;border-radius:8px;padding:9px 11px;
+}
+.ref-shell .amb-matrix-optional[open] summary{background:#3b4246;border-color:#c4a57d;}
+.ref-shell .amb-matrix-optional>button{
+ display:block;margin-top:7px;max-width:280px;text-align:left;font-size:12px;
+ background:#4b4147;border:1px solid #d0a57a;color:#fff1d8;border-radius:7px;padding:10px;
+ font-weight:750;cursor:pointer;
+}
+.ref-shell .amb-matrix-optional>button[aria-pressed=true]{
+ background:#735241;border-color:#ffe1b1;
+}
+.ref-shell .amb-matrix-tool-filters{display:flex;gap:12px;align-items:center;flex-wrap:wrap;}
+.ref-shell .amb-matrix-mode-guide{
+ border:1px solid #4d7d88;border-left:4px solid #66b9b4;border-radius:8px;
+ background:#153b47;padding:11px 14px;margin:12px 0 14px;
+}
+.ref-shell .amb-matrix-mode-guide strong{display:block;font-size:13px;color:#f0f8f3;}
+.ref-shell .amb-matrix-mode-guide p{
+ margin:5px 0 0;font-size:12px;line-height:1.55;color:#d5e7eb;
+}
+.ref-shell .amb-matrix-mode-guide b{color:#fff5c6;}
+.ref-shell .amb-matrix-mode-guide[data-matrix-mode-guide=leopold]{
+ border-left-color:#b6c5ef;background:#1c3b50;
+}
+.ref-shell .amb-matrix-mode-guide[data-matrix-mode-guide=ponderada]{
+ border-color:#947b70;border-left-color:#e4bd85;background:#403947;
+}
+.ref-shell .amb-matrix-mode-guide .amb-matrix-guide-alert{
+ color:#ffe5b3;font-weight:650;margin-top:8px;
+}
+.ref-shell .amb-matrix-back-leopold{
+ margin-top:9px;padding:8px 12px;background:#2e555e;color:#fff;
+ border:1px solid #abc5cb;border-radius:7px;font-weight:750;cursor:pointer;
+}
+.ref-shell .amb-matrix-tools :is(button,summary):focus-visible,
+.ref-shell .amb-matrix-mode-guide button:focus-visible{
+ outline:3px solid #f6d89c;outline-offset:2px;
+}
+@media(max-width:940px){
+ .ref-shell .amb-matrix-view-choices,.ref-shell .amb-matrix-tool-filters{width:100%;}
+ .ref-shell .amb-matrix-modes{flex-wrap:wrap;}
+}
