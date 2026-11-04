@@ -341,12 +341,19 @@ export function ConesaF3Panel({projectId,projectName,factors,focus='f3a',onStage
       value={active.transformation.scope}
       onChange={e=>changeTransformation({scope:e.target.value})}/></label>
    </fieldset>}
-   {quality?<div className="amb-f3-results" data-f3-results>
+   {quality?(focus==='f3b'?<div className="amb-f3b-evaluation" data-f3-results>
+    <strong>Resultado de la función de transformación activa</strong>
+    <p>CA del escenario SIN: <b>{quality.without.toFixed(4)}</b> ·
+     CA del escenario CON: <b>{quality.withProject.toFixed(4)}</b> ·
+     Diferencia de calidad: <b>{quality.delta.toFixed(4)}</b>.</p>
+    <p>Estos valores proceden de los escenarios F3a, interpolados con los nudos revisados aquí.
+     La comparación ambiental global se consulta únicamente en Calidad ambiental.</p>
+   </div>:<div className="amb-f3-results" data-f3-results>
     <span>CA SIN<strong>{quality.without.toFixed(4)}</strong></span>
     <span>CA CON<strong>{quality.withProject.toFixed(4)}</strong></span>
     <span>Δ CA CON − SIN<strong>{quality.delta.toFixed(4)}</strong></span>
     <span>Δ magnitud ({active.unit})<strong>{quality.rawDelta.toLocaleString('es-AR')}</strong></span>
-   </div>:<div className="amb-f3-error" data-f3-issues role="status">
+   </div>):<div className="amb-f3-error" data-f3-issues role="status">
     <strong>Sin resultado cuantitativo validable para este factor</strong>
     <p>{problems.join(' · ')}</p>
    </div>}
