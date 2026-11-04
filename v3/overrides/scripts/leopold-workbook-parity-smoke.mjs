@@ -150,6 +150,29 @@ try{
   await page.getByRole('textbox',{name:'Nombre de nueva acción'}).fill('MOVILIDAD');
   await page.getByRole('button',{name:'Acción',exact:true}).click();
   assert.match(await panel.locator('[data-leopold-possible-duplicates]').innerText(),/Movilidad/i);
+  // QA4: visual review does not change the 50 workbook scores or persistent draft.
+  const review=page.locator('[data-leopold-review]');
+  await review.waitFor();
+  const beforeReview=await page.evaluate(id=>localStorage.getItem('ambienta-impact-matrix-v1:'+id),projectId);
+  assert.equal(Number(await review.locator('[data-leopold-review-count]').innerText())>0,true,
+   'The tunnel workbook contains at least one high scoring interaction at default exploratory criteria');
+  await review.locator('[data-leopold-review-magnitude]').selectOption('10');
+  await review.locator('[data-leopold-review-importance]').selectOption('10');
+  assert.equal(await review.locator('[data-leopold-review-count]').innerText(),'0');
+  assert.match(await review.innerText(),/no significa que el proyecto carezca/i);
+  await review.locator('[data-leopold-review-magnitude]').selectOption('1');
+  await review.locator('[data-leopold-review-importance]').selectOption('1');
+  assert.equal(await review.locator('[data-leopold-review-count]').innerText(),'49',
+   'A pending cell must not appear in the 49 remaining scored workbook interactions');
+  await review.locator('[data-leopold-review-logic]').selectOption('both');
+  assert.equal(await review.locator('[data-leopold-review-count]').innerText(),'49');
+  const afterReview=await page.evaluate(id=>localStorage.getItem('ambienta-impact-matrix-v1:'+id),projectId);
+  assert.equal(afterReview,beforeReview,'Changing review criteria must never rewrite a draft');
+  const openReview=review.locator('[data-leopold-review-open]').first();
+  await openReview.click();
+  assert.equal(await page.locator('[data-matrix-inspector] .amb-matrix-inspector-head').count(),1,
+   'Review button opens the existing cell inspector');
+  await page.screenshot({path:out+'/leopold-review-qa4-'+width+'.png',animations:'disabled'});
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   assert(overflow<=6,'No page horizontal overflow at '+width+': '+overflow);
   assert.deepEqual(errors,[],'No browser errors');
