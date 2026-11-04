@@ -4,6 +4,7 @@ import {ImpactMatrixBuilder,readMatrixAxes} from './ImpactMatrixBuilder';
 import type {DemoState} from '../../lib/demo';
 import {ConesaSimplificado} from './ConesaSimplificado';
 import {ConesaLibroPanel} from './ConesaLibroPanel';
+import {BattellePanel} from './BattellePanel';
 import {validatedConesaEntry} from './ConesaSimplificadoModel';
 import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type ScoredMethodId} from './MatrixMethodData';
 import './MatrixMethodHub.css';
@@ -211,7 +212,7 @@ function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
    {notice&&<p role="status" className="amb-matrix-notice">{notice}</p>}
   </section>;
 }
-type ActiveMethod='causa-leopold'|'conesa-simplificado-tutorial-v1'|'riam-1998';
+type ActiveMethod='causa-leopold'|'conesa-simplificado-tutorial-v1'|'riam-1998'|'battelle';
 type Card={id:ActiveMethod|'battelle';name:string;kind:string;detail:string;status:string;source:string;available:boolean};
 const CARDS:Card[]=[
  {id:'causa-leopold',name:'Identificación y Leopold',kind:'Identificación / valoración',
@@ -224,8 +225,8 @@ const CARDS:Card[]=[
   detail:'Cinco atributos A1, A2, B1, B2 y B3, con valoración estructurada y resultado ES.',
   status:'Disponible · fórmula identificada',source:'Pastakia y Jensen (1998)',available:true},
  {id:'battelle',name:'Battelle-Columbus',kind:'Indicadores de calidad ambiental',
-  detail:'Requiere indicadores medidos, funciones de transformación, pesos y escenarios con/sin proyecto. No es válido calcularlo con valores DEMO.',
-  status:'Preparación metodológica',source:'Dee et al. (1973)',available:false}
+  detail:'Perfil histórico de 78 parámetros y 1000 UIP. Escenarios SIN/CON, funciones documentadas y banderas de investigación; no toma cifras DEMO como mediciones.',
+  status:'Disponible · perfil histórico',source:'Dee et al. (1973)',available:true}
 ];
 type ArchiveStatus={present:boolean;valid:boolean;count:number};
 function oldConesaArchive(projectId:string):ArchiveStatus{
@@ -408,6 +409,7 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
          projectName={projectName} method="conesa-1997-2ex" readOnly/>}
       </section>}
      </>
+     :active==='battelle'?<BattellePanel key={projectId+':battelle'} projectId={projectId} projectName={projectName}/>
      :<ScoredMatrix key={projectId+':'+active} projectId={projectId} projectName={projectName} method={active}/>}
  </div>;
 }

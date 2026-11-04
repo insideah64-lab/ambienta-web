@@ -76,6 +76,8 @@ jobs:
           node apps/web-v3/scripts/impact-matrix-builder-smoke.mjs
           node apps/web-v3/scripts/matrix-workspace-smoke.mjs
           node apps/web-v3/scripts/demo-project-matrices-smoke.mjs
+          node apps/web-v3/scripts/battelle-smoke.mjs
+          node apps/web-v3/scripts/battelle-demo-pack-smoke.mjs
           node apps/web-v3/scripts/matrices-p0-diagnostic.mjs
           node apps/web-v3/scripts/conesa-simplificado-excel-parity-smoke.mjs
           node apps/web-v3/scripts/conesa-libro-1997-smoke.mjs
@@ -105,6 +107,8 @@ jobs:
             qa/matrices-handoff/
             qa/ambienta-matrix-workspace/
             qa/ambienta-demo-project-matrices/
+            qa/ambienta-battelle/
+            qa/ambienta-battelle-demo-pack/
             qa/ambienta-matrix-builder/*.json
             qa/ambienta-matrix-builder/*.csv
             qa/ambienta-conesa-f2/*.json

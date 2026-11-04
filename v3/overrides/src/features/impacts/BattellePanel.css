@@ -1,0 +1,45 @@
+.ref-shell .amb-battelle{--bc-accent:#9bdddc;}
+.ref-shell .amb-battelle-provenance,.ref-shell .amb-battelle-save{font-size:12px;line-height:1.6;color:#c2d9e0;}
+.ref-shell .amb-battelle a{color:var(--bc-accent);text-decoration:underline;}
+.ref-shell .amb-battelle fieldset{min-width:0;border:1px solid var(--mm-stroke);border-radius:10px;padding:16px;margin:16px 0;}
+.ref-shell .amb-battelle legend{font-size:14px;font-weight:750;padding:0 6px;}
+.ref-shell .amb-battelle label:not(.amb-matrix-file){display:grid;gap:6px;font-size:12px;line-height:1.5;min-width:0;}
+.ref-shell .amb-battelle-study{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
+.ref-shell .amb-battelle-study:has(textarea){grid-template-columns:1fr;}
+.ref-shell .amb-battelle-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:16px 0 8px;}
+.ref-shell .amb-battelle-summary>span{display:grid;align-content:start;gap:6px;border:1px solid var(--mm-stroke);padding:12px;border-radius:8px;font-size:11px;}
+.ref-shell .amb-battelle-summary strong{font-size:20px;color:var(--mm-text);font-variant-numeric:tabular-nums;}
+.ref-shell .amb-battelle-category-totals{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px;line-height:1.5;}
+.ref-shell .amb-battelle-category-totals span{padding:8px;border-bottom:1px solid var(--mm-stroke);}
+.ref-shell .amb-battelle-category-totals b{display:block;}
+.ref-shell .amb-battelle-toolbar{display:flex;gap:16px;justify-content:space-between;align-items:center;margin:16px 0 8px;}
+.ref-shell .amb-battelle-toolbar h4{margin:0;}
+.ref-shell .amb-battelle-toolbar label{display:flex;align-items:center;gap:8px;}
+.ref-shell .amb-battelle-scroll{max-height:460px;}
+.ref-shell .amb-battelle-scroll table{width:100%;min-width:940px;table-layout:fixed;border-collapse:separate;border-spacing:0;font-size:12px;}
+.ref-shell .amb-battelle-scroll caption{text-align:left;font-size:11px;padding:8px 12px;}
+.ref-shell .amb-battelle-scroll th,.ref-shell .amb-battelle-scroll td{padding:10px 8px;border-bottom:1px solid var(--mm-stroke);text-align:right;vertical-align:middle;font-variant-numeric:tabular-nums;}
+.ref-shell .amb-battelle-scroll thead th{position:sticky;top:0;z-index:2;background:#184452;color:var(--mm-text);}
+.ref-shell .amb-battelle-scroll th:first-child{width:30%;text-align:left;position:sticky;left:0;z-index:1;background:#153a48;}
+.ref-shell .amb-battelle-scroll thead th:first-child{z-index:3;}
+.ref-shell .amb-battelle-scroll th:nth-child(2){width:6%;}
+.ref-shell .amb-battelle-scroll th:last-child{width:14%;}
+.ref-shell .amb-battelle-scroll tbody th button{border:0;background:none;color:var(--mm-text);padding:0;cursor:pointer;text-align:left;font:inherit;font-weight:750;}
+.ref-shell .amb-battelle-scroll tbody th small{display:block;color:#aecbd1;font-size:10px;margin-top:5px;font-weight:400;}
+.ref-shell .amb-battelle-scroll tr[aria-selected=true]>th{box-shadow:inset 3px 0 var(--bc-accent);}
+.ref-shell .amb-battelle-scroll tr[aria-selected=true]>td{background:#17424b;}
+.ref-shell .amb-battelle-scroll [data-flag=major],.ref-shell .amb-battelle-scroll .is-adverse{color:#ffb5ac;}
+.ref-shell .amb-battelle-scroll [data-flag=minor]{color:#f6d89c;}
+.ref-shell .amb-battelle-scroll [data-flag=gap]{color:#aecbd1;font-size:11px;}
+.ref-shell .amb-battelle-detail{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(300px,1fr);gap:16px;align-items:start;}
+.ref-shell .amb-battelle-fields{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.ref-shell .amb-battelle-scenario{display:grid;gap:12px;padding:12px;border:1px solid var(--mm-stroke);border-radius:8px;}
+.ref-shell .amb-battelle fieldset small{display:block;margin-top:12px;font-size:11px;line-height:1.6;color:#aecbd1;}
+.ref-shell .amb-battelle-chart{margin:16px 0;padding:16px;border:1px solid var(--mm-stroke);border-radius:10px;}
+.ref-shell .amb-battelle-chart h4{margin:0 0 12px;font-size:14px;}
+.ref-shell .amb-battelle-chart svg{display:block;width:100%;height:auto;max-height:240px;}
+.ref-shell .amb-battelle-chart text{fill:currentColor;font-size:12px;}
+.ref-shell .amb-battelle-chart dl{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;}
+.ref-shell .amb-battelle-chart dd{margin:0;text-align:right;font-variant-numeric:tabular-nums;}
+.ref-shell .amb-battelle-chart :is(p,li,summary){font-size:12px;line-height:1.6;}
+.ref-shell .amb-battelle :is(button,input,textarea,select,summary):focus-visible{outline:3px solid #f6d89c;outline-offset:2px;}
