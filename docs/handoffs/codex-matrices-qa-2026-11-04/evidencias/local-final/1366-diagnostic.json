@@ -1,0 +1,1001 @@
+{
+  "base": "http://127.0.0.1:8788/v3/",
+  "width": 1366,
+  "measurements": [
+    {
+      "tag": "initial",
+      "cell": {
+        "x": 309.703125,
+        "y": 2115.4375,
+        "width": 210,
+        "height": 75
+      },
+      "label": {
+        "x": 322.703125,
+        "y": 2124.4375,
+        "width": 183,
+        "height": 56
+      },
+      "text": {
+        "x": 322.703125,
+        "y": 2144.34375,
+        "width": 132.625,
+        "height": 16
+      },
+      "css": {
+        "display": "flex",
+        "alignItems": "center",
+        "lineHeight": "16.2px",
+        "font": "750 12px / 16.2px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "verticalAlign": "middle"
+      },
+      "dpr": 1,
+      "zoom": "1",
+      "assets": [
+        "http://127.0.0.1:8788/v3/assets/index-C7ZzkVY_.js",
+        "http://127.0.0.1:8788/v3/assets/index-D1fUOzUL.css"
+      ]
+    },
+    {
+      "tag": "scroll",
+      "cell": {
+        "x": 309.703125,
+        "y": 462.4375,
+        "width": 210,
+        "height": 75
+      },
+      "label": {
+        "x": 322.703125,
+        "y": 471.4375,
+        "width": 183,
+        "height": 56
+      },
+      "text": {
+        "x": 322.703125,
+        "y": 491.34375,
+        "width": 132.625,
+        "height": 16
+      },
+      "css": {
+        "display": "flex",
+        "alignItems": "center",
+        "lineHeight": "16.2px",
+        "font": "750 12px / 16.2px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "verticalAlign": "middle"
+      },
+      "dpr": 1,
+      "zoom": "1",
+      "assets": [
+        "http://127.0.0.1:8788/v3/assets/index-C7ZzkVY_.js",
+        "http://127.0.0.1:8788/v3/assets/index-D1fUOzUL.css"
+      ]
+    },
+    {
+      "tag": "zoom125",
+      "cell": {
+        "x": 386.625,
+        "y": 1220.703125,
+        "width": 262.5,
+        "height": 93.5
+      },
+      "label": {
+        "x": 402.875,
+        "y": 1231.953125,
+        "width": 229,
+        "height": 70
+      },
+      "text": {
+        "x": 402.875,
+        "y": 1256.828125,
+        "width": 165.78125,
+        "height": 20
+      },
+      "css": {
+        "display": "flex",
+        "alignItems": "center",
+        "lineHeight": "16.2px",
+        "font": "750 12px / 16.2px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "verticalAlign": "middle"
+      },
+      "dpr": 1,
+      "zoom": "1.25",
+      "assets": [
+        "http://127.0.0.1:8788/v3/assets/index-C7ZzkVY_.js",
+        "http://127.0.0.1:8788/v3/assets/index-D1fUOzUL.css"
+      ]
+    },
+    {
+      "tag": "after-navigation",
+      "cell": {
+        "x": 309.703125,
+        "y": 2115.4375,
+        "width": 210,
+        "height": 75
+      },
+      "label": {
+        "x": 322.703125,
+        "y": 2124.4375,
+        "width": 183,
+        "height": 56
+      },
+      "text": {
+        "x": 322.703125,
+        "y": 2144.34375,
+        "width": 132.625,
+        "height": 16
+      },
+      "css": {
+        "display": "flex",
+        "alignItems": "center",
+        "lineHeight": "16.2px",
+        "font": "750 12px / 16.2px Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+        "verticalAlign": "middle"
+      },
+      "dpr": 1,
+      "zoom": "1",
+      "assets": [
+        "http://127.0.0.1:8788/v3/assets/index-C7ZzkVY_.js",
+        "http://127.0.0.1:8788/v3/assets/index-D1fUOzUL.css"
+      ]
+    }
+  ],
+  "logs": {
+    "console": [],
+    "pageerror": [],
+    "failed": [],
+    "responses": [
+      {
+        "url": "http://127.0.0.1:8788/v3/index.html?qa=handoff",
+        "status": 200,
+        "headers": {
+          "content-length": "614",
+          "content-type": "text/html",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-D1fUOzUL.css",
+        "status": 200,
+        "headers": {
+          "content-length": "375331",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "text/css",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-C7ZzkVY_.js",
+        "status": 200,
+        "headers": {
+          "content-length": "1992278",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "text/javascript",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-brand-BXkWHm6a.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5514",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-dashboard-HZT9ZYe8.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "6772",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-territory-DSgvg577.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "7400",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-monitoring-IXBnhd0i.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4996",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-evidence-BmuuGieV.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4942",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-audits-ys3L9Jl1.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5562",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-gis-DiO2K7-J.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "7540",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-satellite-B2tQUI7O.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "8012",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-legal-DkViCEaG.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4398",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-history-aipRBx0J.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4984",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-library-BSPG8rwA.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5146",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-cloud-RTgGvmh1.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4668",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/index.html?qa=handoff",
+        "status": 200,
+        "headers": {
+          "content-length": "614",
+          "content-type": "text/html",
+          "date": "Wed, 04 Nov 2026 17:42:07 GMT",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-C7ZzkVY_.js",
+        "status": 200,
+        "headers": {
+          "content-length": "1992278",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "text/javascript",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-D1fUOzUL.css",
+        "status": 200,
+        "headers": {
+          "content-length": "375331",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "text/css",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-brand-BXkWHm6a.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5514",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-dashboard-HZT9ZYe8.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "6772",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-territory-DSgvg577.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "7400",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-monitoring-IXBnhd0i.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4996",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-audits-ys3L9Jl1.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5562",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-evidence-BmuuGieV.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4942",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-gis-DiO2K7-J.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "7540",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-satellite-B2tQUI7O.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "8012",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-legal-DkViCEaG.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4398",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-library-BSPG8rwA.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5146",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-history-aipRBx0J.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4984",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-cloud-RTgGvmh1.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4668",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/index.html?qa=handoff",
+        "status": 200,
+        "headers": {
+          "content-length": "614",
+          "content-type": "text/html",
+          "date": "Wed, 04 Nov 2026 17:42:08 GMT",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-C7ZzkVY_.js",
+        "status": 200,
+        "headers": {
+          "content-length": "1992278",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "text/javascript",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-D1fUOzUL.css",
+        "status": 200,
+        "headers": {
+          "content-length": "375331",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "text/css",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-brand-BXkWHm6a.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5514",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-dashboard-HZT9ZYe8.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "6772",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-territory-DSgvg577.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "7400",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-monitoring-IXBnhd0i.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4996",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-audits-ys3L9Jl1.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5562",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-evidence-BmuuGieV.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4942",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-gis-DiO2K7-J.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "7540",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-satellite-B2tQUI7O.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "8012",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-legal-DkViCEaG.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4398",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-library-BSPG8rwA.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5146",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-history-aipRBx0J.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4984",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-cloud-RTgGvmh1.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4668",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/index.html?qa=handoff",
+        "status": 200,
+        "headers": {
+          "content-length": "614",
+          "content-type": "text/html",
+          "date": "Wed, 04 Nov 2026 17:42:08 GMT",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-C7ZzkVY_.js",
+        "status": 200,
+        "headers": {
+          "content-length": "1992278",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "text/javascript",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-D1fUOzUL.css",
+        "status": 200,
+        "headers": {
+          "content-length": "375331",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "text/css",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-brand-BXkWHm6a.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5514",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-dashboard-HZT9ZYe8.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "6772",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-territory-DSgvg577.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "7400",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-monitoring-IXBnhd0i.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4996",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-audits-ys3L9Jl1.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5562",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-evidence-BmuuGieV.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4942",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-gis-DiO2K7-J.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "7540",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-satellite-B2tQUI7O.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "8012",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-legal-DkViCEaG.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4398",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-library-BSPG8rwA.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5146",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-history-aipRBx0J.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4984",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-cloud-RTgGvmh1.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4668",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/index.html?qa=handoff",
+        "status": 200,
+        "headers": {
+          "content-length": "614",
+          "content-type": "text/html",
+          "date": "Wed, 04 Nov 2026 17:42:09 GMT",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-C7ZzkVY_.js",
+        "status": 200,
+        "headers": {
+          "content-length": "1992278",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "text/javascript",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-D1fUOzUL.css",
+        "status": 200,
+        "headers": {
+          "content-length": "375331",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "text/css",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-brand-BXkWHm6a.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5514",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-dashboard-HZT9ZYe8.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "6772",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-territory-DSgvg577.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "7400",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-monitoring-IXBnhd0i.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4996",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-audits-ys3L9Jl1.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5562",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-evidence-BmuuGieV.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4942",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-gis-DiO2K7-J.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "7540",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-satellite-B2tQUI7O.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "8012",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-legal-DkViCEaG.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4398",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-library-BSPG8rwA.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "5146",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-history-aipRBx0J.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4984",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/icon-cloud-RTgGvmh1.webp",
+        "status": 200,
+        "headers": {
+          "content-length": "4668",
+          "date": "Wed, 04 Nov 2026 17:42:05 GMT",
+          "content-type": "image/webp",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT",
+          "server": "SimpleHTTP/0.6 Python/3.13.15"
+        }
+      }
+    ],
+    "assets": [
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-C7ZzkVY_.js",
+        "status": 200,
+        "headers": {
+          "server": "SimpleHTTP/0.6 Python/3.13.15",
+          "date": "Wed, 04 Nov 2026 17:42:10 GMT",
+          "content-type": "text/javascript",
+          "content-length": "1992278",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT"
+        },
+        "sha256": "6a7df659b5ec8d8ef31ed867179a2fa6a196f103124a7e7730391dc30e58dbc7"
+      },
+      {
+        "url": "http://127.0.0.1:8788/v3/assets/index-D1fUOzUL.css",
+        "status": 200,
+        "headers": {
+          "server": "SimpleHTTP/0.6 Python/3.13.15",
+          "date": "Wed, 04 Nov 2026 17:42:10 GMT",
+          "content-type": "text/css",
+          "content-length": "375331",
+          "last-modified": "Wed, 04 Nov 2026 17:28:54 GMT"
+        },
+        "sha256": "c9333c08ea925bbbd859cbdd954752f89daa8cb068aeeeb7631e7421c5e924b5"
+      }
+    ]
+  },
+  "storage": {}
+}

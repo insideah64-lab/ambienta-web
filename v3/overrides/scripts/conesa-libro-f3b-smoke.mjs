@@ -90,6 +90,10 @@ try{
   const compare=await f3.locator('.amb-f3-quality-disclosure tbody').innerText();
   assert(compare.includes('F3b · interpolación por tramos')&&compare.includes('0.6000'),compare);
   assert.equal(await f3.locator('.amb-f3-quality-count').innerText(),'1 de 7 factores calculables');
+  const [curveCSV]=await Promise.all([page.waitForEvent('download'),f3.getByRole('button',{name:'CSV F3a/F3b'}).click()]);
+  await curveCSV.saveAs(out+'/curva-'+width+'.csv');
+  const curveText=await fs.readFile(await curveCSV.path(),'utf8');
+  assert(curveText.includes('0.4')&&curveText.includes('0.6')&&curveText.includes('tramos-lineales'));
   await page.locator('[data-conesa-phase-tab="f3b"]').click();
   const f3bKey=await page.evaluate(()=>Object.keys(localStorage)
    .find(k=>k.startsWith('ambienta-conesa-libro-1997-f3b:')));

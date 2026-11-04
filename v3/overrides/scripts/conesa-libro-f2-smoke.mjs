@@ -15,6 +15,8 @@ try{
   assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
   await page.locator('[data-conesa-book]').waitFor();
   const book=page.locator('[data-conesa-book]'),f2=page.locator('[data-conesa-f2]');
+  await book.locator('[data-conesa-phase-panel="f1"] .amb-conesa-top').screenshot({
+   path:out+'/alcance-conesa-'+width+'.png'});
   await f2.waitFor({state:'attached'});
   assert.equal(await f2.isVisible(),false,'F2 is mounted but hidden until selected');
 
@@ -98,6 +100,14 @@ try{
   await book.locator('[data-conesa-book-cell]').first().click();
   assert.equal((await book.locator('[data-book-signed]').innerText()).trim(),'-34');
   assert.equal((await book.locator('[data-book-category]').innerText()).trim(),'Moderado');
+  const [f1json]=await Promise.all([page.waitForEvent('download'),book.getByRole('button',{name:'JSON',exact:true}).click()]);
+  await f1json.saveAs(out+'/f1-minus34-'+width+'.json');
+  const f1Export=JSON.parse(await fs.readFile(await f1json.path(),'utf8'));
+  assert.equal(f1Export.projectId,'DEMO-001');
+  assert.equal(Object.values(f1Export.entries)[0].criteria.IN,4);
+  const [f1csv]=await Promise.all([page.waitForEvent('download'),book.getByRole('button',{name:'CSV',exact:true}).click()]);
+  await f1csv.saveAs(out+'/f1-minus34-'+width+'.csv');
+  assert.match(await fs.readFile(await f1csv.path(),'utf8'),/-34/);
   await page.evaluate(key=>localStorage.setItem(key,'{invalid-F2-json'),f2key);
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();

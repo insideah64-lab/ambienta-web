@@ -1,0 +1,14 @@
+[
+  {
+    "path": "v3/assets/index-BoIbwhjn.js",
+    "browser_sha256": "6a7df659b5ec8d8ef31ed867179a2fa6a196f103124a7e7730391dc30e58dbc7",
+    "gh_pages_sha256": "6a7df659b5ec8d8ef31ed867179a2fa6a196f103124a7e7730391dc30e58dbc7",
+    "equal": true
+  },
+  {
+    "path": "v3/assets/index-LITKOc0i.css",
+    "browser_sha256": "5680ee5fe421dde274acf2121b6f12ff92e011ee69291513ee3daf6c61e76c7f",
+    "gh_pages_sha256": "5680ee5fe421dde274acf2121b6f12ff92e011ee69291513ee3daf6c61e76c7f",
+    "equal": true
+  }
+]

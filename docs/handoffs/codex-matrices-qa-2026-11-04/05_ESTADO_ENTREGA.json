@@ -1,0 +1,30 @@
+{
+  "date": "2026-11-04",
+  "repository": "insideah64-lab/ambienta-web",
+  "base_sha": "841f1356f86a3561be70fb0d3c7ce961a8d3640b",
+  "branch": "fix/codex-matrices-qa-2026-11-04",
+  "pr": 85,
+  "first_regression_commit": "c2909a3995b5b44a84f61dff5d969a8c89ff4e53",
+  "integration": "HOLD",
+  "ci": {
+    "initial_run_id": 41879153054,
+    "initial_status": "queued",
+    "final_status": "pending-new-head"
+  },
+  "cases": {
+    "leopold_header_historical": "BLOCKED_NOT_REPRODUCED",
+    "blue_fish_historical": "BLOCKED_NOT_REPRODUCED",
+    "leopold_minus7_5_reload_json_csv": "PASS",
+    "conesa_f1_minus34_reload_json_csv": "PASS",
+    "conesa_f2_1000uip_reload": "PASS",
+    "conesa_f3a_counter_chart_reload_json_csv": "PASS",
+    "conesa_f3b_experts_curve_reload_json_csv": "PASS",
+    "unit_tests": "PASS_221_OF_221",
+    "v1_v2_integrity": "PASS",
+    "formula_changes": "NONE",
+    "tinyfish_calls": 0,
+    "merge": "NOT_RUN",
+    "deployment_of_branch": "NOT_RUN"
+  },
+  "methodological_report": "04_CONTRASTE_LIBRO_ORIGINAL.md"
+}

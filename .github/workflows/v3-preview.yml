@@ -104,9 +104,11 @@ jobs:
             qa/ambienta-matrix-builder/*.json
             qa/ambienta-matrix-builder/*.csv
             qa/ambienta-conesa-f2/*.json
+            qa/ambienta-conesa-f2/*.csv
             qa/ambienta-conesa-f3a/*.json
             qa/ambienta-conesa-f3a/*.csv
             qa/ambienta-conesa-f3b/*.json
+            qa/ambienta-conesa-f3b/*.csv
           retention-days: 30
           if-no-files-found: error
       - name: Guardar capturas QA Diablillos (Área y SIG)

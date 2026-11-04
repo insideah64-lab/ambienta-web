@@ -169,7 +169,10 @@ export function ConesaLibroPanel({projectId,projectName}:Props){
    <div>
     <p className="amb-matrix-overline"><BookOpen size={15} aria-hidden="true"/> EDICIÓN BIBLIOGRÁFICA · CUALITATIVA F1</p>
     <h3>Valoración cualitativa</h3>
-    <p>Valoración cualitativa versionada; no contiene aún matriz depurada, pesos UIP ni valoración cuantitativa del libro. Los valores son declaraciones del evaluador y requieren fundamento técnico.</p>
+    <p>F1 registra la importancia cualitativa; F2 permite depurar y ponderar factores en UIP.
+     Calidad ambiental y Curvas comparan escenarios mediante funciones de transformación.
+     Todavía no se calcula el valor Vj ni el impacto ambiental total del libro.
+     Los valores son declaraciones del evaluador y requieren fundamento técnico.</p>
     <code>I = ± [3IN + 2(EX+EXcr) + (MO+MOcr) + PE + RV + SI + AC + EF + PR + MC]</code>
    </div>
    <div className="amb-matrix-exports">

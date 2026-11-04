@@ -1,0 +1,45 @@
+{
+  "schema": "ambienta.conesa-libro-1997.dep-uip.f2",
+  "methodId": "conesa-libro-1997-f2",
+  "projectId": "DEMO-001",
+  "projectName": "Urbanización — expediente de ejemplo",
+  "updatedAt": "2026-11-04T17:46:47.012Z",
+  "screening": {
+    "threshold": 40,
+    "thresholdReason": "Tamiz documentado del ejercicio de regresión",
+    "thresholdEvidence": "Acta QA del ejemplo ficticio",
+    "decisions": {
+      "demo-f1::demo-a1": {
+        "treatment": "tamiz",
+        "reason": "Por debajo del umbral de este ensayo didáctico",
+        "evidence": "Caso didáctico en laboratorio QA"
+      }
+    },
+    "alerts": {
+      "demo-f1::demo-a1": {
+        "enabled": true,
+        "reason": "Lugar de daño potencial irreversible en circunstancias críticas",
+        "evidence": "Acta de prueba QA",
+        "alternative": "Alternativa de ubicación sujeta a análisis"
+      }
+    }
+  },
+  "uip": {
+    "method": "pesos_1_10",
+    "panelReference": "Equipo ambiental de consulta didáctica",
+    "source": "Acta del panel de valoración didáctica",
+    "sessionDate": "2026-11-03",
+    "notes": "",
+    "coefficients": {
+      "demo-f1": 1,
+      "demo-f2": 1,
+      "demo-f3": 1,
+      "demo-f4": 1,
+      "demo-f5": 1,
+      "demo-f6": 1,
+      "demo-f7": 1
+    }
+  },
+  "provenance": "Conesa Fernández-Vítora (1997, reimp. 2000), pp. 96–100; F2 experimental",
+  "interpretation": "Propuesta documental no validada por expertos"
+}

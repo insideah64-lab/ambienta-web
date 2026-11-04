@@ -61,9 +61,17 @@ try {
   // Retain full 7x4 table evidence, including columns/rows clipped by its scroll viewport.
   const wrapper=grid.locator('..');
   const originalStyle=await wrapper.getAttribute('style');
-  await wrapper.evaluate(e=>{e.style.overflow='visible';e.style.maxHeight='none';e.style.width='max-content';});
+  const tableStyle=await grid.getAttribute('style');
+  const tableWidth=await grid.evaluate(e=>e.getBoundingClientRect().width);
+  const inspector=page.locator('[data-matrix-inspector]');
+  const inspectorStyle=await inspector.getAttribute('style');
+  await inspector.evaluate(e=>e.style.visibility='hidden');
+  await grid.evaluate((e,w)=>e.style.width=w+'px',tableWidth);
+  await wrapper.evaluate((e,w)=>{e.style.overflow='visible';e.style.maxHeight='none';e.style.width=w+'px';},tableWidth);
   await grid.screenshot({path:`${out}/${width}-table-complete.png`});
   await wrapper.evaluate((e,s)=>s===null?e.removeAttribute('style'):e.setAttribute('style',s),originalStyle);
+  await grid.evaluate((e,s)=>s===null?e.removeAttribute('style'):e.setAttribute('style',s),tableStyle);
+  await inspector.evaluate((e,s)=>s===null?e.removeAttribute('style'):e.setAttribute('style',s),inspectorStyle);
   for(const url of measurements[0].assets) {
    const response=await ctx.request.get(url);
    logs.assets.push({url,status:response.status(),headers:response.headers(),

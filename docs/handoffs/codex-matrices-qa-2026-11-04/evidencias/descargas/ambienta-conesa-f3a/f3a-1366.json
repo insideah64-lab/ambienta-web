@@ -1,0 +1,38 @@
+{
+  "schema": "ambienta.conesa-libro-1997.indicadores-ca.f3a",
+  "methodId": "conesa-libro-1997-f3a",
+  "projectId": "DEMO-001",
+  "projectName": "Urbanización — expediente de ejemplo",
+  "updatedAt": "2026-11-04T17:32:49.733Z",
+  "records": {
+    "demo-f1": {
+      "indicator": "Parámetro ficticio QA",
+      "unit": "mg/L",
+      "method": "directo",
+      "modelReference": "",
+      "composition": "Composición individual del ensayo didáctico sin sinergia",
+      "transformation": {
+        "kind": "lineal",
+        "min": 0,
+        "max": 100,
+        "orientation": "decreciente",
+        "source": "Acta técnica de transformación ficticia QA",
+        "scope": "Solo para prueba de regresión en dominio 0 a 100"
+      },
+      "without": {
+        "value": 20,
+        "date": "2026-10-01",
+        "source": "Informe técnico de ensayo sin proyecto",
+        "kind": "medido"
+      },
+      "withProject": {
+        "value": 50,
+        "date": "2026-10-02",
+        "source": "Informe predictivo de ensayo con proyecto",
+        "kind": "estimado"
+      }
+    }
+  },
+  "provenance": "Conesa (1997), 5.2–5.3.2 pp. 107–116",
+  "interpretation": "Borrador sin validación profesional"
+}

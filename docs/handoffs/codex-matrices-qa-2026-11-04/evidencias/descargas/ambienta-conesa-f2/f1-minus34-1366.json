@@ -1,0 +1,31 @@
+{
+  "schema": "ambienta.conesa-libro-1997.cualitativo-f1",
+  "methodId": "conesa-libro-1997-cualitativo-f1",
+  "projectId": "DEMO-001",
+  "projectName": "Urbanización — expediente de ejemplo",
+  "updatedAt": "2026-11-04T17:46:46.685Z",
+  "entries": {
+    "demo-f1::demo-a1": {
+      "sign": -1,
+      "criteria": {
+        "IN": 4,
+        "EX": 2,
+        "EX_CR": 0,
+        "MO": 4,
+        "MO_CR": 0,
+        "PE": 4,
+        "RV": 1,
+        "SI": 1,
+        "AC": 1,
+        "EF": 4,
+        "PR": 1,
+        "MC": 2
+      },
+      "recovery": null,
+      "reason": "",
+      "evidence": ""
+    }
+  },
+  "source": "Conesa Fernández-Vítora, Guía metodológica para la evaluación del impacto ambiental, 3.ª ed. (1997), reimp. 2000, pp. 89–97",
+  "boundaryPolicy": "F1: I<25 irrelevante; 25<=I<50 moderado; 50<=I<=75 severo; I>75 crítico. El texto de 1997 solapa 50: se opta explícitamente por severo; el 75 permanece severo porque crítico es >75."
+}
