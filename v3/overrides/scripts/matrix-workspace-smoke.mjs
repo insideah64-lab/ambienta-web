@@ -12,6 +12,28 @@ try{
   page.on('pageerror',e=>errors.push(String(e)));
   await page.goto((process.env.QA_BASE_URL||'http://127.0.0.1:8787/v3/')+'index.html#/matrices');
   const grid=page.locator('[data-impact-matrix] .amb-matrix-grid');await grid.waitFor();
+  const density=[];
+  async function checkDensity(state){
+   const geometry=await grid.evaluate(table=>{
+    const rect=e=>e.getBoundingClientRect();
+    const rail=rect(table.querySelector('thead th'));
+    const label=table.querySelector('.amb-matrix-corner-label');
+    const range=document.createRange();range.selectNodeContents(label);const text=range.getBoundingClientRect();
+    return {railWidth:rail.width,cornerOffsetX:Math.abs(rail.x+rail.width/2-text.x-text.width/2),
+     cornerOffsetY:Math.abs(rail.y+rail.height/2-text.y-text.height/2),
+     rows:[...table.querySelectorAll('tbody tr')].map(row=>({height:rect(row).height,
+      bands:[...row.querySelectorAll('td')].map(td=>rect(td).height-rect(td.querySelector('button')).height)}))};
+   });
+   assert(Math.abs(geometry.railWidth-240)<1,'Factor rail must not absorb spare desktop width');
+   assert(geometry.cornerOffsetX<2&&geometry.cornerOffsetY<2,'Corner text must be centered in both axes');
+   for(const row of geometry.rows){
+    assert(row.height<=70,'Default rows must remain compact');
+    assert(row.bands.every(gap=>gap<2),'Evaluation button must fill its row without empty bands');
+   }
+   density.push({state,...geometry});
+   await page.locator('.amb-matrix-scroll').screenshot({path:out+'/density-'+state+'-'+width+'.png'});
+  }
+  await checkDensity('initial');
   const stored=()=>page.evaluate(()=>localStorage.getItem('ambienta-impact-matrix-v1:DEMO-001'));
   const untouched=await stored();
   assert.equal(await page.locator('.amb-method-hub.is-compact').count(),1);
@@ -25,6 +47,10 @@ try{
   const expandedWidth=(await grid.locator('..').boundingBox()).width;
   if(width>1000)assert(expandedWidth>baseWidth+150,'Expanded workspace must recover sidebar width');
   assert.equal(await stored(),untouched,'Presentation controls must not create or rewrite matrix storage');
+  await checkDensity('expanded');
+  await page.getByRole('button',{name:'Mostrar editor',exact:true}).click();
+  await checkDensity('expanded-with-editor');
+  await page.getByRole('button',{name:'Ocultar editor',exact:true}).click();
   await page.screenshot({path:out+'/expanded-'+width+'.png',fullPage:true});
   await page.getByRole('button',{name:'Restaurar navegación',exact:true}).click();
   await page.screenshot({path:out+'/initial-'+width+'.png',fullPage:true});
@@ -85,9 +111,10 @@ try{
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
   assert.equal(overflow,false,'Page must not overflow horizontally; grid owns its scroll');
   assert.deepEqual(errors,[]);
-  results.push({width,status:'PASS',initialGridTop:top,baseWidth,expandedWidth,errors});
+  results.push({width,status:'PASS',initialGridTop:top,baseWidth,expandedWidth,density,errors});
   await context.close();
  }
 }finally{await browser.close();}
 await fs.writeFile(out+'/results.json',JSON.stringify(results,null,2));
 console.log(JSON.stringify(results));
+

@@ -313,7 +313,8 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
   </div>
   <div className={'amb-matrix-canvas'+(inspectorOpen?'':' is-editor-collapsed')} data-matrix-canvas>
   <div className="amb-matrix-scroll" role="region" tabIndex={0} aria-label="Matriz editable, desplazamiento horizontal disponible">
-   <table className="amb-matrix-grid">
+   <table className="amb-matrix-grid" style={{width:`max(100%, ${240+doc.actions.length*170}px)`}}>
+    <colgroup><col style={{width:240}}/>{doc.actions.map(action=><col key={action.id}/>)}</colgroup>
     <thead><tr><th className="amb-matrix-sticky" scope="col"><span className="amb-matrix-corner-label">Componente ambiental</span></th>
      {doc.actions.map(action=><th key={action.id} scope="col" className={axisDraft?.kind==='action'&&axisDraft.id===action.id?'amb-matrix-axis-editing':''}>
       {axisDraft?.kind==='action'&&axisDraft.id===action.id?
@@ -363,8 +364,8 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
          <button type="button" onClick={()=>setAxisDraft(null)} aria-label="Cancelar edición de factor"><X size={15}/></button>
         </div>
        </div>:
-       <>
-        <strong>{factor.name}</strong><small>{factor.group}</small>
+       <div className="amb-matrix-row-head">
+        <div className="amb-matrix-row-label"><strong>{factor.name}</strong><small>{factor.group}</small></div>
         <div className="amb-matrix-axis-actions">
          <button type="button" aria-label={'Editar fila '+factor.name}
           onClick={()=>setAxisDraft({kind:'factor',id:factor.id,name:factor.name,group:factor.group,weight:factor.weight})}>
@@ -372,7 +373,7 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
          <button type="button" aria-label={'Eliminar fila '+factor.name}
           onClick={()=>deleteFactor(factor.id)}><X size={14}/></button>
         </div>
-       </>}
+       </div>}
      </th>
      {doc.actions.map(action=>{
        const key=cellKey(factor.id,action.id),cell=doc.cells[key];
@@ -540,3 +541,4 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
   </footer>
  </section>;
 }
+
