@@ -301,7 +301,7 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
   <div className="amb-matrix-canvas" data-matrix-canvas>
   <div className="amb-matrix-scroll" role="region" tabIndex={0} aria-label="Matriz editable, desplazamiento horizontal disponible">
    <table className="amb-matrix-grid">
-    <thead><tr><th className="amb-matrix-sticky">Componente ambiental</th>
+    <thead><tr><th className="amb-matrix-sticky" scope="col"><span className="amb-matrix-corner-label">Componente ambiental</span></th>
      {doc.actions.map(action=><th key={action.id} scope="col" className={axisDraft?.kind==='action'&&axisDraft.id===action.id?'amb-matrix-axis-editing':''}>
       {axisDraft?.kind==='action'&&axisDraft.id===action.id?
        <div className="amb-matrix-axis-editor" data-matrix-edit-action={action.id}>
@@ -317,16 +317,19 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
          <button type="button" onClick={()=>setAxisDraft(null)} aria-label="Cancelar edición de acción"><X size={15}/></button>
         </div>
        </div>:
-       <>
-        <small>{PHASES[action.phase]}</small><span>{action.name}</span>
-        <div className="amb-matrix-axis-actions">
-         <button type="button" aria-label={'Editar columna '+action.name}
-          onClick={()=>setAxisDraft({kind:'action',id:action.id,name:action.name,phase:action.phase})}>
-          <Pencil size={14}/></button>
-         <button type="button" aria-label={'Eliminar columna '+action.name}
-          onClick={()=>deleteAction(action.id)}><X size={14}/></button>
+       <div className="amb-matrix-column-head">
+        <div className="amb-matrix-column-meta">
+         <small>{PHASES[action.phase]}</small>
+         <div className="amb-matrix-axis-actions">
+          <button type="button" aria-label={'Editar columna '+action.name}
+           onClick={()=>setAxisDraft({kind:'action',id:action.id,name:action.name,phase:action.phase})}>
+           <Pencil size={14}/></button>
+          <button type="button" aria-label={'Eliminar columna '+action.name}
+           onClick={()=>deleteAction(action.id)}><X size={14}/></button>
+         </div>
         </div>
-       </>}
+        <span title={action.name}>{action.name}</span>
+       </div>}
      </th>)}
     </tr></thead>
     <tbody>{filteredFactors.map(factor=><tr key={factor.id}>

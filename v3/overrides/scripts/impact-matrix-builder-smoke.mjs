@@ -26,6 +26,22 @@ try {
   assert.equal(await page.locator('[data-matrix-canvas] [data-matrix-inspector]').count(),1,
    'Cell evaluation belongs alongside the matrix, not below it');
   assert.equal(await grid.locator('thead th').count(),5,'4 action examples plus factor header');
+  const headingGeometry=await grid.evaluate(table=>{
+   const header=table.querySelector('thead tr');
+   const corner=table.querySelector('thead .amb-matrix-sticky');
+   const label=table.querySelector('.amb-matrix-corner-label');
+   if(!header||!corner||!label)throw Error('Missing compact matrix header');
+   const h=header.getBoundingClientRect(),c=corner.getBoundingClientRect(),l=label.getBoundingClientRect();
+   return {height:h.height,cornerCenter:c.top+c.height/2,labelCenter:l.top+l.height/2,
+    actions:table.querySelectorAll('.amb-matrix-column-head').length};
+  });
+  assert(headingGeometry.height<=88,
+   'Column header must be compact; screenshot regression: '+JSON.stringify(headingGeometry));
+  assert(Math.abs(headingGeometry.cornerCenter-headingGeometry.labelCenter)<=5,
+   'Factor heading must be vertically centered, not stuck to the bottom of an empty header');
+  assert.equal(headingGeometry.actions,4,'All action labels keep an inline control row');
+  await grid.locator('thead').screenshot({path:output+'/matrix-header-compact-'+width+'.png',
+   animations:'disabled'});
   assert.equal(await grid.locator('tbody tr').count(),7,'7 factors, no fake evaluations');
   assert.equal(await page.locator('.amb-matrix-kpis>span').nth(1).locator('strong').innerText(),'0');
   assert.equal(await page.locator('.amb-matrix-cell--negative,.amb-matrix-cell--positive').count(),0);
