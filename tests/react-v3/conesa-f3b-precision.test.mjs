@@ -61,7 +61,7 @@ test('Session export separates series, sorts labels and makes no certified claim
  assert(output);
  assert.equal(output.series.length,2);
  assert.deepEqual(output.series[0].points,[{m:0,ca:0},{m:20,ca:1}]);
- assert.equal(output.series[0].sourcePixels.length,2);
+ assert.deepEqual(output.series[0].sourcePixels,[{x:100,y:350},{x:500,y:50}]);
  assert.match(output.qualification,/no certificadas/);
  assert(!Object.hasOwn(output,'image'));
  assert(!Object.hasOwn(output,'signature'));
