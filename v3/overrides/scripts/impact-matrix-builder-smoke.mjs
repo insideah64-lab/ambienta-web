@@ -8,7 +8,7 @@ try {
  for(const width of [1366,1800]){
   const ctx=await browser.newContext({viewport:{width,height:900},acceptDownloads:true,reducedMotion:'reduce'});
   const page=await ctx.newPage();const errors=[];page.on('pageerror',err=>errors.push(String(err)));
-  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/impactos');
+  await page.goto((process.env.QA_BASE_URL||'http://127.0.0.1:8787/v3/')+'index.html#/impactos');
   await page.locator('.v2-table').first().waitFor();
   assert.equal(await page.locator('[data-impact-matrix]').count(),0,
     'Impactos must be a documentary register, not the editing workbench');
@@ -159,8 +159,13 @@ try {
   const [jsonDownload]=await Promise.all([
     page.waitForEvent('download'),page.getByRole('button',{name:'JSON',exact:true}).click()
   ]);
+  await jsonDownload.saveAs(output+'/leopold-'+width+'.json');
+  await csvDownload.saveAs(output+'/leopold-'+width+'.csv');
   const imported=JSON.parse(await fs.readFile(await jsonDownload.path(),'utf8'));
   assert.equal(imported.schema,'ambienta.impact-matrix.v1');
+  assert.equal(imported.projectId,'DEMO-001');
+  const scored=Object.values(imported.cells).find(c=>c.sign===-1);
+  assert.equal(scored.magnitude,7);assert.equal(scored.importance,5);
   assert(imported.actions.some(x=>x.name==='Restauración de humedales'&&x.phase==='operacion'));
   assert(imported.factors.some(x=>x.name==='Humedales de altura'&&x.group==='Medio biótico'&&x.weight===1.5));
   assert.equal(Object.values(imported.cells).filter(c=>c.sign!==0).length,1);

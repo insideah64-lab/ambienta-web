@@ -9,7 +9,7 @@ try{
   const ctx=await browser.newContext({viewport:{width,height:900},acceptDownloads:true,reducedMotion:'reduce'});
   const page=await ctx.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(String(e)));
-  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
+  await page.goto((process.env.QA_BASE_URL||'http://127.0.0.1:8787/v3/')+'index.html#/matrices');
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
   await page.locator('[data-conesa-phase-tab="f3a"]').click();
   await page.locator('[data-conesa-book]').waitFor();
@@ -74,6 +74,14 @@ try{
   assert(v.includes('-0.3000')||v.includes('−0.3000'),v);
   assert.equal(await f3.locator('[data-f3-visual-empty]').count(),0);
   assert.equal(await f3.locator('[data-f3-chart-row]').count(),1);
+  assert.equal(await f3.locator('.amb-f3-quality-count').innerText(),'1 de 7 factores calculables');
+  // Losing the last mandatory source must invalidate editor, graph and counter together.
+  await editor.getByRole('textbox',{name:'F3 withProject fuente'}).fill('');
+  assert.equal(await editor.locator('[data-f3-results]').count(),0);
+  assert.equal(await f3.locator('[data-f3-chart-row]').count(),0);
+  assert.equal(await f3.locator('.amb-f3-quality-count').innerText(),'0 de 7 factores calculables');
+  await editor.getByRole('textbox',{name:'F3 withProject fuente'}).fill('Informe predictivo de ensayo con proyecto');
+  assert.equal(await f3.locator('.amb-f3-quality-count').innerText(),'1 de 7 factores calculables');
   assert.match(await f3.locator('[data-f3-chart-row]').first().innerText(),/SIN medido · CON estimado/);
 
   await f3.locator('.amb-f3-quality-disclosure summary').click();
@@ -94,9 +102,14 @@ try{
   const f1Data=f1?await page.evaluate(k=>localStorage.getItem(k),f1):null;
   const [dl]=await Promise.all([page.waitForEvent('download'),f3.getByRole('button',{name:'JSON F3a'}).click()]);
   const data=JSON.parse(await fs.readFile(await dl.path(),'utf8'));
+  await dl.saveAs(out+'/f3a-'+width+'.json');
+  const [csv]=await Promise.all([page.waitForEvent('download'),f3.getByRole('button',{name:'CSV F3a'}).click()]);
+  await csv.saveAs(out+'/f3a-'+width+'.csv');
+  assert.match(await fs.readFile(await csv.path(),'utf8'),/0\.8/);
   assert.equal(data.methodId,'conesa-libro-1997-f3a');
   const first=Object.values(data.records)[0];
   assert.equal(first.without.value,20);assert.equal(first.withProject.value,50);
+  assert.equal(data.projectId,'DEMO-001');
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
   await page.locator('[data-conesa-phase-tab="f3a"]').click();
@@ -104,6 +117,7 @@ try{
   await f3.locator('[data-f3-factor]').first().click();
   assert(await f3.locator('[data-f3-results]').count()===1,'F3 persists through reload');
   assert.equal(await f3.locator('[data-f3-chart-row]').count(),1,'Chart derives from persisted F3 data');
+  assert.equal(await f3.locator('.amb-f3-quality-count').innerText(),'1 de 7 factores calculables');
   if(f1)assert.equal(await page.evaluate(k=>localStorage.getItem(k),f1),f1Data);
   await page.evaluate(k=>localStorage.setItem(k,'{corrupt-F3a-json'),key);
   await page.reload();
