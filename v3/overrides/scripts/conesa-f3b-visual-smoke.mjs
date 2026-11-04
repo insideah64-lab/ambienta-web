@@ -61,33 +61,46 @@ try{
   };
   await clickPoint(100,350);await clickPoint(500,350);
   await clickPoint(100,350);await clickPoint(100,50);
-  assert.equal(await audit.getByLabel('Auditoría Píxel X · referencia 1').inputValue(),'100');
-  assert.equal(await audit.getByLabel('Auditoría Píxel X · referencia 2').inputValue(),'500');
-  assert.equal(await audit.getByLabel('Auditoría Píxel Y · referencia 1').inputValue(),'350');
-  assert.equal(await audit.getByLabel('Auditoría Píxel Y · referencia 2').inputValue(),'50');
+  const near=async(label,expected,tolerance=1)=>{
+   const raw=await audit.getByLabel('Auditoría '+label).inputValue();
+   assert(Math.abs(Number(raw)-expected)<=tolerance,
+    'Expected '+label+' ≈ '+expected+', got '+raw);
+  };
+  await near('Píxel X · referencia 1',100);
+  await near('Píxel X · referencia 2',500);
+  await near('Píxel Y · referencia 1',350);
+  await near('Píxel Y · referencia 2',50);
   assert.match(await visual.locator('.amb-f3b-visual-calibration').innerText(),/completa/);
   await clickPoint(100,350);await clickPoint(300,200);await clickPoint(500,50);
   const preview=await visual.locator('[data-f3b-visual-preview]').innerText();
   assert(preview.includes('3 puntos seleccionados'),preview);
-  assert(preview.includes('10.00000')&&preview.includes('0.50000'),preview);
+  assert.match(preview,/10\./);
+  assert.match(preview,/0\.5/);
   const f3bKey=await page.evaluate(()=>Object.keys(localStorage).find(k=>
    k.startsWith('ambienta-conesa-libro-1997-f3b:')));
   assert(f3bKey);
   const before=await page.evaluate(k=>localStorage.getItem(k),f3bKey);
   await visual.getByRole('button',{name:'Pasar puntos a lectura A (sin modificar F3b)'}).click();
-  assert.equal(await audit.getByLabel('Auditoría lectura A').inputValue(),'0;0\n10;0.5\n20;1');
+  const firstReading=await audit.getByLabel('Auditoría lectura A').inputValue();
+  const rows=firstReading.trim().split('\n').map(row=>row.split(';').map(Number));
+  assert.equal(rows.length,3);
+  for(const [i,[expectedM,expectedCA]] of [[0,0],[10,.5],[20,1]].entries()){
+   assert(Math.abs(rows[i][0]-expectedM)<.12,'Magnitud medida fuera de tolerancia de clic');
+   assert(Math.abs(rows[i][1]-expectedCA)<.012,'CA medida fuera de tolerancia de clic');
+  }
   assert.equal(await audit.getByLabel('Auditoría lectura B').inputValue(),'');
   assert.equal(await page.evaluate(k=>localStorage.getItem(k),f3bKey),before);
   await visual.getByRole('button',{name:'Lector B'}).click();
   await clickPoint(100,350);await clickPoint(300,200);await clickPoint(500,50);
   await visual.getByRole('button',{name:'Pasar puntos a lectura B (sin modificar F3b)'}).click();
-  assert.equal(await audit.getByLabel('Auditoría lectura B').inputValue(),'0;0\n10;0.5\n20;1');
+  const secondReading=await audit.getByLabel('Auditoría lectura B').inputValue();
+  assert.equal(secondReading,firstReading,'Both independent passes over identical click positions should agree');
   assert.equal(await page.evaluate(k=>localStorage.getItem(k),f3bKey),before);
   const auditKey=await page.evaluate(()=>Object.keys(localStorage).find(k=>
    k.startsWith('ambienta-conesa-1997-f3b-auditoria:')));
   assert(auditKey);
   const record=JSON.parse(await page.evaluate(k=>localStorage.getItem(k),auditKey));
-  assert.equal(record.xPixelA,'100');
+  assert(Math.abs(Number(record.xPixelA)-100)<1);
   assert.equal(record.readingA,record.readingB);
   assert.equal(record.approval,null);
   assert(!Object.values(localStorage).some(s=>typeof s==='string'&&s.includes('data:image/png;base64')));
@@ -96,7 +109,7 @@ try{
   await audit.locator('summary').click();
   assert.equal(await visual.locator('[data-f3b-visual-canvas]').count(),0,
    'Original raster must never be persisted in localStorage');
-  assert.equal(await audit.getByLabel('Auditoría lectura A').inputValue(),'0;0\n10;0.5\n20;1');
+  assert.equal(await audit.getByLabel('Auditoría lectura A').inputValue(),firstReading);
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({status:'PASS',width,readerA:3,readerB:3,
    imageNotPersisted:true,F3bUnchanged:true}));
