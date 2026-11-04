@@ -80,6 +80,7 @@ jobs:
           node apps/web-v3/scripts/conesa-libro-f3a-smoke.mjs
           node apps/web-v3/scripts/conesa-libro-f3b-smoke.mjs
           node apps/web-v3/scripts/conesa-f3b-auditoria-smoke.mjs
+          node apps/web-v3/scripts/conesa-f3b-visual-smoke.mjs
           node apps/web-v3/scripts/conesa-anejo4-atmosfera-smoke.mjs
           node apps/web-v3/scripts/conesa-residual-smoke.mjs
           node apps/web-v3/scripts/matrix-method-catalog-smoke.mjs
@@ -274,6 +275,14 @@ jobs:
         with:
           name: ambienta-conesa-anejo4-atmosfera
           path: qa/ambienta-conesa-anejo4-atmosfera/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Capturas F3b · digitalización manual sobre imagen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-conesa-f3b-digitalizador-visual
+          path: qa/ambienta-conesa-visual-f3b/
           retention-days: 30
           if-no-files-found: warn
       - name: Capturas F3b · auditoría y doble lectura
