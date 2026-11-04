@@ -1,0 +1,34 @@
+{
+  "version": "ambienta.battelle-training-pack.v1",
+  "cases": [
+    {
+      "projectId": "DEMO-001",
+      "ready": 6,
+      "coveredWeight": 94,
+      "without": 78.7,
+      "withProject": 58.28,
+      "delta": -20.42,
+      "major": 4,
+      "minor": 2
+    },
+    {
+      "projectId": "DIAB-2026-DEMO",
+      "ready": 7,
+      "coveredWeight": 136,
+      "without": 112.4,
+      "withProject": 85.4,
+      "delta": -27,
+      "major": 3,
+      "minor": 3
+    }
+  ],
+  "control": {
+    "ready": 78,
+    "coveredWeight": 1000,
+    "without": 500,
+    "withProject": 400,
+    "delta": -100,
+    "major": 18,
+    "minor": 60
+  }
+}
