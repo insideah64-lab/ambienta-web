@@ -13,7 +13,7 @@ try{
   page.on('pageerror',error=>errors.push(String(error)));
   const open=async()=>{
    await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
-   await page.getByRole('button',{name:'Según libro · Conesa 1997 (experimental)'}).click();
+   await page.locator('[data-conesa-book]').waitFor();
   };
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
   await open();
