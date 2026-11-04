@@ -388,3 +388,25 @@
  outline:2px solid #ffdda8;
  outline-offset:2px;
 }
+
+/* QA #82: the generic `thead th span {display:block}` rule has higher
+   specificity than the old corner-label rule, so text was stuck at the top
+   even when the span's rectangle itself was vertically centered. */
+.ref-shell .amb-matrix-grid thead th .amb-matrix-corner-label{
+ display:flex;
+ align-items:center;
+ justify-content:flex-start;
+ box-sizing:border-box;
+ min-height:56px;
+ width:100%;
+ margin:0;
+}
+.ref-shell .amb-matrix-grid thead th .amb-matrix-column-head > span{
+ display:-webkit-box;
+ -webkit-box-orient:vertical;
+ -webkit-line-clamp:2;
+ line-clamp:2;
+}
+.ref-shell .amb-matrix-grid thead th .amb-matrix-column-meta small{
+ margin:0;
+}
