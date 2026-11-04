@@ -249,8 +249,8 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
      exclusivamente el método seleccionado para este factor.</p>
    </div>
    {curveActive&&curveRecord?
-    <ConesaF3CurveEditor base={active} curve={curveRecord}
-     blocked={blocked||curveBlocked} onChange={updateCurve}/>:
+    <ConesaF3CurveEditor base={active} curve={curveRecord} projectId={projectId}
+     factorId={factor.id} blocked={blocked||curveBlocked} onChange={updateCurve}/>:
    <fieldset className="amb-f3-transform">
     <legend>Función CA=f(M) · lineal documentada</legend>
     <div className="amb-f3-grid">
