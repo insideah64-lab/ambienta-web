@@ -15,7 +15,7 @@ try{
   assert.equal(await page.locator('[data-catalog-method]').count(),4);
   assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
   assert.equal((await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] .amb-method-cardcopy strong').innerText()).trim(),'Conesa');
-  assert.equal(await page.locator('[data-catalog-method="battelle"] button').count(),0);
+  assert.equal(await page.locator('[data-catalog-method="battelle"] button').count(),1);
   const ids=['causa-leopold','conesa-simplificado-tutorial-v1','riam-1998','battelle'];
   const accents=[];
   for(const id of ids){
