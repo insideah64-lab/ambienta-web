@@ -12,7 +12,8 @@ import {
 import {ConesaF3CurveEditor} from './ConesaF3CurveEditor';
 import {ConesaF3Comparison} from './ConesaF3Comparison';
 import './ConesaF3Panel.css';
-type Props={projectId:string;projectName:string;factors:F2Factor[]};
+type Props={projectId:string;projectName:string;factors:F2Factor[];
+ focus?:'f3a'|'f3b';onStageChange?:(next:'f3a'|'f3b')=>void};
 function readDraft(projectId:string,projectName:string):{doc:F3Doc;damaged:string|null}{
  try{
   const raw=localStorage.getItem(F3_STORAGE+projectId);
@@ -50,7 +51,7 @@ function readCurveDraft(projectId:string,projectName:string):{doc:F3BDoc;damaged
  }catch{/* Draft remains memory-only when storage unavailable */}
  return {doc:blankF3BDoc(projectId,projectName),damaged:null};
 }
-export function ConesaF3Panel({projectId,projectName,factors}:Props){
+export function ConesaF3Panel({projectId,projectName,factors,focus='f3a',onStageChange}:Props){
  const [loaded]=useState(()=>readDraft(projectId,projectName));
  const [curveLoaded]=useState(()=>readCurveDraft(projectId,projectName));
  const [doc,setDoc]=useState<F3Doc>(loaded.doc);
@@ -133,11 +134,11 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
   }
   return '\uFEFF'+lines.map(row=>row.map(csv).join(';')).join('\r\n');
  };
- return <section className="amb-f3" data-conesa-f3={F3_METHOD}>
+ return <section className="amb-f3" data-conesa-f3={F3_METHOD} data-conesa-f3-focus={focus}>
   <header className="amb-f3-head">
    <div>
-    <p className="amb-matrix-overline"><BookOpen size={15}/> FASES F3a / F3b · VALORACIÓN CUANTITATIVA EXPERIMENTAL</p>
-    <h3>Indicadores, escenarios y calidad ambiental</h3>
+    <p className="amb-matrix-overline"><BookOpen size={15}/> {focus==='f3a'?'ETAPA F3a · INDICADORES Y ESCENARIOS':'ETAPA F3b · CURVAS DOCUMENTADAS'}</p>
+    <h3>{focus==='f3a'?'Indicadores y calidad ambiental':'Curvas de transformación'}</h3>
     <p>Conesa 1997, pp. 107–117 y Anejo 4. Se comparan magnitudes y calidades por factor, SIN/CON proyecto.
      No se infieren mediciones, funciones ni eficacia de medidas. F3 no calcula todavía Vj, IA total
      ni demuestra equivalencia entre la importancia cualitativa y la calidad ambiental.</p>
@@ -194,6 +195,13 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
   </div>
   {factor&&<section className="amb-f3-editor" data-f3-editor={factor.id}>
    <h4>{factor.name} · valoración por indicador</h4>
+   {focus==='f3b'&&<div className="amb-f3-stage-hint" role="note">
+    <strong>Datos de referencia desde Calidad ambiental (F3a)</strong>
+    <p>Indicador: {active.indicator||'pendiente'} · Unidad: {active.unit||'pendiente'}.
+     Los escenarios SIN/CON se editan en F3a y se reutilizan aquí sin copiarlos.</p>
+    {onStageChange&&<button type="button" onClick={()=>onStageChange('f3a')}>Editar indicador y escenarios en F3a</button>}
+   </div>}
+   {focus==='f3a'&&<>
    <div className="amb-f3-grid">
     <label>Indicador de impacto
      <input aria-label="F3 indicador" maxLength={350} disabled={blocked} value={active.indicator}
@@ -237,7 +245,8 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
      </fieldset>;
     })}
    </div>
-   <div className="amb-f3-type">
+   </>}
+   {focus==='f3b'&&<div className="amb-f3-type">
     <label>Tipo de transformación de calidad ambiental
      <select aria-label="F3 tipo de función" value={curveActive?'curva':'lineal'}
       disabled={curveBlocked||blocked} onChange={e=>chooseCurve(e.target.value as 'lineal'|'curva')}>
@@ -247,10 +256,12 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
     </label>
     <p>Cambiar de función no borra ni transforma la anterior. La evaluación utiliza
      exclusivamente el método seleccionado para este factor.</p>
-   </div>
-   {curveActive&&curveRecord?
+   </div>}
+   {focus==='f3b' ? (curveActive&&curveRecord?
     <ConesaF3CurveEditor base={active} curve={curveRecord} projectId={projectId}
      factorId={factor.id} blocked={blocked||curveBlocked} onChange={updateCurve}/>:
+    <p className="amb-f3-stage-hint">Para trabajar con curvas, elegí «F3b · curva por nudos documentados».
+     La función lineal se configura en la solapa Calidad ambiental.</p>) :
    <fieldset className="amb-f3-transform">
     <legend>Función CA=f(M) · lineal documentada</legend>
     <div className="amb-f3-grid">
@@ -287,7 +298,7 @@ export function ConesaF3Panel({projectId,projectName,factors}:Props){
     <strong>Sin resultado cuantitativo validable para este factor</strong>
     <p>{problems.join(' · ')}</p>
    </div>}
-   {!blocked&&current&&<button type="button" className="amb-f3-delete" onClick={()=>{
+   {focus==='f3a'&&!blocked&&current&&<button type="button" className="amb-f3-delete" onClick={()=>{
     modified.current=true;setDoc(before=>{
      const records={...before.records};delete records[factor.id];
      return {...before,records,updatedAt:new Date().toISOString()};

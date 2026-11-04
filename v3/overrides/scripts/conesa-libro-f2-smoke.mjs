@@ -15,7 +15,9 @@ try{
   assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
   await page.locator('[data-conesa-book]').waitFor();
   const book=page.locator('[data-conesa-book]'),f2=page.locator('[data-conesa-f2]');
-  await f2.waitFor();
+  await f2.waitFor({state:'attached'});
+  assert.equal(await f2.isVisible(),false,'F2 is mounted but hidden until selected');
+
   assert.equal(await f2.locator('[data-f2-interaction]').count(),0);
   assert.equal((await f2.locator('[data-f2-uip-total]').count()),0,
    'Weight proposal is hidden until explicit expansion');
@@ -29,6 +31,8 @@ try{
    await book.getByRole('combobox',{name:'Conesa libro '+key,exact:true}).selectOption(String(n));
   assert.equal((await book.locator('[data-book-absolute]').innerText()).trim(),'28');
   assert.equal(await f2.locator('[data-f2-interaction]').count(),1);
+  await page.locator('[data-conesa-phase-tab="f2"]').click();
+  assert.equal(await page.locator('[data-conesa-phase-tab="f2"]').getAttribute('aria-selected'),'true');
   const button=f2.locator('[data-f2-interaction]').first();
   await button.click();
   const editor=f2.locator('[data-f2-editor]');
@@ -80,6 +84,7 @@ try{
    'F2 never writes F1 scores');
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
+  await page.locator('[data-conesa-phase-tab="f2"]').click();
   await page.locator('[data-conesa-book]').waitFor();
   assert.equal(await f2.locator('[data-f2-interaction]').count(),1);
   assert.equal((await f2.locator('.amb-f2-summary span').nth(3).locator('strong').innerText()).trim(),'1');
@@ -88,6 +93,7 @@ try{
   await page.evaluate(key=>localStorage.setItem(key,'{invalid-F2-json'),f2key);
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
+  await page.locator('[data-conesa-phase-tab="f2"]').click();
   await page.locator('[data-conesa-book]').waitFor();
   assert.equal(await f2.locator('[role="alert"]').count(),1);
   const [raw]=await Promise.all([page.waitForEvent('download'),

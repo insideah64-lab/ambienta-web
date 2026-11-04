@@ -34,6 +34,30 @@ try{
   await main.waitFor();
   assert.equal((await main.locator('h3').first().innerText()).trim(),'Conesa');
   assert.equal(await page.locator('[data-conesa-variant-switch]').count(),0);
+  const tabs=page.getByRole('tablist',{name:'Etapas de evaluación Conesa'});
+  assert.equal(await tabs.getByRole('tab').count(),4,'One tab for each Conesa workspace');
+  assert.equal(await page.locator('[data-conesa-phase-panel="f1"]').isVisible(),true);
+  assert.equal(await page.locator('[data-conesa-phase-panel="f2"]').isVisible(),false);
+  assert.equal(await page.locator('[data-conesa-phase-panel="f3"]').isVisible(),false);
+  const originalKeys=await page.evaluate(()=>Object.keys(localStorage).sort());
+  await page.locator('[data-conesa-phase-tab="f1"]').focus();
+  await page.keyboard.press('End');
+  assert.equal(await page.locator('[data-conesa-phase-tab="f3b"]').getAttribute('aria-selected'),'true',
+   'End key opens final curves stage');
+  assert.equal(await page.locator('[data-conesa-f3]').getAttribute('data-conesa-f3-focus'),'f3b');
+  await page.keyboard.press('Home');
+  assert.equal(await page.locator('[data-conesa-phase-tab="f1"]').getAttribute('aria-selected'),'true',
+   'Home key returns to first phase');
+  await page.keyboard.press('ArrowRight');
+  assert.equal(await page.locator('[data-conesa-phase-tab="f2"]').getAttribute('aria-selected'),'true');
+  await page.locator('[data-conesa-phase-tab="f3a"]').click();
+  assert.equal(await page.locator('[data-conesa-f3]').getAttribute('data-conesa-f3-focus'),'f3a');
+  await page.locator('[data-conesa-phase-tab="f3b"]').click();
+  assert.equal(await page.locator('[data-conesa-f3]').getAttribute('data-conesa-f3-focus'),'f3b');
+  await page.locator('[data-conesa-phase-tab="f1"]').click();
+  assert.deepEqual(await page.evaluate(()=>Object.keys(localStorage).sort()),originalKeys,
+   'Navigation through empty stages must not seed or rewrite Conesa drafts');
+
   assert.equal(await page.locator('[data-conesa-simplificado]').count(),0);
   assert.equal(await page.locator('[data-conesa-simplified-archive]').count(),0);
   assert.equal(await page.locator('[data-conesa-legacy-archive]').count(),0);

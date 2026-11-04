@@ -1,4 +1,4 @@
-import {useEffect,useMemo,useRef,useState} from 'react';
+import {useEffect,useId,useMemo,useRef,useState} from 'react';
 import {ArrowDownToLine,RefreshCcw,X,BookOpen} from 'lucide-react';
 import {readMatrixAxes} from './ImpactMatrixBuilder';
 import {
@@ -12,6 +12,13 @@ import {ConesaF3Panel} from './ConesaF3Panel';
 import './ConesaLibroPanel.css';
 
 type Props={projectId:string;projectName:string};
+type Stage='f1'|'f2'|'f3a'|'f3b';
+const STAGES=[
+ {id:'f1',title:'Valorar impactos',detail:'Naturaleza, importancia y evidencias'},
+ {id:'f2',title:'Depurar y ponderar',detail:'Criba, alertas y pesos UIP'},
+ {id:'f3a',title:'Calidad ambiental',detail:'Indicadores y escenarios SIN/CON'},
+ {id:'f3b',title:'Curvas',detail:'Transformaciones y trazabilidad'}
+] as const;
 type Draft={
  schema:typeof BOOK_SCHEMA;methodId:typeof BOOK_METHOD_ID;
  projectId:string;projectName:string;updatedAt:string;
@@ -62,6 +69,8 @@ export function ConesaLibroPanel({projectId,projectName}:Props){
  const [selected,setSelected]=useState<string|null>(null);
  const [refresh,setRefresh]=useState(0);
  const [notice,setNotice]=useState('');
+ const [stage,setStage]=useState<Stage>('f1');
+ const stagePrefix=useId();
  const axes=useMemo(()=>readMatrixAxes(projectId,projectName),[projectId,projectName,refresh]);
  useEffect(()=>{
   if(!modified.current||loaded.damaged!==null)return;
@@ -127,10 +136,39 @@ export function ConesaLibroPanel({projectId,projectName}:Props){
  const selectedResult=calculateBookConesa(selectedItem?.entry);
  const selectedProblems=bookProblems(selectedItem?.entry);
  return <section className="amb-matrix amb-conesa-rev amb-conesa-book" data-conesa-book={BOOK_METHOD_ID}>
+  <header className="amb-conesa-workbench-intro">
+   <p className="amb-matrix-overline">HERRAMIENTAS · EVALUACIÓN DE IMPACTOS</p>
+   <h3>Conesa</h3>
+   <p>Una metodología, cuatro espacios de trabajo. Elegí una solapa para avanzar sin perder
+    las valoraciones ni mezclar sus borradores. Las etapas no representan versiones distintas del método.</p>
+  </header>
+  <div className="amb-conesa-stage-tabs" role="tablist" aria-label="Etapas de evaluación Conesa">
+   {STAGES.map((step,i)=><button key={step.id} type="button" role="tab"
+    id={stagePrefix+'-tab-'+step.id}
+    data-conesa-phase-tab={step.id}
+    aria-selected={stage===step.id}
+    aria-controls={stagePrefix+'-panel-'+(step.id==='f3a'||step.id==='f3b'?'f3':step.id)}
+    tabIndex={stage===step.id?0:-1}
+    onClick={()=>setStage(step.id)}
+    onKeyDown={e=>{
+     const key=e.key;
+     if(!['ArrowRight','ArrowLeft','Home','End'].includes(key))return;
+     e.preventDefault();
+     const n=key==='Home'?0:key==='End'?STAGES.length-1:
+      (i+(key==='ArrowRight'?1:-1)+STAGES.length)%STAGES.length;
+     setStage(STAGES[n].id);
+     e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[n]?.focus();
+    }}>
+    <span className="amb-conesa-stage-number">{String(i+1).padStart(2,'0')}</span>
+    <span><strong>{step.title}</strong><small>{step.detail}</small></span>
+   </button>)}
+  </div>
+  <div role="tabpanel" className="amb-conesa-phase-panel" data-conesa-phase-panel="f1"
+   id={stagePrefix+'-panel-f1'} aria-labelledby={stagePrefix+'-tab-f1'} hidden={stage!=='f1'}>
   <div className="amb-conesa-top">
    <div>
     <p className="amb-matrix-overline"><BookOpen size={15} aria-hidden="true"/> EDICIÓN BIBLIOGRÁFICA · CUALITATIVA F1</p>
-    <h3>Conesa</h3>
+    <h3>Valoración cualitativa</h3>
     <p>Valoración cualitativa versionada; no contiene aún matriz depurada, pesos UIP ni valoración cuantitativa del libro. Los valores son declaraciones del evaluador y requieren fundamento técnico.</p>
     <code>I = ± [3IN + 2(EX+EXcr) + (MO+MOcr) + PE + RV + SI + AC + EF + PR + MC]</code>
    </div>
@@ -261,13 +299,22 @@ export function ConesaLibroPanel({projectId,projectName}:Props){
     </tbody></table>
    </div>
   </div>
-  <ConesaF2Panel projectId={projectId} projectName={projectName}
-   factors={axes.factors} actions={axes.actions} entries={doc.entries}/>
-  <ConesaF3Panel projectId={projectId} projectName={projectName} factors={axes.factors}/>
   <footer className="amb-matrix-footer">
    <span>Conesa · F1 · fuente 1997/reimp. 2000 · {projectId}</span>
    <span>{BOOK_BOUNDARY_POLICY}</span>
   </footer>
   {notice&&<p role="status" className="amb-matrix-notice">{notice}</p>}
+  </div>
+  <div role="tabpanel" className="amb-conesa-phase-panel" data-conesa-phase-panel="f2"
+   id={stagePrefix+'-panel-f2'} aria-labelledby={stagePrefix+'-tab-f2'} hidden={stage!=='f2'}>
+   <ConesaF2Panel projectId={projectId} projectName={projectName}
+    factors={axes.factors} actions={axes.actions} entries={doc.entries}/>
+  </div>
+  <div role="tabpanel" className="amb-conesa-phase-panel" data-conesa-phase-panel="f3"
+   id={stagePrefix+'-panel-f3'} aria-labelledby={stagePrefix+'-tab-'+(stage==='f3b'?'f3b':'f3a')}
+   hidden={stage!=='f3a'&&stage!=='f3b'}>
+   <ConesaF3Panel projectId={projectId} projectName={projectName} factors={axes.factors}
+    focus={stage==='f3b'?'f3b':'f3a'} onStageChange={setStage}/>
+  </div>
  </section>;
 }
