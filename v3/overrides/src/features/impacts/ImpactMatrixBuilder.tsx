@@ -3,6 +3,7 @@ import {Link} from 'react-router-dom';
 import {ArrowDownToLine,ChevronDown,Plus,RotateCcw,UploadCloud,X} from 'lucide-react';
 import './ImpactMatrixBuilder.css';
 import {LeopoldSummaryPanel} from './LeopoldSummaryPanel';
+import {LeopoldReviewPanel} from './LeopoldReviewPanel';
 
 type Sign = -1|0|1;
 type Phase = 'preparacion'|'construccion'|'operacion'|'cierre';
@@ -247,7 +248,14 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
     </tr>)}</tbody>
    </table>
   </div>
-  {mode==='leopold'&&<LeopoldSummaryPanel projectId={projectId} actions={doc.actions} factors={doc.factors} visibleFactors={filteredFactors} cells={doc.cells}/>}
+  {mode==='leopold'&&<>
+    <LeopoldSummaryPanel projectId={projectId} actions={doc.actions} factors={doc.factors} visibleFactors={filteredFactors} cells={doc.cells}/>
+    <LeopoldReviewPanel actions={doc.actions} factors={doc.factors} cells={doc.cells}
+     onReviewCell={key=>{
+      setSelected(key);
+      document.querySelector('[data-matrix-inspector]')?.scrollIntoView({behavior:'smooth',block:'center'});
+     }}/>
+   </>}
   <div className="amb-matrix-bottom">
    <div className="amb-matrix-side">
     <h4>Construir la matriz</h4>
