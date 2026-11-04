@@ -74,8 +74,11 @@ try{
   await clickPoint(100,350);await clickPoint(300,200);await clickPoint(500,50);
   const preview=await visual.locator('[data-f3b-visual-preview]').innerText();
   assert(preview.includes('3 puntos seleccionados'),preview);
-  assert.match(preview,/10\./);
-  assert.match(preview,/0\.5/);
+  const previewRows=await visual.locator('[data-f3b-visual-preview] tbody tr').allInnerTexts();
+  assert.equal(previewRows.length,3);
+  const [middleM,middleCA]=previewRows[1].split('\t').slice(1,3).map(Number);
+  assert(Math.abs(middleM-10)<.12,'Origen M alterado por presentación SVG');
+  assert(Math.abs(middleCA-.5)<.012,'Origen CA alterado por presentación SVG');
   const f3bKey=await page.evaluate(()=>Object.keys(localStorage).find(k=>
    k.startsWith('ambienta-conesa-libro-1997-f3b:')));
   assert(f3bKey);
