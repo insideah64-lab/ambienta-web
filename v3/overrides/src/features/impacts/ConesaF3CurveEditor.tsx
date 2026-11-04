@@ -4,14 +4,15 @@ import {
  type F3BCurve,type F3BCurvePoint
 } from './ConesaF3CurveModel';
 import {ConesaAnnex4Library} from './ConesaAnnex4Library';
+import {ConesaF3DigitizationAudit} from './ConesaF3DigitizationAudit';
 import {annex4Citation} from './ConesaAnnex4Catalog';
 import './ConesaF3CurveEditor.css';
 type Props={
- base:F3FactorRecord;curve:F3BCurve;
+ base:F3FactorRecord;curve:F3BCurve;projectId:string;factorId:string;
  blocked:boolean;onChange:(next:F3BCurve)=>void
 };
 const numberOrNull=(text:string)=>text.trim()===''?null:Number(text);
-export function ConesaF3CurveEditor({base,curve,blocked,onChange}:Props){
+export function ConesaF3CurveEditor({base,curve,projectId,factorId,blocked,onChange}:Props){
  const issues=f3bProblems(base,curve);
  const complete=f3bPointProblems(curve.points).length===0;
  const first=curve.points[0],last=curve.points[curve.points.length-1];
@@ -138,6 +139,9 @@ export function ConesaF3CurveEditor({base,curve,blocked,onChange}:Props){
    </svg>
    <p>Marcas: círculo vacío = SIN, círculo lleno = CON (cuando sus magnitudes están dentro del dominio).</p>
   </div>}
+  {curve.origin==='anejo4'&&
+   <ConesaF3DigitizationAudit key={factorId} projectId={projectId}
+    factorId={factorId} curve={curve} blocked={blocked}/>}
   {issues.length>0?<div className="amb-f3b-issues" data-f3b-issues role="status">
    <strong>La curva no se aplica a los resultados mientras falten datos o validaciones</strong>
    <p>{issues.join(' · ')}</p>
