@@ -1,0 +1,63 @@
+{
+  "project": "AMBIENTA — Plataforma Ambiental Argentina",
+  "handoff_date": "2026-11-04",
+  "repo": "insideah64-lab/ambienta-web",
+  "handoff_branch": "handoff/codex-matrices-qa-2026-11-04",
+  "base_ref": "main",
+  "verified_base_sha": "98a4f3b7cfd196f287eba2a161516bdac1e663c3",
+  "pr82": {
+    "number": 82,
+    "merged": true,
+    "merge_commit_sha": "98a4f3b7cfd196f287eba2a161516bdac1e663c3"
+  },
+  "pages": {
+    "url": "https://insideah64-lab.github.io/ambienta-web/v3/#/matrices",
+    "run_id": 41869294822,
+    "conclusion": "success"
+  },
+  "tinyfish": [
+    {
+      "run_id": "55cd5c09-55f7-410d-b24c-a62309a5c4ba",
+      "type": "leopold-and-conesa-f1",
+      "url": "https://agent.tinyfish.ai/runs/55cd5c09-55f7-410d-b24c-a62309a5c4ba"
+    },
+    {
+      "run_id": "ea5eb73e-1aaf-452a-861f-775c3457b360",
+      "type": "conesa-f1-f2-f3a-f3b",
+      "url": "https://agent.tinyfish.ai/runs/ea5eb73e-1aaf-452a-861f-775c3457b360"
+    },
+    {
+      "run_id": "efe91e9f-546e-4f0b-8eb8-b2836db43a82",
+      "type": "post-pr82-published-qa",
+      "url": "https://agent.tinyfish.ai/runs/efe91e9f-546e-4f0b-8eb8-b2836db43a82",
+      "status": "completed",
+      "steps": 102,
+      "blocked": true
+    }
+  ],
+  "priorities": [
+    "P0: published Leopold header conflict (CI pass versus TinyFish fail)",
+    "P0: blue fish/loading lock-up investigation",
+    "P1: F3a scenario comparison 1/7 vs 0/7",
+    "P1: F3b valid documented curve and explicit validation errors",
+    "P1: export files + persistence after real reload (including F2 UIP)",
+    "P2: UI refinement and regression evidence"
+  ],
+  "documents": [
+    "00_LEER_PRIMERO.md",
+    "01_PROMPT_CODEX.md",
+    "02_EVIDENCIAS_Y_CRITERIOS.md",
+    "MANIFIESTO.json"
+  ],
+  "safety": {
+    "do_not_break": [
+      "V1/V2 builds",
+      "ambienta.impact-matrix.v1",
+      "ambienta-conesa-libro-1997-*",
+      "existing stored drafts"
+    ],
+    "no_unverified_pass": true,
+    "no_tinyfish_spend_without_approval": true
+  },
+  "record_purpose": "Codex continuation only; does not claim product defects are resolved"
+}
