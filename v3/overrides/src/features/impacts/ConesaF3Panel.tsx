@@ -256,7 +256,7 @@ export function ConesaF3Panel({projectId,projectName,factors,focus='f3a',onStage
     </label>
     <p>Cambiar de función no borra ni transforma la anterior. La evaluación utiliza
      exclusivamente el método seleccionado para este factor.</p>
-   </div>
+   </div>}
    {focus==='f3b' ? (curveActive&&curveRecord?
     <ConesaF3CurveEditor base={active} curve={curveRecord} projectId={projectId}
      factorId={factor.id} blocked={blocked||curveBlocked} onChange={updateCurve}/>:
