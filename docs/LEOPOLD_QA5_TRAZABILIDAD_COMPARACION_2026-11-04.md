@@ -1,6 +1,6 @@
 # AMBIENTA — Leopold QA5: registro de revisiones y comparación de alternativas
 
-Fecha: 2026-11-04. Dependencia directa: QA4, PR #73. La rama QA5 nació del head verificado `d1c9c1d445f99fbf30ae6fd5d28e7eeffffb555c` y no altera el esquema del expediente.
+Fecha: 2026-11-04. QA4, PR #73, fue fusionado y publicado (commit `dedf4510d65f73e85763349e78d0fdee983d2716`, Pages SUCCESS). QA5 se rebasó sobre ese `main` ya aprobado; la rama contiene solo sus cambios y no altera el esquema del expediente.
 
 ## Fundamento
 
@@ -31,7 +31,7 @@ Conesa Fernández-Vítora, *Guía metodológica para la evaluación del impacto 
 3. `leopold-workbook-parity-smoke.mjs` amplía el E2E Chromium 1366/1800: selecciona celda, crea revisión, comprueba independencia de `localStorage`, modifica M y detecta revisión obsoleta; carga alternativa B, verifica factor común y ausencia de mutación; recarga y comprueba persistencia solo del registro.
 4. Continuidad de todos los checks V3 y preservaciones V1/V2, además del ejercicio original de 50 interacciones.
 
-**HOLD:** no publicar ni fusionar QA5 hasta CI completo PASS. Si el PR #73 QA4 aún no está fusionado, QA5 debe permanecer apilado contra esa rama, sin integrarse directamente en `main` por sorpresa.
+**HOLD:** no publicar ni fusionar QA5 hasta CI completo PASS. PR #73 QA4 ya fusionado; QA5 se evalúa como PR #74 contra `main`, con CI propio obligatorio.
 
 ## Próximas mejoras no incluidas
 
