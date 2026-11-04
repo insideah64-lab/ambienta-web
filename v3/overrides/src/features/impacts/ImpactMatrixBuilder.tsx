@@ -1,6 +1,6 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {Link} from 'react-router-dom';
-import {ArrowDownToLine,ChevronDown,Plus,RotateCcw,UploadCloud,X} from 'lucide-react';
+import {ArrowDownToLine,Check,ChevronDown,Pencil,Plus,RotateCcw,UploadCloud,X} from 'lucide-react';
 import './ImpactMatrixBuilder.css';
 import {LeopoldSummaryPanel} from './LeopoldSummaryPanel';
 import {LeopoldReviewPanel} from './LeopoldReviewPanel';
@@ -10,6 +10,8 @@ type Phase = 'preparacion'|'construccion'|'operacion'|'cierre';
 type Mode = 'identificacion'|'leopold'|'ponderada';
 type Action = {id:string;name:string;phase:Phase};
 type Factor = {id:string;name:string;group:string;weight:number};
+type AxisDraft = {kind:'action';id:string;name:string;phase:Phase}|
+ {kind:'factor';id:string;name:string;group:string;weight:number};
 type Cell = {sign:Sign;magnitude:number|null;importance:number|null;reason:string;evidence:string};
 type Matrix = {schema:'ambienta.impact-matrix.v1';projectId:string;projectName:string;updatedAt:string;actions:Action[];factors:Factor[];cells:Record<string,Cell>};
 type ExistingImpact={id:string;factor:string;name:string};
@@ -107,10 +109,11 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
  const [selected,setSelected]=useState<string|null>(null);
  const [actionName,setActionName]=useState('');
  const [factorName,setFactorName]=useState('');
+ const [axisDraft,setAxisDraft]=useState<AxisDraft|null>(null);
  const [notice,setNotice]=useState('');
  const [onlyEvaluated,setOnlyEvaluated]=useState(false);
  const [diagonal,setDiagonal]=useState(false);
- useEffect(()=>{modified.current=false;setDoc(readMatrix(projectId,projectName));setSelected(null);},[projectId,projectName]);
+ useEffect(()=>{modified.current=false;setDoc(readMatrix(projectId,projectName));setSelected(null);setAxisDraft(null);},[projectId,projectName]);
  useEffect(()=>{
   // Opening the read-only Impactos page must never create a draft or mutate local DEMO storage.
   if(!modified.current)return;
@@ -147,7 +150,7 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
  };
  const addFactor=()=>{if(!factorName.trim())return;const label=factorName.trim().slice(0,250);
   if(doc.factors.length>=150)return setNotice('Límite de 150 factores por matriz.');
-  update(cur=>({...cur,factors:[...cur.factors,{id:uid('f'),name:label,group:'Sin clasificar',weight:1}]}));setFactorName('');
+  update(cur=>({...cur,factors:[...cur.factors,{id:uid('f'),name:label,group:'Sin clasificar',weight:1}]}));setFactorName('');setOnlyEvaluated(false);
  };
  const importFactors=()=>{
   const known=new Set(doc.factors.map(f=>f.name.trim().toLocaleLowerCase('es')));
@@ -159,7 +162,7 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
   }
   if(!add.length)return setNotice('Los factores del expediente ya están presentes o no hay factores vinculados.');
   if(doc.factors.length+add.length>150)return setNotice('Demasiados factores para importar.');
-  update(cur=>({...cur,factors:[...cur.factors,...add]}));
+  update(cur=>({...cur,factors:[...cur.factors,...add]}));setOnlyEvaluated(false);
   setNotice('Se incorporaron '+add.length+' factores nominales del expediente, sin asignar impactos ni puntuaciones.');
  };
  const onImport=async(file:File|undefined)=>{
@@ -171,14 +174,33 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
    modified.current=true;setDoc(payload);setSelected(null);setNotice('Matriz JSON importada y verificada.');
   }catch{setNotice('No fue posible leer el archivo JSON.');}
  };
- const deleteAction=(id:string)=>{if(!window.confirm('¿Eliminar esta acción y sus interacciones?'))return;update(cur=>({
+ const deleteAction=(id:string)=>{if(!window.confirm('¿Eliminar esta acción y sus interacciones?'))return;setAxisDraft(null);update(cur=>({
   ...cur,actions:cur.actions.filter(a=>a.id!==id),
   cells:Object.fromEntries(Object.entries(cur.cells).filter(([key])=>!key.endsWith('::'+id)))
  }));setSelected(null);};
- const deleteFactor=(id:string)=>{if(!window.confirm('¿Eliminar este factor y sus interacciones?'))return;update(cur=>({
+ const deleteFactor=(id:string)=>{if(!window.confirm('¿Eliminar este factor y sus interacciones?'))return;setAxisDraft(null);update(cur=>({
   ...cur,factors:cur.factors.filter(f=>f.id!==id),
   cells:Object.fromEntries(Object.entries(cur.cells).filter(([key])=>!key.startsWith(id+'::')))
  }));setSelected(null);};
+ const saveAxis=()=>{
+  if(!axisDraft)return;
+  const name=axisDraft.name.trim();
+  if(!name){setNotice('Escribí un nombre antes de guardar la fila o columna.');return;}
+  if(axisDraft.kind==='action'){
+   update(cur=>({...cur,actions:cur.actions.map(a=>a.id===axisDraft.id?{
+    ...a,name:name.slice(0,250),phase:axisDraft.phase}:a)}));
+  }else{
+   const group=axisDraft.group.trim();
+   if(!group){setNotice('Indicá el grupo ambiental del factor.');return;}
+   if(!Number.isFinite(axisDraft.weight)||axisDraft.weight<0.1||axisDraft.weight>5){
+    setNotice('El peso exploratorio debe estar entre 0,1 y 5.');return;
+   }
+   update(cur=>({...cur,factors:cur.factors.map(f=>f.id===axisDraft.id?{
+    ...f,name:name.slice(0,250),group:group.slice(0,140),weight:axisDraft.weight}:f)}));
+  }
+  setNotice('Cambios del catálogo guardados. Se conservan las interacciones y valoraciones vinculadas.');
+  setAxisDraft(null);
+ };
  return <section className="amb-matrix" data-impact-matrix="v1" aria-label="Constructor de matrices ambientales">
   <header className="amb-matrix-top">
    <div><p className="amb-matrix-overline">LABORATORIO DE EVALUACIÓN · BORRADOR LOCAL</p>
