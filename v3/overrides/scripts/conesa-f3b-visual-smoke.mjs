@@ -51,6 +51,7 @@ try{
   await audit.getByLabel('Auditoría CA Y · referencia 1').fill('0');
   await audit.getByLabel('Auditoría CA Y · referencia 2').fill('1');
   const clickPoint=async(x,y)=>{
+   await svg.scrollIntoViewIfNeeded();
    const p=await svg.evaluate((el,pos)=>{
     const point=el.createSVGPoint();point.x=pos.x;point.y=pos.y;
     const mapped=point.matrixTransform(el.getScreenCTM());
