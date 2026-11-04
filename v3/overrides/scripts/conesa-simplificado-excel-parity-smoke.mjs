@@ -25,11 +25,9 @@ try{
   await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
   assert.equal(await page.locator('[data-conesa-simplificado]').count(),0);
-  const projectId=await page.evaluate(()=>Object.keys(localStorage).filter(x=>x.startsWith('ambienta-impact-matrix-v1:'))
-   .map(x=>x.slice('ambienta-impact-matrix-v1:'.length))[0]??null);
-  const actualId=projectId??(await page.locator('[data-conesa-book] .amb-matrix-footer').first().innerText())
-   .match(/DIAB[^\s·]*/)?.[0];
-  assert(actualId,'Main Conesa must identify its real project');
+  const actualId=(await page.locator('[data-conesa-book] .amb-matrix-footer span').first().innerText())
+   .split('·').at(-1)?.trim();
+  assert(actualId,'Main Conesa must identify the current project');
   const entries={};
   const usable=[examples[0],examples[1],examples[3],examples[4]];
   for(let i=0;i<usable.length;i++){
