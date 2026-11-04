@@ -317,9 +317,12 @@
  padding:9px 13px;
  background:#194351;
 }
-.ref-shell .amb-matrix-corner-label{
- display:flex;
- align-items:center;
+/* The generic "thead th span {display:block}" rule is more specific than
+   .amb-matrix-corner-label. Target this actual child with higher specificity:
+   the text must be centered, not just its empty 56px wrapper. */
+.ref-shell .amb-matrix-grid thead th.amb-matrix-sticky > .amb-matrix-corner-label{
+ display:grid;
+ place-items:center start;
  min-height:56px;
  color:#f2fafc;
  font-size:12px;
