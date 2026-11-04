@@ -1,0 +1,30 @@
+.ref-shell .amb-leopold-compare{margin:16px 0;padding:18px;border:1px solid #4b6976;border-radius:12px;
+ background:linear-gradient(140deg,#182b39,#27404b);color:#ecf6f4}
+.ref-shell .amb-leopold-compare h4{font-size:19px;margin:2px 0 7px;color:#fff}
+.ref-shell .amb-leopold-compare p{font-size:12px;line-height:1.6;color:#cbdbe0}
+.ref-shell .amb-leopold-compare-head{display:flex;align-items:start;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.ref-shell .amb-leopold-compare-upload{display:flex;flex-direction:column;gap:8px;padding:9px 12px;border:1px solid #88b0bd;
+ border-radius:9px;font-size:12px;background:#0f2c39;color:#e7f4f6}
+.ref-shell .amb-leopold-compare-upload input{max-width:265px;font-size:12px;color:#e2f5f9}
+.ref-shell .amb-leopold-compare .amb-leopold-compare-warning{border-left:3px solid #d8bd82;
+ padding:9px 12px;background:#503d2c39;color:#f0dcc3}
+.ref-shell .amb-leopold-compare-metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:14px 0}
+.ref-shell .amb-leopold-compare-metrics span{padding:12px;border:1px solid #4f6b79;border-radius:8px;
+ background:#132f3b;min-width:0}
+.ref-shell .amb-leopold-compare-metrics strong,.ref-shell .amb-leopold-compare-metrics small,
+.ref-shell .amb-leopold-compare-metrics b{display:block;overflow-wrap:anywhere}
+.ref-shell .amb-leopold-compare-metrics strong{font-size:15px;color:#f8ede0}
+.ref-shell .amb-leopold-compare-metrics small{font-size:12px;color:#bdcfda;margin:4px 0}
+.ref-shell .amb-leopold-compare-metrics b{font-size:11px;color:#e4f4eb;font-weight:600}
+.ref-shell .amb-leopold-compare-scroll{border-radius:8px;border:1px solid #5e7a85;overflow:auto;margin:15px 0;max-height:450px}
+.ref-shell .amb-leopold-compare-scroll table{border-collapse:collapse;min-width:870px;width:100%;font-size:12px}
+.ref-shell .amb-leopold-compare-scroll th,.ref-shell .amb-leopold-compare-scroll td{
+ border-bottom:1px solid #4d6570;padding:9px;text-align:left}
+.ref-shell .amb-leopold-compare-scroll th small{display:block;font-weight:400;color:#b7ced5;margin-top:5px}
+.ref-shell .amb-leopold-compare-scroll thead{position:sticky;top:0;background:#275562}
+.ref-shell .amb-leopold-compare-scroll tbody tr:nth-child(even){background:#294c5466}
+.ref-shell .amb-leopold-compare button{font-size:12px;font-weight:700;padding:10px 13px;border-radius:7px;
+ background:#bdded8;color:#153b41;border:1px solid #91bbb3}
+.ref-shell .amb-leopold-compare button:disabled{opacity:.6}
+.ref-shell .amb-leopold-compare :focus-visible{outline:3px solid #efd099;outline-offset:2px}
+@media(max-width:950px){.ref-shell .amb-leopold-compare-metrics{grid-template-columns:1fr}}

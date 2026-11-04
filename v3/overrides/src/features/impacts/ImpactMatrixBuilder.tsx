@@ -4,6 +4,8 @@ import {ArrowDownToLine,ChevronDown,Plus,RotateCcw,UploadCloud,X} from 'lucide-r
 import './ImpactMatrixBuilder.css';
 import {LeopoldSummaryPanel} from './LeopoldSummaryPanel';
 import {LeopoldReviewPanel} from './LeopoldReviewPanel';
+import {LeopoldReviewLedgerPanel} from './LeopoldReviewLedgerPanel';
+import {LeopoldAlternativePanel} from './LeopoldAlternativePanel';
 
 type Sign = -1|0|1;
 type Phase = 'preparacion'|'construccion'|'operacion'|'cierre';
@@ -336,6 +338,9 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
      <p>Las celdas sin evaluar no cuentan como ausencia de impacto.</p></div>}
    </div>
   </div>
+  {mode==='leopold'&&<LeopoldReviewLedgerPanel projectId={projectId} selectedKey={selected}
+   actions={doc.actions} factors={doc.factors} cells={doc.cells}/>}
+  {mode==='leopold'&&<LeopoldAlternativePanel key={projectId} active={doc}/>}
   {notice&&<p className="amb-matrix-notice" role="status">{notice} <button type="button" onClick={()=>setNotice('')}>Cerrar</button></p>}
   <footer className="amb-matrix-footer">
    <span>Guardado local · {new Date(doc.updatedAt).toLocaleString('es-AR')} · {projectId}</span>

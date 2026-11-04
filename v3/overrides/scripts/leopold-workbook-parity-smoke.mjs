@@ -173,6 +173,55 @@ try{
   assert.equal(await page.locator('[data-matrix-inspector] .amb-matrix-inspector-head').count(),1,
    'Review button opens the existing cell inspector');
   await page.screenshot({path:out+'/leopold-review-qa4-'+width+'.png',animations:'disabled'});
+  // QA5: explicit review entry is written separately and does not edit the matrix.
+  const ledger=page.locator('[data-leopold-ledger]');
+  const beforeLedgerMatrix=await page.evaluate(id=>
+   localStorage.getItem('ambienta-impact-matrix-v1:'+id),projectId);
+  await ledger.getByRole('textbox',{name:'Responsable de revisión Leopold'}).fill('QA Técnica');
+  await ledger.getByRole('textbox',{name:'Fundamento de revisión Leopold'})
+   .fill('Revisión demostrativa: solicitar datos de línea de base.');
+  await ledger.locator('[data-leopold-ledger-save]').click();
+  assert.equal(await ledger.locator('[data-leopold-ledger-count]').innerText(),'1');
+  assert.equal(await ledger.locator('[data-leopold-ledger-stale]').innerText(),'0');
+  assert.equal(await page.evaluate(id=>
+   localStorage.getItem('ambienta-impact-matrix-v1:'+id),projectId),beforeLedgerMatrix,
+   'Reviewer notes must not mutate original matrix storage');
+  const savedLedger=await page.evaluate(id=>
+   JSON.parse(localStorage.getItem('ambienta-leopold-review-v1:'+id)),projectId);
+  assert.equal(savedLedger.schema,'ambienta.leopold.review.v1');
+  assert.equal(savedLedger.entries[0].reviewer,'QA Técnica');
+  const oldMag=savedLedger.entries[0].snapshot.magnitude;
+  const changedMag=oldMag===10?9:10;
+  await page.getByRole('combobox',{name:'Magnitud del impacto'}).selectOption(String(changedMag));
+  assert.equal(await ledger.locator('[data-leopold-ledger-stale]').innerText(),'1');
+  // QA5: compare read-only alternative JSON using the original factor group.
+  const compare=page.locator('[data-leopold-compare]');
+  const alt={
+   schema:'ambienta.impact-matrix.v1',projectId:'alternative-b',
+   projectName:'EJERCICIO - Ruta B',
+   actions:[{id:'b-a',name:'Obras alternativa B',phase:'construccion'}],
+   factors:[{id:'b-f',name:factorNames[0],group:groups[0],weight:1}],
+   cells:{'b-f::b-a':{sign:-1,magnitude:5,importance:3,
+    reason:'Ejemplo ficticio',evidence:'Fixture QA'}}
+  };
+  const beforeAlt=await page.evaluate(id=>
+   localStorage.getItem('ambienta-impact-matrix-v1:'+id),projectId);
+  await compare.locator('[data-leopold-compare-import]').setInputFiles({
+   name:'alternativa-b.json',mimeType:'application/json',buffer:Buffer.from(JSON.stringify(alt))
+  });
+  assert.equal(await compare.locator('[data-leopold-compare-shared]').innerText(),'1');
+  assert.match(await compare.innerText(),/ruta b/i);
+  assert.equal(await page.evaluate(id=>
+   localStorage.getItem('ambienta-impact-matrix-v1:'+id),projectId),beforeAlt,
+   'Comparison must remain read-only');
+  await page.screenshot({path:out+'/leopold-qa5-ledger-alternatives-'+width+'.png',animations:'disabled'});
+  await page.reload();await page.locator('[data-impact-matrix="v1"]').waitFor();
+  await page.getByRole('button',{name:'Leopold',exact:true}).click();
+  assert.equal(await page.locator('[data-leopold-ledger-count]').innerText(),'1',
+   'Review ledger persists across reload independently of matrix');
+  assert.equal(await page.locator('[data-leopold-ledger-stale]').innerText(),'1');
+  assert.equal(await page.locator('[data-leopold-compare-shared]').count(),0,
+   'Uploaded comparison must not persist to project storage');
   const overflow=await page.evaluate(()=>document.documentElement.scrollWidth-innerWidth);
   assert(overflow<=6,'No page horizontal overflow at '+width+': '+overflow);
   assert.deepEqual(errors,[],'No browser errors');
