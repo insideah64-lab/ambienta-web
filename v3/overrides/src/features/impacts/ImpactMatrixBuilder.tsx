@@ -203,7 +203,7 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
   setNotice('Cambios del catálogo guardados. Se conservan las interacciones y valoraciones vinculadas.');
   setAxisDraft(null);
  };
- return <section className="amb-matrix" data-impact-matrix="v1" aria-label="Constructor de matrices ambientales">
+ return <section className="amb-matrix" data-impact-matrix="v1" data-impact-mode={mode} aria-label="Constructor de matrices ambientales">
   <header className="amb-matrix-top">
    <div><p className="amb-matrix-overline">LABORATORIO DE EVALUACIÓN · BORRADOR LOCAL</p>
     <h3>Constructor de matrices de impacto</h3>
@@ -228,20 +228,49 @@ export function ImpactMatrixBuilder({projectId,projectName,registeredImpacts}:Pr
    <span><strong>{negative}</strong><small>adversas declaradas</small></span>
   </div>
   <div className="amb-matrix-tools">
-   <div className="amb-matrix-modes" aria-label="Método de visualización">
-    <button type="button" aria-pressed={mode==='identificacion'} onClick={()=>setMode('identificacion')}>Identificación</button>
-    <button type="button" aria-pressed={mode==='leopold'} onClick={()=>setMode('leopold')}>Leopold</button>
-    <button type="button" aria-pressed={mode==='ponderada'} onClick={()=>setMode('ponderada')}>Ponderación exploratoria</button>
+   <div className="amb-matrix-view-choices">
+    <div className="amb-matrix-modes" aria-label="Etapas principales de la matriz">
+     <button type="button" aria-pressed={mode==='identificacion'} onClick={()=>setMode('identificacion')}>1 · Identificación</button>
+     <button type="button" aria-pressed={mode==='leopold'} onClick={()=>setMode('leopold')}>2 · Leopold</button>
+    </div>
+    <details className="amb-matrix-optional" data-matrix-optional>
+     <summary>Opciones avanzadas</summary>
+     <button type="button" aria-pressed={mode==='ponderada'} onClick={()=>setMode('ponderada')}>
+      Ponderación exploratoria · no normativa
+     </button>
+    </details>
    </div>
-   <label className="amb-matrix-filter"><input type="checkbox" checked={onlyEvaluated} onChange={e=>setOnlyEvaluated(e.target.checked)}/> Solo factores con interacciones</label>
-    {mode==='leopold'&&<label className="amb-matrix-filter"><input type="checkbox" data-leopold-diagonal-toggle checked={diagonal} onChange={e=>setDiagonal(e.target.checked)}/> Mostrar diagonal clásica M/I</label>}
+   <div className="amb-matrix-tool-filters">
+    <label className="amb-matrix-filter"><input type="checkbox" checked={onlyEvaluated}
+     onChange={e=>setOnlyEvaluated(e.target.checked)}/> Solo factores con interacciones</label>
+    {mode==='leopold'&&<label className="amb-matrix-filter"><input type="checkbox"
+     data-leopold-diagonal-toggle checked={diagonal} onChange={e=>setDiagonal(e.target.checked)}/>
+     Mostrar diagonal clásica M/I</label>}
+   </div>
   </div>
-  <div className="amb-matrix-legend">
-   {mode==='identificacion'
-    ? 'Identificación: + impacto beneficioso; − impacto adverso; ∅ sin interacción declarada; — no evaluado.'
-    : mode==='leopold'
-      ? 'Leopold según la matriz clásica: signo y magnitud (1–10) arriba; importancia (1–10) abajo. El producto M×I es una adaptación didáctica, no un índice oficial de aprobación.'
-      : 'Vista exploratoria: signo × magnitud × importancia × peso editable. NO es la importancia de Conesa ni una clasificación legal.'}
+  <div className="amb-matrix-mode-guide" data-matrix-mode-guide={mode} role="note">
+   {mode==='identificacion'?<>
+    <strong>Etapa 1 · Identificar interacciones</strong>
+    <p>Marcá en cada cruce un impacto adverso (−), beneficioso (+), ausencia de interacción (∅)
+     o dejalo sin evaluar (—). <b>Ejemplo visual: −</b>. No se asignan números automáticamente.</p>
+   </>:mode==='leopold'?<>
+    <strong>Etapa 2 · Valorar con Leopold</strong>
+    <p>Las celdas valoradas muestran signo y dos criterios diferentes: magnitud e importancia (1–10).
+     <b> Ejemplo ficticio: −7/5</b> = magnitud adversa 7, importancia 5.</p>
+    {scored===0?<p className="amb-matrix-guide-alert" data-matrix-leopold-empty>
+     Todavía no hay celdas completamente valoradas. Seleccioná una celda y completá su signo,
+     magnitud e importancia. Por eso, si todas están vacías, esta vista parece igual a Identificación.</p>:
+     <p data-matrix-leopold-ready>{scored} interacción(es) con magnitud e importancia registradas.
+      Las celdas incompletas siguen señaladas como pendientes.</p>}
+   </>:<>
+    <strong>Herramienta avanzada · Ponderación exploratoria</strong>
+    <p>Se calcula signo × magnitud × importancia × peso editable del factor.
+     <b> Ejemplo ilustrativo: −7 × 5 × 1 = −35</b>.
+     Este producto no pertenece al cálculo clásico de Leopold, no es la importancia de Conesa
+     y no determina la aprobación ambiental de un proyecto.</p>
+    <button type="button" className="amb-matrix-back-leopold"
+     onClick={()=>setMode('leopold')}>Volver a Leopold</button>
+   </>}
   </div>
   <div className="amb-matrix-construction" data-matrix-inline-builder aria-label="Construcción directa de filas y columnas">
    <div className="amb-matrix-construction-head">
