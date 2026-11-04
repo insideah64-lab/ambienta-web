@@ -31,6 +31,8 @@ try{
    await book.getByRole('combobox',{name:'Conesa libro '+key,exact:true}).selectOption(String(n));
   assert.equal((await book.locator('[data-book-absolute]').innerText()).trim(),'28');
   assert.equal(await f2.locator('[data-f2-interaction]').count(),1);
+  await page.locator('[data-conesa-phase-tab="f2"]').click();
+  assert.equal(await page.locator('[data-conesa-phase-tab="f2"]').getAttribute('aria-selected'),'true');
   const button=f2.locator('[data-f2-interaction]').first();
   await button.click();
   const editor=f2.locator('[data-f2-editor]');
