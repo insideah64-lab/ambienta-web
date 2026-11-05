@@ -44,6 +44,7 @@ test('Baseline rejects orphan, cyclic, forked and origin-changing histories on i
  const d=withRecord();
  const child={...d.observations[0],id:'r2',supersedes:'r1',correctionReason:'QA'};
  for(const observations of [[{...d.observations[0],indicatorId:'unknown'}],[{...child,supersedes:'unknown'}],[{...child,id:'r1'}],[d.observations[0],{...child,origin:'synthetic'}],[d.observations[0],child,{...child,id:'r3'}],[{...d.observations[0],supersedes:'r2',correctionReason:'Cycle'},child]])assert(!m.validBaseline({...d,observations},'DEMO-001'));
+ for(const field of ['origin','basis','scenario','qualifier'])assert.equal(m.validBaseline({...d,observations:[{...d.observations[0],[field]:{toString:null,valueOf:null}}]},'DEMO-001'),false);
  assert(!m.validBaseline({...d,unexpected:'x'},'DEMO-001'));assert(!m.validBaseline({...d,observations:[{...d.observations[0],value:'0'}]},'DEMO-001'));
 });
 test('Baseline imports add records atomically; key order is idempotent and conflicts never overwrite',()=>{

@@ -57,6 +57,7 @@ export function observationProblems(o:Observation):string[]{
 function validObservation(x:unknown):x is Observation{
  if(!object(x)||!keys(x,['id','indicatorId','start','end','location','latitude','longitude','origin','basis','scenario','horizon','qualifier','value','detectionLimit','uncertainty','uncertaintyNote','source','author','notes','supersedes','correctionReason','createdAt']))return false;
  if(!identifier(x.id)||!stamp(x.createdAt)||!(x.supersedes===null||identifier(x.supersedes)))return false;
+ if(!['origin','basis','scenario','qualifier'].every(k=>typeof x[k]==='string'))return false;
  if(!['start','end','location','horizon','uncertaintyNote','source','author','notes','correctionReason'].every(k=>text(x[k])))return false;
  return observationProblems(x as unknown as Observation).length===0;
 }
