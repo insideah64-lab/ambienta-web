@@ -58,6 +58,8 @@ try{for(const width of [1366,1800])for(const project of ['DEMO-001','DIAB-2026-D
  await page.evaluate(({key,record})=>localStorage.setItem(key,JSON.stringify(record)),{key,record});
  await page.goto(page.url().split('#')[0]+'#/area');await page.locator('[data-perimeter-saved]').filter({hasText:sourceName}).waitFor();
  const areaSnapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
+ await page.locator('[data-perimeter-editor] input[type=file]').setInputFiles({name:'unsaved.geojson',mimeType:'application/geo+json',buffer:Buffer.from(JSON.stringify(polygon))});await page.locator('[data-perimeter-candidate]').waitFor();assert.equal(await page.locator('[data-perimeter-ndvi]').count(),0);await page.locator('[data-perimeter-ndvi-pending]').waitFor();
+ await page.getByRole('button',{name:'Limpiar borrador',exact:true}).click();await page.locator('[data-perimeter-ndvi]').waitFor();assert.deepEqual(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage))),areaSnapshot);
  await page.locator('[data-perimeter-ndvi]').click();await p.locator('[data-ndvi-mask=polygon]').waitFor();await p.locator('[data-ndvi-mask-name]').filter({hasText:sourceName}).waitFor();
  await p.getByText('Servicio local disponible',{exact:true}).waitFor();
  await p.locator('[data-ndvi-field=start]').fill('2025-05-01');await p.locator('[data-ndvi-field=end]').fill('2025-06-30');

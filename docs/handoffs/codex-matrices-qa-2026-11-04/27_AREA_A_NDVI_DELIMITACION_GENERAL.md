@@ -8,6 +8,8 @@ El cálculo debe respetar cualquier delimitación válida elegida por el operado
 
 Se agrega **Calcular NDVI dentro de este perímetro** junto a las acciones del perímetro guardado en Área de estudio. Abre MITA y copia la geometría guardada del caso actual en este navegador, sin modificar fuente, respaldos ni zonificación. Se muestra el nombre de la delimitación seleccionada y se solicitan período y escena. El historial de trabajos anteriores no debe sustituir esa selección. Cada trabajo mantiene su propia geometría al recargar. También continúa disponible la importación directa de GeoJSON.
 
+Si hay un dibujo en curso o un contorno importado todavía sin guardar, se oculta el acceso a NDVI y se pide guardar o limpiar ese borrador. Así no se envía el perímetro anterior mientras el mapa muestra otro contorno preparado. Esta situación tiene una prueba Playwright en ambas demos y anchos de escritorio.
+
 FAIL identificado: el límite anterior de 0,1° por lado rechazaba el contorno ilustrativo de la captura, aunque podía procesarse dentro del límite de memoria. Se reemplaza por un presupuesto de píxeles, con una estimación conservadora a 10 m y rechazo explícito si supera 12 millones. No se afirma que la estimación represente superficie ni una resolución garantizada. El tamaño exacto de la grilla se comprueba antes de leer las bandas. No se simplifica ni cambia el contorno para hacerlo entrar. Se mantienen los demás límites (2.000 posiciones, 180 KB al importar y período de hasta 366 días). No se cambia NDVI, calibración ni criterios de calidad.
 
 ## Resultados de verificación
