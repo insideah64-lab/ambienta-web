@@ -1,59 +1,46 @@
-# MITA satelital — recepción de resultados
+# MITA satelital — continuidad pública de QA
 
-Fecha: 2026-11-05. Rama `feature/mita-resultados-2026-11-05`, basada en `bfc935dfd78babd8ad728439287538e99028b4be` (RIAM, PR #88). No se fusiona ni despliega; continúa el HOLD de la cadena anterior.
+Fecha: 2026-11-05. [PR #89](https://github.com/insideah64-lab/ambienta-web/pull/89), rama `feature/mita-resultados-2026-11-05`, dependiente de #88. Base: `bfc935dfd78babd8ad728439287538e99028b4be`. Main reconfirmado: `841f1356f86a3561be70fb0d3c7ce961a8d3640b`.
 
-## Diagnóstico y alcance
+Esta versión pública se limita a resultados verificables en el código y CI del repositorio público AMBIENTA. Omite referencias, contratos y detalles de implementación de repositorios privados. El informe de trabajo completo y las capturas se conservan localmente; no se incorporan nuevas imágenes a esta actualización pública.
 
-En V3 la ruta `#/mita` solo mostraba un aviso y un enlace a V1. Se contrastó el contrato del motor existente en el repositorio privado `insideah64-lab/plataforma-ambiental-argentina`, main `9aadd4235b4e25b1887102c623287078812ca829`: `remote.py`, `raster.py`, `indices.py`, `cli.py`, `api.py`, documentación V0.2 y QA Sentinel-2. No se copia su implementación privada al repositorio público ni se alteran sus fórmulas.
+## Cambios de la interfaz pública
 
-El motor ya produce NDVI remoto desde Sentinel-2 L2A/Earth Search mediante `scene-ndvi`, con B04/B08/SCL, calibración explícita y productos TIFF/JSON/PNG/HTML. La API existente consulta metadatos; no ofrece procesamiento remoto autenticado. Esta entrega conecta los **archivos de resultados** con el proyecto, sin anunciar procesamiento web inexistente.
+La ruta `#/mita` ofrece recepción y revisión de informes, vinculación explícita al proyecto, controles de archivos, persistencia local y descargas. No ejecuta procesamiento satelital desde la página. No se modifican las fórmulas de matrices ni se trasladan resultados automáticamente a otros módulos.
 
-La referencia oficial [Copernicus S2 Applications](https://sentiwiki.copernicus.eu/web/s2-applications) distingue NDVI y clasificación de escena. Se conservan calibración, máscara y valores declarados por MITA; no se modifica el cálculo. Un porcentaje de nube de escena no se presenta como nube local. NDVI no se convierte en contaminación, impacto, cumplimiento ni puntuación de otra matriz.
+## Commits
 
-## Implementación y contrato
+- `cf940a7f5978a32030a1ab2c1d07089691112b7f`: implementación de la interfaz y regresiones.
+- `0fd2d9642394d9d270c0c541a31e776e0b6c94ec`: conserva el encabezado ilustrado original. Código final validado.
+- El commit documental posterior publica este resumen; su HEAD y ejecución se registran en el PR #89.
 
-- Ficha con escena, adquisición, colección, BBOX, CRS, dimensiones, NDVI mínimo/promedio/máximo y conteos válidos. Distingue el denominador de la BBOX del ráster rectangular. Cero NDVI y ausencia de píxeles válidos son estados distintos.
-- Acepta exclusivamente JSON UTF-8 sin BOM del contrato nativo `engine=MITA`, `version=0.2.0`, `index=NDVI`, `provider=earthsearch`. Los informes 0.1 locales, productos atmosféricos y otros índices necesitan adaptadores posteriores; no se reinterpretan silenciosamente.
-- Valida límites geográficos, fechas, escala/offset, máscara SCL 4/5/6, remuestreo, conteos, fracciones y orden/rango NDVI. Sin píxeles válidos exige estadísticas null. Requiere SHA-256 de salida y fuentes de bandas/catálogo.
-- Vista previa antes de guardar. Se exige una explicación del vínculo con el proyecto: el producto no prueba automáticamente pertenencia a su perímetro. No se compara ni acredita la BBOX contra una geometría oficial.
-- Cada registro conserva el texto UTF-8 original, su SHA-256 calculado, nombre de archivo, fecha de importación y vínculo declarado. Importar no modifica línea base, matrices, evidencias, V1/V2 ni el catálogo compartido.
-- Clave separada `ambienta-mita-results-v1:<projectId>`, esquema `ambienta.mita-results.v1`. Máximo 20 informes de hasta 1 MiB cada uno; la cuota real del navegador puede ser menor. Registro por adición, sin botón de borrado. Original del registro anterior respaldado antes de agregar. Duplicados idénticos seleccionan la entrada existente.
-- Un archivo local incompatible se bloquea y permite descargar el original literal. Otra pestaña no puede sobrescribir silenciosamente un registro más nuevo. Si falla la cuota, se mantiene la vista previa y el JSON original descargable; no se comunica un guardado exitoso.
-- GeoTIFF local hasta 64 MiB: se comprueba cabecera TIFF y SHA-256 contra el informe. Esto solo demuestra coincidencia de bytes con el hash **declarado**; no certifica autenticidad del autor, estructura GeoTIFF, CRS, valores, estadística ni validez científica. El TIFF no se guarda y la comprobación vuelve a pendiente tras recargar.
-- Exportación del JSON original literal y del registro del proyecto. El registro agregado es un archivo de trazabilidad; por ahora el importador acepta informes individuales, no restauraciones masivas del registro.
-- No se ejecutan enlaces, HTML ni solicitudes a activos del informe importado. No se suben archivos a terceros. Persistencia local, sin sincronización ni API nueva.
+## Resultados
 
-## Diseño técnico
-
-Una ficha DOM y un listado de hasta 20 productos por vista. React controla la selección y lectura de datos; sin mapa, canvas, WebGL ni librería adicional de gráficos. Estadísticas y calidad visibles, procedencia/calibración desplegables mediante teclado. El color solo destaca selección/aviso, nunca clasifica severidad ambiental.
-
-La URL `#/mita?producto=<sha256-json>` selecciona un producto del registro local del proyecto. La URL tiene precedencia; un ID ausente se avisa, sin cargar datos ficticios ni transmitir el archivo. Recarga y enlaces directos conservan selección; el enlace no comparte los archivos entre navegadores. Contextos del proyecto y registros separados. Teléfono fuera del alcance solicitado; objetivo PC 1366/1800. Sin animaciones ni permisos de geolocalización/cámara.
-
-Costos: hasta 1 MiB de lectura JSON; para TIFF se calcula una huella de hasta 64 MiB con WebCrypto y memoria temporal. No se procesan píxeles ni se añaden dependencias. El almacenamiento puede agotarse antes del límite de 20 informes; se avisa sin pérdida de originales. El fallback es descargar y conservar el JSON. El motor privado y su infraestructura permanecen separados.
-
-## QA
-
-| Comprobación | Resultado | Evidencia |
+| Comprobación | Estado | Evidencia pública / local |
 |---|---|---|
-| Pruebas unitarias | PASS | 261/261 sobre el código final; seis nuevas de MITA |
-| TypeScript/Vite | PASS | Build final completo; continúan las advertencias previas de recursos CSS y tamaño de bundle |
-| DEMO-001 / DIAB-2026-DEMO, 1366/1800 | PASS | Chromium limpio; cuatro combinaciones |
-| Recarga y selección por URL | PASS | Conserva informe, contexto y valores; hash TIFF vuelve a pendiente |
-| Descargas JSON reales | PASS | Originales y registros descargados y leídos; originales idénticos al archivo importado |
-| Huellas y archivos incorrectos | PASS | TIFF coincidente, TIFF modificado rechazado, JSON incompatible rechazado |
-| Almacenamiento histórico y proyectos | PASS | Claves previas intactas; registro aislado por proyecto |
-| Archivo local dañado | PASS | Edición bloqueada y original literal descargado |
-| Pestañas desactualizadas / cuota | PASS | Dos pestañas reales sin sobrescritura; cuota simulada con original descargable y sin confirmación falsa de guardado |
-| Capturas completas y ampliadas | PASS | Ocho PNG generados; completas y fichas DEMO-001 1366/1800 abiertas y revisadas, sin recortes; espera explícita de tipografías |
-| CI completo sobre rama MITA | NOT_RUN | Enlace/commit se registran en el PR al finalizar |
-| Nuevo procesamiento satelital real | NOT_RUN | No se ejecutó el motor Python ni se descargaron escenas en esta entrega |
-| Validación científica independiente | NOT_RUN | No se infiere de los controles del importador |
-| GitHub Pages | NOT_RUN | HOLD heredado, sin publicación |
+| TypeScript y build | PASS | CI completo y build local |
+| Pruebas unitarias | PASS | 261/261, seis nuevas |
+| Dos demos, 1366/1800 | PASS | Cuatro combinaciones, Chromium limpio |
+| Recarga y descargas | PASS | Archivos descargados y leídos; originales preservados |
+| Controles de archivos y almacenamiento | PASS | Duplicados, archivo incorrecto, cuota y pestañas desactualizadas |
+| Iconografía de 17 rutas | PASS | Regresión local y CI tras la corrección |
+| Capturas completas y ampliadas | PASS | Generadas y abiertas localmente a ambos anchos |
+| Primera ejecución CI | FAIL | 41968368832: faltaba el encabezado ilustrado; corregido sin debilitar pruebas |
+| CI del código final | PASS | 41969005896; todos los pasos satisfactorios |
+| Nuevo procesamiento satelital real | NOT_RUN | Fuera de esta entrega de interfaz |
+| Validación científica independiente | NOT_RUN | No se infiere de las pruebas del adaptador |
+| Publicación GitHub Pages | NOT_RUN | HOLD heredado; no se fusiona ni despliega |
 
-Los archivos usados por la regresión son **sintéticos para comprobar el adaptador**. La pequeña muestra TIFF prueba transporte/huellas; no contiene georreferenciación científica acreditada. Sus estadísticas no son mediciones de Salta ni Diablillos. El informe del motor de 2026-10-30 registra una ejecución real anterior, pero no se vuelve a contar como prueba de esta entrega. No se consumen créditos TinyFish/vidIQ.
+[Primera ejecución con fallo](https://github.com/insideah64-lab/ambienta-web/actions/runs/41968368832). El test de iconografía detuvo la batería antes de llegar a MITA. La falta de archivos posteriores hizo fallar además la carga QA; no fue un nuevo fallo de cálculo ni un P0 ejecutado y fallido.
 
-Reproducción: staging `bash v3/scripts/build-v3.sh`, `node --test tests/react-v3/*.test.mjs`, servidor `dist` en 8787 y `node apps/web-v3/scripts/mita-results-smoke.mjs`. Evidencias en `qa/ambienta-mita/`, incluidas en `ambienta-matrices-handoff-qa` de CI. La batería pasa a 50 comandos de scripts de navegador, incluido P0. Fuente canónica `v3/overrides/src/features/mita/`; `apps/web-v3/` se genera.
+[CI 41969005896 — SUCCESS](https://github.com/insideah64-lab/ambienta-web/actions/runs/41969005896): build, pruebas unitarias, batería completa de navegador, diagnóstico P0, hashes V1/V2 y cargas de artefactos. La corrección restaura el pictograma y la estructura de encabezado del sistema existente.
 
-## Siguiente paso
+Los datos de prueba son sintéticos para verificar la interfaz; no son mediciones ambientales de los proyectos. No se consumieron créditos de TinyFish ni vidIQ.
 
-Definir ejecución remota autenticada con cuotas/cola/almacenamiento o un flujo local asistido del motor; después visor GeoTIFF georreferenciado, contraste de AOI/perímetro y series temporales con períodos/condiciones comparables. La API experimental existente no se transforma en un servicio público de procesamiento sin desarrollar esos componentes. No trasladar estadísticas automáticamente a la línea base ni a matrices.
+## Continuidad
+
+Revisión local: `http://127.0.0.1:8787/v3/index.html#/mita`. Pruebas: `node --test tests/react-v3/*.test.mjs` y, tras el staging habitual y servidor local, `node apps/web-v3/scripts/mita-results-smoke.mjs`.
+
+Paquete local: `AMBIENTA_MITA_Pruebas_y_Descargas.zip`, 21 archivos más manifiesto SHA-256, reabierto y verificado. La documentación completa local se identifica como `19_MITA_RECEPCION_RESULTADOS_COMPLETO_LOCAL.md`.
+
+Pendientes: búsqueda de escenas y ejecución web, visor georreferenciado, series temporales y validación científica. Se conserva la cadena de PR #85 → #86 → #87 → #88 → #89 y el HOLD de publicación anterior. El resultado sobre el último HEAD documental queda enlazado en el PR.
