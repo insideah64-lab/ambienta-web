@@ -1,4 +1,5 @@
 // Public result contract only. The private Python engine is not embedded here.
+import {ndviPolygon} from './NdviClient';
 export const MITA_SCHEMA='ambienta.mita-results.v1';
 export const MAX_REPORT_BYTES=1024*1024;
 export const MAX_TIFF_BYTES=64*1024*1024;
@@ -29,6 +30,13 @@ export function parseMitaReport(raw:string):Report{
  ensure(finite(s.valid_fraction)&&Math.abs(s.valid_fraction-s.valid_pixels/s.pixels)<=0.0000011,'Fracción válida del ráster inconsistente.');
  ensure(q&&integer(q.inside_bbox_pixels)&&q.inside_bbox_pixels>0&&q.inside_bbox_pixels<=s.pixels&&q.valid_pixels===s.valid_pixels&&q.valid_pixels<=q.inside_bbox_pixels,'Recuento de calidad dentro de BBOX inconsistente.');
  ensure(finite(q.valid_fraction_inside_bbox)&&Math.abs(q.valid_fraction_inside_bbox-q.valid_pixels/q.inside_bbox_pixels)<=0.0000011,'Fracción válida local inconsistente.');
+ if(r.aoi!==undefined){
+  ensure(r.aoi?.kind==='polygon'&&r.aoi.crs==='EPSG:4326','Máscara de recorte no compatible.');
+  const p=ndviPolygon(r.aoi.geometry);
+  ensure(p.bbox.every((n,i)=>Math.abs(n-b[i])<=1e-8)&&/^[a-f0-9]{64}$/i.test(r.aoi.sha256||''),'Extensión o huella de la máscara inválida.');
+  ensure(integer(q.inside_aoi_pixels)&&q.inside_aoi_pixels>0&&q.inside_aoi_pixels<=q.inside_bbox_pixels&&s.valid_pixels<=q.inside_aoi_pixels,'Recuento del polígono inconsistente.');
+  ensure(finite(q.valid_fraction_inside_aoi)&&Math.abs(q.valid_fraction_inside_aoi-s.valid_pixels/q.inside_aoi_pixels)<=0.0000011,'Fracción válida del polígono inconsistente.');
+ }
  ensure(JSON.stringify(q.scl_valid_classes)==='[4,5,6]'&&q.resampling_nir==='bilinear'&&q.resampling_scl==='nearest','La máscara SCL o el remuestreo no corresponden al perfil MITA 0.2.0.');
  if(s.valid_pixels===0)ensure(s.ndvi_min===null&&s.ndvi_max===null&&s.ndvi_mean===null,'Sin píxeles válidos, las estadísticas NDVI deben ser null.');
  else ensure([s.ndvi_min,s.ndvi_max,s.ndvi_mean].every(finite)&&s.ndvi_min>=-1.00001&&s.ndvi_max<=1.00001&&s.ndvi_min<=s.ndvi_mean&&s.ndvi_mean<=s.ndvi_max,'Estadísticas NDVI fuera de rango u orden.');
