@@ -38,6 +38,7 @@ import {DocumentLinkAuditPanel} from './features/traceability/DocumentLinkAuditP
 import {PreliminaryTechnicalReportPanel} from './features/reporting/PreliminaryTechnicalReportPanel';
 import type {AmbientaIconName} from './features/iconography/AmbientaIcon';
 import {ArtworkIcon} from './features/iconography/ArtworkIcon';
+import {BaselinePanel} from './features/baseline/BaselinePanel';
 import {MatrixMethodHub} from './features/impacts/MatrixMethodHub';
 
 
@@ -46,6 +47,7 @@ const NAV_PRIMARY: Navigation[] = [
   {path:'/',label:'Resumen',icon:'dashboard',description:'Resumen visual del expediente y sus compromisos.'},
   {path:'/expediente',label:'Expediente',icon:'folder',description:'Alcance, responsables y fases del proyecto.'},
   {path:'/area',label:'Área de estudio',icon:'territory',description:'Definir ventana, territorio, perímetro, superficies y subáreas del proyecto.'},
+  {path:'/linea-base',label:'Línea base',icon:'inspections',description:'Indicadores, registros, fuentes e incertidumbre por proyecto.'},
   {path:'/impactos',label:'Impactos',icon:'impacts',description:'Impactos ambientales vinculados al proyecto.'},
   {path:'/pga',label:'Plan de Gestión',icon:'pga',description:'Programas, medidas, indicadores y trazabilidad ambiental.'},
   {path:'/monitoreo',label:'Monitoreo',icon:'monitoring',description:'Inspecciones, resultados y seguimiento en campo.'},
@@ -157,7 +159,7 @@ function Matrices({data}:{data:DemoState}) {
   return <div className="v2-area-stack" data-page-role="environmental-matrices-tool">
     <details className="amb-workspace-about"><summary>Acerca del constructor y el guardado local</summary>
     <Panel kicker="HERRAMIENTAS · EVALUACIÓN AMBIENTAL" icon="measures" title="Constructor de matrices">
-      <p className="v2-panel-note">Espacio de trabajo independiente para elaborar matrices de identificación y valoración. Los impactos ya registrados se consultan en <Link to="/impactos">Impactos</Link>; las ediciones del constructor se guardan en un borrador local vinculado al identificador del expediente, sin modificar el registro original.</p>
+      <p className="v2-panel-note">Espacio de trabajo independiente para elaborar matrices de identificación y valoración. Los impactos ya registrados se consultan en <Link to="/impactos">Impactos</Link>; las ediciones del constructor se guardan en un borrador local vinculado al identificador del expediente, sin modificar el registro original. Las magnitudes y sus fuentes pueden documentarse en <Link to="/linea-base">Línea base</Link>; no se transfieren automáticamente a una matriz.</p>
     </Panel>
     </details>
     <MatrixMethodHub projectId={data.project.id} projectName={data.project.name} registeredImpacts={data.impacts} pgaData={data}/>
@@ -395,6 +397,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<ReferenceDashboard data={data} k={k} onExport={()=>exportDemo(data)}/>}/>
           <Route path="/area" element={<AreaEstudio data={data}/>}/>
+          <Route path="/linea-base" element={<BaselinePanel key={data.project.id} data={data}/>}/>
           <Route path="/impactos" element={<Impactos data={data}/>}/>
           <Route path="/matrices" element={<Matrices data={data}/>}/>
           <Route path="/evidencias" element={<Evidencias data={data} onAction={openAction} onApply={applyTransaction}/>}/>
