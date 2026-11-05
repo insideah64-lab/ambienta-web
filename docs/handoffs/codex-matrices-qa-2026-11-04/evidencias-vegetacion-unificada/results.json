@@ -1,0 +1,50 @@
+[
+  {
+    "project": "DEMO-001",
+    "width": 1366,
+    "status": "PASS",
+    "singleVegetationTab": true,
+    "newResultVisible": false,
+    "legacyLinks": true,
+    "historyReload": true,
+    "noDuplicateCalculator": true,
+    "storageUnchanged": true,
+    "errors": []
+  },
+  {
+    "project": "DEMO-001",
+    "width": 1800,
+    "status": "PASS",
+    "singleVegetationTab": true,
+    "newResultVisible": false,
+    "legacyLinks": true,
+    "historyReload": true,
+    "noDuplicateCalculator": true,
+    "storageUnchanged": true,
+    "errors": []
+  },
+  {
+    "project": "DIAB-2026-DEMO",
+    "width": 1366,
+    "status": "PASS",
+    "singleVegetationTab": true,
+    "newResultVisible": true,
+    "legacyLinks": true,
+    "historyReload": true,
+    "noDuplicateCalculator": true,
+    "storageUnchanged": true,
+    "errors": []
+  },
+  {
+    "project": "DIAB-2026-DEMO",
+    "width": 1800,
+    "status": "PASS",
+    "singleVegetationTab": true,
+    "newResultVisible": true,
+    "legacyLinks": true,
+    "historyReload": true,
+    "noDuplicateCalculator": true,
+    "storageUnchanged": true,
+    "errors": []
+  }
+]
