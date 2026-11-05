@@ -7,6 +7,8 @@ export type NdviSearch={searchId:string;scenes:NdviScene[];partial:boolean;messa
 export type NdviJob={id:string;project:string;status:'queued'|'running'|'succeeded'|'failed'|'cancelled';phase:string;created:string;updated:string;error:string|null;cancelRequested:boolean;sceneId:string;bbox:number[];query:{start:string;end:string;maxCloud:number;geometry?:NdviGeometry|null};index:'ndvi';mode:'local-only'};
 export type NdviSummary={sceneId:string;acquiredAt:string;min:number|null;mean:number|null;max:number|null;validPixels:number;rasterPixels:number;windowPixels:number;validFraction:number;aoiKind?:'polygon'|'bbox';crs:string;width:number;height:number;legend:{value:number;color:string}[]};
 export const emptyNdviForm=():NdviForm=>({west:'',south:'',east:'',north:'',start:'',end:'',maxCloud:'30'});
+// Conservative 10 m planning estimate; actual source-grid size is checked before reading bands.
+export const ndviWindowPixels=(b:number[])=>(Math.ceil((b[2]-b[0])*111320/10)+4)*(Math.ceil((b[3]-b[1])*111700/10)+4);
 export function ndviPolygon(input:unknown):{geometry:NdviGeometry;bbox:number[]}{
  const g=input as {type?:string};
  const parsed=validatePerimeterGeoJson(g?.type==='Polygon'||g?.type==='MultiPolygon'?{type:'Feature',properties:{},geometry:input}:input);
@@ -18,7 +20,7 @@ export function ndviPolygon(input:unknown):{geometry:NdviGeometry;bbox:number[]}
 export function ndviQuery(form:NdviForm,geometry?:NdviGeometry|null){
  const bbox=[form.west,form.south,form.east,form.north].map(v=>v.trim()===''?NaN:Number(v));
  if(bbox.some(v=>!Number.isFinite(v))||bbox[0]<-180||bbox[2]>180||bbox[1]<-90||bbox[3]>90||bbox[0]>=bbox[2]||bbox[1]>=bbox[3])throw Error('Ingresá una ventana válida: oeste < este y sur < norte, en grados WGS84.');
- if(bbox[2]-bbox[0]>.1||bbox[3]-bbox[1]>.1)throw Error('En el piloto, cada lado de la ventana admite hasta 0,1°. Reducí el área.');
+ if(ndviWindowPixels(bbox)>12000000)throw Error('La extensión supera el presupuesto del piloto de 12 millones de píxeles a 10 m. Usá una delimitación menor; no se sustituye por un rectángulo ni se simplifica automáticamente.');
  for(const value of [form.start,form.end])if(!/^\d{4}-\d{2}-\d{2}$/.test(value)||!Number.isFinite(Date.parse(value))||new Date(value).toISOString().slice(0,10)!==value)throw Error('Indicá fechas válidas.');
  const days=(Date.parse(form.end)-Date.parse(form.start))/86400000;
  if(days<0||days>366)throw Error('El período debe estar ordenado y abarcar hasta 366 días.');
