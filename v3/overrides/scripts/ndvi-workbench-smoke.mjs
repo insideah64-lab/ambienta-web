@@ -1,12 +1,14 @@
 import assert from 'node:assert/strict';import fs from 'node:fs/promises';import path from 'node:path';import {createHash} from 'node:crypto';import {chromium} from 'playwright';
 import {mitaFixture,tiffFixture} from '../../../tests/fixtures/mita-fixture.mjs';
 import {createServer} from 'node:http';
+import {buildPerimeterRecord,perimeterKey} from '../src/features/maps/perimeter-source.mjs';
+import {DIABLILLOS_QA_GEOJSON} from '../src/features/maps/diablillos-reference-qa.mjs';
 const out='qa/ambienta-ndvi';await fs.mkdir(out,{recursive:true});const base=process.env.QA_BASE_URL||'http://127.0.0.1:8787/v3/';
 const bytes=tiffFixture(),raw=JSON.stringify(mitaFixture(createHash('sha256').update(bytes).digest('hex'))),png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jN1cAAAAASUVORK5CYII=','base64');
 const browser=await chromium.launch({headless:true}),results=[],servers=[];
 try{for(const width of [1366,1800])for(const project of ['DEMO-001','DIAB-2026-DEMO']){
  const context=await browser.newContext({viewport:{width,height:1000}}),page=await context.newPage(),errors=[];page.on('pageerror',e=>errors.push(e.message));
- let job=null,submits=0,polls=0;
+ let job=null,submits=0,polls=0,lastQuery=null;
  // Native HTTP fixtures exercise actual Chromium downloads, not intercepted responses.
  const server=createServer(async(req,res)=>{try{
   const u=new URL(req.url,'http://localhost'),p=u.pathname.replace('/api/mita',''),method=req.method;let data;
@@ -18,10 +20,10 @@ try{for(const width of [1366,1800])for(const project of ['DEMO-001','DIAB-2026-D
    res.writeHead(200,{'content-type':{'.html':'text/html','.js':'text/javascript','.css':'text/css','.webp':'image/webp','.svg':'image/svg+xml'}[ext]||'application/octet-stream'});res.end(content);return;
   }
   if(p==='/health')data={mode:'local-only',indices:['ndvi']};
-  else if(p==='/scenes/search'){data={searchId:'c'.repeat(32),partial:true,message:'QA sintético: primera página no exhaustiva.',scenes:[{id:'QA_SYNTHETIC',date:'2025-05-29T00:00:00Z',cloud:3,ready:true,coversWindow:true}]};}
+  else if(p==='/scenes/search'){const chunks=[];for await(const chunk of req)chunks.push(chunk);lastQuery=JSON.parse(Buffer.concat(chunks));data={searchId:'c'.repeat(32),partial:true,message:'QA sintético: primera página no exhaustiva.',scenes:[{id:'QA_SYNTHETIC',date:'2025-05-29T00:00:00Z',cloud:3,ready:true,coversWindow:true}]};}
   else if(p==='/jobs'&&method==='POST'){
    const chunks=[];for await(const chunk of req)chunks.push(chunk);const b=JSON.parse(Buffer.concat(chunks));assert.equal(b.project,project);submits++;await new Promise(r=>setTimeout(r,150));
-   job={id:'a'.repeat(32),project,status:'queued',phase:'queued',created:'2026-11-05T00:00:00Z',updated:'2026-11-05T00:00:00Z',error:null,cancelRequested:false,sceneId:'QA_SYNTHETIC',bbox:[-65.47,-24.76,-65.465,-24.755],query:{start:'2025-05-01',end:'2025-06-30',maxCloud:80},index:'ndvi',mode:'local-only'};data=job;
+   job={id:(submits===1?'a':'b').repeat(32),project,status:'queued',phase:'queued',created:'2026-11-05T00:00:00Z',updated:'2026-11-05T00:00:00Z',error:null,cancelRequested:false,sceneId:'QA_SYNTHETIC',bbox:lastQuery.bbox,query:{start:lastQuery.start,end:lastQuery.end,maxCloud:lastQuery.max_cloud,...(lastQuery.geometry?{geometry:lastQuery.geometry}:{})},index:'ndvi',mode:'local-only'};data=job;
   }else if(p==='/jobs'){
    assert.equal(u.searchParams.get('project'),project);if(job&&++polls>1)job={...job,status:'succeeded',phase:'completed'};data={jobs:job?[job]:[]};
   }else if(/^\/jobs\/[a-f0-9]{32}$/.test(p))data=job;
@@ -51,8 +53,24 @@ try{for(const width of [1366,1800])for(const project of ['DEMO-001','DIAB-2026-D
  await p.getByRole('button',{name:'Usar solo ventana rectangular',exact:true}).click();await p.locator('[data-ndvi-mask=bbox]').waitFor();assert.equal(await p.locator('[data-ndvi-field=west]').getAttribute('readonly'),null);
  await p.locator('[data-ndvi-polygon]').setInputFiles({name:'invalid.geojson',mimeType:'application/geo+json',buffer:Buffer.from(JSON.stringify({type:'Point',coordinates:[0,0]}))});await page.waitForFunction(()=>/GeoJSON|Perímetro/.test(document.querySelector('[data-ndvi-message]')?.textContent||''));await p.locator('[data-ndvi-mask=bbox]').waitFor();
  for(const [k,v] of Object.entries(before))assert.equal(await page.evaluate(k=>localStorage.getItem(k),k),v);
- assert.deepEqual(errors,[]);results.push({project,width,status:'PASS',submits,downloads:true,reload:true,parametersRestored:true,polygonImport:true,polygonSearchInvalidatedOnDateChange:true,invalidGeometryRejected:true,reviewBeforeSave:true,oldStorageUnchanged:true});await context.close();
+ const selected=project==='DIAB-2026-DEMO'?DIABLILLOS_QA_GEOJSON:{type:'FeatureCollection',features:[{type:'Feature',properties:{},geometry:polygon}]};
+ const sourceName='QA-generic-'+project+'.geojson',record=buildPerimeterRecord({geojson:selected,sha256:createHash('sha256').update(JSON.stringify(selected)).digest('hex'),sourceName,sourceType:'geojson',description:'Synthetic regression source; never an official perimeter',createdAt:'2026-11-05T00:00:00Z'}),key=perimeterKey(project==='DIAB-2026-DEMO');
+ await page.evaluate(({key,record})=>localStorage.setItem(key,JSON.stringify(record)),{key,record});
+ await page.goto(page.url().split('#')[0]+'#/area');await page.locator('[data-perimeter-saved]').filter({hasText:sourceName}).waitFor();
+ const areaSnapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
+ await page.locator('[data-perimeter-editor] input[type=file]').setInputFiles({name:'unsaved.geojson',mimeType:'application/geo+json',buffer:Buffer.from(JSON.stringify({type:'Feature',properties:{},geometry:polygon}))});await page.locator('[data-perimeter-candidate]').waitFor();assert.equal(await page.locator('[data-perimeter-ndvi]').count(),0);await page.locator('[data-perimeter-ndvi-pending]').waitFor();
+ await page.getByRole('button',{name:'Limpiar borrador',exact:true}).click();await page.locator('[data-perimeter-ndvi]').waitFor();assert.deepEqual(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage))),areaSnapshot);
+ await page.locator('[data-perimeter-ndvi]').click();await p.locator('[data-ndvi-mask=polygon]').waitFor();await p.locator('[data-ndvi-mask-name]').filter({hasText:sourceName}).waitFor();
+ await p.getByText('Servicio local disponible',{exact:true}).waitFor();
+ await p.locator('[data-ndvi-field=start]').fill('2025-05-01');await p.locator('[data-ndvi-field=end]').fill('2025-06-30');
+ await p.locator('[data-ndvi-search]').click();await p.getByRole('radio').check();assert.deepEqual(lastQuery.geometry,selected.features[0].geometry);assert.deepEqual(lastQuery.bbox,record.bounds);
+ assert(!page.url().includes('trabajo='));assert(page.url().includes('area=guardada'));
+ await page.evaluate(()=>document.fonts.ready);await page.evaluate(()=>window.scrollTo(0,0));await page.screenshot({path:path.join(out,project+'-'+width+'-area-to-ndvi-full.png'),fullPage:true});await p.screenshot({path:path.join(out,project+'-'+width+'-area-to-ndvi-panel.png')});
+ await p.locator('[data-ndvi-submit]').click();await page.waitForURL(url=>url.hash.includes('trabajo='+ 'b'.repeat(32)));await p.locator('[data-ndvi-job-status]').filter({hasText:'Completado'}).waitFor();await page.reload();await p.locator('[data-ndvi-mask=polygon]').waitFor();
+ assert.deepEqual(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage))),areaSnapshot);
+ assert.deepEqual(errors,[]);results.push({project,width,status:'PASS',submits,downloads:true,reload:true,parametersRestored:true,polygonImport:true,polygonSearchInvalidatedOnDateChange:true,invalidGeometryRejected:true,areaToNdviExactGeometry:true,previousJobDidNotReplaceSelection:true,maskRestored:true,reviewBeforeSave:true,oldStorageUnchanged:true});await context.close();
 }
 const c=await browser.newContext(),page=await c.newPage();let calls=0;page.on('request',r=>{if(r.url().includes('/api/mita'))calls++;});await page.goto(base+'index.html#/mita');await page.getByText('Procesamiento no disponible',{exact:true}).waitFor();assert.equal(await page.locator('[data-ndvi-search]').isDisabled(),true);assert.equal(calls,0);await c.close();
 await fs.writeFile(path.join(out,'results.json'),JSON.stringify({status:'PASS',scope:'Synthetic API transport/interaction regression; real satellite test is separate',results,staticInstallNoApiCalls:true},null,2));console.log('NDVI workbench PASS: both demos, 1366/1800, downloads, reload, explicit review and static fallback.');
 }finally{await browser.close();for(const server of servers){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}}
+

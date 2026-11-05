@@ -1,4 +1,5 @@
 import {useEffect,useState,type ChangeEvent} from 'react';
+import {Link} from 'react-router-dom';
 import type {PointAoi} from '../georef/AoiWorkbench';
 import {IS_DIABLILLOS_CASE} from '../../lib/demo';
 // @ts-ignore: Node/browser source validation and provenance contract
@@ -172,6 +173,7 @@ export function PerimeterWorkbench({aoi}:Props){
     Guardar este perímetro</button>
   </div>}
   {saved&&<div className="geo-perimeter-saved-actions">
+   {!candidate&&!drawing&&vertices.length===0?<Link to="/mita?area=guardada" data-perimeter-ndvi>Calcular NDVI dentro de este perímetro</Link>:<p data-perimeter-ndvi-pending>Guardá el nuevo contorno o limpiá el borrador antes de enviar el perímetro guardado a NDVI.</p>}
    <button type="button" onClick={adjustQueryWindow}>Ajustar ventana de consulta a este perímetro</button>
    <button type="button" onClick={()=>{
     const text=JSON.stringify(saved.geojson,null,2);
