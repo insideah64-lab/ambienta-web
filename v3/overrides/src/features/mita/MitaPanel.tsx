@@ -1,4 +1,4 @@
-import {useRef,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import type {DemoState} from '../../lib/demo';
 import {ArtworkIcon} from '../iconography/ArtworkIcon';
@@ -14,6 +14,9 @@ export function MitaPanel({data}:{data:DemoState}){
  const project=data.project.id,[saved,setSaved]=useState(()=>load(project)),[pending,setPending]=useState<{entry:MitaEntry;report:any}|null>(null);
  const [context,setContext]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[verified,setVerified]=useState<Record<string,string>>({});
  const [params,setParams]=useSearchParams(),source=useRef(saved.raw),operation=useRef(false);
+ const historicalLink=params.get('historial')==='ndvi'||(!params.get('vegetacion')&&!!(params.get('trabajo')||params.get('producto')||params.get('area')==='guardada'));
+ const [historyOpen,setHistoryOpen]=useState(historicalLink||!!saved.error);
+ useEffect(()=>{if(historicalLink||saved.error)setHistoryOpen(true);},[historicalLink,saved.error]);
  const selected=saved.doc?.entries.find(e=>e.id===params.get('producto'));
  const entry=pending?.entry||selected,report=pending?.report||(selected?parseMitaReport(selected.raw):null);
  const choose=(id:string)=>{setPending(null);setNotice('');setParams(prev=>{const p=new URLSearchParams(prev);p.set('producto',id);return p;});};
@@ -37,14 +40,16 @@ export function MitaPanel({data}:{data:DemoState}){
   if(file.size>MAX_TIFF_BYTES)throw Error('El GeoTIFF supera 64 MiB.');
   await verifyTiff(await file.arrayBuffer(),expected);setVerified(v=>({...v,[id]:file.name}));setNotice('Huella coincidente. Los bytes del archivo coinciden con el hash declarado; esto no valida su contenido científico.');
  }catch(e){setVerified(v=>{const n={...v};delete n[id];return n;});setNotice(e instanceof Error?e.message:String(e));}finally{setBusy(false);operation.current=false;}}
- const isNo2=params.get('analisis')==='no2',isVegetation=params.get('analisis')==='vegetacion';
- const switcher=<nav className="amb-mita-analysis-switch" aria-label="Tipo de análisis satelital"><button aria-pressed={!isNo2&&!isVegetation} onClick={()=>setParams(prev=>{const p=new URLSearchParams(prev);p.delete('analisis');return p;})}>Vegetación · NDVI</button><button aria-pressed={isVegetation} onClick={()=>setParams(prev=>{const p=new URLSearchParams(prev);p.set('analisis','vegetacion');return p;})}>Sensores e índices</button><button aria-pressed={isNo2} onClick={()=>setParams(prev=>{const p=new URLSearchParams(prev);p.set('analisis','no2');return p;})}>Atmósfera · NO₂</button></nav>;
- if(isVegetation)return <section className="amb-mita" data-mita-workspace aria-label="Resultados satelitales MITA"><header><h2>MITA · vegetación multiespectral</h2><p>Compará sensores e índices sobre cualquier delimitación del proyecto.</p></header>{switcher}<VegetationWorkbench key={project} project={project}/></section>;
+ const isNo2=params.get('analisis')==='no2';
+ const switcher=<nav className="amb-mita-analysis-switch" aria-label="Tipo de análisis satelital"><button aria-pressed={!isNo2} onClick={()=>setParams(prev=>{const p=new URLSearchParams(prev);p.set('analisis','vegetacion');return p;})}>Vegetación</button><button aria-pressed={isNo2} onClick={()=>setParams(prev=>{const p=new URLSearchParams(prev);p.set('analisis','no2');return p;})}>Atmósfera · NO₂</button></nav>;
  if(isNo2)return <section className="amb-mita" data-mita-workspace aria-label="Resultados satelitales MITA"><header><h2>MITA · análisis satelital</h2><p>Delimitaciones y resultados independientes para cada proyecto.</p></header>{switcher}<No2Workbench key={project} project={project}/></section>;
  return <section className="amb-mita" data-mita-workspace aria-label="Resultados satelitales MITA">
-  <header className="v2-panel-title"><div><p className="v2-kicker">SENTINEL-2 · NDVI</p><h2><ArtworkIcon kind="satellite" size={25}/> NDVI y resultados del proyecto</h2><p>Procesá una escena en la versión asistida local o importá un informe. Revisá su calidad y justificá su vínculo con <strong>{project}</strong> antes de registrarlo.</p></div></header>
+  <header className="v2-panel-title"><div><h2><ArtworkIcon kind="satellite" size={25}/> Vegetación</h2><p>Elegí sensor e índice, calculá sobre la delimitación del proyecto y consultá sus resultados.</p></div></header>
   {switcher}
-  <NdviWorkbench project={project} onReport={file=>void importReport(file)}/>
+  <VegetationWorkbench key={project} project={project}/>
+  <details className="amb-mita-history" data-mita-history open={historyOpen} onToggle={e=>{const open=e.currentTarget.open;if(open===historyOpen)return;setHistoryOpen(open);setParams(prev=>{const p=new URLSearchParams(prev);if(open)p.set('historial','ndvi');else p.delete('historial');return p;},{replace:true});}}><summary>Resultados NDVI anteriores e informes importados</summary>
+  {historyOpen&&<><p>Consultá los trabajos anteriores de Sentinel-2 y los informes vinculados a <strong>{project}</strong>. Para nuevos análisis usá los selectores de arriba.</p>
+  <NdviWorkbench historyOnly project={project} onReport={file=>void importReport(file)}/>
   <p className="amb-mita-note">Los informes conservan el cálculo y la calibración del motor. El NDVI no es una medición de contaminación ni un dictamen de impacto ambiental.</p>
   {saved.error&&<div role="alert"><p>El archivo local no se puede abrir. No se sobrescribe: {saved.error}</p><button onClick={()=>{try{download('MITA-original-local.json',localStorage.getItem(mitaKey(project))||'');}catch{setNotice('No se pudo leer el almacenamiento.');}}}>Descargar original local</button></div>}
   <div className="amb-mita-toolbar"><label>Importar informe MITA 0.2.0 (JSON, hasta 1 MiB)<input data-mita-import type="file" accept=".json,application/json" disabled={busy||!!saved.error} onChange={e=>{void importReport(e.target.files?.[0]);e.target.value='';}}/></label>
@@ -73,5 +78,7 @@ export function MitaPanel({data}:{data:DemoState}){
    </>}
   </article></div>
   <footer><p>Flujo: calcular NDVI o importar un resultado → revisar JSON y GeoTIFF → vincular al proyecto. Las series temporales, el visor georreferenciado y la ejecución remota autenticada quedan pendientes.</p><a href="https://sentiwiki.copernicus.eu/web/s2-applications" target="_blank" rel="noreferrer">Referencia técnica Sentinel-2 · Copernicus</a></footer>
+  </>}
+  </details>
  </section>;
 }
