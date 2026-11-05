@@ -1,0 +1,53 @@
+import {useEffect,useRef,useState,type MouseEvent} from 'react';
+import {useSearchParams} from 'react-router-dom';
+import {ndviRequest,ndviFileUrl,ndviLegend,type NdviJob,type NdviSummary} from './NdviClient';
+import {parseNdviAnalysis,viewGradient,type NdviAnalysis} from './NdviReviewModel';
+import './NdviResultView.css';
+const f=(v:number|null|undefined)=>v==null?'Sin datos':v.toLocaleString('es-AR',{minimumFractionDigits:4,maximumFractionDigits:4});
+type Pixel={jobId:string;row:number;col:number;valid:boolean;ndvi:number|null;lon:number;lat:number};
+export function NdviResultView({job,summary}:{job:NdviJob;summary:NdviSummary}){
+ const [params,setParams]=useSearchParams(),mode=params.get('vista')==='local'?'local':params.get('vista')==='rgb'?'rgb':'fixed',zoom=params.get('zoom')==='4'?4:params.get('zoom')==='2'?2:1;
+ const [analysis,setAnalysis]=useState<NdviAnalysis|null>(null),[loading,setLoading]=useState(true),[error,setError]=useState(''),[imageError,setImageError]=useState(false),[point,setPoint]=useState<Pixel|null>(null),[pixelMessage,setPixelMessage]=useState(''),[row,setRow]=useState('0'),[col,setCol]=useState('0');
+ const pixelRequest=useRef<AbortController|null>(null);
+ useEffect(()=>{const c=new AbortController();setLoading(true);setAnalysis(null);setError('');setPoint(null);setPixelMessage('');setImageError(false);
+  ndviRequest<unknown>('/jobs/'+job.id+'/analysis?project='+encodeURIComponent(job.project),undefined,c.signal).then(a=>setAnalysis(parseNdviAnalysis(a,job.id,summary.sceneId,summary.validPixels))).catch(()=>{if(!c.signal.aborted)setError('Esta instalación no ofrece la revisión ampliada. Se conserva la vista previa histórica y las descargas.');}).finally(()=>{if(!c.signal.aborted)setLoading(false);});
+  return()=>{c.abort();pixelRequest.current?.abort();};
+ },[job.id,job.project,summary.sceneId,summary.validPixels]);
+ useEffect(()=>setImageError(false),[mode,job.id]);
+ const choose=(key:string,value:string)=>setParams(prev=>{const p=new URLSearchParams(prev);p.set(key,value);return p;},{replace:true});
+ const localUnavailable=mode==='local'&&!analysis?.local,shownMode=!analysis||localUnavailable?'fixed':mode;
+ const scale=shownMode==='local'?analysis?.local:analysis?.fixed;
+ const source=ndviFileUrl(job,!analysis?'preview':shownMode==='rgb'?'context':shownMode==='local'?'view-local':'view-fixed');
+ async function inspect(r:number,c:number){
+  if(!Number.isInteger(r)||!Number.isInteger(c)||r<0||c<0||r>=summary.height||c>=summary.width){setPixelMessage('Elegí una fila y columna dentro de la grilla.');return;}
+  pixelRequest.current?.abort();const controller=new AbortController();pixelRequest.current=controller;setPixelMessage('Consultando píxel…');setPoint(null);setRow(String(r));setCol(String(c));
+  try{const p=await ndviRequest<Pixel>('/jobs/'+job.id+'/pixel?project='+encodeURIComponent(job.project)+'&row='+r+'&col='+c,undefined,controller.signal);
+   if(p.jobId!==job.id||p.row!==r||p.col!==c||typeof p.valid!=='boolean'||(p.valid?typeof p.ndvi!=='number'||!Number.isFinite(p.ndvi)||Math.abs(p.ndvi)>1.00001:p.ndvi!==null)||!Number.isFinite(p.lon)||!Number.isFinite(p.lat))throw Error('Respuesta de píxel incompatible.');
+   if(!controller.signal.aborted){setPoint(p);setPixelMessage('');}
+  }catch{if(!controller.signal.aborted)setPixelMessage('No se pudo consultar el píxel. Las descargas originales siguen disponibles.');}
+ }
+ function imageClick(e:MouseEvent<HTMLImageElement>){if(!analysis)return;const b=e.currentTarget.getBoundingClientRect();void inspect(Math.min(summary.height-1,Math.floor((e.clientY-b.top)/b.height*summary.height)),Math.min(summary.width-1,Math.floor((e.clientX-b.left)/b.width*summary.width)));}
+ const bins=analysis?.histogram||[],max=Math.max(1,...bins.map(b=>b.count)),left=bins[0]?.lo,right=bins.at(-1)?.hi;
+ return <div className="amb-ndvi-review" data-ndvi-review>
+  <p><strong>Vista de la adquisición {summary.acquiredAt.slice(0,10)}</strong>. Los colores representan NDVI; no clasifican contaminación ni severidad de impacto.</p>
+  <div className="amb-ndvi-view-tools" aria-label="Visualización del resultado">
+   <button aria-pressed={shownMode==='fixed'} onClick={()=>choose('vista','fixed')}>NDVI · escala fija</button>
+   <button disabled={!analysis?.local} aria-pressed={shownMode==='local'} onClick={()=>choose('vista','local')}>Contraste local P02–P98</button>
+   <button disabled={!analysis} aria-pressed={shownMode==='rgb'} onClick={()=>choose('vista','rgb')}>Color verdadero · misma fecha</button>
+   <label>Ampliación<select aria-label="Ampliación del resultado" value={zoom} onChange={e=>choose('zoom',e.target.value)}><option value="1">Ajustar</option><option value="2">2×</option><option value="4">4×</option></select></label>
+  </div>
+  {loading?<p role="status">Preparando distribución y vista opaca…</p>:<>
+   {error&&<p role="status">{error}</p>}
+   {localUnavailable&&analysis&&<p>No hay variación P02–P98 suficiente. Se muestra la escala fija.</p>}
+   <p data-ndvi-view-description>{!analysis?'Vista previa histórica: puede conservar transparencia en sus píxeles válidos. El archivo original no se modifica.':shownMode==='local'?'Contraste local exploratorio: P02 '+f(analysis?.p02??null)+' a P98 '+f(analysis?.p98??null)+'. Los extremos se saturan solo en la imagen. No usar estos colores para comparar fechas.':shownMode==='rgb'?'Composición TCI del mismo producto y fecha, alineada a la grilla y máscara válida del NDVI. Se carga desde la fuente pública al pedirla. No representa valores NDVI.':'Escala fija −1 a +1. Los píxeles válidos son opacos; transparente significa sin dato válido.'}</p>
+   {imageError?<p role="alert">No se pudo cargar esta vista. Podés volver a la escala fija o descargar el GeoTIFF. <button onClick={()=>setImageError(false)}>Reintentar vista</button></p>:<div className="amb-ndvi-raster-scroll" tabIndex={0} role="region" aria-label="Imagen ampliable; usar las barras de desplazamiento" data-ndvi-image-viewport><div className="amb-ndvi-raster-frame" style={{width:zoom===1?'min(100%, '+Math.round(560*summary.width/summary.height)+'px)':zoom*100+'%'}}><img src={source} onError={()=>setImageError(true)} onClick={imageClick} alt={(shownMode==='rgb'?'Color verdadero':'NDVI')+' del recorte '+summary.sceneId} data-ndvi-preview data-ndvi-display={shownMode}/></div></div>}
+   <p className="amb-ndvi-view-caption">Recorte en {summary.crs}. El GeoTIFF conserva la georreferenciación. El contorno es el seleccionado para el trabajo; esta vista no acredita un límite oficial. Ampliar no agrega resolución espacial.</p>
+   {shownMode!=='rgb'&&<><div className="amb-ndvi-legend" style={{backgroundImage:scale?viewGradient(scale):ndviLegend(summary.legend)}}/><div className="amb-ndvi-legend-labels"><span>{shownMode==='local'?f(analysis?.p02??null):'−1'}</span><span>{shownMode==='local'?'Contraste local · P02–P98':'0'}</span><span>{shownMode==='local'?f(analysis?.p98??null):'+1'}</span></div></>}
+   {analysis&&<><form className="amb-ndvi-pixel" onSubmit={e=>{e.preventDefault();void inspect(row.trim()===''?NaN:Number(row),col.trim()===''?NaN:Number(col));}}><strong>Consultar píxel del GeoTIFF</strong><label>Fila · desde 0<input type="number" min="0" max={summary.height-1} step="1" value={row} onChange={e=>setRow(e.target.value)}/></label><label>Columna · desde 0<input type="number" min="0" max={summary.width-1} step="1" value={col} onChange={e=>setCol(e.target.value)}/></label><button>Consultar píxel</button></form><p role="status" data-ndvi-pixel-result>{pixelMessage||(!point?'Podés hacer clic en la imagen o indicar fila y columna con el teclado.':`Fila ${point.row}, columna ${point.col} · ${point.valid?'NDVI '+f(point.ndvi):'Sin dato válido'} · centro WGS84 ${point.lon.toFixed(6)}, ${point.lat.toFixed(6)}`)}</p>
+    <section className="amb-ndvi-distribution" aria-label="Distribución de valores NDVI" data-ndvi-distribution><h5>Distribución de los píxeles válidos</h5><dl><div><dt>Mediana</dt><dd>{f(analysis.median)}</dd></div><div><dt>Percentil 2</dt><dd>{f(analysis.p02)}</dd></div><div><dt>Percentil 98</dt><dd>{f(analysis.p98)}</dd></div></dl>
+    <p>{analysis.validPixels.toLocaleString('es-AR')} píxeles válidos. El porcentaje válido expresa la regla de calidad aplicada, no vegetación sana ni exactitud científica. Los percentiles describen la distribución; no son intervalos de confianza.</p>
+    {bins.length>0&&<><svg viewBox="0 0 640 220" role="img" aria-label={'Histograma NDVI de '+f(left)+' a '+f(right)+', '+analysis.validPixels+' píxeles válidos'}><line x1="46" y1="178" x2="625" y2="178" stroke="currentColor"/>{[0,.5,1].map(v=><g key={v}><line x1="46" y1={178-v*150} x2="625" y2={178-v*150} stroke="currentColor" opacity=".18"/><text x="39" y={182-v*150} textAnchor="end">{(max*v/analysis.validPixels*100).toFixed(1)} %</text></g>)}{bins.map((b,i)=><rect key={i} x={47+i*577/bins.length} y={178-b.count/max*150} width={Math.max(1,577/bins.length-1)} height={b.count/max*150} fill="#6dcbb0"><title>{f(b.lo)+' a '+f(b.hi)+': '+b.count+' píxeles'}</title></rect>)}<text x="46" y="201">{f(left)}</text><text x="625" y="201" textAnchor="end">{f(right)}</text><text x="335" y="218" textAnchor="middle">NDVI · intervalos descriptivos</text></svg><details><summary>Ver recuentos del histograma</summary><table><thead><tr><th>Desde</th><th>Hasta</th><th>Píxeles</th></tr></thead><tbody>{bins.map((b,i)=><tr key={i}><td>{f(b.lo)}</td><td>{f(b.hi)}</td><td>{b.count.toLocaleString('es-AR')}</td></tr>)}</tbody></table></details></>}
+    </section></>}
+  </>}
+ </div>;
+}

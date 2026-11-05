@@ -3,10 +3,11 @@ import {useSearchParams} from 'react-router-dom';
 import {IS_DIABLILLOS_CASE} from '../../lib/demo';
 // @ts-ignore: existing project query window, never a verified perimeter.
 import {aoiKey,readPointAoi} from '../maps/aoi-model.mjs';
-import {emptyNdviForm,ndviQuery,ndviPolygon,ndviRequest,ndviFileUrl,ndviLegend,type NdviGeometry,type NdviForm,type NdviSearch,type NdviJob,type NdviSummary} from './NdviClient';
+import {emptyNdviForm,ndviQuery,ndviPolygon,ndviRequest,ndviFileUrl,type NdviGeometry,type NdviForm,type NdviSearch,type NdviJob,type NdviSummary} from './NdviClient';
 // @ts-ignore: source record remains read-only; masks are snapshots per job.
 import {readPerimeter,perimeterKey} from '../maps/perimeter-source.mjs';
 import './NdviWorkbench.css';
+import {NdviResultView} from './NdviResultView';
 const labels={queued:'En cola',running:'Procesando',succeeded:'Completado',failed:'Fallido',cancelled:'Cancelado'};
 const f=(n:number|null)=>n===null?'Sin datos':n.toLocaleString('es-AR',{minimumFractionDigits:4,maximumFractionDigits:4});
 export function NdviWorkbench({project,onReport}:{project:string;onReport:(file:File)=>void}){
@@ -15,7 +16,7 @@ export function NdviWorkbench({project,onReport}:{project:string;onReport:(file:
  const [detail,setDetail]=useState<NdviJob|null>(null);
  const [jobs,setJobs]=useState<NdviJob[]>([]),[summary,setSummary]=useState<NdviSummary|null>(null),[busy,setBusy]=useState(false),[message,setMessage]=useState(''),[serviceError,setServiceError]=useState('');
  const [params,setParams]=useSearchParams(),jobId=params.get('trabajo'),fromArea=params.get('area')==='guardada',listed=jobs.find(j=>j.id===jobId),job=detail?.id===jobId?{...detail,...listed,query:detail.query}:listed,pending=useRef(false);
- const select=(id:string,replace=false)=>setParams(prev=>{const p=new URLSearchParams(prev);p.delete('area');p.set('trabajo',id);return p;},{replace});
+ const select=(id:string,replace=false)=>setParams(prev=>{const p=new URLSearchParams(prev);p.delete('area');p.delete('vista');p.delete('zoom');p.set('trabajo',id);return p;},{replace});
  useEffect(()=>{if(!job?.query)return;setForm({west:String(job.bbox[0]),south:String(job.bbox[1]),east:String(job.bbox[2]),north:String(job.bbox[3]),start:job.query.start,end:job.query.end,maxCloud:String(job.query.maxCloud)});setGeometry(job.query.geometry||null);setMaskName(job.query.geometry?'Polígono conservado en el trabajo '+job.id:'');setSearch(null);setScene('');},[job?.id,detail?.id]);
  useEffect(()=>{if(fromArea&&!jobId)savedPolygon();},[fromArea,jobId,project]);
  useEffect(()=>{if(!available||!jobId||!/^[a-f0-9]{32}$/.test(jobId))return;const c=new AbortController();ndviRequest<NdviJob>('/jobs/'+jobId+'?project='+encodeURIComponent(project),undefined,c.signal).then(j=>{if(j.project!==project||j.id!==jobId)throw Error('El detalle no corresponde al proyecto.');setDetail(j);}).catch(e=>{if(!c.signal.aborted)setServiceError(String(e));});return()=>c.abort();},[available,jobId,project]);
@@ -62,7 +63,7 @@ export function NdviWorkbench({project,onReport}:{project:string;onReport:(file:
    {!job?<p>{jobId?'Este trabajo no está en el registro del proyecto de este servicio.':'Seleccioná un trabajo para revisar su resultado.'}</p>:<><h4 data-ndvi-job-status>{labels[job.status]} · NDVI</h4><p>{job.sceneId}</p><p>Ventana usada: {job.bbox.join(', ')} · EPSG:4326</p>{job.cancelRequested&&job.status==='running'&&<p>Cancelación solicitada: se confirmará al detenerse el proceso. No se publica el resultado mientras tanto.</p>}{job.error&&<p role="alert">{job.error}</p>}
    {['queued','running'].includes(job.status)&&<button disabled={busy||job.cancelRequested} onClick={()=>void action(async()=>{await ndviRequest('/jobs/'+job.id+'/cancel',{project});setMessage('Cancelación solicitada.');})}>Solicitar cancelación</button>}
    {job.status==='succeeded'&&summary&&<><p>Adquisición: {summary.acquiredAt} · {summary.width} × {summary.height} · {summary.crs}</p><div className="amb-mita-stats">{[['Mínimo',summary.min],['Promedio',summary.mean],['Máximo',summary.max]].map(([name,value])=><div key={String(name)}><small>NDVI {name}</small><strong>{f(value as number|null)}</strong></div>)}</div><p data-ndvi-quality>Válidos en {summary.aoiKind==='polygon'?'el polígono':'la ventana'}: {summary.validPixels.toLocaleString('es-AR')} / {summary.windowPixels.toLocaleString('es-AR')} ({(summary.validFraction*100).toLocaleString('es-AR',{maximumFractionDigits:2})} %). Ráster rectangular: {summary.rasterPixels.toLocaleString('es-AR')} píxeles.</p>
-   {summary.validPixels===0?<p role="alert">Sin píxeles válidos: no hay NDVI interpretable.</p>:<figure><img src={ndviFileUrl(job,'preview')} alt={'Vista previa del recorte NDVI de '+summary.sceneId} data-ndvi-preview/><figcaption>Vista previa del recorte. La georreferenciación se conserva en el GeoTIFF; esta imagen no acredita el perímetro del proyecto.</figcaption><div className="amb-ndvi-legend" style={{backgroundImage:ndviLegend(summary.legend)}}/><div className="amb-ndvi-legend-labels"><span>−1</span><span>0</span><span>+1</span></div><small>Escala NDVI continua. Transparente: sin datos. El color no clasifica contaminación ni severidad de impacto.</small></figure>}
+   {summary.validPixels===0?<p role="alert">Sin píxeles válidos: no hay NDVI interpretable.</p>:<NdviResultView job={job} summary={summary}/>}
    <div className="amb-ndvi-downloads"><a href={ndviFileUrl(job,'raster')} download>Descargar GeoTIFF</a><a href={ndviFileUrl(job,'report')} download>Descargar informe JSON</a><button disabled={busy} onClick={()=>void action(async()=>{const r=await fetch(ndviFileUrl(job,'report'));if(!r.ok)throw Error('No se pudo recuperar el informe.');const blob=await r.blob();if(blob.size>1048576)throw Error('El informe supera el límite de revisión.');onReport(new File([blob],'MITA-NDVI-'+job.id+'.json',{type:'application/json'}));setMessage('Informe enviado a la ficha de revisión de abajo. Revisá su vínculo antes de guardarlo.');})}>Revisar y vincular al proyecto</button></div></>}
    </>}
   </article></div>}
