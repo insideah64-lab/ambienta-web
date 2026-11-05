@@ -51,6 +51,7 @@ export function MitaPanel({data}:{data:DemoState}){
    <header><p>{pending?'VISTA PREVIA · SIN REGISTRAR':'REGISTRADO EN '+project}</p><h3 data-mita-scene>{report.scene_id}</h3><p>Adquisición: <time>{report.acquisition_datetime}</time> · {report.collection}</p></header>
    <div className="amb-mita-stats">{[['NDVI mínimo',report.statistics.ndvi_min],['NDVI promedio',report.statistics.ndvi_mean],['NDVI máximo',report.statistics.ndvi_max]].map(([label,n])=><div key={String(label)}><small>{label}</small><strong>{f(n as number|null)}</strong></div>)}</div>
    <div className="amb-mita-quality"><h4>Calidad y cobertura</h4><dl>
+    {report.aoi?.kind==='polygon'&&<div><dt>Píxeles válidos del polígono · exterior y huecos excluidos</dt><dd>{report.quality.valid_pixels.toLocaleString('es-AR')} / {report.quality.inside_aoi_pixels.toLocaleString('es-AR')} ({f(report.quality.valid_fraction_inside_aoi*100)} %)</dd></div>}
     <div><dt>Píxeles válidos dentro de la BBOX</dt><dd>{report.quality.valid_pixels.toLocaleString('es-AR')} / {report.quality.inside_bbox_pixels.toLocaleString('es-AR')} ({f(report.quality.valid_fraction_inside_bbox*100)} %)</dd></div>
     <div><dt>Píxeles válidos del ráster rectangular</dt><dd>{report.statistics.valid_pixels.toLocaleString('es-AR')} / {report.statistics.pixels.toLocaleString('es-AR')} ({f(report.statistics.valid_fraction*100)} %)</dd></div>
     <div><dt>Nubosidad de la escena completa</dt><dd>{f(report.scene_cloud_percent)} % · no representa la nubosidad local</dd></div>

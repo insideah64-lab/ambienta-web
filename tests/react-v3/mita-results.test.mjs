@@ -1,7 +1,7 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {createRequire} from 'node:module';
 import {mitaFixture,tiffFixture} from '../fixtures/mita-fixture.mjs';
 const require=createRequire(new URL('../../apps/web-v3/package.json',import.meta.url));
-const built=await require('esbuild').build({entryPoints:['v3/overrides/src/features/mita/MitaModel.ts'],bundle:true,write:false,format:'esm',platform:'node'});
+const built=await require('esbuild').build({entryPoints:['v3/overrides/src/features/mita/MitaModel.ts'],nodePaths:['apps/web-v3/node_modules'],bundle:true,write:false,format:'esm',platform:'node'});
 const m=await import('data:text/javascript;base64,'+Buffer.from(built.outputFiles[0].text).toString('base64'));
 const bytes=tiffFixture(),ab=bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength),hash=await m.sha256(ab),fixture=mitaFixture(hash),raw=JSON.stringify(fixture);
 test('MITA native report is read without changing values or radiometry',()=>{assert.deepEqual(m.parseMitaReport(raw),fixture);assert.equal(m.parseMitaReport(raw).calibration.red_offset,-.1);});
