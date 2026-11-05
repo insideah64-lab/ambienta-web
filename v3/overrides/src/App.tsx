@@ -59,7 +59,7 @@ const NAV_PRIMARY: Navigation[] = [
 ];
 const NAV_TOOLS: Navigation[] = [
   {path:'/matrices',label:'Matrices ambientales',icon:'measures',description:'Crear, editar y exportar matrices ambientales por proyecto.'},
-  {path:'/mita',label:'MITA satelital',icon:'satellite',description:'Revisar y vincular resultados Sentinel-2 NDVI generados por MITA.'},
+  {path:'/mita',label:'MITA satelital',icon:'satellite',description:'Analizar vegetación (NDVI) y columna troposférica de NO₂ con productos satelitales.'},
   {path:'/normativa',label:'Normativa',icon:'legal',description:'Referencias de gestión normativa pendientes de incorporación.'},
   {path:'/biblioteca',label:'Biblioteca',icon:'library',description:'Biblioteca documental pendiente de conexión.'},
   {path:'/historial',label:'Historial',icon:'history',description:'Registro local de actividades de demostración.'},
