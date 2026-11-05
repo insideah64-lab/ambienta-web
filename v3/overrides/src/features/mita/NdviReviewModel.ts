@@ -1,5 +1,7 @@
 export type ViewScale={domain:[number,number];legend:{value:number;color:string}[]};
-export type NdviAnalysis={jobId:string;sceneId:string;outputSha256:string;validPixels:number;p02:number|null;median:number|null;p98:number|null;histogram:{lo:number;hi:number;count:number}[];fixed:ViewScale;local:ViewScale|null};
+export const ZOOM_LEVELS=[1,2,4,8];
+export const nextRasterZoom=(value:number,direction:number)=>ZOOM_LEVELS[Math.max(0,Math.min(3,ZOOM_LEVELS.indexOf(value)+(direction>0?1:-1)))];
+export type NdviAnalysis={jobId:string;sceneId:string;outputSha256:string;validPixels:number;p02:number|null;median:number|null;p98:number|null;histogram:{lo:number;hi:number;count:number}[];fixed:ViewScale;local:ViewScale|null;palettes?:Partial<Record<'viridis'|'cividis',{fixed:ViewScale;local:ViewScale|null}>>};
 const finite=(x:unknown):x is number=>typeof x==='number'&&Number.isFinite(x);
 export function viewGradient(scale:ViewScale){
  const [lo,hi]=scale?.domain||[];
@@ -14,5 +16,6 @@ export function parseNdviAnalysis(input:unknown,jobId:string,sceneId:string,vali
  if(a.validPixels){if(!a.histogram.length||![a.p02,a.median,a.p98].every(x=>finite(x)&&Math.abs(x)<=1.00001)||a.p02!>a.median!||a.median!>a.p98!)throw Error('Percentiles inválidos.');}
  else if(a.p02!==null||a.median!==null||a.p98!==null||a.local!==null)throw Error('Un resultado sin datos no admite percentiles.');
  if(a.local){viewGradient(a.local);if(a.local.domain[0]!==a.p02||a.local.domain[1]!==a.p98)throw Error('Contraste local sin límites P02–P98 trazables.');}
+ if(a.palettes){for(const [name,p] of Object.entries(a.palettes)){if(!['viridis','cividis'].includes(name)||!p)throw Error('Paleta no compatible.');viewGradient(p.fixed);if(p.fixed.domain[0]!==-1||p.fixed.domain[1]!==1)throw Error('Paleta fija sin escala completa.');if(p.local){viewGradient(p.local);if(p.local.domain[0]!==a.p02||p.local.domain[1]!==a.p98)throw Error('Paleta local sin límites trazables.');}else if(a.local)throw Error('Paleta local incompleta.');}}
  return a;
 }
