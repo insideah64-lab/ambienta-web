@@ -27,11 +27,11 @@ export const CONESA_CRITERIA:readonly MethodCriterion[]=[
  {id:'MC',name:'Recuperabilidad',options:opt([[1,'Inmediata'],[2,'Mediano plazo'],[4,'Mitigable'],[8,'Irrecuperable']])}
 ];
 export const RIAM_CRITERIA:readonly MethodCriterion[]=[
- {id:'A1',name:'Importancia de la condición',options:opt([[0,'Sin importancia'],[1,'Local'],[2,'Extralocal'],[3,'Regional'],[4,'Nacional/internacional']])},
+ {id:'A1',name:'Importancia de la condición',options:opt([[0,'Sin importancia'],[1,'Local'],[2,'Extralocal'],[3,'Regional/nacional'],[4,'Nacional/internacional']])},
  {id:'A2',name:'Magnitud del cambio',options:opt([[-3,'Adverso muy importante'],[-2,'Adverso significativo'],[-1,'Adverso menor'],[0,'Sin cambio'],[1,'Beneficio menor'],[2,'Beneficio significativo'],[3,'Beneficio muy importante']])},
- {id:'B1',name:'Permanencia',options:opt([[1,'Sin cambio'],[2,'Temporal'],[3,'Permanente']])},
- {id:'B2',name:'Reversibilidad',options:opt([[1,'Sin cambio'],[2,'Reversible'],[3,'Irreversible']])},
- {id:'B3',name:'Acumulación',options:opt([[1,'Sin cambio'],[2,'No acumulativo'],[3,'Acumulativo']])}
+ {id:'B1',name:'Permanencia',options:opt([[1,'Sin cambio / no aplicable'],[2,'Temporal'],[3,'Permanente']])},
+ {id:'B2',name:'Reversibilidad',options:opt([[1,'Sin cambio / no aplicable'],[2,'Reversible'],[3,'Irreversible']])},
+ {id:'B3',name:'Acumulación / sinergia',options:opt([[1,'Sin cambio / no aplicable'],[2,'No acumulativo'],[3,'Acumulativo/sinérgico']])}
 ];
 export const METHOD_DEFINITIONS:Record<ScoredMethodId,MethodDefinition>={
  'conesa-1997-2ex':{
