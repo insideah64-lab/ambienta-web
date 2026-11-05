@@ -58,7 +58,7 @@ try{for(const width of [1366,1800])for(const project of ['DEMO-001','DIAB-2026-D
  await page.evaluate(({key,record})=>localStorage.setItem(key,JSON.stringify(record)),{key,record});
  await page.goto(page.url().split('#')[0]+'#/area');await page.locator('[data-perimeter-saved]').filter({hasText:sourceName}).waitFor();
  const areaSnapshot=await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage)));
- await page.locator('[data-perimeter-editor] input[type=file]').setInputFiles({name:'unsaved.geojson',mimeType:'application/geo+json',buffer:Buffer.from(JSON.stringify(polygon))});await page.locator('[data-perimeter-candidate]').waitFor();assert.equal(await page.locator('[data-perimeter-ndvi]').count(),0);await page.locator('[data-perimeter-ndvi-pending]').waitFor();
+ await page.locator('[data-perimeter-editor] input[type=file]').setInputFiles({name:'unsaved.geojson',mimeType:'application/geo+json',buffer:Buffer.from(JSON.stringify({type:'Feature',properties:{},geometry:polygon}))});await page.locator('[data-perimeter-candidate]').waitFor();assert.equal(await page.locator('[data-perimeter-ndvi]').count(),0);await page.locator('[data-perimeter-ndvi-pending]').waitFor();
  await page.getByRole('button',{name:'Limpiar borrador',exact:true}).click();await page.locator('[data-perimeter-ndvi]').waitFor();assert.deepEqual(await page.evaluate(()=>Object.fromEntries(Object.entries(localStorage))),areaSnapshot);
  await page.locator('[data-perimeter-ndvi]').click();await p.locator('[data-ndvi-mask=polygon]').waitFor();await p.locator('[data-ndvi-mask-name]').filter({hasText:sourceName}).waitFor();
  await p.getByText('Servicio local disponible',{exact:true}).waitFor();
@@ -73,3 +73,4 @@ try{for(const width of [1366,1800])for(const project of ['DEMO-001','DIAB-2026-D
 const c=await browser.newContext(),page=await c.newPage();let calls=0;page.on('request',r=>{if(r.url().includes('/api/mita'))calls++;});await page.goto(base+'index.html#/mita');await page.getByText('Procesamiento no disponible',{exact:true}).waitFor();assert.equal(await page.locator('[data-ndvi-search]').isDisabled(),true);assert.equal(calls,0);await c.close();
 await fs.writeFile(path.join(out,'results.json'),JSON.stringify({status:'PASS',scope:'Synthetic API transport/interaction regression; real satellite test is separate',results,staticInstallNoApiCalls:true},null,2));console.log('NDVI workbench PASS: both demos, 1366/1800, downloads, reload, explicit review and static fallback.');
 }finally{await browser.close();for(const server of servers){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}}
+
