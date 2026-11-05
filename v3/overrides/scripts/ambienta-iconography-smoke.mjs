@@ -146,7 +146,7 @@ try{
     'Navigation/icon changes must not mutate expediente');
   await page.screenshot({path:output+'/pga-'+width+'.png',animations:'disabled'});
   assert.deepEqual(errors,[]);
-  console.log(JSON.stringify({width,result:'PASS',navIcons:16,metrics:4,
+  console.log(JSON.stringify({width,result:'PASS',navIcons:snapshot.navCount,metrics:4,
     environmentalIndicators:4,distinctColors:new Set(snapshot.colors).size,
     dataPreserved:true,reducedMotion:true,overflow:snapshot.overflow}));
   await ctx.close();
