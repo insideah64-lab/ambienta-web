@@ -54,7 +54,8 @@ Build local aproximado tras Lumen: CSS 611 kB (112 kB gzip), JS 2.081 MB (621 kB
 | Archivo dañado, categorías dañadas, cuota y pestañas | PASS | Sin sobrescritura del original; estados explícitos y exportables |
 | Constructor y archivos Conesa anteriores | PASS | `matrix-workspace-smoke.mjs` y `matrix-method-catalog-smoke.mjs` |
 | Revisión visual de escritorio | PASS | Capturas completas, fichas y distribución abiertas; tablas ocupan el ancho y ES/banda se separan |
-| CI remoto de esta entrega | NOT_RUN | Resultado y SHA se registran al cerrar el PR |
+| CI remoto de esta entrega | PASS | Ejecución 41965074633; código e420cfb20d43ccab76b301d54d41b8897736e120; build, 255 pruebas unitarias, batería de navegador, P0 y hashes V1/V2 |
+| Operación mediante teclado | PASS | Selector de categoría PC, filtro +E y limpieza mediante teclado; puntuaciones sin cambios |
 | Publicación GitHub Pages | NOT_RUN | HOLD heredado, sin despliegue |
 | Incidencias históricas de encabezado Leopold/pez azul | BLOCKED | No reproducidas en P0; no se atribuyen ni cierran en esta entrega |
 | Comparador de alternativas y conexión revisada con línea base | NOT_RUN | Siguiente entrega; no se simula con una suma de ES |
@@ -73,3 +74,27 @@ Código: `v3/overrides/src/features/impacts/RiamInterpretationModel.ts`, `RiamIn
 5. Resultados, 12 capturas y archivos descargados: `qa/ambienta-riam/`. Se incluyen en `ambienta-matrices-handoff-qa` con retención de 30 días. Se conserva la batería completa de 49 scripts del workflow y los hashes V1/V2.
 
 Pendientes: comparador con componentes y horizonte comunes, selección explícita de fuentes de línea base y trazabilidad más detallada. Se mantiene la cadena de PR y el HOLD de publicación anterior.
+
+## Commit y capturas permanentes
+
+Código de esta entrega: `dcccf73a9f73f1d89a28ca218a009f5e8198b10e`. [PR #88](https://github.com/insideah64-lab/ambienta-web/pull/88), con base en la rama del PR #87. El cierre documental posterior incorpora la evidencia de CI y las cuatro imágenes siguientes.
+
+[Vista completa 1366 px](riam-capturas/DEMO-001-1366-full.jpg) · [Vista completa 1800 px](riam-capturas/DEMO-001-1800-full.jpg)
+
+[Interpretación ampliada 1366 px](riam-capturas/DEMO-001-1366-interpretation.jpg) · [Interpretación ampliada 1800 px](riam-capturas/DEMO-001-1800-interpretation.jpg)
+
+Son copias JPEG de los PNG reales sin redimensionar, abiertas y revisadas después de convertirlas. Se conserva el conjunto de 12 PNG de ambas demos en el artefacto y en el paquete local `AMBIENTA_RIAM_Pruebas_y_Descargas.zip`: 28 archivos de QA más un manifiesto SHA-256 contrastado con el ZIP. Los archivos de control dañados son intencionales y no deben importarse como evaluaciones.
+
+![RIAM: bandas y categorías, 1366 px](riam-capturas/DEMO-001-1366-interpretation.jpg)
+
+## Ajuste del diagnóstico P0
+
+La primera ejecución remota [41964134313](https://github.com/insideah64-lab/ambienta-web/actions/runs/41964134313) quedó FAIL en el recorrido de P0 después de que RIAM y línea base pasaran. El recorrido suponía que una recarga siempre volvía a Leopold; ahora el método se conserva en la URL. Commit `e420cfb20d43ccab76b301d54d41b8897736e120`: se comprueba que Conesa sigue seleccionado tras recargar y se vuelve explícitamente a Leopold antes de medir el encabezado. No se elimina ninguna comprobación de geometría, zoom, consola, recursos ni navegación. P0 local repetido: PASS a 1366/1800, sin errores de página ni peticiones fallidas.
+
+## Cierre de CI y publicación
+
+[CI 41965074633 — SUCCESS](https://github.com/insideah64-lab/ambienta-web/actions/runs/41965074633) valida el código final `e420cfb20d43ccab76b301d54d41b8897736e120`: build completo, 255 pruebas unitarias, batería de 49 comandos de scripts de navegador, diagnóstico P0 y hashes V1/V2. Todos los pasos y cargas de artefactos finalizaron satisfactoriamente.
+
+[Artefacto de matrices, línea base y RIAM](https://github.com/insideah64-lab/ambienta-web/actions/runs/41965074633/artifacts/13386649815), ID `13386649815`, digest `sha256:59d07b0ed9d9473b5e1b34298807b4bdc7acca94580b911d11fe8abc462c1225`. Retención: 30 días. Las cuatro imágenes de este documento quedan versionadas en GitHub. El commit documental posterior solo incorpora este cierre y las capturas; la ejecución sobre ese HEAD se registra en el PR para evitar modificar recursivamente el documento con cada nuevo identificador de CI.
+
+No se fusionó ni desplegó. Se mantiene el HOLD heredado y la cadena #85 → #86 → #87 → #88. El comparador de alternativas queda para la siguiente entrega; las clasificaciones actuales no constituyen una comparación de alternativas ni un índice normativo.
