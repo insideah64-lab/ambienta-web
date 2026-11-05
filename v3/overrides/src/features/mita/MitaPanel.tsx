@@ -1,6 +1,7 @@
 import {useRef,useState} from 'react';
 import {useSearchParams} from 'react-router-dom';
 import type {DemoState} from '../../lib/demo';
+import {ArtworkIcon} from '../iconography/ArtworkIcon';
 import {mitaKey,readMita,parseMitaReport,addMita,reportHash,verifyTiff,MAX_REPORT_BYTES,MAX_TIFF_BYTES,type MitaEntry} from './MitaModel';
 import './MitaPanel.css';
 function download(name:string,raw:string){const u=URL.createObjectURL(new Blob([raw],{type:'application/json;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),2000);}
@@ -34,7 +35,7 @@ export function MitaPanel({data}:{data:DemoState}){
   await verifyTiff(await file.arrayBuffer(),expected);setVerified(v=>({...v,[id]:file.name}));setNotice('Huella coincidente. Los bytes del archivo coinciden con el hash declarado; esto no valida su contenido científico.');
  }catch(e){setVerified(v=>{const n={...v};delete n[id];return n;});setNotice(e instanceof Error?e.message:String(e));}finally{setBusy(false);operation.current=false;}}
  return <section className="amb-mita" data-mita-workspace aria-label="Resultados satelitales MITA">
-  <header><p className="v2-kicker">SENTINEL-2 · RECEPCIÓN DE PRODUCTOS</p><h2>Resultados satelitales del proyecto</h2><p>Importá el JSON generado por <code>mita scene-ndvi</code>. Revisá su calidad y justificá su vínculo con <strong>{project}</strong> antes de registrarlo.</p></header>
+  <header className="v2-panel-title"><div><p className="v2-kicker">SENTINEL-2 · RECEPCIÓN DE PRODUCTOS</p><h2><ArtworkIcon kind="satellite" size={25}/> Resultados satelitales del proyecto</h2><p>Importá el JSON generado por <code>mita scene-ndvi</code>. Revisá su calidad y justificá su vínculo con <strong>{project}</strong> antes de registrarlo.</p></div></header>
   <p className="amb-mita-note">Los informes conservan el cálculo y la calibración del motor. La página no busca escenas ni procesa rásteres. El NDVI no es una medición de contaminación ni un dictamen de impacto ambiental.</p>
   {saved.error&&<div role="alert"><p>El archivo local no se puede abrir. No se sobrescribe: {saved.error}</p><button onClick={()=>{try{download('MITA-original-local.json',localStorage.getItem(mitaKey(project))||'');}catch{setNotice('No se pudo leer el almacenamiento.');}}}>Descargar original local</button></div>}
   <div className="amb-mita-toolbar"><label>Importar informe MITA 0.2.0 (JSON, hasta 1 MiB)<input data-mita-import type="file" accept=".json,application/json" disabled={busy||!!saved.error} onChange={e=>{void importReport(e.target.files?.[0]);e.target.value='';}}/></label>
