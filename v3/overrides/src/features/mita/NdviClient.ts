@@ -29,9 +29,9 @@ export function ndviQuery(form:NdviForm,geometry?:NdviGeometry|null){
  if(geometry){const checked=ndviPolygon(geometry);if(checked.bbox.some((n,i)=>Math.abs(n-bbox[i])>1e-8))throw Error('La ventana no coincide con el polígono. Volvé a seleccionarlo.');}
  return {bbox,start:form.start,end:form.end,max_cloud:cloud,...(geometry?{geometry}: {})};
 }
-export const ndviFileUrl=(job:NdviJob,kind:'preview'|'report'|'raster')=>'/api/mita/jobs/'+encodeURIComponent(job.id)+'/files/'+kind+'?project='+encodeURIComponent(job.project);
+export const ndviFileUrl=(job:NdviJob,kind:'preview'|'report'|'raster'|'view-fixed'|'view-local'|'context')=>'/api/mita/jobs/'+encodeURIComponent(job.id)+'/files/'+kind+'?project='+encodeURIComponent(job.project);
 export async function ndviRequest<T>(path:string,body?:unknown,signal?:AbortSignal):Promise<T>{
- if(!/^\/(health|scenes\/search|jobs(?:\/[a-f0-9]{32}(?:\/(?:cancel|summary))?)?)(\?project=[A-Za-z0-9_%.-]+)?$/.test(path))throw Error('Ruta de procesamiento no autorizada.');
+ if(!/^\/(health|scenes\/search|jobs(?:\/[a-f0-9]{32}(?:\/(?:cancel|summary|analysis))?)?)(\?project=[A-Za-z0-9_%.-]+)?$/.test(path)&&!/^\/jobs\/[a-f0-9]{32}\/pixel\?project=[A-Za-z0-9_%.-]+&row=\d{1,8}&col=\d{1,8}$/.test(path))throw Error('Ruta de procesamiento no autorizada.');
  const r=await fetch('/api/mita'+path,{method:body===undefined?'GET':'POST',headers:{'content-type':'application/json','x-mita-client':'ambienta-ndvi-v1'},...(body===undefined?{}:{body:JSON.stringify(body)}),signal:signal||AbortSignal.timeout(25000),credentials:'same-origin'});
  const text=await r.text();if(text.length>1000000)throw Error('La respuesta del servicio es demasiado grande.');
  let data;try{data=JSON.parse(text);}catch{throw Error('Esta instalación no tiene un servicio NDVI compatible. Podés seguir importando informes.');}
