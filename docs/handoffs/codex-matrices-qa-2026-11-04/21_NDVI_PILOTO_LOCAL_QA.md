@@ -22,7 +22,7 @@ Filtros en el formulario, selección de escena explícita, estado de trabajo en 
 |---|---|---|
 | TypeScript/Vite | PASS | Build completo, sin nuevas dependencias |
 | Pruebas unitarias de web | PASS | 265/265; cuatro nuevas de consulta, límites, leyenda y rutas |
-| Pruebas del servicio local | PASS | 55 pruebas, conservando los controles numéricos existentes |
+| Pruebas del servicio local | PASS | 56 pruebas, conservando los controles numéricos existentes; cancelación durante comprobación final cubierta |
 | DEMO-001 / DIAB-2026-DEMO a 1366/1800 | PASS | Cuatro combinaciones, Chromium limpio y servidor HTTP sintético |
 | Doble clic y recarga | PASS | Un envío; mismo trabajo y parámetros recuperados |
 | Descargas sintéticas | PASS | GeoTIFF/JSON descargados y hashes contrastados |
@@ -31,7 +31,7 @@ Filtros en el formulario, selección de escena explícita, estado de trabajo en 
 | Reinicio del servicio | PASS | Trabajo terminado y archivos conservados |
 | Revisión antes de guardar | PASS | No se registra resultado hasta justificar su vínculo |
 | Capturas completas y ampliadas | PASS | Generadas y abiertas a ambos anchos; nueva revisión al cerrar cualquier ajuste visual |
-| CI remoto | NOT_RUN | Se enlaza el resultado final en el PR |
+| CI remoto de interfaz | PASS | 42050282366, todos los pasos satisfactorios sobre 18833e65013fcd6eed2a0077b3568c01059ff7f0 |
 | Procesamiento publicado en Internet | NOT_RUN | Servicio solo local; no se despliega |
 | Validación científica independiente | NOT_RUN | No se infiere de la conectividad ni de estos tests |
 | Contaminantes criterio | NOT_RUN | Etapa posterior, expresamente fuera de alcance |
@@ -45,3 +45,13 @@ Código canónico de interfaz: `v3/overrides/src/features/mita/NdviClient.ts`, `
 ## Continuidad
 
 Mantener el servicio en modo local para esta etapa. Pendientes: ejecución remota autenticada, despliegue y presupuesto, pruebas de carga, polígonos del proyecto, mosaicos, series temporales y visor georreferenciado completo. No ampliar todavía a contaminantes ni reinterpretar NDVI como calidad del aire. Continúa el HOLD heredado; no se fusiona ni publica sin resolver sus condiciones.
+
+## Cierre del código de interfaz
+
+[PR #90](https://github.com/insideah64-lab/ambienta-web/pull/90). Código `18833e65013fcd6eed2a0077b3568c01059ff7f0`. [CI 42050282366 — SUCCESS](https://github.com/insideah64-lab/ambienta-web/actions/runs/42050282366): build, 265 pruebas unitarias, batería de navegador con NDVI, diagnóstico P0, conservación de hashes V1/V2 y cargas de artefactos completas.
+
+La actualización posterior solo cierra este documento. El resultado sobre ese HEAD se enlaza en el PR, evitando nuevos commits recursivos solo para cambiar el número de ejecución. El servicio complementario no se incluye en este repositorio público. La versión local utilizada para QA permanece separada; su autorización y revisión se registran en su propio PR.
+
+[Artefacto QA del código validado](https://github.com/insideah64-lab/ambienta-web/actions/runs/42050282366/artifacts/13426078696), ID `13426078696`, digest `sha256:e73dcc03ff029ddc8abec12f24676d0102bcf401c2b398f838ba13518943c4a4`, retención 30 días. Las imágenes NDVI de esa regresión CI son controles sintéticos de interfaz; la ejecución satelital real se conserva por separado.
+
+El paquete local `AMBIENTA_NDVI_Real_y_Regresion.zip` separa los controles sintéticos de la ejecución real: 25 archivos más manifiesto SHA-256, reabierto y contrastado. Las capturas reales a 1366/1800 y sus ampliaciones se conservan en ese paquete y en los archivos locales de entrega. No se presentan como capturas de una instalación publicada.
