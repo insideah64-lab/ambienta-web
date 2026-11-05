@@ -4,3 +4,5 @@
 
 /* Explicit native select colors prevent white-on-white option menus on Windows. */
 .amb-ndvi-review select{color-scheme:dark;background-color:#173c48;color:#f2fafb;border:1px solid #83aeb8;border-radius:5px;padding:8px;min-height:42px}.amb-ndvi-review select option{background-color:#173c48;color:#f2fafb}.amb-ndvi-review select:disabled{color:#acc3c8;opacity:.75}.amb-ndvi-review [data-ndvi-contrast="alto"]{filter:contrast(1.45) saturate(1.2)}
+
+.amb-ndvi-tone-key{display:flex;gap:18px;flex-wrap:wrap;margin:12px 0}.amb-ndvi-tone-key span{display:flex;align-items:center;gap:6px;font-size:13px}.amb-ndvi-tone-key i{display:inline-block;width:24px;height:18px;border:1px solid #aac3b7;border-radius:3px}

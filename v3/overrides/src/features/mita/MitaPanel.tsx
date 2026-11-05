@@ -3,6 +3,7 @@ import {useSearchParams} from 'react-router-dom';
 import type {DemoState} from '../../lib/demo';
 import {ArtworkIcon} from '../iconography/ArtworkIcon';
 import {No2Workbench} from './No2Workbench';
+import {VegetationWorkbench} from './VegetationWorkbench';
 import {NdviWorkbench} from './NdviWorkbench';
 import {mitaKey,readMita,parseMitaReport,addMita,reportHash,verifyTiff,MAX_REPORT_BYTES,MAX_TIFF_BYTES,type MitaEntry} from './MitaModel';
 import './MitaPanel.css';
@@ -36,8 +37,9 @@ export function MitaPanel({data}:{data:DemoState}){
   if(file.size>MAX_TIFF_BYTES)throw Error('El GeoTIFF supera 64 MiB.');
   await verifyTiff(await file.arrayBuffer(),expected);setVerified(v=>({...v,[id]:file.name}));setNotice('Huella coincidente. Los bytes del archivo coinciden con el hash declarado; esto no valida su contenido científico.');
  }catch(e){setVerified(v=>{const n={...v};delete n[id];return n;});setNotice(e instanceof Error?e.message:String(e));}finally{setBusy(false);operation.current=false;}}
- const isNo2=params.get('analisis')==='no2';
- const switcher=<nav className="amb-mita-analysis-switch" aria-label="Tipo de análisis satelital"><button aria-pressed={!isNo2} onClick={()=>setParams(prev=>{const p=new URLSearchParams(prev);p.delete('analisis');return p;})}>Vegetación · NDVI</button><button aria-pressed={isNo2} onClick={()=>setParams(prev=>{const p=new URLSearchParams(prev);p.set('analisis','no2');return p;})}>Atmósfera · NO₂</button></nav>;
+ const isNo2=params.get('analisis')==='no2',isVegetation=params.get('analisis')==='vegetacion';
+ const switcher=<nav className="amb-mita-analysis-switch" aria-label="Tipo de análisis satelital"><button aria-pressed={!isNo2&&!isVegetation} onClick={()=>setParams(prev=>{const p=new URLSearchParams(prev);p.delete('analisis');return p;})}>Vegetación · NDVI</button><button aria-pressed={isVegetation} onClick={()=>setParams(prev=>{const p=new URLSearchParams(prev);p.set('analisis','vegetacion');return p;})}>Sensores e índices</button><button aria-pressed={isNo2} onClick={()=>setParams(prev=>{const p=new URLSearchParams(prev);p.set('analisis','no2');return p;})}>Atmósfera · NO₂</button></nav>;
+ if(isVegetation)return <section className="amb-mita" data-mita-workspace aria-label="Resultados satelitales MITA"><header><h2>MITA · vegetación multiespectral</h2><p>Compará sensores e índices sobre cualquier delimitación del proyecto.</p></header>{switcher}<VegetationWorkbench key={project} project={project}/></section>;
  if(isNo2)return <section className="amb-mita" data-mita-workspace aria-label="Resultados satelitales MITA"><header><h2>MITA · análisis satelital</h2><p>Delimitaciones y resultados independientes para cada proyecto.</p></header>{switcher}<No2Workbench key={project} project={project}/></section>;
  return <section className="amb-mita" data-mita-workspace aria-label="Resultados satelitales MITA">
   <header className="v2-panel-title"><div><p className="v2-kicker">SENTINEL-2 · NDVI</p><h2><ArtworkIcon kind="satellite" size={25}/> NDVI y resultados del proyecto</h2><p>Procesá una escena en la versión asistida local o importá un informe. Revisá su calidad y justificá su vínculo con <strong>{project}</strong> antes de registrarlo.</p></div></header>
