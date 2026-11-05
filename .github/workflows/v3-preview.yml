@@ -80,6 +80,7 @@ jobs:
           node apps/web-v3/scripts/battelle-demo-pack-smoke.mjs
           node apps/web-v3/scripts/baseline-smoke.mjs
           node apps/web-v3/scripts/riam-interpretation-smoke.mjs
+          node apps/web-v3/scripts/mita-results-smoke.mjs
           node apps/web-v3/scripts/matrices-p0-diagnostic.mjs
           node apps/web-v3/scripts/conesa-simplificado-excel-parity-smoke.mjs
           node apps/web-v3/scripts/conesa-libro-1997-smoke.mjs
@@ -113,6 +114,7 @@ jobs:
             qa/ambienta-battelle-demo-pack/
             qa/ambienta-baseline/
             qa/ambienta-riam/
+            qa/ambienta-mita/
             qa/ambienta-matrix-builder/*.json
             qa/ambienta-matrix-builder/*.csv
             qa/ambienta-conesa-f2/*.json

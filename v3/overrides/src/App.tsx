@@ -39,6 +39,7 @@ import {PreliminaryTechnicalReportPanel} from './features/reporting/PreliminaryT
 import type {AmbientaIconName} from './features/iconography/AmbientaIcon';
 import {ArtworkIcon} from './features/iconography/ArtworkIcon';
 import {BaselinePanel} from './features/baseline/BaselinePanel';
+import {MitaPanel} from './features/mita/MitaPanel';
 import {MatrixMethodHub} from './features/impacts/MatrixMethodHub';
 
 
@@ -58,14 +59,13 @@ const NAV_PRIMARY: Navigation[] = [
 ];
 const NAV_TOOLS: Navigation[] = [
   {path:'/matrices',label:'Matrices ambientales',icon:'measures',description:'Crear, editar y exportar matrices ambientales por proyecto.'},
-  {path:'/mita',label:'MITA satelital',icon:'satellite',description:'Información sobre integración del motor satelital MITA.'},
+  {path:'/mita',label:'MITA satelital',icon:'satellite',description:'Revisar y vincular resultados Sentinel-2 NDVI generados por MITA.'},
   {path:'/normativa',label:'Normativa',icon:'legal',description:'Referencias de gestión normativa pendientes de incorporación.'},
   {path:'/biblioteca',label:'Biblioteca',icon:'library',description:'Biblioteca documental pendiente de conexión.'},
   {path:'/historial',label:'Historial',icon:'history',description:'Registro local de actividades de demostración.'},
   {path:'/nube',label:'Espacio privado',icon:'cloud',description:'Acceso autenticado de solo lectura a expedientes de Supabase.'}
 ];
 const NAV=[...NAV_PRIMARY,...NAV_TOOLS];
-const CLOUD_URL='https://insideah64-lab.github.io/ambienta-web/cloud.html';
 
 function Badge({ children, tone='neutral' }: {children: React.ReactNode; tone?: 'neutral'|'mint'|'amber'|'blue'}) {
   return <span className={'v2-badge v2-badge-'+tone}>{children}</span>;
@@ -200,15 +200,13 @@ function Reportes({data,onExport}:{data:DemoState;onExport:()=>void}) {
     <SpatialLinksPanel data={data} mode="report"/>
   </Panel>;
 }
-function ToolSection({kind}:{kind:'mita'|'normativa'|'biblioteca'}) {
+function ToolSection({kind}:{kind:'normativa'|'biblioteca'}) {
   const spec={
-    mita:['MITA satelital','El motor de análisis satelital sigue disponible por separado; no se han conectado productos validados a este expediente.'],
     normativa:['Normativa','La biblioteca normativa requiere fuentes jurisdiccionales y versiones verificadas. No se emiten conclusiones legales automáticamente.'],
     biblioteca:['Biblioteca','El gestor de documentos se incorporará después de validar acceso privado y trazabilidad de archivos en Supabase.']
   }[kind];
-  return <Panel kicker="HERRAMIENTAS AMBIENTALES" icon={kind==='mita'?'satellite':kind==='normativa'?'legal':'library'} title={spec[0]}>
+  return <Panel kicker="HERRAMIENTAS AMBIENTALES" icon={kind==='normativa'?'legal':'library'} title={spec[0]}>
     <p className="v2-caption">{spec[1]}</p>
-    {kind==='mita'&&<a className="v2-small-link" href={CLOUD_URL}>Consultar aplicación V1 <ExternalLink size={14}/></a>}
   </Panel>;
 }
 function PGA({data,onAction}: {data:DemoState;onAction:(kind:DemoActionKind,measureId?:string)=>void}) {
@@ -403,7 +401,7 @@ export default function App() {
           <Route path="/evidencias" element={<Evidencias data={data} onAction={openAction} onApply={applyTransaction}/>}/>
           <Route path="/mapas" element={<MapasSIG data={data}/>}/>
           <Route path="/reportes" element={<Reportes data={data} onExport={()=>exportDemo(data)}/>}/>
-          <Route path="/mita" element={<ToolSection kind="mita"/>}/>
+          <Route path="/mita" element={<MitaPanel key={data.project.id} data={data}/>}/>
           <Route path="/normativa" element={<ToolSection kind="normativa"/>}/>
           <Route path="/biblioteca" element={<ToolSection kind="biblioteca"/>}/>
           <Route path="/expediente" element={<Expediente data={data}/>}/>
