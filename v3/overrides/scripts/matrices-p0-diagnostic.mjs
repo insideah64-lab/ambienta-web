@@ -55,6 +55,10 @@ try {
     await page.locator('[data-conesa-book]').waitFor();
    }
    await page.reload();
+   // Method selection is now URL-backed: verify it survives before returning to Leopold.
+   await page.locator('[data-conesa-book]').waitFor();
+   assert.equal(new URLSearchParams(new URL(page.url()).hash.split('?')[1]).get('metodo'),'conesa-simplificado-tutorial-v1');
+   await page.locator('[data-catalog-method="causa-leopold"] button').click();
    await page.locator('[data-impact-matrix]').waitFor();
   }
   await capture('after-navigation');
