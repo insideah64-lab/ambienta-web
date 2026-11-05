@@ -28,8 +28,8 @@ try{
       heroBytes:performance.getEntriesByType('resource').filter(e=>e.name.includes('hero-puna')).length,
     };
   });
-  assert.equal(raster.ready,16,'All 16 navigation art images must load');
-  assert.equal(new Set(raster.imageSources).size,16,'All 16 modules need different generated image files');
+  assert.equal(raster.ready,17,'All 17 navigation art images must load');
+  assert.equal(new Set(raster.imageSources).size,17,'All 17 modules need different generated image files');
   assert(raster.imageWidths.every(x=>x>0),'Actual WebP pixel data required, not just SVG placeholders');
   assert(raster.background.includes('hero-puna'),'Generated photo must replace prior vector background');
   assert(!raster.background.includes('ambienta-landscape.svg'),'Old scenic SVG must not be active');
@@ -56,10 +56,10 @@ try{
       overflow:document.documentElement.scrollWidth-innerWidth
     };
   });
-  assert.equal(snapshot.navCount,16,'16 navigation destinations must remain');
+  assert.equal(snapshot.navCount,17,'17 navigation destinations must remain');
   assert(snapshot.glyphs.every(Boolean),'No missing navigation icon');
-  assert.equal(new Set(snapshot.glyphs).size,16,'Each destination has a distinct motif');
-  assert.equal(new Set(snapshot.shapes).size,16,'Each icon is a distinct SVG drawing');
+  assert.equal(new Set(snapshot.glyphs).size,17,'Each destination has a distinct motif');
+  assert.equal(new Set(snapshot.shapes).size,17,'Each icon is a distinct SVG drawing');
   assert(new Set(snapshot.colors).size>=5,'Icons must use differentiated, subtle module accents');
   assert.equal(snapshot.navAriaHidden,true);
   assert.equal(snapshot.navLabels,true);
@@ -146,7 +146,7 @@ try{
     'Navigation/icon changes must not mutate expediente');
   await page.screenshot({path:output+'/pga-'+width+'.png',animations:'disabled'});
   assert.deepEqual(errors,[]);
-  console.log(JSON.stringify({width,result:'PASS',navIcons:16,metrics:4,
+  console.log(JSON.stringify({width,result:'PASS',navIcons:snapshot.navCount,metrics:4,
     environmentalIndicators:4,distinctColors:new Set(snapshot.colors).size,
     dataPreserved:true,reducedMotion:true,overflow:snapshot.overflow}));
   await ctx.close();
