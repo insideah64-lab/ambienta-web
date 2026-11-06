@@ -4,6 +4,7 @@ import type {DemoState} from '../../lib/demo';
 import {ArtworkIcon} from '../iconography/ArtworkIcon';
 import {No2Workbench} from './No2Workbench';
 import {VegetationWorkbench} from './VegetationWorkbench';
+import {VegetationTimelineWorkbench} from './VegetationTimelineWorkbench';
 import {NdviWorkbench} from './NdviWorkbench';
 import {mitaKey,readMita,parseMitaReport,addMita,reportHash,verifyTiff,MAX_REPORT_BYTES,MAX_TIFF_BYTES,type MitaEntry} from './MitaModel';
 import './MitaPanel.css';
@@ -14,7 +15,7 @@ export function MitaPanel({data}:{data:DemoState}){
  const project=data.project.id,[saved,setSaved]=useState(()=>load(project)),[pending,setPending]=useState<{entry:MitaEntry;report:any}|null>(null);
  const [context,setContext]=useState(''),[notice,setNotice]=useState(''),[busy,setBusy]=useState(false),[verified,setVerified]=useState<Record<string,string>>({});
  const [params,setParams]=useSearchParams(),source=useRef(saved.raw),operation=useRef(false);
- const historicalLink=params.get('historial')==='ndvi'||(!params.get('vegetacion')&&!!(params.get('trabajo')||params.get('producto')||params.get('area')==='guardada'));
+ const historicalLink=params.get('historial')==='ndvi'||(params.get('modo')!=='temporal'&&!params.get('vegetacion')&&!!(params.get('trabajo')||params.get('producto')||params.get('area')==='guardada'));
  const [historyOpen,setHistoryOpen]=useState(historicalLink||!!saved.error);
  useEffect(()=>{if(historicalLink||saved.error)setHistoryOpen(true);},[historicalLink,saved.error]);
  const selected=saved.doc?.entries.find(e=>e.id===params.get('producto'));
@@ -46,7 +47,8 @@ export function MitaPanel({data}:{data:DemoState}){
  return <section className="amb-mita" data-mita-workspace aria-label="Resultados satelitales MITA">
   <header className="v2-panel-title"><div><h2><ArtworkIcon kind="satellite" size={25}/> Vegetación</h2><p>Elegí sensor e índice, calculá sobre la delimitación del proyecto y consultá sus resultados.</p></div></header>
   {switcher}
-  <VegetationWorkbench key={project} project={project}/>
+  <label className="amb-mita-mode">Tipo de análisis<select data-mita-vegetation-mode value={params.get('modo')==='temporal'?'temporal':'adquisicion'} onChange={e=>setParams(prev=>{const p=new URLSearchParams(prev);if(e.target.value==='temporal')p.set('modo','temporal');else p.delete('modo');return p;})}><option value="adquisicion">Una adquisición · sensores e índices</option><option value="temporal">Seguimiento temporal de vegetación</option></select></label>
+  {params.get('modo')==='temporal'?<VegetationTimelineWorkbench key={project} project={project}/>:<VegetationWorkbench key={project} project={project}/>}
   <details className="amb-mita-history" data-mita-history open={historyOpen} onToggle={e=>{const open=e.currentTarget.open;if(open===historyOpen)return;setHistoryOpen(open);setParams(prev=>{const p=new URLSearchParams(prev);if(open)p.set('historial','ndvi');else p.delete('historial');return p;},{replace:true});}}><summary>Resultados NDVI anteriores e informes importados</summary>
   {historyOpen&&<><p>Consultá los trabajos anteriores de Sentinel-2 y los informes vinculados a <strong>{project}</strong>. Para nuevos análisis usá los selectores de arriba.</p>
   <NdviWorkbench historyOnly project={project} onReport={file=>void importReport(file)}/>
