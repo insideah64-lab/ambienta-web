@@ -1,0 +1,38 @@
+{
+  "status": "PASS",
+  "synthetic": false,
+  "seriesId": "6ea60b7337eb52a9e9c51311f5796647",
+  "commonPixels": 1091969,
+  "commonFraction": 0.9592154940539249,
+  "eligibleDates": 3,
+  "deltaMean": 0.006583625121587814,
+  "deltaSha256": "9f1ea44e6dc318766724b71047c99a477a13d7d8fd6a2f15ec159246f8b4838b",
+  "downloadedDeltaMatchesIndependentCalculationExactly": true,
+  "historicalNdviShaUnchanged": true,
+  "dates": [
+    {
+      "date": "2025-06-05T14:40:00.803000Z",
+      "validFraction": 0.9995748411364039,
+      "eligible": true,
+      "meanCommon": 0.06790490196999073
+    },
+    {
+      "date": "2025-06-08T14:39:43.422000Z",
+      "validFraction": 0.9992972580767008,
+      "eligible": true,
+      "meanCommon": 0.07444286448135214
+    },
+    {
+      "date": "2025-06-13T14:40:03.918000Z",
+      "validFraction": 0.3164183352395208,
+      "eligible": false,
+      "meanCommon": null
+    },
+    {
+      "date": "2025-06-18T14:39:44.392000Z",
+      "validFraction": 0.9592752271174053,
+      "eligible": true,
+      "meanCommon": 0.07448852709043698
+    }
+  ]
+}
