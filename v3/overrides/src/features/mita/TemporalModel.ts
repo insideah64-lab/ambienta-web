@@ -1,3 +1,4 @@
+import {publishedTemporalFile} from './PublishedTemporal';
 import {ndviPolygon,type NdviGeometry} from './NdviClient';
 import {VEGETATION_INDICES,type VegetationIndex} from './VegetationModel';
 export const MAX_TEMPORAL_DATES=12;
@@ -44,7 +45,7 @@ export async function temporalRequest(path:string,body?:unknown,signal?:AbortSig
  const r=await fetch('/api/mita/vegetation/temporal'+path,{method:body===undefined?'GET':'POST',headers:{'content-type':'application/json','x-mita-client':'ambienta-ndvi-v1'},...(body===undefined?{}:{body:JSON.stringify(body)}),credentials:'same-origin',signal:signal||AbortSignal.timeout(60000)});
  const raw=await r.text();if(raw.length>1000000)throw Error('Respuesta temporal demasiado grande.');let data;try{data=JSON.parse(raw);}catch{throw Error('El servicio no ofrece seguimiento temporal compatible.');}if(!r.ok)throw Error(typeof data.detail==='string'?data.detail:'No se pudo completar el seguimiento temporal.');return data;
 }
-export const temporalFile=(r:TemporalReport,kind:'report'|'csv'|'delta'|'preview',domain=.25)=>'/api/mita/vegetation/temporal/series/'+r.seriesId+'/files/'+kind+'?project='+encodeURIComponent(r.projectId)+(kind==='preview'?'&domain='+domain:'');
+export function temporalFile(r:TemporalReport,kind:'report'|'csv'|'delta'|'preview',domain=.25,published=false){if(published){if(kind==='delta')throw Error('GeoTIFF no publicado en esta copia de consulta.');return publishedTemporalFile(r.projectId,r.seriesId,kind);}return '/api/mita/vegetation/temporal/series/'+r.seriesId+'/files/'+kind+'?project='+encodeURIComponent(r.projectId)+(kind==='preview'?'&domain='+domain:'');}
 export function temporalChart(r:TemporalReport,detail:boolean){
  const rows=r.observations.filter(x=>x.eligible&&x.common?.mean!==null&&x.common),times=rows.map(x=>Date.parse(x.date));if(rows.length<2)return null;
  const vals=rows.flatMap(x=>[x.common!.mean!,x.common!.p25!,x.common!.p75!]),low=Math.min(...vals),high=Math.max(...vals),pad=Math.max(.01,(high-low)*.1);

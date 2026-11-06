@@ -79,7 +79,7 @@ export function MitaPanel({data}:{data:DemoState}){
    <button data-mita-export-original onClick={()=>download('MITA-'+entry.id.slice(0,12)+'-original.json',entry.raw)}>Descargar JSON original</button>
    </>}
   </article></div>
-  <footer><p>Flujo: calcular NDVI o importar un resultado → revisar JSON y GeoTIFF → vincular al proyecto. Las series temporales, el visor georreferenciado y la ejecución remota autenticada quedan pendientes.</p><a href="https://sentiwiki.copernicus.eu/web/s2-applications" target="_blank" rel="noreferrer">Referencia técnica Sentinel-2 · Copernicus</a></footer>
+  <footer><p>Flujo: calcular NDVI o importar un resultado → revisar JSON y GeoTIFF → vincular al proyecto. La consulta de series publicadas está disponible en Seguimiento temporal. Procesar nuevas imágenes requiere un servicio de cálculo conectado; la ejecución remota autenticada sigue pendiente.</p><a href="https://sentiwiki.copernicus.eu/web/s2-applications" target="_blank" rel="noreferrer">Referencia técnica Sentinel-2 · Copernicus</a></footer>
   </>}
   </details>
  </section>;
