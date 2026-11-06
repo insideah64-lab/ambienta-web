@@ -1,0 +1,1 @@
+alter table public.mita_browser_results add constraint mita_browser_required_report check (report ?& array['schema','engine','projectId','fingerprint','analysisId'] and report->>'schema' is not null and report->>'engine' is not null and report->>'projectId' is not null and report->>'fingerprint' is not null and report->>'analysisId' is not null);
