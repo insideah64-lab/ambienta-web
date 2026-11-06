@@ -10,11 +10,13 @@ try{
    reducedMotion:'reduce'});
   const page=await ctx.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(String(e)));
-  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
+  await page.goto((process.env.QA_BASE_URL||'http://127.0.0.1:8787/v3/')+'index.html#/matrices');
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
   assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
   await page.locator('[data-conesa-book]').waitFor();
   const book=page.locator('[data-conesa-book]'),f2=page.locator('[data-conesa-f2]');
+  await book.locator('[data-conesa-phase-panel="f1"] .amb-conesa-top').screenshot({
+   path:out+'/alcance-conesa-'+width+'.png'});
   await f2.waitFor({state:'attached'});
   assert.equal(await f2.isVisible(),false,'F2 is mounted but hidden until selected');
 
@@ -26,10 +28,10 @@ try{
   assert.deepEqual(before,[],'F2 must not create empty records when merely opened');
   await book.locator('[data-conesa-book-cell]').first().click();
   await book.getByRole('combobox',{name:'Conesa libro naturaleza'}).selectOption('-1');
-  const vals={IN:2,EX:2,EX_CR:0,MO:4,MO_CR:0,PE:4,RV:1,SI:1,AC:1,EF:4,PR:1,MC:2};
+  const vals={IN:4,EX:2,EX_CR:0,MO:4,MO_CR:0,PE:4,RV:1,SI:1,AC:1,EF:4,PR:1,MC:2};
   for(const [key,n] of Object.entries(vals))
    await book.getByRole('combobox',{name:'Conesa libro '+key,exact:true}).selectOption(String(n));
-  assert.equal((await book.locator('[data-book-absolute]').innerText()).trim(),'28');
+  assert.equal((await book.locator('[data-book-absolute]').innerText()).trim(),'34');
   assert.equal(await f2.locator('[data-f2-interaction]').count(),1);
   await page.locator('[data-conesa-phase-tab="f2"]').click();
   assert.equal(await page.locator('[data-conesa-phase-tab="f2"]').getAttribute('aria-selected'),'true');
@@ -38,7 +40,7 @@ try{
   const editor=f2.locator('[data-f2-editor]');
   await editor.getByRole('combobox',{name:'Conesa F2 tratamiento'}).selectOption('tamiz');
   assert.match(await editor.locator('[data-f2-problems]').innerText(),/umbral/i);
-  await f2.getByRole('spinbutton',{name:'Conesa F2 umbral'}).fill('30');
+  await f2.getByRole('spinbutton',{name:'Conesa F2 umbral'}).fill('40');
   await f2.getByRole('textbox',{name:'Conesa F2 fundamento tamiz'}).fill('Tamiz documentado del ejercicio de regresión');
   await f2.getByRole('textbox',{name:'Conesa F2 evidencia tamiz'}).fill('Acta QA del ejemplo ficticio');
   await editor.getByRole('textbox',{name:'Conesa F2 fundamento decisión'}).fill('Por debajo del umbral de este ensayo didáctico');
@@ -74,9 +76,11 @@ try{
   const f1Before=await page.evaluate(key=>localStorage.getItem(key),f1key);
   const [dl]=await Promise.all([page.waitForEvent('download'),
    f2.getByRole('button',{name:'JSON F2'}).click()]);
+  await dl.saveAs(out+'/f2-'+width+'.json');
   const exported=JSON.parse(await fs.readFile(await dl.path(),'utf8'));
+  assert.equal(exported.projectId,'DEMO-001');
   assert.equal(exported.methodId,'conesa-libro-1997-f2');
-  assert.equal(exported.screening.threshold,30);
+  assert.equal(exported.screening.threshold,40);
   assert.equal(Object.keys(exported.screening.alerts).length,1);
   assert.equal(exported.uip.panelReference,'Equipo ambiental de consulta didáctica');
   const f2Before=await page.evaluate(key=>localStorage.getItem(key),f2key);
@@ -90,6 +94,20 @@ try{
   assert.equal((await f2.locator('.amb-f2-summary span').nth(3).locator('strong').innerText()).trim(),'1');
   assert.equal(await page.evaluate(key=>localStorage.getItem(key),f2key),f2Before,
    'Read-only reload does not alter previously saved content');
+  await f2.getByRole('button',{name:'Registrar ponderación de factores'}).click();
+  assert.match(await f2.locator('[data-f2-uip-total]').innerText(),/1000 UIP/);
+  await page.locator('[data-conesa-phase-tab="f1"]').click();
+  await book.locator('[data-conesa-book-cell]').first().click();
+  assert.equal((await book.locator('[data-book-signed]').innerText()).trim(),'-34');
+  assert.equal((await book.locator('[data-book-category]').innerText()).trim(),'Moderado');
+  const [f1json]=await Promise.all([page.waitForEvent('download'),book.getByRole('button',{name:'JSON',exact:true}).click()]);
+  await f1json.saveAs(out+'/f1-minus34-'+width+'.json');
+  const f1Export=JSON.parse(await fs.readFile(await f1json.path(),'utf8'));
+  assert.equal(f1Export.projectId,'DEMO-001');
+  assert.equal(Object.values(f1Export.entries)[0].criteria.IN,4);
+  const [f1csv]=await Promise.all([page.waitForEvent('download'),book.getByRole('button',{name:'CSV',exact:true}).click()]);
+  await f1csv.saveAs(out+'/f1-minus34-'+width+'.csv');
+  assert.match(await fs.readFile(await f1csv.path(),'utf8'),/-34/);
   await page.evaluate(key=>localStorage.setItem(key,'{invalid-F2-json'),f2key);
   await page.reload();
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();

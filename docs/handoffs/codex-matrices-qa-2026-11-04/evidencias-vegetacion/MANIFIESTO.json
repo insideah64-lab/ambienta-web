@@ -1,0 +1,40 @@
+{
+  "scope": "Real public satellite data on illustrative non-official AOI; no deployment",
+  "files": [
+    {
+      "file": "comparison-1366-full.jpg",
+      "bytes": 343664,
+      "sha256": "d40bf5896df439679174cc5cea8a3ba80ed31fd190352259f3bf6991e6683ebc"
+    },
+    {
+      "file": "comparison-1800-full.jpg",
+      "bytes": 424556,
+      "sha256": "bd1385dce0915e9cb69ee04e2399b411f8d8aa5b4353b0081607b02294024f1e"
+    },
+    {
+      "file": "comparison.json",
+      "bytes": 1050,
+      "sha256": "ca885026dd6d825a4fbc33b17f39d4ce89c83f1bd5dcbd383cb6c266eeda6862"
+    },
+    {
+      "file": "NDVI-1366-detail.jpg",
+      "bytes": 64177,
+      "sha256": "89d638393c2909d4d004551e527f469a5bed03360ae8733250a8784d18294a8c"
+    },
+    {
+      "file": "NDVI-1800-detail.jpg",
+      "bytes": 85775,
+      "sha256": "60dd2216aacd7bb49184700f084d71fc3d26022edf348d94e5c5c21428adb93c"
+    },
+    {
+      "file": "sentinel2-report.json",
+      "bytes": 3264,
+      "sha256": "1341938a1c4d29d3c416665cf2f0b81375ecb2ad37dc8d12e1fd0cbc893c47dd"
+    },
+    {
+      "file": "sentinel2-stats.csv",
+      "bytes": 676,
+      "sha256": "936c92ba560bd2dc8259a84532b011d9a0b75599d5f1880bb2f588f784db55a5"
+    }
+  ]
+}

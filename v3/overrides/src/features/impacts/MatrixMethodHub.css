@@ -1,5 +1,42 @@
 /* Independent method selection and form calculations in the AMBIENTA desktop workbench. */
 .ref-shell .amb-method-hub{min-width:0}
+.ref-shell .amb-workspace-about{font-size:12px;color:#bdd8dd}
+.ref-shell .amb-workspace-about>summary{cursor:pointer;padding:7px 0}
+.ref-shell .amb-workspace-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;color:#edfafa}
+.ref-shell .amb-workspace-toolbar strong{font-size:18px}
+.ref-shell .amb-workspace-toolbar small{display:block;font-size:12px;font-weight:400;color:#b7d3d9;margin-top:4px}
+.ref-shell .amb-workspace-toolbar>div{display:flex;gap:8px;flex-wrap:wrap}
+.ref-shell .amb-workspace-toolbar button{border:1px solid #68989e;border-radius:8px;padding:9px 12px;min-height:40px;background:#163e49;color:#eefbf8;font:inherit;font-size:12px;cursor:pointer}
+.ref-shell .amb-workspace-toolbar button:focus-visible,.ref-shell .amb-method-purpose>summary:focus-visible{outline:3px solid #f6d89c;outline-offset:3px}
+.ref-shell .amb-method-hub.is-compact .amb-method-catalog{padding:12px;margin-top:12px}
+.ref-shell .amb-method-hub.is-compact .amb-method-heading{display:none}
+.ref-shell .amb-method-hub.is-compact .amb-method-cardgrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.ref-shell .amb-method-hub.is-compact .amb-method-card{padding:10px;gap:8px;min-height:0}
+.ref-shell .amb-method-hub.is-compact .amb-method-cardtop{min-height:0}
+.ref-shell .amb-method-hub.is-compact .amb-method-cardcopy{max-width:none}
+.ref-shell .amb-method-hub.is-compact .amb-method-cardcopy strong{font-size:15px;margin:0}
+.ref-shell .amb-method-hub.is-compact .amb-method-cardcopy :is(small,p),
+.ref-shell .amb-method-hub.is-compact .amb-method-cardvisual,
+.ref-shell .amb-method-hub.is-compact .amb-method-cardbottom :is(.amb-method-status,.amb-method-source){display:none}
+.ref-shell .amb-method-hub.is-compact .amb-method-cardbottom{display:flex;margin:0;padding:0;border:0}
+.ref-shell .amb-method-hub.is-compact .amb-method-cardbottom button{max-width:100%;white-space:normal}
+.ref-shell .amb-method-purpose[hidden]{display:none}
+.ref-shell:has(.amb-method-hub[data-workspace-expanded=true]) .v2-page-intro,
+.ref-shell:has(.amb-method-hub[data-workspace-expanded=true]) .amb-workspace-about{display:none}
+.ref-shell .amb-method-hub :is(.amb-matrix-scroll,[data-conesa-phase-panel]){scroll-margin-top:82px}
+.ref-shell .amb-method-purpose>summary{cursor:pointer;font-size:12px;font-weight:700}
+.ref-shell .amb-method-purpose[open]>summary{margin-bottom:12px}
+/* Expanded mode stays in normal document flow: no modal, focus trap or remount. */
+@media(min-width:1001px){
+ .ref-shell:has(.amb-method-hub[data-workspace-expanded=true]){grid-template-columns:minmax(0,1fr)!important}
+ .ref-shell:has(.amb-method-hub[data-workspace-expanded=true])>.v2-sidebar{display:none}
+ .ref-shell:has(.amb-method-hub[data-workspace-expanded=true])>.v2-main{grid-column:1;margin-left:0;width:100%;min-width:0}
+}
+@media(max-width:710px){
+ .ref-shell .amb-method-hub.is-compact .amb-method-cardgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .ref-shell .amb-workspace-toolbar>div{width:100%}
+ .ref-shell .amb-workspace-toolbar button{flex:1}
+}
 .ref-shell .amb-method-catalog{
  padding:22px 24px;margin-top:16px;border:1px solid #417885;border-radius:17px;
  background:linear-gradient(138deg,#092e3a,#103b41 54%,#172c3f);

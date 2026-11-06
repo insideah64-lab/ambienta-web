@@ -11,7 +11,7 @@ try{
    acceptDownloads:true,reducedMotion:'reduce'});
   const page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(String(e)));
-  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
+  await page.goto((process.env.QA_BASE_URL||'http://127.0.0.1:8787/v3/')+'index.html#/matrices');
   await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
   await page.locator('[data-conesa-book]').waitFor();
   assert.equal(await page.locator('[data-conesa-variant-switch]').count(),0,

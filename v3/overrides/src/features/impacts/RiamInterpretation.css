@@ -1,0 +1,40 @@
+.ref-shell [data-method-assessment="riam-1998"]{--canvas:198 65% 10%;--surface:195 58% 14%;--surface-muted:195 50% 17%;--surface-strong:194 44% 23%;--line:191 30% 42%;--ink:165 60% 95%;--ink-soft:190 30% 82%;--ink-muted:190 25% 75%;--brand:160 60% 70%;--brand-solid:164 50% 24%;--brand-soft:164 45% 20%;--on-brand:165 60% 95%;--success:160 60% 70%;--warning:39 70% 72%;--danger:8 65% 75%;--accent:188 65% 75%;}
+.ref-shell .amb-riam{margin-top:20px;border-top:1px solid hsl(var(--line));padding-top:18px;color:hsl(var(--ink));}
+.ref-shell .amb-riam>header{display:flex;align-items:center;justify-content:space-between;gap:16px;}
+.ref-shell .amb-riam h4{margin:0;font-size:18px;}
+.ref-shell .amb-riam>header>span,.ref-shell .amb-riam p,.ref-shell .amb-riam details{font-size:12px;line-height:1.65;color:hsl(var(--ink-soft));}
+.ref-shell .amb-riam a{color:hsl(var(--brand));text-decoration:underline;}
+.ref-shell .amb-riam-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:14px 0;}
+.ref-shell .amb-riam-stats>span{display:grid;gap:6px;font-size:11px;padding:12px;border:1px solid hsl(var(--line));border-radius:8px;background:hsl(var(--surface));}
+.ref-shell .amb-riam-stats strong{font-size:22px;font-variant-numeric:tabular-nums;}
+.ref-shell .amb-riam-filters{display:flex;gap:12px;align-items:end;flex-wrap:wrap;margin:15px 0;}
+.ref-shell .amb-riam-filters label{flex:1;min-width:200px;}
+.ref-shell .amb-riam :is(button,select),.ref-shell .amb-riam-category-field select{font:inherit;font-size:12px;color:hsl(var(--ink));background:hsl(var(--surface-muted));border:1px solid hsl(var(--line));border-radius:7px;padding:8px 10px;min-height:36px;}
+.ref-shell .amb-riam label,.ref-shell .amb-riam-category-field label{display:grid;gap:6px;font-size:12px;}
+.ref-shell .amb-riam button{cursor:pointer;}
+.ref-shell .amb-riam :is(button,select):focus-visible,.ref-shell .amb-riam-category-field select:focus-visible{outline:3px solid hsl(var(--warning));outline-offset:2px;}
+.ref-shell .amb-riam-bands{display:grid;grid-template-columns:repeat(11,minmax(0,1fr));gap:6px;}
+.ref-shell .amb-riam-bands button{display:grid;gap:6px;text-align:center;padding:8px 5px;}
+.ref-shell .amb-riam-bands button[aria-pressed=true]{outline:2px solid hsl(var(--brand));outline-offset:1px;}
+.ref-shell .amb-riam-bands strong{font-size:18px;}
+.ref-shell .amb-riam-bands i{display:block;height:5px;background:hsl(var(--surface-strong));border-radius:2px;overflow:hidden;}
+.ref-shell .amb-riam-bands b{display:block;height:100%;background:hsl(var(--accent));}
+.ref-shell .amb-riam details{margin:12px 0;}
+.ref-shell .amb-riam summary{cursor:pointer;font-weight:650;}
+.ref-shell .amb-riam-table{margin-top:14px;max-height:340px;overflow:auto;}
+.ref-shell .amb-riam-table table{width:100%;min-width:770px;table-layout:fixed;}
+.ref-shell .amb-riam-table caption{padding:10px 12px;text-align:left;color:hsl(var(--ink-soft));font-size:11px;}
+.ref-shell .amb-riam-table :is(th,td){padding:9px 10px;vertical-align:top;font-size:12px;overflow-wrap:anywhere;}
+.ref-shell .amb-riam-table thead th{position:sticky;top:0;background:hsl(var(--surface-strong));z-index:1;}
+.ref-shell .amb-riam-table th:first-child{width:25%;}
+.ref-shell .amb-riam-table small{display:block;font-size:10px;color:hsl(var(--ink-muted));line-height:1.5;margin-top:5px;}
+.ref-shell .amb-riam-badge{display:inline-flex;white-space:normal;font-size:11px;line-height:1.5;gap:5px;margin:4px 0 0 6px;}
+.ref-shell .amb-method-score .amb-riam-badge{margin-left:0;}
+.ref-shell .amb-riam-warning{padding:10px 12px;border-left:3px solid hsl(var(--warning));background:hsl(var(--surface-strong));}
+.ref-shell .amb-riam-category-field{padding:12px;border:1px solid hsl(var(--line));border-radius:8px;margin:12px 0;}
+.ref-shell .amb-riam-category-field p,.ref-shell .amb-riam-criterion-help{font-size:11px;color:hsl(var(--ink-soft));line-height:1.6;margin:6px 0 0;}
+.ref-shell [data-method-assessment="riam-1998"] .amb-matrix-cell small{display:block;font-size:10px;line-height:1.3;margin-top:3px;}
+
+.ref-shell [data-method-assessment="riam-1998"] .amb-matrix-cell{flex-direction:column;gap:3px;}
+.ref-shell .amb-riam-register .amb-riam-badge{display:table;margin:5px 0 0;}
+.ref-shell .amb-riam-criterion-help{font-weight:400;}

@@ -49,7 +49,7 @@ try{
    viewport:{width,height:900},acceptDownloads:true,reducedMotion:'reduce'});
   const page=await ctx.newPage();
   const errors=[];page.on('pageerror',e=>errors.push(String(e)));
-  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
+  await page.goto((process.env.QA_BASE_URL||'http://127.0.0.1:8787/v3/')+'index.html#/matrices');
   await page.locator('[data-impact-matrix="v1"]').waitFor();
   const projectId=(await page.locator('[data-impact-matrix] .amb-matrix-footer span').first().innerText())
     .split('·').at(-1)?.trim();

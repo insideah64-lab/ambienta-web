@@ -1,9 +1,13 @@
+import {useSearchParams} from 'react-router-dom';
+import {RiamInterpretation,RiamBandBadge,RiamCategoryField,useRiamMetadata} from './RiamInterpretation';
+import {riamBand,riamExport,riamCsv,RIAM_HELP} from './RiamInterpretationModel';
 import {useEffect,useMemo,useRef,useState} from 'react';
 import {ArrowDownToLine,X,Grid3X3,Target,Scale,Activity,ArrowUpRight,Check} from 'lucide-react';
 import {ImpactMatrixBuilder,readMatrixAxes} from './ImpactMatrixBuilder';
 import type {DemoState} from '../../lib/demo';
 import {ConesaSimplificado} from './ConesaSimplificado';
 import {ConesaLibroPanel} from './ConesaLibroPanel';
+import {BattellePanel} from './BattellePanel';
 import {validatedConesaEntry} from './ConesaSimplificadoModel';
 import {assess,METHOD_DEFINITIONS,validAssessment,type Assessment,type ScoredMethodId} from './MatrixMethodData';
 import './MatrixMethodHub.css';
@@ -51,16 +55,22 @@ function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
  const [refresh,setRefresh]=useState(0);
  const axes=useMemo(()=>readMatrixAxes(projectId,projectName),[projectId,projectName,refresh]);
  const [doc,setDoc]=useState<MethodDocument>(()=>read(projectId,projectName,method));
- const modified=useRef(false);
+ const modified=useRef(false),originalBackedUp=useRef(false);
+ const riamMeta=useRiamMetadata(projectId);
+ const sourceLast=useRef<string|null|undefined>(undefined),sourceBeforeEdit=useRef<string|null>(null);
+ const [sourceVolatile,setSourceVolatile]=useState(false);
+ if(sourceLast.current===undefined){try{sourceLast.current=localStorage.getItem(keyFor(projectId,method));}catch{sourceLast.current=null;}}
+ const [sourceBlocked]=useState(()=>{if(method!=='riam-1998')return false;try{const raw=localStorage.getItem(keyFor(projectId,method));return raw!==null&&!validDocument(JSON.parse(raw),projectId,method);}catch{return true;}});
  const [selected,setSelected]=useState<string|null>(null);
  const [notice,setNotice]=useState('');
  useEffect(()=>{
   if(!modified.current)return;
-  try{localStorage.setItem(keyFor(projectId,method),JSON.stringify(doc));}
-  catch{setNotice('Guardado local no disponible. Exportá el JSON para conservar tu evaluación.');}
+  try{const key=keyFor(projectId,method);if(method==='riam-1998'&&localStorage.getItem(key)!==sourceLast.current){setSourceVolatile(true);setNotice('Otra pestaña cambió RIAM. Se conserva el archivo local; exportá tu trabajo en memoria y recargá antes de continuar.');return;}const raw=JSON.stringify(doc);localStorage.setItem(key,raw);sourceLast.current=raw;setSourceVolatile(false);}
+  catch{setSourceVolatile(true);setNotice('Guardado local no disponible. Exportá el JSON para conservar tu evaluación.');}
  },[doc,projectId,method]);
  const edit=(id:string,patch:Partial<Assessment>)=>{
-  if(readOnly)return;
+  if(readOnly||sourceBlocked)return;
+  if(method==='riam-1998'&&!originalBackedUp.current){try{const raw=localStorage.getItem(keyFor(projectId,method));if(raw!==sourceLast.current){setNotice('Otra pestaña cambió RIAM. Recargá antes de editar; los datos locales se conservan.');return;}if(raw!==null)localStorage.setItem(keyFor(projectId,method)+':backup:'+crypto.randomUUID(),raw);sourceBeforeEdit.current=raw;originalBackedUp.current=true;}catch{setNotice('No se pudo conservar un respaldo previo a la edición. Exportá el original antes de continuar.');return;}}
   modified.current=true;
   setDoc(current=>{
    const previous=current.entries[id]||{sign:null,criteria:{},reason:'',evidence:''};
@@ -80,9 +90,12 @@ function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
   const action=axes.actions.find(a=>a.id===selected.slice(i+2));
   return factor&&action?{factor,action,entry:doc.entries[selected]}:null;
  },[selected,axes,doc]);
- const complete=Object.values(doc.entries).filter(x=>assess(method,x)!==null).length;
- const incomplete=Object.values(doc.entries).filter(x=>assess(method,x)===null).length;
+ const catalogIds=new Set(axes.factors.flatMap(f=>axes.actions.map(a=>f.id+'::'+a.id)));
+ const counted=method==='riam-1998'?Object.entries(doc.entries).filter(([id])=>catalogIds.has(id)).map(([,entry])=>entry):Object.values(doc.entries);
+ const complete=counted.filter(x=>assess(method,x)!==null).length;
+ const incomplete=counted.filter(x=>assess(method,x)===null).length;
  const exportCsv=()=>{
+  if(method==='riam-1998'){download('AMBIENTA-'+method+'-'+projectId+'.csv','text/csv;charset=utf-8',riamCsv(projectId,projectName,axes,doc.entries,riamMeta.doc,definition.version,riamMeta.blocked?'invalid-preserved':riamMeta.volatile?'memory-only':'available'));return;}
   const rows=[
    ['Proyecto','Método y versión','Acción','Etapa','Factor','Signo',
     ...definition.fields.map(c=>c.id), 'Resultado calculado','Fundamento','Evidencia']
@@ -106,11 +119,13 @@ function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
      {readOnly&&<p role="note">Evaluación original de la edición anterior. Solo consulta y exportación; no se combina con el Conesa simplificado vigente.</p>}
     </div>
     <div className="amb-matrix-exports">
-     <button type="button" onClick={exportCsv}><ArrowDownToLine size={16}/> CSV</button>
-     <button type="button" onClick={()=>download('AMBIENTA-'+method+'-'+projectId+'.json','application/json',
-      JSON.stringify({...doc,methodSpecification:definition.version},null,2))}><ArrowDownToLine size={16}/> JSON</button>
+     {method==='riam-1998'&&<button type="button" onClick={()=>document.querySelector('[data-riam-interpretation]')?.scrollIntoView({block:'start'})}>Ver bandas y categorías</button>}
+     <button type="button" disabled={sourceBlocked} onClick={exportCsv}><ArrowDownToLine size={16}/> CSV</button>
+     <button type="button" disabled={sourceBlocked} onClick={()=>download('AMBIENTA-'+method+'-'+projectId+'.json','application/json',
+      JSON.stringify({...doc,methodSpecification:definition.version,...(method==='riam-1998'?{riamInterpretation:{...riamExport(axes,doc.entries,riamMeta.doc),storageStatus:sourceVolatile?'memory-only':'available',previousDocument:sourceBeforeEdit.current?JSON.parse(sourceBeforeEdit.current):null,metadataStatus:riamMeta.blocked?'invalid-preserved':riamMeta.volatile?'memory-only':'available',...(riamMeta.blocked?{metadataRaw:riamMeta.raw}:{})}}:{})},null,2))}><ArrowDownToLine size={16}/> JSON</button>
     </div>
    </div>
+   {sourceBlocked&&<p className="amb-matrix-notice" role="alert">El archivo RIAM no supera la validación. Se conserva intacto, sin editar ni exportar un documento vacío. <button type="button" onClick={()=>downloadStoredRaw(keyFor(projectId,method),'RIAM-original-'+projectId+'.txt')}>Descargar RIAM original</button></p>}
    <p className="amb-method-disclaimer">
     Se evalúa cada interacción por separado, con los parámetros propios del método.
     Ninguna celda recibe criterios por defecto. Los resultados son valoraciones técnicas
@@ -119,7 +134,7 @@ function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
    </p>
    <div className="amb-method-stats">
     <div><strong>{axes.actions.length} × {axes.factors.length}</strong><small>acciones × factores</small></div>
-    <div><strong>{complete}</strong><small>valoraciones completas</small></div>
+    <div><strong>{complete}</strong><small>{method==='riam-1998'?'valoraciones calculables':'valoraciones completas'}</small></div>
     <div><strong>{incomplete}</strong><small>valoraciones incompletas</small></div>
    </div>
    <div className="amb-method-tools">
@@ -142,6 +157,7 @@ function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
         aria-label={'Evaluar '+f.name+' × '+a.name+' en '+definition.shortName}
         aria-pressed={selected===id} onClick={()=>setSelected(id)}>
         {score===null?(entry?'Pend.':'—'):score>0?'+'+score:String(score)}
+        {method==='riam-1998'&&score!==null&&<small data-riam-cell-band>{riamBand(score)?.code}</small>}
        </button></td>;
       })}
      </tr>)}</tbody>
@@ -160,6 +176,7 @@ function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
       </div>
       <button type="button" aria-label="Cerrar ficha del método" onClick={()=>setSelected(null)}><X size={18}/></button>
      </header>
+     {method==='riam-1998'&&<RiamCategoryField factorId={chosen.factor.id} state={riamMeta} disabled={sourceBlocked}/>}
      {method==='conesa-1997-2ex'&&<label>Carácter / naturaleza
       <select aria-label="Signo Conesa" disabled={readOnly} value={chosen.entry?.sign===-1?'-1':chosen.entry?.sign===1?'1':''}
        onChange={e=>edit(selected,{sign:e.target.value?Number(e.target.value) as -1|1:null})}>
@@ -169,7 +186,7 @@ function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
      </label>}
      <div className="amb-method-criteria">
       {definition.fields.map(field=><label key={field.id}>{field.name} ({field.id})
-       <select disabled={readOnly} aria-label={field.id+' - '+field.name} value={chosen.entry?.criteria[field.id]??''}
+       <select disabled={readOnly||sourceBlocked} aria-label={field.id+' - '+field.name} value={chosen.entry?.criteria[field.id]??''}
         onChange={e=>{
          const criteria={...(chosen.entry?.criteria||{})};
          if(e.target.value==='')delete criteria[field.id];
@@ -179,31 +196,34 @@ function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
         <option value="">Sin valorar</option>
         {field.options.map(o=><option key={o.value} value={o.value}>{o.value} · {o.label}</option>)}
        </select>
+       {method==='riam-1998'&&<small className="amb-riam-criterion-help">{RIAM_HELP[field.id]}</small>}
       </label>)}
      </div>
      <div className="amb-method-score">
       <span>Resultado por {definition.shortName}</span>
       <strong data-method-result>{assess(method,chosen.entry)??'Pendiente'}</strong>
+      {method==='riam-1998'&&<RiamBandBadge score={assess(method,chosen.entry)}/>}
       <small>{assess(method,chosen.entry)===null?
        'Solo se calcula cuando todos los criterios están completos.':
        'Cálculo reproducible; no sustituye el juicio ni la revisión profesional.'}</small>
      </div>
      <label>Fundamento técnico y supuestos
-      <textarea disabled={readOnly} maxLength={5000} rows={3} value={chosen.entry?.reason||''}
+      <textarea disabled={readOnly||sourceBlocked} maxLength={5000} rows={3} value={chosen.entry?.reason||''}
        onChange={e=>edit(selected,{reason:e.target.value})}
        placeholder="Describir por qué se asignó cada criterio y qué incertidumbre persiste…"/>
      </label>
      <label>Documento o evidencia
-      <input disabled={readOnly} maxLength={1000} value={chosen.entry?.evidence||''}
+      <input disabled={readOnly||sourceBlocked} maxLength={1000} value={chosen.entry?.evidence||''}
        onChange={e=>edit(selected,{evidence:e.target.value})}
        placeholder="Código de informe, página, enlace o referencia verificable"/>
      </label>
      {chosen.entry&&!chosen.entry.reason.trim()&&<p className="amb-matrix-caution-inline">
       Valoración provisional: falta documentar la justificación.</p>}
-     {chosen.entry&&!readOnly&&<button type="button" className="amb-matrix-secondary"
+     {chosen.entry&&!readOnly&&method!=='riam-1998'&&<button type="button" className="amb-matrix-secondary"
        onClick={()=>remove(selected)}>Eliminar valoración de esta interacción</button>}
     </div>}
    </div>
+   {method==='riam-1998'&&<RiamInterpretation axes={axes} entries={doc.entries} state={riamMeta} onSelect={setSelected}/>}
    <footer className="amb-matrix-footer">
     <span>Guardado por expediente y método · {projectId} · {doc.updatedAt.slice(0,10)}</span>
     <span>Catálogo de acciones y factores compartido; las puntuaciones permanecen separadas entre metodologías.</span>
@@ -211,7 +231,7 @@ function ScoredMatrix({projectId,projectName,method,readOnly=false}:{
    {notice&&<p role="status" className="amb-matrix-notice">{notice}</p>}
   </section>;
 }
-type ActiveMethod='causa-leopold'|'conesa-simplificado-tutorial-v1'|'riam-1998';
+type ActiveMethod='causa-leopold'|'conesa-simplificado-tutorial-v1'|'riam-1998'|'battelle';
 type Card={id:ActiveMethod|'battelle';name:string;kind:string;detail:string;status:string;source:string;available:boolean};
 const CARDS:Card[]=[
  {id:'causa-leopold',name:'Identificación y Leopold',kind:'Identificación / valoración',
@@ -224,8 +244,8 @@ const CARDS:Card[]=[
   detail:'Cinco atributos A1, A2, B1, B2 y B3, con valoración estructurada y resultado ES.',
   status:'Disponible · fórmula identificada',source:'Pastakia y Jensen (1998)',available:true},
  {id:'battelle',name:'Battelle-Columbus',kind:'Indicadores de calidad ambiental',
-  detail:'Requiere indicadores medidos, funciones de transformación, pesos y escenarios con/sin proyecto. No es válido calcularlo con valores DEMO.',
-  status:'Preparación metodológica',source:'Dee et al. (1973)',available:false}
+  detail:'Perfil histórico de 78 parámetros y 1000 UIP. Escenarios SIN/CON, funciones documentadas y banderas de investigación; no toma cifras DEMO como mediciones.',
+  status:'Disponible · perfil histórico',source:'Dee et al. (1973)',available:true}
 ];
 type ArchiveStatus={present:boolean;valid:boolean;count:number};
 function oldConesaArchive(projectId:string):ArchiveStatus{
@@ -264,8 +284,13 @@ function downloadStoredRaw(key:string,filename:string){
  }catch{/* Never mutate archived data on storage failure. */}
 }
 export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData}:Props){
- const [active,setActive]=useState<ActiveMethod>('causa-leopold');
+ const [params,setParams]=useSearchParams();
+ const active:ActiveMethod=CARDS.some(c=>c.id===params.get('metodo')&&c.available)?params.get('metodo') as ActiveMethod:'causa-leopold';
+ const setActive=(value:ActiveMethod)=>setParams(previous=>{const next=new URLSearchParams(previous);next.set('metodo',value);if(value!=='riam-1998'){next.delete('riam-banda');next.delete('riam-categoria');}return next;});
  const [legacyOpen,setLegacyOpen]=useState(false);
+ const [detailsOpen,setDetailsOpen]=useState(false);
+ const [expanded,setExpanded]=useState(false);
+ const workspace=useRef<HTMLDivElement>(null);
 
  const archive=useMemo(()=>active==='conesa-simplificado-tutorial-v1'
   ?oldConesaArchive(projectId):{present:false,valid:false,count:0},[projectId,active]);
@@ -274,7 +299,22 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
  const residualArchive=useMemo(()=>active==='conesa-simplificado-tutorial-v1'
   ?hasResidualArchive(projectId):false,[projectId,active]);
  const [simplifiedOpen,setSimplifiedOpen]=useState(false);
- return <div className="amb-method-hub" data-matrix-method-catalog="v1">
+ return <div ref={workspace} className={'amb-method-hub'+(detailsOpen?'':' is-compact')} data-matrix-method-catalog="v1"
+  data-workspace-expanded={expanded}>
+  <div className="amb-workspace-toolbar" aria-label="Espacio de trabajo de matrices">
+   <strong>Constructor de matrices <small>{projectId} · borrador local</small></strong>
+   <div>
+    <button type="button" onClick={()=>{
+     const target=[...workspace.current!.querySelectorAll<HTMLElement>('.amb-matrix-scroll,[data-conesa-phase-panel]')]
+      .find(node=>node.getBoundingClientRect().height>0);
+     if(target){if(!target.hasAttribute('tabindex'))target.tabIndex=-1;target.focus({preventScroll:true});target.scrollIntoView({block:'start'});}
+    }}>Ir a evaluación</button>
+    <button type="button" aria-expanded={detailsOpen} onClick={()=>setDetailsOpen(value=>!value)}>
+     {detailsOpen?'Ocultar descripción de métodos':'Ver descripción de métodos'}</button>
+    <button type="button" aria-pressed={expanded} onClick={()=>setExpanded(value=>!value)}>
+     {expanded?'Restaurar navegación':'Ampliar espacio de trabajo'}</button>
+   </div>
+  </div>
   <section className="amb-method-catalog" aria-label="Catálogo de métodos ambientales">
    <div className="amb-method-heading">
     <p className="amb-matrix-overline">HERRAMIENTAS · MATRICES AMBIENTALES</p>
@@ -318,7 +358,7 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
       </span>
       <span className="amb-method-source">{card.source}</span>
       {card.available?<button type="button" aria-pressed={active===card.id}
-       onClick={()=>setActive(card.id as ActiveMethod)}>
+       onClick={()=>{setActive(card.id as ActiveMethod);setDetailsOpen(false);}}>
        {active===card.id?<><Check size={15} strokeWidth={2.5}/> Método seleccionado</>
         :<>Abrir método <ArrowUpRight size={15}/></>}
       </button>
@@ -327,13 +367,14 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
     </div>;
    })}</div>
   </section>
-  <section className="amb-method-purpose" aria-label="Finalidades y etapas de las matrices">
+  <details hidden={!detailsOpen} className="amb-method-purpose" aria-label="Finalidades y etapas de las matrices">
+   <summary>Consultar otras finalidades y etapas</summary>
    <h4>Otros tipos de matrices: etapas y finalidades, no necesariamente otros métodos</h4>
    <p><strong>Valoración absoluta / relativa:</strong> etapas y ponderaciones que deben documentar su método base.
     <strong> Impactos residuales:</strong> valoración posterior a medidas de mitigación.
     <strong> Efectos acumulativos:</strong> análisis específico de interacciones y escenarios.
     <strong> Seguimiento del PGA:</strong> seguimiento de compromisos, indicadores y verificaciones, no una puntuación de impacto.</p>
-  </section>
+  </details>
   {active==='causa-leopold'
    ?<ImpactMatrixBuilder projectId={projectId} projectName={projectName} registeredImpacts={registeredImpacts}/>
    :active==='conesa-simplificado-tutorial-v1'
@@ -389,6 +430,7 @@ export function MatrixMethodHub({projectId,projectName,registeredImpacts,pgaData
          projectName={projectName} method="conesa-1997-2ex" readOnly/>}
       </section>}
      </>
+     :active==='battelle'?<BattellePanel key={projectId+':battelle'} projectId={projectId} projectName={projectName}/>
      :<ScoredMatrix key={projectId+':'+active} projectId={projectId} projectName={projectName} method={active}/>}
  </div>;
 }

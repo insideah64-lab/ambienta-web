@@ -11,14 +11,15 @@
     "test": "node --test ../../tests/react-v2/*.test.mjs"
   },
   "dependencies": {
+    "@santi020k/lumen-react": "4.3.0",
     "@supabase/supabase-js": "2.118.0",
     "@tanstack/react-query": "^5.90.0",
+    "@turf/intersect": "^7.2.0",
     "lucide-react": "^0.468.0",
+    "maplibre-gl": "5.19.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-router-dom": "^7.9.5",
-    "maplibre-gl": "5.19.0",
-    "@turf/intersect": "^7.2.0"
+    "react-router-dom": "^7.9.5"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.15",

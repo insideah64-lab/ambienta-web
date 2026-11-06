@@ -1,0 +1,26 @@
+[
+  {
+    "width": 1366,
+    "status": "PASS",
+    "realSatellite": true,
+    "project": "DIAB-2026-DEMO",
+    "seriesId": "6ea60b7337eb52a9e9c51311f5796647",
+    "downloads": 3,
+    "reload": true,
+    "errors": [],
+    "network": [],
+    "localStorageUnchanged": true
+  },
+  {
+    "width": 1800,
+    "status": "PASS",
+    "realSatellite": true,
+    "project": "DIAB-2026-DEMO",
+    "seriesId": "6ea60b7337eb52a9e9c51311f5796647",
+    "downloads": 3,
+    "reload": true,
+    "errors": [],
+    "network": [],
+    "localStorageUnchanged": true
+  }
+]

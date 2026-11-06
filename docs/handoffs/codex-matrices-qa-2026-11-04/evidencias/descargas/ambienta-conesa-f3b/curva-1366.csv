@@ -1,0 +1,8 @@
+﻿"Factor";"Indicador";"Unidad";"Tipo";"SIN";"Fecha SIN";"Fuente SIN";"CON";"Fecha CON";"Fuente CON";"CA SIN";"CA CON";"Delta CA";"Delta magnitud";"Transformación";"Fuente transformación";"Método composición";"Avisos"
+"Calidad del aire";"Parámetro ambiental ficticio del QA";"mg/L";"directo";"20";"2026-10-01";"Línea de base de ensayo reproducible";"50";"2026-10-02";"Modelo predictivo de ensayo reproducible";"0.4";"1";"0.6";"30";"{""enabled"":true,""indicator"":""Parámetro ambiental ficticio del QA"",""unit"":""mg/L"",""origin"":""expertos"",""source"":""Acta sintética QA de panel ficticio, sin referencia al Anejo 4"",""bookPage"":null,""scope"":""Únicamente escenario ficticio de laboratorio entre M=0 y M=100"",""assessor"":""Equipo evaluador de prueba"",""evidence"":""Nudos sintéticos de prueba, no digitalización de la curva del libro"",""interpolation"":""tramos-lineales"",""points"":[{""m"":0,""ca"":0},{""m"":50,""ca"":1},{""m"":100,""ca"":0}]}";"Acta sintética QA de panel ficticio, sin referencia al Anejo 4";"Acciones del caso didáctico tratadas explícitamente";""
+"Agua superficial";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
+"Calidad del suelo";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
+"Vegetación";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
+"Fauna";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
+"Paisaje";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
+"Empleo local";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"

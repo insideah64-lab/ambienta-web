@@ -1,0 +1,66 @@
+[
+  {
+    "capture": "qa\\matrices-handoff\\local-before\\1366-initial-header.png",
+    "height": 76,
+    "inkTop": 33,
+    "inkBottom": 44,
+    "inkCenter": 38.5,
+    "cellCenter": 37.5
+  },
+  {
+    "capture": "qa\\matrices-handoff\\local-before\\1800-initial-header.png",
+    "height": 76,
+    "inkTop": 34,
+    "inkBottom": 45,
+    "inkCenter": 39.5,
+    "cellCenter": 37.5
+  },
+  {
+    "capture": "qa\\matrices-handoff\\pages-before\\1366-initial-header.png",
+    "height": 76,
+    "inkTop": 33,
+    "inkBottom": 44,
+    "inkCenter": 38.5,
+    "cellCenter": 37.5
+  },
+  {
+    "capture": "qa\\matrices-handoff\\pages-before\\1800-initial-header.png",
+    "height": 76,
+    "inkTop": 34,
+    "inkBottom": 45,
+    "inkCenter": 39.5,
+    "cellCenter": 37.5
+  },
+  {
+    "capture": "qa\\matrices-handoff\\local-verified\\1366-initial-header.png",
+    "height": 76,
+    "inkTop": 33,
+    "inkBottom": 44,
+    "inkCenter": 38.5,
+    "cellCenter": 37.5
+  },
+  {
+    "capture": "qa\\matrices-handoff\\local-verified\\1800-initial-header.png",
+    "height": 76,
+    "inkTop": 34,
+    "inkBottom": 45,
+    "inkCenter": 39.5,
+    "cellCenter": 37.5
+  },
+  {
+    "capture": "qa\\matrices-handoff\\pages-verified\\1366-initial-header.png",
+    "height": 76,
+    "inkTop": 33,
+    "inkBottom": 44,
+    "inkCenter": 38.5,
+    "cellCenter": 37.5
+  },
+  {
+    "capture": "qa\\matrices-handoff\\pages-verified\\1800-initial-header.png",
+    "height": 76,
+    "inkTop": 34,
+    "inkBottom": 45,
+    "inkCenter": 39.5,
+    "cellCenter": 37.5
+  }
+]

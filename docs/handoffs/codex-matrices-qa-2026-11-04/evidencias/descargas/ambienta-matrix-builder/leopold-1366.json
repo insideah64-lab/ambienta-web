@@ -1,0 +1,116 @@
+{
+  "schema": "ambienta.impact-matrix.v1",
+  "projectId": "DEMO-001",
+  "projectName": "Urbanización — expediente de ejemplo",
+  "updatedAt": "2026-11-04T17:33:03.773Z",
+  "actions": [
+    {
+      "id": "demo-a1",
+      "name": "Movimiento de suelos · ejemplo",
+      "phase": "construccion"
+    },
+    {
+      "id": "demo-a2",
+      "name": "Tránsito de maquinaria · ejemplo",
+      "phase": "construccion"
+    },
+    {
+      "id": "demo-a3",
+      "name": "Uso de agua · ejemplo",
+      "phase": "operacion"
+    },
+    {
+      "id": "demo-a4",
+      "name": "Revegetación · ejemplo",
+      "phase": "cierre"
+    },
+    {
+      "id": "a-0viwnwe8",
+      "name": "Restauración de humedales",
+      "phase": "operacion"
+    }
+  ],
+  "factors": [
+    {
+      "id": "demo-f1",
+      "name": "Calidad del aire",
+      "group": "Medio físico",
+      "weight": 1
+    },
+    {
+      "id": "demo-f2",
+      "name": "Agua superficial",
+      "group": "Medio físico",
+      "weight": 1
+    },
+    {
+      "id": "demo-f3",
+      "name": "Calidad del suelo",
+      "group": "Medio físico",
+      "weight": 1
+    },
+    {
+      "id": "demo-f4",
+      "name": "Vegetación",
+      "group": "Medio biótico",
+      "weight": 1
+    },
+    {
+      "id": "demo-f5",
+      "name": "Fauna",
+      "group": "Medio biótico",
+      "weight": 1
+    },
+    {
+      "id": "demo-f6",
+      "name": "Paisaje",
+      "group": "Perceptual",
+      "weight": 1
+    },
+    {
+      "id": "demo-f7",
+      "name": "Empleo local",
+      "group": "Socioeconómico",
+      "weight": 1
+    },
+    {
+      "id": "f-1y1jlrrv",
+      "name": "Suelo",
+      "group": "Importado del expediente",
+      "weight": 1
+    },
+    {
+      "id": "f-jlghij9a",
+      "name": "Agua",
+      "group": "Importado del expediente",
+      "weight": 1
+    },
+    {
+      "id": "f-dqmvlpzu",
+      "name": "Aire",
+      "group": "Importado del expediente",
+      "weight": 1
+    },
+    {
+      "id": "f-jzww73hi",
+      "name": "Biodiversidad",
+      "group": "Importado del expediente",
+      "weight": 1
+    },
+    {
+      "id": "f-2ignyaay",
+      "name": "Humedales de altura",
+      "group": "Medio biótico",
+      "weight": 1.5
+    }
+  ],
+  "cells": {
+    "demo-f1::demo-a1": {
+      "sign": -1,
+      "magnitude": 7,
+      "importance": 5,
+      "reason": "Hipótesis de laboratorio, sin mediciones ni observaciones de campo.",
+      "evidence": "Fuente pendiente de verificación"
+    }
+  }
+}

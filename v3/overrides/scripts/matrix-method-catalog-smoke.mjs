@@ -10,12 +10,12 @@ try{
   const context=await browser.newContext({viewport:{width,height:900},acceptDownloads:true,reducedMotion:'reduce'});
   const page=await context.newPage(),errors=[];
   page.on('pageerror',e=>errors.push(String(e)));
-  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
+  await page.goto((process.env.QA_BASE_URL||'http://127.0.0.1:8787/v3/')+'index.html#/matrices');
   await page.locator('[data-matrix-method-catalog="v1"]').waitFor();
   assert.equal(await page.locator('[data-catalog-method]').count(),4);
   assert.equal(await page.locator('[data-catalog-method^="conesa"]').count(),1);
   assert.equal((await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] .amb-method-cardcopy strong').innerText()).trim(),'Conesa');
-  assert.equal(await page.locator('[data-catalog-method="battelle"] button').count(),0);
+  assert.equal(await page.locator('[data-catalog-method="battelle"] button').count(),1);
   const ids=['causa-leopold','conesa-simplificado-tutorial-v1','riam-1998','battelle'];
   const accents=[];
   for(const id of ids){

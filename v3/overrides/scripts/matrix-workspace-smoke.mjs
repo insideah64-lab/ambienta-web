@@ -1,0 +1,119 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs/promises';
+import {chromium} from 'playwright';
+const out='qa/ambienta-matrix-workspace';
+await fs.mkdir(out,{recursive:true});
+const browser=await chromium.launch({headless:true});
+const results=[];
+try{
+ for(const width of [1366,1800]){
+  const context=await browser.newContext({viewport:{width,height:900},acceptDownloads:true,reducedMotion:'reduce'});
+  const page=await context.newPage(),errors=[];
+  page.on('pageerror',e=>errors.push(String(e)));
+  await page.goto((process.env.QA_BASE_URL||'http://127.0.0.1:8787/v3/')+'index.html#/matrices');
+  const grid=page.locator('[data-impact-matrix] .amb-matrix-grid');await grid.waitFor();
+  const density=[];
+  async function checkDensity(state){
+   const geometry=await grid.evaluate(table=>{
+    const rect=e=>e.getBoundingClientRect();
+    const rail=rect(table.querySelector('thead th'));
+    const label=table.querySelector('.amb-matrix-corner-label');
+    const range=document.createRange();range.selectNodeContents(label);const text=range.getBoundingClientRect();
+    return {railWidth:rail.width,cornerOffsetX:Math.abs(rail.x+rail.width/2-text.x-text.width/2),
+     cornerOffsetY:Math.abs(rail.y+rail.height/2-text.y-text.height/2),
+     rows:[...table.querySelectorAll('tbody tr')].map(row=>({height:rect(row).height,
+      bands:[...row.querySelectorAll('td')].map(td=>rect(td).height-rect(td.querySelector('button')).height)}))};
+   });
+   assert(Math.abs(geometry.railWidth-240)<1,'Factor rail must not absorb spare desktop width');
+   assert(geometry.cornerOffsetX<2&&geometry.cornerOffsetY<2,'Corner text must be centered in both axes');
+   for(const row of geometry.rows){
+    assert(row.height<=70,'Default rows must remain compact');
+    assert(row.bands.every(gap=>gap<2),'Evaluation button must fill its row without empty bands');
+   }
+   density.push({state,...geometry});
+   await page.locator('.amb-matrix-scroll').screenshot({path:out+'/density-'+state+'-'+width+'.png'});
+  }
+  await checkDensity('initial');
+  const stored=()=>page.evaluate(()=>localStorage.getItem('ambienta-impact-matrix-v1:DEMO-001'));
+  const untouched=await stored();
+  assert.equal(await page.locator('.amb-method-hub.is-compact').count(),1);
+  const top=await grid.evaluate(e=>e.getBoundingClientRect().top+scrollY);
+  assert(top<1150,'The workbench must not be buried beneath presentation panels');
+  const baseWidth=(await grid.locator('..').boundingBox()).width;
+  await page.getByRole('button',{name:'Ver descripción de métodos',exact:true}).click();
+  await page.locator('[data-catalog-method="causa-leopold"] button').click();
+  assert.equal(await page.locator('.amb-method-hub.is-compact').count(),1);
+  await page.getByRole('button',{name:'Ampliar espacio de trabajo',exact:true}).click();
+  const expandedWidth=(await grid.locator('..').boundingBox()).width;
+  if(width>1000)assert(expandedWidth>baseWidth+150,'Expanded workspace must recover sidebar width');
+  assert.equal(await stored(),untouched,'Presentation controls must not create or rewrite matrix storage');
+  await checkDensity('expanded');
+  await page.getByRole('button',{name:'Mostrar editor',exact:true}).click();
+  await checkDensity('expanded-with-editor');
+  await page.getByRole('button',{name:'Ocultar editor',exact:true}).click();
+  await page.screenshot({path:out+'/expanded-'+width+'.png',fullPage:true});
+  await page.getByRole('button',{name:'Restaurar navegación',exact:true}).click();
+  await page.screenshot({path:out+'/initial-'+width+'.png',fullPage:true});
+  await grid.locator('thead').screenshot({path:out+'/header-'+width+'.png'});
+  await page.getByRole('button',{name:'Ir a evaluación',exact:true}).click();
+  assert.equal(await page.locator('.amb-matrix-scroll').evaluate(node=>node===document.activeElement),true);
+  await page.screenshot({path:out+'/workbench-'+width+'.png'});
+  assert.equal(await page.locator('[data-matrix-unassessed]').innerText(),'28');
+  await page.getByRole('button',{name:'Siguiente pendiente de valorar',exact:true}).click();
+  await page.getByRole('button',{name:'− Adverso',exact:true}).click();
+  await page.getByRole('combobox',{name:'Magnitud del impacto',exact:true}).selectOption('7');
+  await page.getByRole('combobox',{name:'Importancia del impacto',exact:true}).selectOption('5');
+  assert.equal(await page.locator('[data-matrix-undocumented]').innerText(),'1');
+  assert.equal(await page.locator('[data-matrix-documented]').innerText(),'0');
+  assert.match(await page.locator('[data-matrix-cell-documentation]').innerText(),/fundamento técnico y referencia documental/);
+  const first=grid.locator('tbody .amb-matrix-cell').first();
+  assert.equal((await first.innerText()).trim(),'−7/5');
+  await page.getByRole('button',{name:'Ocultar editor',exact:true}).click();
+  assert.equal(await page.locator('[data-matrix-inspector]').isVisible(),false);
+  await page.getByRole('button',{name:'Siguiente por documentar',exact:true}).click();
+  assert.equal(await page.locator('[data-matrix-inspector]').isVisible(),true);
+  await page.getByPlaceholder('Describir relación causal, escenario, temporalidad e incertidumbre…').fill('Ejemplo ficticio de QA para probar documentación, sin observaciones de campo.');
+  await page.getByPlaceholder('Código, página, enlace o informe verificable…').fill('Acta sintética QA-001');
+  assert.equal(await page.locator('[data-matrix-documented]').innerText(),'1');
+  assert.equal(await page.locator('[data-matrix-undocumented]').innerText(),'0');
+  await first.focus();await page.keyboard.press('ArrowRight');
+  assert.equal(await grid.locator('tbody .amb-matrix-cell').nth(1).getAttribute('aria-pressed'),'true');
+  await page.getByRole('button',{name:'∅ Sin interacción',exact:true}).click();
+  assert.match(await page.locator('[data-matrix-cell-documentation]').innerText(),/Sin interacción declarada/);
+  assert.equal(await page.getByRole('combobox',{name:'Magnitud del impacto',exact:true}).count(),0);
+  await grid.locator('tbody .amb-matrix-cell').nth(1).focus();
+  await page.keyboard.press('End');
+  assert.equal(await grid.locator('tbody .amb-matrix-cell').nth(3).getAttribute('aria-pressed'),'true');
+  await page.keyboard.press('ArrowDown');
+  assert.equal(await grid.locator('tbody .amb-matrix-cell').nth(7).getAttribute('aria-pressed'),'true');
+  await first.click();
+  // Historic payload remains exportable but does not inflate the current catalog's counters.
+  await page.evaluate(()=>{
+   const key='ambienta-impact-matrix-v1:DEMO-001',doc=JSON.parse(localStorage.getItem(key));
+   doc.cells['historic-factor::removed-action']={sign:-1,magnitude:9,importance:9,reason:'Histórico ficticio QA',evidence:'Archivo sintético'};
+   localStorage.setItem(key,JSON.stringify(doc));
+  });
+  await page.reload();await grid.waitFor();await first.click();
+  assert.equal(await page.locator('[data-matrix-unassessed]').innerText(),'26');
+  assert.equal(await page.locator('[data-matrix-documented]').innerText(),'1');
+  await page.screenshot({path:out+'/documented-'+width+'.png',fullPage:true});
+  if(width>=1366)await page.locator('[data-matrix-canvas]').screenshot({path:out+'/editor-'+width+'.png'});
+  await page.reload();await grid.waitFor();
+  assert.equal((await first.innerText()).trim(),'−7/5');
+  assert.equal(await page.locator('[data-matrix-documented]').innerText(),'1');
+  const downloadEvent=page.waitForEvent('download');
+  await page.locator('[data-impact-matrix] .amb-matrix-exports').getByRole('button',{name:'JSON',exact:true}).click();
+  const download=await downloadEvent;const filename=out+'/matrix-'+width+'.json';await download.saveAs(filename);
+  const doc=JSON.parse(await fs.readFile(filename,'utf8'));
+  assert.equal(doc.cells['demo-f1::demo-a1'].magnitude,7);assert.equal(doc.cells['demo-f1::demo-a1'].importance,5);
+  assert.equal(doc.schema,'ambienta.impact-matrix.v1');
+  assert.equal(doc.cells['historic-factor::removed-action'].magnitude,9,'Keep historic cells intact in export');
+  const overflow=await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1);
+  assert.equal(overflow,false,'Page must not overflow horizontally; grid owns its scroll');
+  assert.deepEqual(errors,[]);
+  results.push({width,status:'PASS',initialGridTop:top,baseWidth,expandedWidth,density,errors});
+  await context.close();
+ }
+}finally{await browser.close();}
+await fs.writeFile(out+'/results.json',JSON.stringify(results,null,2));
+console.log(JSON.stringify(results));

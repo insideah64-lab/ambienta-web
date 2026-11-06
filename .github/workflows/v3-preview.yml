@@ -74,6 +74,19 @@ jobs:
           node apps/web-v3/scripts/ambienta-iconography-smoke.mjs
           node apps/web-v3/scripts/icon-coverage-smoke.mjs
           node apps/web-v3/scripts/impact-matrix-builder-smoke.mjs
+          node apps/web-v3/scripts/matrix-workspace-smoke.mjs
+          node apps/web-v3/scripts/demo-project-matrices-smoke.mjs
+          node apps/web-v3/scripts/battelle-smoke.mjs
+          node apps/web-v3/scripts/battelle-demo-pack-smoke.mjs
+          node apps/web-v3/scripts/baseline-smoke.mjs
+          node apps/web-v3/scripts/riam-interpretation-smoke.mjs
+          node apps/web-v3/scripts/mita-results-smoke.mjs
+          node apps/web-v3/scripts/ndvi-workbench-smoke.mjs
+          node apps/web-v3/scripts/no2-workbench-smoke.mjs
+          node apps/web-v3/scripts/vegetation-workbench-smoke.mjs
+          node apps/web-v3/scripts/temporal-workbench-smoke.mjs
+          node apps/web-v3/scripts/temporal-public-smoke.mjs
+          node apps/web-v3/scripts/matrices-p0-diagnostic.mjs
           node apps/web-v3/scripts/conesa-simplificado-excel-parity-smoke.mjs
           node apps/web-v3/scripts/conesa-libro-1997-smoke.mjs
           node apps/web-v3/scripts/conesa-libro-f2-smoke.mjs
@@ -93,6 +106,35 @@ jobs:
           node apps/web-v3/scripts/georef-real-smoke.mjs
           node apps/web-v3/scripts/sig-gateway-smoke.mjs
           sha256sum -c /tmp/ambienta-v1-v2.sha
+      - name: Diagnóstico P0 de matrices y descargas verificadas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ambienta-matrices-handoff-qa
+          path: |
+            qa/matrices-handoff/
+            qa/ambienta-matrix-workspace/
+            qa/ambienta-demo-project-matrices/
+            qa/ambienta-battelle/
+            qa/ambienta-battelle-demo-pack/
+            qa/ambienta-baseline/
+            qa/ambienta-riam/
+            qa/ambienta-mita/
+            qa/ambienta-ndvi/
+            qa/ambienta-no2/
+            qa/ambienta-vegetation/
+            qa/ambienta-temporal/
+            qa/ambienta-temporal-public/
+            qa/ambienta-matrix-builder/*.json
+            qa/ambienta-matrix-builder/*.csv
+            qa/ambienta-conesa-f2/*.json
+            qa/ambienta-conesa-f2/*.csv
+            qa/ambienta-conesa-f3a/*.json
+            qa/ambienta-conesa-f3a/*.csv
+            qa/ambienta-conesa-f3b/*.json
+            qa/ambienta-conesa-f3b/*.csv
+          retention-days: 30
+          if-no-files-found: error
       - name: Guardar capturas QA Diablillos (Área y SIG)
         if: always()
         uses: actions/upload-artifact@v4

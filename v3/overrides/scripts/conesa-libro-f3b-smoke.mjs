@@ -15,7 +15,7 @@ try{
    await page.locator('[data-catalog-method="conesa-simplificado-tutorial-v1"] button').click();
    await page.locator('[data-conesa-book]').waitFor();
   }
-  await page.goto('http://127.0.0.1:8787/v3/index.html?caso=diablillos#/matrices');
+  await page.goto((process.env.QA_BASE_URL||'http://127.0.0.1:8787/v3/')+'index.html#/matrices');
   await open();
   await page.locator('[data-conesa-phase-tab="f3a"]').click();
   const f3=page.locator('[data-conesa-f3]');
@@ -34,12 +34,12 @@ try{
   await editor.getByRole('textbox',{name:'F3 función fuente'}).fill('Fuente de control lineal ficticia QA');
   await editor.getByRole('textbox',{name:'F3 función alcance'}).fill('Solo para regresión local y valores de 0 a 100');
   await editor.getByRole('spinbutton',{name:'F3 without magnitud'}).fill('20');
-  await editor.getByRole('spinbutton',{name:'F3 withProject magnitud'}).fill('75');
+  await editor.getByRole('spinbutton',{name:'F3 withProject magnitud'}).fill('50');
   await editor.getByLabel('F3 without fecha').fill('2026-10-01');
   await editor.getByLabel('F3 withProject fecha').fill('2026-10-02');
   await editor.getByRole('textbox',{name:'F3 without fuente'}).fill('Línea de base de ensayo reproducible');
   await editor.getByRole('textbox',{name:'F3 withProject fuente'}).fill('Modelo predictivo de ensayo reproducible');
-  assert.match(await editor.locator('[data-f3-results]').innerText(),/-0.5500/);
+  assert.match(await editor.locator('[data-f3-results]').innerText(),/-0.3000/);
   const f3aKey=await page.evaluate(()=>Object.keys(localStorage)
    .find(k=>k.startsWith('ambienta-conesa-libro-1997-f3a:')));
   assert(f3aKey);
@@ -53,9 +53,10 @@ try{
   assert.equal(await editor.locator('[data-f3-results]').count(),0,
    'F3b pending provenance must not silently fall back to existing F3a scores');
   assert.match(await editor.locator('[data-f3b-issues]').innerText(),/fuente/i);
+  await editor.getByRole('combobox',{name:'F3b procedencia'}).selectOption('expertos');
   await editor.getByRole('textbox',{name:'F3b fuente'})
-   .fill('Conesa 1997, Anejo 4, ejemplo didáctico revisado');
-  await editor.getByRole('spinbutton',{name:'F3b página'}).fill('267');
+   .fill('Acta sintética QA de panel ficticio, sin referencia al Anejo 4');
+  assert.equal(await editor.getByRole('spinbutton',{name:'F3b página'}).count(),0);
   await editor.getByRole('textbox',{name:'F3b responsable'}).fill('Equipo evaluador de prueba');
   await editor.getByRole('textbox',{name:'F3b ámbito'})
    .fill('Únicamente escenario ficticio de laboratorio entre M=0 y M=100');
@@ -70,8 +71,12 @@ try{
   await editor.getByRole('spinbutton',{name:'F3b CA nudo 3'}).fill('0');
   assert.equal(await editor.locator('[data-f3b-ready]').count(),1);
   const f3bOutput=await editor.locator('[data-f3-results]').innerText();
-  assert(f3bOutput.includes('0.4000')&&f3bOutput.includes('0.5000')
-   &&f3bOutput.includes('0.1000'),f3bOutput);
+  assert(f3bOutput.includes('0.4000')&&f3bOutput.includes('1.0000')
+   &&f3bOutput.includes('0.6000'),f3bOutput);
+  await editor.getByRole('textbox',{name:'F3b evidencia'}).fill('');
+  assert.equal(await editor.locator('[data-f3-results]').count(),0);
+  assert.match(await editor.locator('[data-f3b-issues]').innerText(),/evidencia/i);
+  await editor.getByRole('textbox',{name:'F3b evidencia'}).fill('Nudos sintéticos de prueba, no digitalización de la curva del libro');
   assert.equal(await f3.locator('[data-f3b-workspace]').count(),1);
   assert.equal(await f3.locator('[data-f3a-workspace]').count(),0,
    'Curves must not repeat the SIN/CON comparison page');
@@ -83,7 +88,12 @@ try{
   assert.equal(await f3.locator('[data-f3-chart-row]').count(),1);
   await f3.locator('.amb-f3-quality-disclosure summary').click();
   const compare=await f3.locator('.amb-f3-quality-disclosure tbody').innerText();
-  assert(compare.includes('F3b · interpolación por tramos')&&compare.includes('0.1000'),compare);
+  assert(compare.includes('F3b · interpolación por tramos')&&compare.includes('0.6000'),compare);
+  assert.equal(await f3.locator('.amb-f3-quality-count').innerText(),'1 de 7 factores calculables');
+  const [curveCSV]=await Promise.all([page.waitForEvent('download'),f3.getByRole('button',{name:'CSV F3a/F3b'}).click()]);
+  await curveCSV.saveAs(out+'/curva-'+width+'.csv');
+  const curveText=await fs.readFile(await curveCSV.path(),'utf8');
+  assert(curveText.includes('0.4')&&curveText.includes('0.6')&&curveText.includes('tramos-lineales'));
   await page.locator('[data-conesa-phase-tab="f3b"]').click();
   const f3bKey=await page.evaluate(()=>Object.keys(localStorage)
    .find(k=>k.startsWith('ambienta-conesa-libro-1997-f3b:')));
@@ -92,7 +102,11 @@ try{
    page.waitForEvent('download'),f3.getByRole('button',{name:'JSON Curvas F3b'}).click()
   ]);
   const saved=JSON.parse(await fs.readFile(await download.path(),'utf8'));
+  await download.saveAs(out+'/curva-'+width+'.json');
   assert.equal(saved.methodId,'conesa-libro-1997-f3b');
+  assert.equal(saved.projectId,'DEMO-001');
+  assert.equal(Object.values(saved.records)[0].origin,'expertos');
+  assert.deepEqual(Object.values(saved.records)[0].points,[{m:0,ca:0},{m:50,ca:1},{m:100,ca:0}]);
   assert.equal(Object.values(saved.records)[0].points.length,3);
   assert.equal(await page.evaluate(k=>localStorage.getItem(k),f3aKey),f3aRaw,
    'F3b edits must not rewrite existing F3a draft');
@@ -102,15 +116,15 @@ try{
   assert.equal(await editor.locator('[data-f3-results]').count(),0,
    'F3b must not show F3a linear output as a curve interpolation');
   await page.locator('[data-conesa-phase-tab="f3a"]').click();
-  assert.match(await editor.locator('[data-f3-results]').innerText(),/-0.5500/,
+  assert.match(await editor.locator('[data-f3-results]').innerText(),/-0.3000/,
    'Linear result remains available in the environmental quality tab');
   await page.locator('[data-conesa-phase-tab="f3b"]').click();
   await editor.getByRole('combobox',{name:'F3 tipo de función'}).selectOption('curva');
-  assert.match(await editor.locator('[data-f3-results]').innerText(),/0.1000/);
+  assert.match(await editor.locator('[data-f3-results]').innerText(),/0.6000/);
   await page.reload();await open();await page.locator('[data-conesa-phase-tab="f3b"]').click();
   await f3.locator('[data-f3-factor]').first().click();
   assert.equal(await editor.getByRole('combobox',{name:'F3 tipo de función'}).inputValue(),'curva');
-  assert.match(await editor.locator('[data-f3-results]').innerText(),/0.1000/);
+  assert.match(await editor.locator('[data-f3-results]').innerText(),/0.6000/);
   await page.evaluate(k=>localStorage.setItem(k,'{damaged-F3b-draft'),f3bKey);
   await page.reload();await open();await page.locator('[data-conesa-phase-tab="f3b"]').click();
   assert.equal(await f3.locator('[data-f3b-damaged]').count(),1);
@@ -123,7 +137,7 @@ try{
   assert.equal(await page.evaluate(k=>localStorage.getItem(k),f3aKey),f3aRaw);
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({status:'PASS',width,curvePoints:3,
-   nonMonotone:true,deltaCA:0.1,independent:true,corruptedPreserved:true}));
+   nonMonotone:true,deltaCA:0.6,independent:true,corruptedPreserved:true}));
   await ctx.close();
  }
 }finally{await browser.close();}

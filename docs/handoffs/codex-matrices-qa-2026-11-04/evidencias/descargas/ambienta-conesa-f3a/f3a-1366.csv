@@ -1,0 +1,8 @@
+﻿"Factor";"Indicador";"Unidad";"Tipo";"SIN";"Fecha SIN";"Fuente SIN";"CON";"Fecha CON";"Fuente CON";"CA SIN";"CA CON";"Delta CA";"Delta magnitud";"Transformación";"Fuente transformación";"Método composición";"Avisos"
+"Calidad del aire";"Parámetro ficticio QA";"mg/L";"directo";"20";"2026-10-01";"Informe técnico de ensayo sin proyecto";"50";"2026-10-02";"Informe predictivo de ensayo con proyecto";"0.8";"0.5";"'-0.30000000000000004";"30";"{""kind"":""lineal"",""min"":0,""max"":100,""orientation"":""decreciente"",""source"":""Acta técnica de transformación ficticia QA"",""scope"":""Solo para prueba de regresión en dominio 0 a 100""}";"Acta técnica de transformación ficticia QA";"Composición individual del ensayo didáctico sin sinergia";""
+"Agua superficial";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
+"Calidad del suelo";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
+"Vegetación";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
+"Fauna";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
+"Paisaje";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
+"Empleo local";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"";"Indicador y escenarios aún no registrados"
