@@ -2,7 +2,7 @@
 
 Primera entrega de seguimiento sobre cualquier Polygon/MultiPolygon WGS84 admitido por el piloto, incluidos huecos. Se integra en **Vegetación → Tipo de análisis → Seguimiento temporal**. No modifica los esquemas, almacenamiento ni fórmulas aprobadas de resultados anteriores.
 
-Estado de publicación: **HOLD**. Preparar PRs borrador apilados sobre web #100 y motor privado #13. No fusionar ni desplegar; CI de los nuevos HEAD pendiente al escribir este documento. El cierre de CI se registra en los PRs y en el archivo de estado posterior.
+Estado de publicación: **HOLD**. PRs borrador: [web #101](https://github.com/insideah64-lab/ambienta-web/pull/101), apilado sobre #100, y [motor privado #14](https://github.com/insideah64-lab/plataforma-ambiental-argentina/pull/14), apilado sobre #13. No fusionar ni desplegar; Motor HEAD `569b5aa2b527ebf988faa77fce35d682c14e7087`: CI completo PASS (runs 42157701591 y 42157765814, Python 3.11/3.12 y web). Web código HEAD `5cf81417ba2a8a926a0357e33c6d64c324626a05`; el commit posterior solo incorpora documentación y evidencia autorizada. CI web completo PASS para ese HEAD: run 42157912886, incluidos navegador, diagnóstico P0, exportaciones y 44 pasos satisfactorios. Esta actualización documental se apila en un PR separado sobre #101; no cambia el código probado. El cierre de CI se registra en los PRs y en el archivo de estado posterior.
 
 Bases verificadas: web `a3f14ec4c94385074d0ee40848a5105d139ebfb8`; motor `d66860baf13f4c2a357441daae550200f510c05b`. Main público sigue en `841f1356f86a3561be70fb0d3c7ce961a8d3640b`. Rama nueva `feature/mita-seguimiento-temporal-2026-11-06`.
 
@@ -35,6 +35,10 @@ SHA-256 del GeoTIFF descargado: `9f1ea44e6dc318766724b71047c99a477a13d7d8fd6a2f1
 
 Evidencia local: `work/temporal-real-qa/`: JSON/CSV/GeoTIFF descargados a 1366 y 1800, capturas full/result/chart/change, `results.json`, `numerical-audit.json`. Se abrieron y revisaron visualmente **full, chart y change en ambos anchos**. Copia de capturas y auditorías en `evidencias-mita-temporal/`; las pruebas CI utilizan fixtures marcados SYNTHETIC, separados de estas adquisiciones reales.
 
+También se crearon series reales SAVI `0511753bf916f015f2799de719e935fc`, MSAVI2 `28c08afa23c6b80c94fce069d5b1be4d` y EVI `e9c224d020d24c12707a5ffe4e594063` a partir de las mismas adquisiciones. Sus GeoTIFF descargados coinciden exactamente con final−inicial calculado independientemente. Las diferencias medias son +0,0039262987, +0,0033750234 y +0,0038099100, respectivamente. No se descargaron nuevas escenas para esta comprobación.
+
+La revisión automática detuvo inicialmente la carga binaria de capturas por falta de autorización pública explícita. El usuario autorizó después publicar las seis capturas y los informes JSON/CSV en este repositorio público; se adjuntan en `evidencias-mita-temporal/` con manifiesto SHA-256. Las copias JPEG son compactas para revisión; los PNG a resolución original y los GeoTIFF descargados permanecen en el archivo de continuidad local.
+
 ## Resultados
 
 | Verificación | Estado | Evidencia |
@@ -47,10 +51,13 @@ Evidencia local: `work/temporal-real-qa/`: JSON/CSV/GeoTIFF descargados a 1366 y
 | Tanda real de 4 fechas y recarga con trabajo en curso | PASS | 4 terminadas, 1 reutilizada; 1 excluida por calidad al construir serie |
 | Exportaciones y recálculo independiente reales | PASS | JSON/CSV/GeoTIFF descargados en ambos anchos; hash y valores exactos |
 | Consola/red y revisión visual real | PASS | sin pageerrors ni HTTP >=400; capturas abiertas |
-| CI completo de nuevos PRs | NOT_RUN | registrar cierre por HEAD en PRs |
+| CI completo del motor #14 | PASS | runs 42157701591 y 42157765814, Python 3.11/3.12 y web |
+| CI completo web #101 | PASS | run 42157912886, HEAD `5cf81417ba2a8a926a0357e33c6d64c324626a05`, 44 pasos satisfactorios |
+| Publicación de evidencia real autorizada | PASS | seis capturas JPEG, JSON/CSV y manifiesto; autorización explícita posterior al bloqueo |
+| SAVI, MSAVI2 y EVI temporales reales | PASS | GeoTIFF descargados, diferencias exactas sobre las mismas adquisiciones |
 | Despliegue/GitHub Pages de esta entrega | NOT_RUN | HOLD; no publicado |
 | Validación agronómica independiente y causal | NOT_RUN | requiere campo, cultivo, clima y protocolo |
-| Serie temporal Landsat real, otros polígonos reales e índices distintos de NDVI en vivo | NOT_RUN | perfiles existentes y tests sintéticos; ampliar QA en siguiente etapa |
+| Serie temporal Landsat real y otros polígonos reales | NOT_RUN | perfiles existentes y tests sintéticos; ampliar QA en siguiente etapa |
 
 ## Continuación
 
