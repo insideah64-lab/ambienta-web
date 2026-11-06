@@ -84,6 +84,7 @@ jobs:
           node apps/web-v3/scripts/ndvi-workbench-smoke.mjs
           node apps/web-v3/scripts/no2-workbench-smoke.mjs
           node apps/web-v3/scripts/vegetation-workbench-smoke.mjs
+          node apps/web-v3/scripts/temporal-workbench-smoke.mjs
           node apps/web-v3/scripts/matrices-p0-diagnostic.mjs
           node apps/web-v3/scripts/conesa-simplificado-excel-parity-smoke.mjs
           node apps/web-v3/scripts/conesa-libro-1997-smoke.mjs
@@ -121,6 +122,7 @@ jobs:
             qa/ambienta-ndvi/
             qa/ambienta-no2/
             qa/ambienta-vegetation/
+            qa/ambienta-temporal/
             qa/ambienta-matrix-builder/*.json
             qa/ambienta-matrix-builder/*.csv
             qa/ambienta-conesa-f2/*.json
